@@ -1,0 +1,96 @@
+---
+layout: page
+title: Grade Calculator
+permalink: /grade-calculator/
+---
+
+ <h1>Final Grade Calculator</h1>
+
+  <div id="controls">
+    <label for="currentGrade">Current Semester Grade (%):</label>
+    <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
+    <button id="calculate">Calculate</button>
+  </div>
+
+  <table id="results" hidden>
+    <thead>
+      <tr>
+        <th>Letter Grade</th>
+        <th>Threshold (%)</th>
+        <th>Needed on Final (%)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const gradeScale = [
+      { name: 'A+', low: 98 },
+      { name: 'A',  low: 93 },
+      { name: 'A-', low: 90 },
+      { name: 'B+', low: 87 },
+      { name: 'B',  low: 83 },
+      { name: 'B-', low: 80 },
+      { name: 'C+', low: 77 },
+      { name: 'C',  low: 73 },
+      { name: 'C-', low: 70 },
+      { name: 'D+', low: 67 },
+      { name: 'D',  low: 63 },
+      { name: 'D-', low: 60 },
+      { name: 'F',  low: 0  }
+    ];
+
+    function neededFinal(current, target) {
+      return (target - current * 0.8) / 0.2;
+    }
+
+    document.getElementById('calculate').addEventListener('click', () => {
+      const current = parseFloat(document.getElementById('currentGrade').value);
+      if (isNaN(current)) {
+        alert('Please enter a valid current grade.');
+        return;
+      }
+
+      // Calculate needs for all grades
+      const results = gradeScale.map(g => {
+        const need = neededFinal(current, g.low);
+        return { ...g, need };
+      });
+
+      // Find highest guaranteed grade index
+      const guaranteedIndex = results.findIndex(r => r.need <= 0);
+
+      // Determine which grades to display
+      const displayResults = (guaranteedIndex >= 0)
+        ? results.slice(0, guaranteedIndex + 1)
+        : results;
+
+      // Render table
+      const table = document.getElementById('results');
+      const tbody = table.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      displayResults.forEach(r => {
+        let display = r.need.toFixed(2);
+        let cls = '';
+
+        if (r.need > 100) {
+          display = 'Not possible';
+          cls = 'impossible';
+        } else if (r.need <= 0) {
+          display = 'Guaranteed';
+          cls = 'guaranteed';
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${r.name}</td>
+          <td>${r.low.toFixed(2)}</td>
+          <td class="${cls}">${display}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      table.hidden = false;
+    });
+  </script>
