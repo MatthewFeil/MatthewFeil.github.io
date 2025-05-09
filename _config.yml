@@ -5,7 +5,7 @@ author:
 # The `>` after `description:` means to ignore line-breaks until next key.
 # If you want to omit the line-break after the end of text, use `>-` instead.
 description: >
-  The blog of a freshman in high school with a passion for music, audio technology, and coding.
+  The website of Matthew Feil, a high school student with a passion for music and technology.
 
 # Build settings
 
