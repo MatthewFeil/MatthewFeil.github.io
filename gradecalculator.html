@@ -3,15 +3,102 @@ layout: page
 title: Grade Calculator
 permalink: /grade-calculator/
 ---
+<style>
+    /* Light mode styles */
+    body {
+      background: #fff;
+      color: #000;
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 2em auto;
+      padding: 1em;
+    }
 
- <h1>Final Grade Calculator</h1>
+    /* Controls container to keep input and button aligned */
+    #controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin: 0.5em 0;
+    }
 
-  <div id="controls">
+    /* Reset margins on inline inputs/buttons */
+    input,
+    button {
+      font-size: 1em;
+      padding: 0.5em;
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      text-align: center;
+    }
+
+    th {
+      background: #f4f4f4;
+    }
+
+    .impossible {
+      color: #d00;
+    }
+
+    .guaranteed {
+      color: #080;
+    }
+
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #121212;
+        color: #e0e0e0;
+      }
+
+      input,
+      button {
+        background: #1e1e1e;
+        color: #e0e0e0;
+        border: 1px solid #444;
+      }
+
+      table {
+        border-color: #444;
+      }
+
+      th,
+      td {
+        border: 1px solid #444;
+      }
+
+      th {
+        background: #2a2a2a;
+      }
+
+      .impossible {
+        color: #ff6b6b;
+      }
+
+      .guaranteed {
+        color: #6bff6b;
+      }
+    }
+  </style>
+  
+   <div id="controls">
     <label for="currentGrade">Current Semester Grade (%):</label>
     <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
     <button id="calculate">Calculate</button>
   </div>
-
+<br>
   <table id="results" hidden>
     <thead>
       <tr>
