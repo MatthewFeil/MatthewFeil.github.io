@@ -4,171 +4,113 @@ title: Grade Calculator
 permalink: /grade-calculator/
 ---
 <style>
-    /* Controls container to keep input and button aligned */
+    /* Container for the calculator */
+    .calculator {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 2em auto;
+      padding: 1em;
+    }
+
+    /* Controls: label, input, button inline */
     #controls {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
       gap: 0.5em;
+      flex-wrap: wrap;
       margin: 0.5em 0;
     }
 
-    /* Reset margins on inline inputs/buttons */
-    input,
-    button {
+    /* Inputs and buttons with explicit borders */
+    .calculator input,
+    .calculator button {
+      -webkit-appearance: none;
+      background-color: var(--color-canvas-default, #fff);
+      color: var(--color-text-primary, #000);
+      border: 1px solid var(--color-text-secondary, #888);
+      border-radius: var(--border-radius, 4px);
+      padding: 0.5em 0.75em;
       font-size: 1em;
-      padding: 0.5em;
-      margin: 0;
     }
 
+    /* Button accent styling */
+    .calculator button {
+      background-color: var(--color-primary, #0366d6);
+      color: var(--color-primary-foreground, #fff);
+      cursor: pointer;
+    }
+
+    /* Table styling */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1em;
     }
-
-    th,
-    td {
+    th, td {
       border: 1px solid #ccc;
       padding: 0.5em;
       text-align: center;
     }
+    th { background: #f4f4f4; }
+    .impossible { color: #d00; }
+    .guaranteed { color: #080; }
 
-    th {
-      background: #f4f4f4;
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+      .calculator input,
+      .calculator button {
+        background-color: var(--color-bg-contrast, #1e1e1e);
+        color: var(--color-text-primary, #e0e0e0);
+        border-color: var(--color-text-secondary, #444);
+      }
+      th, td { border-color: #444; }
+      th { background: #2a2a2a; }
     }
-
-    .impossible {
-      color: #d00;
-    }
-
-    .guaranteed {
-      color: #080;
-    }
-
-    .calculator input,
-.calculator button {
-  /* keep your existing styles… */
-  -webkit-appearance: none;
-  background-color: var(--color-canvas-default);
-  color:            var(--color-text-primary);
-  border-radius:    var(--border-radius);
-  padding:          0.5em 0.75em;
-  font-size:        1em;
-
-  /* ← add this: */
-  border: 1px solid var(--color-text-secondary);
-}
-
-/* Button accent style */
-.calculator button {
-  background-color: var(--color-primary);
-  color:            var(--color-primary-foreground);
-  cursor:           pointer;
-
-  /* override the shared border if you want it the same accent color */
-  /* border: 1px solid var(--color-primary); */
-}
-
-@media (prefers-color-scheme: dark) {
-  .calculator input,
-  .calculator button {
-    background-color: var(--color-bg-contrast);
-    color:            var(--color-text-primary);
-    /* dark-mode border: */
-    border: 1px solid var(--color-text-secondary);
-  }
-}
-
   </style>
-
-<div class="calculator">
-   <div id="controls">
-    <label for="currentGrade">Current Semester Grade (%):</label>
-    <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
-    <button id="calculate">Calculate</button>
+</head>
+<body>
+  <div class="calculator">
+    <h1>Grade Needed Calculator (Debug)</h1>
+    <div id="controls">
+      <label for="currentGrade">Current Semester Grade (%):</label>
+      <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
+      <button id="calculate">Calculate</button>
+    </div>
+    <table id="results" hidden>
+      <thead>
+        <tr>
+          <th>Letter Grade</th>
+          <th>Threshold (%)</th>
+          <th>Needed on Final (%)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-  <table id="results" hidden>
-    <thead>
-      <tr>
-        <th>Letter Grade</th>
-        <th>Threshold (%)</th>
-        <th>Needed on Final (%)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-
   <script>
     const gradeScale = [
-      { name: 'A+', low: 98 },
-      { name: 'A',  low: 93 },
-      { name: 'A-', low: 90 },
-      { name: 'B+', low: 87 },
-      { name: 'B',  low: 83 },
-      { name: 'B-', low: 80 },
-      { name: 'C+', low: 77 },
-      { name: 'C',  low: 73 },
-      { name: 'C-', low: 70 },
-      { name: 'D+', low: 67 },
-      { name: 'D',  low: 63 },
-      { name: 'D-', low: 60 },
-      { name: 'F',  low: 0  }
+      { name: 'A+', low: 98 }, { name: 'A', low: 93 }, { name: 'A-', low: 90 },
+      { name: 'B+', low: 87 }, { name: 'B', low: 83 }, { name: 'B-', low: 80 },
+      { name: 'C+', low: 77 }, { name: 'C', low: 73 }, { name: 'C-', low: 70 },
+      { name: 'D+', low: 67 }, { name: 'D', low: 63 }, { name: 'D-', low: 60 }, { name: 'F', low: 0 }
     ];
-
-    function neededFinal(current, target) {
-      return (target - current * 0.8) / 0.2;
-    }
-
+    function neededFinal(current, target) { return (target - current * 0.8) / 0.2; }
     document.getElementById('calculate').addEventListener('click', () => {
       const current = parseFloat(document.getElementById('currentGrade').value);
-      if (isNaN(current)) {
-        alert('Please enter a valid current grade.');
-        return;
-      }
-
-      // Calculate needs for all grades
-      const results = gradeScale.map(g => {
-        const need = neededFinal(current, g.low);
-        return { ...g, need };
-      });
-
-      // Find highest guaranteed grade index
+      if (isNaN(current)) { alert('Please enter a valid current grade.'); return; }
+      const results = gradeScale.map(g => ({ ...g, need: neededFinal(current, g.low) }));
       const guaranteedIndex = results.findIndex(r => r.need <= 0);
-
-      // Determine which grades to display
-      const displayResults = (guaranteedIndex >= 0)
-        ? results.slice(0, guaranteedIndex + 1)
-        : results;
-
-      // Render table
-      const table = document.getElementById('results');
-      const tbody = table.querySelector('tbody');
-      tbody.innerHTML = '';
-
+      const displayResults = (guaranteedIndex >= 0) ? results.slice(0, guaranteedIndex + 1) : results;
+      const table = document.getElementById('results'), tbody = table.querySelector('tbody'); tbody.innerHTML = '';
       displayResults.forEach(r => {
-        let display = r.need.toFixed(2);
-        let cls = '';
-
-        if (r.need > 100) {
-          display = 'Not possible';
-          cls = 'impossible';
-        } else if (r.need <= 0) {
-          display = 'Guaranteed';
-          cls = 'guaranteed';
-        }
-
+        let display = r.need.toFixed(2), cls = '';
+        if (r.need > 100) { display = 'Not possible'; cls = 'impossible'; }
+        else if (r.need <= 0) { display = 'Guaranteed'; cls = 'guaranteed'; }
         const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${r.name}</td>
-          <td>${r.low.toFixed(2)}</td>
-          <td class="${cls}">${display}</td>
-        `;
+        row.innerHTML = `<td>${r.name}</td><td>${r.low.toFixed(2)}</td><td class="${cls}">${display}</td>`;
         tbody.appendChild(row);
       });
-
       table.hidden = false;
     });
-    
   </script>
+</body>
