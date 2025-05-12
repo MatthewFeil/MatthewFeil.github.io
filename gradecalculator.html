@@ -48,44 +48,38 @@ permalink: /grade-calculator/
 
     .calculator input,
 .calculator button {
-  /* use Minima’s background & text variables */
+  /* keep your existing styles… */
+  -webkit-appearance: none;
   background-color: var(--color-canvas-default);
   color:            var(--color-text-primary);
-  border:           1px solid var(--color-text-secondary);
   border-radius:    var(--border-radius);
   padding:          0.5em 0.75em;
   font-size:        1em;
-  
-  /* strip iOS’s native styling */
-  -webkit-appearance: none;
+
+  /* ← add this: */
+  border: 1px solid var(--color-text-secondary);
 }
 
-/* Button gets the accent color by default */
+/* Button accent style */
 .calculator button {
   background-color: var(--color-primary);
   color:            var(--color-primary-foreground);
-  border:           none;
   cursor:           pointer;
+
+  /* override the shared border if you want it the same accent color */
+  /* border: 1px solid var(--color-primary); */
 }
 
-/* Hover & active feedback */
-.calculator button:hover {
-  background-color: var(--color-accent);
-  color:            var(--color-accent-foreground);
-}
-.calculator button:active {
-  opacity: 0.9;
-}
-
-/* Dark-mode tweaks (if your Minima version uses prefers-color-scheme) */
 @media (prefers-color-scheme: dark) {
   .calculator input,
   .calculator button {
     background-color: var(--color-bg-contrast);
     color:            var(--color-text-primary);
-    border-color:     var(--color-text-secondary);
+    /* dark-mode border: */
+    border: 1px solid var(--color-text-secondary);
   }
 }
+
   </style>
 
 <div class="calculator">
