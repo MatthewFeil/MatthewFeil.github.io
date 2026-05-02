@@ -1,0 +1,118 @@
+---
+layout: page
+title: Stock Portfolio
+permalink: /portfolio/
+---
+
+<link rel="stylesheet" href="{{ "/assets/css/portfolio.css" | relative_url }}">
+
+<section class="portfolio-app" data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api">
+  <div class="portfolio-lock" id="portfolio-lock">
+    <h2>Portfolio locked</h2>
+    <p>Enter the portfolio password to view and update your stock tracker.</p>
+    <form id="portfolio-unlock-form" class="portfolio-form">
+      <label for="portfolio-password">Password</label>
+      <div class="portfolio-inline">
+        <input id="portfolio-password" type="password" autocomplete="current-password" required>
+        <button type="submit">Unlock</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="portfolio-workspace" id="portfolio-workspace" hidden>
+    <div class="portfolio-toolbar">
+      <div>
+        <p class="portfolio-kicker">Personal tracker</p>
+        <h2>Your holdings</h2>
+      </div>
+      <button id="portfolio-lock-button" type="button">Lock</button>
+    </div>
+
+    <div class="portfolio-summary" id="portfolio-summary">
+      <div>
+        <span>Total value</span>
+        <strong id="summary-value">$0.00</strong>
+      </div>
+      <div>
+        <span>Cost basis</span>
+        <strong id="summary-cost">$0.00</strong>
+      </div>
+      <div>
+        <span>Total gain/loss</span>
+        <strong id="summary-gain">$0.00</strong>
+      </div>
+      <div>
+        <span>Gain/loss %</span>
+        <strong id="summary-percent">0.00%</strong>
+      </div>
+    </div>
+
+    <div class="portfolio-grid">
+      <section class="portfolio-panel">
+        <h3>Add stock</h3>
+        <form id="stock-form" class="portfolio-form">
+          <label for="stock-symbol">Ticker symbol</label>
+          <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
+
+          <label for="stock-name">Name</label>
+          <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
+
+          <button type="submit">Add stock</button>
+        </form>
+      </section>
+
+      <section class="portfolio-panel">
+        <h3>Add investment log</h3>
+        <form id="log-form" class="portfolio-form">
+          <label for="log-stock">Stock</label>
+          <select id="log-stock" name="stock_id" required></select>
+
+          <label for="log-date">Date</label>
+          <input id="log-date" name="logged_at" type="date" required>
+
+          <label for="log-type">Type</label>
+          <select id="log-type" name="entry_type">
+            <option value="additional_investment">Additional invested money</option>
+            <option value="reinvested_dividend">Reinvested dividend</option>
+          </select>
+
+          <label for="log-price">Purchase price per share</label>
+          <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
+
+          <label for="log-amount">Total purchase amount</label>
+          <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
+
+          <button type="submit">Add log</button>
+        </form>
+      </section>
+    </div>
+
+    <p class="portfolio-status" id="portfolio-status" role="status"></p>
+
+    <div class="portfolio-table-wrap">
+      <table class="portfolio-table">
+        <thead>
+          <tr>
+            <th>Stock</th>
+            <th>Shares</th>
+            <th>Avg purchase</th>
+            <th>Current price</th>
+            <th>Cost basis</th>
+            <th>Total value</th>
+            <th>Gain/loss</th>
+            <th>Gain/loss %</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="portfolio-rows"></tbody>
+      </table>
+    </div>
+
+    <section class="portfolio-panel portfolio-logs">
+      <h3>Logs</h3>
+      <div id="portfolio-logs"></div>
+    </section>
+  </div>
+</section>
+
+<script src="{{ "/assets/js/portfolio.js" | relative_url }}" defer></script>

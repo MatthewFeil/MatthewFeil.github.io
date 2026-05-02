@@ -30,22 +30,22 @@ permalink: /grade-calculator/
   font-size: 1em;
   padding: 0.5em;
   margin: 0;
-  background-color: var(--color-canvas-default);
-  color: var(--color-text-primary);
-  border: 1px solid currentColor;
+  background-color: color-mix(in srgb, var(--minima-background-color) 92%, var(--minima-text-color));
+  color: var(--minima-text-color);
+  border: 1px solid var(--minima-border-color-01);
   border-radius: 0.5rem;
 }
 
 .calculator button {
-  background-color: var(--color-primary);
-  color: var(--color-primary-foreground);
+  background-color: #245f73;
+  color: #fff;
   cursor: pointer;
-  border-color: var(--color-primary);
+  border-color: #245f73;
 }
 
 .calculator button:hover {
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: #1c4e5f;
+  border-color: #1c4e5f;
 }
   #results th,
   #results td {

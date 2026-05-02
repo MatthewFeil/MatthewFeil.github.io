@@ -1,0 +1,231 @@
+.portfolio-app {
+  --portfolio-border: color-mix(in srgb, currentColor 18%, transparent);
+  --portfolio-muted: color-mix(in srgb, currentColor 62%, transparent);
+  --portfolio-surface: color-mix(in srgb, var(--minima-background-color) 92%, var(--minima-text-color));
+  --portfolio-soft: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
+  --portfolio-button: #245f73;
+  --portfolio-button-hover: #1c4e5f;
+  --portfolio-good: #16804a;
+  --portfolio-bad: #c43434;
+  color: var(--minima-text-color);
+}
+
+.portfolio-lock,
+.portfolio-panel,
+.portfolio-summary,
+.portfolio-table-wrap {
+  border: 1px solid var(--portfolio-border);
+  border-radius: 8px;
+  background: var(--portfolio-soft);
+}
+
+.portfolio-lock,
+.portfolio-panel {
+  padding: 1rem;
+}
+
+.portfolio-lock {
+  max-width: 520px;
+}
+
+.portfolio-lock h2,
+.portfolio-toolbar h2,
+.portfolio-panel h3 {
+  margin-top: 0;
+}
+
+.portfolio-kicker,
+.portfolio-status,
+.portfolio-lock p {
+  color: var(--portfolio-muted);
+}
+
+.portfolio-kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.portfolio-toolbar,
+.portfolio-inline,
+.portfolio-log-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.portfolio-summary div {
+  padding: 0.9rem;
+  background: var(--portfolio-surface);
+}
+
+.portfolio-summary span {
+  display: block;
+  color: var(--portfolio-muted);
+  font-size: 0.82rem;
+}
+
+.portfolio-summary strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.2rem;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.portfolio-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.portfolio-form label {
+  font-weight: 600;
+}
+
+.portfolio-form input,
+.portfolio-form select,
+.portfolio-form button,
+.portfolio-toolbar button,
+.portfolio-action {
+  box-sizing: border-box;
+  min-height: 2.45rem;
+  padding: 0.5rem 0.65rem;
+  color: var(--minima-text-color);
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.portfolio-form input::placeholder {
+  color: color-mix(in srgb, var(--minima-text-color) 52%, transparent);
+}
+
+.portfolio-form button,
+.portfolio-toolbar button,
+.portfolio-action {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.portfolio-form button {
+  background: var(--portfolio-button);
+  color: #fff;
+  border-color: var(--portfolio-button);
+}
+
+.portfolio-form button:hover {
+  background: var(--portfolio-button-hover);
+  border-color: var(--portfolio-button-hover);
+}
+
+.portfolio-table-wrap {
+  overflow-x: auto;
+}
+
+.portfolio-table {
+  width: 100%;
+  min-width: 880px;
+  border-collapse: collapse;
+  margin: 0;
+  color: var(--minima-text-color);
+  background: var(--portfolio-surface);
+}
+
+.portfolio-table th,
+.portfolio-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--portfolio-border);
+  border-left: 0;
+  border-right: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.portfolio-table th {
+  background: var(--portfolio-soft);
+  color: var(--minima-text-color);
+}
+
+.portfolio-table th:first-child,
+.portfolio-table td:first-child {
+  text-align: left;
+}
+
+.portfolio-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.portfolio-symbol {
+  display: block;
+  font-weight: 800;
+}
+
+.portfolio-name {
+  display: block;
+  color: var(--portfolio-muted);
+  font-size: 0.85rem;
+}
+
+.portfolio-positive {
+  color: var(--portfolio-good);
+}
+
+.portfolio-negative {
+  color: var(--portfolio-bad);
+}
+
+.portfolio-logs {
+  margin-top: 1rem;
+}
+
+.portfolio-log {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--portfolio-border);
+}
+
+.portfolio-log:first-child {
+  border-top: 0;
+}
+
+.portfolio-log p {
+  margin: 0.2rem 0 0;
+  color: var(--portfolio-muted);
+}
+
+@media (max-width: 760px) {
+  .portfolio-summary,
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-toolbar,
+  .portfolio-inline {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .portfolio-app {
+    --portfolio-button: #2f7f98;
+    --portfolio-button-hover: #3c9bb8;
+    --portfolio-good: #52c985;
+    --portfolio-bad: #ff7a7a;
+  }
+}

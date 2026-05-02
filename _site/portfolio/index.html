@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Stock Portfolio | Matthew Feil</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Stock Portfolio" />
+<meta name="author" content="Matthew Feil" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:site_name" content="Matthew Feil" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Stock Portfolio" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Stock Portfolio","url":"/portfolio/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Matthew Feil</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><a class="page-link" href="/portfolio/">Stock Portfolio</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Stock Portfolio</h1>
+  </header>
+
+  <div class="post-content">
+    <link rel="stylesheet" href="/assets/css/portfolio.css">
+
+<section class="portfolio-app" data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api">
+  <div class="portfolio-lock" id="portfolio-lock">
+    <h2>Portfolio locked</h2>
+    <p>Enter the portfolio password to view and update your stock tracker.</p>
+    <form id="portfolio-unlock-form" class="portfolio-form">
+      <label for="portfolio-password">Password</label>
+      <div class="portfolio-inline">
+        <input id="portfolio-password" type="password" autocomplete="current-password" required>
+        <button type="submit">Unlock</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="portfolio-workspace" id="portfolio-workspace" hidden>
+    <div class="portfolio-toolbar">
+      <div>
+        <p class="portfolio-kicker">Personal tracker</p>
+        <h2>Your holdings</h2>
+      </div>
+      <button id="portfolio-lock-button" type="button">Lock</button>
+    </div>
+
+    <div class="portfolio-summary" id="portfolio-summary">
+      <div>
+        <span>Total value</span>
+        <strong id="summary-value">$0.00</strong>
+      </div>
+      <div>
+        <span>Cost basis</span>
+        <strong id="summary-cost">$0.00</strong>
+      </div>
+      <div>
+        <span>Total gain/loss</span>
+        <strong id="summary-gain">$0.00</strong>
+      </div>
+      <div>
+        <span>Gain/loss %</span>
+        <strong id="summary-percent">0.00%</strong>
+      </div>
+    </div>
+
+    <div class="portfolio-grid">
+      <section class="portfolio-panel">
+        <h3>Add stock</h3>
+        <form id="stock-form" class="portfolio-form">
+          <label for="stock-symbol">Ticker symbol</label>
+          <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
+
+          <label for="stock-name">Name</label>
+          <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
+
+          <button type="submit">Add stock</button>
+        </form>
+      </section>
+
+      <section class="portfolio-panel">
+        <h3>Add investment log</h3>
+        <form id="log-form" class="portfolio-form">
+          <label for="log-stock">Stock</label>
+          <select id="log-stock" name="stock_id" required></select>
+
+          <label for="log-date">Date</label>
+          <input id="log-date" name="logged_at" type="date" required>
+
+          <label for="log-type">Type</label>
+          <select id="log-type" name="entry_type">
+            <option value="additional_investment">Additional invested money</option>
+            <option value="reinvested_dividend">Reinvested dividend</option>
+          </select>
+
+          <label for="log-price">Purchase price per share</label>
+          <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
+
+          <label for="log-amount">Total purchase amount</label>
+          <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
+
+          <button type="submit">Add log</button>
+        </form>
+      </section>
+    </div>
+
+    <p class="portfolio-status" id="portfolio-status" role="status"></p>
+
+    <div class="portfolio-table-wrap">
+      <table class="portfolio-table">
+        <thead>
+          <tr>
+            <th>Stock</th>
+            <th>Shares</th>
+            <th>Avg purchase</th>
+            <th>Current price</th>
+            <th>Cost basis</th>
+            <th>Total value</th>
+            <th>Gain/loss</th>
+            <th>Gain/loss %</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="portfolio-rows"></tbody>
+      </table>
+    </div>
+
+    <section class="portfolio-panel portfolio-logs">
+      <h3>Logs</h3>
+      <div id="portfolio-logs"></div>
+    </section>
+  </div>
+</section>
+
+<script src="/assets/js/portfolio.js" defer></script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name">Matthew Feil</li>
+          
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>The website of Matthew Feil, a high school student with a passion for music and technology.
+</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

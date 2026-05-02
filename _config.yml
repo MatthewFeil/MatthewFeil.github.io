@@ -28,6 +28,7 @@ plugins:
 header_pages:
 - about.md
 - playlists.html
+- portfolio.html
 
 # Set to `true` to show excerpts on the homepage.
 #show_excerpts: false
@@ -68,5 +69,4 @@ minima:
   #  - { platform: twitter,        user_url: "https://twitter.com/jekyllrb" }
   #  - { platform: x,              user_url: "https://x.com/jekyllrb" }
   #  - { platform: youtube,        user_url: "https://www.youtube.com/jekyll" }
-
 
