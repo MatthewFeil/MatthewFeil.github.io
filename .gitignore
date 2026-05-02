@@ -1,2 +1,7 @@
 # macOS Finder metadata
 .DS_Store
+
+# Local environment secrets
+.env
+.env.local
+.env.*.local
