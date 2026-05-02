@@ -59,7 +59,10 @@
 
   function metricsForStock(stock) {
     const stockLogs = state.logs.filter((log) => log.stock_id === stock.id);
-    const costBasis = stockLogs.reduce((sum, log) => sum + Number(log.total_purchase_amount), 0);
+    const costBasis = stockLogs.reduce((sum, log) => {
+      if (log.entry_type === 'reinvested_dividend') return sum;
+      return sum + Number(log.total_purchase_amount);
+    }, 0);
     const shares = stockLogs.reduce((sum, log) => sum + sharesForLog(log), 0);
     const avgPrice = shares > 0 ? costBasis / shares : 0;
     const currentPrice = Number(state.quotes[stock.symbol]?.price || 0);
