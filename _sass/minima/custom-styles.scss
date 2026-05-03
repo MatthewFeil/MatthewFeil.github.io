@@ -74,6 +74,102 @@ input[type="reset"]:hover {
   color: var(--minima-text-color);
 }
 
+.tracker-lock {
+  max-width: 520px;
+  padding: 1rem;
+}
+
+.tracker-lock h2 {
+  margin: 0;
+}
+
+.tracker-lock p {
+  margin: 0.5rem 0 1rem;
+}
+
+.tracker-lock-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tracker-lock-form label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.tracker-lock-inline {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tracker-lock-inline input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tracker-lock-inline button {
+  flex: 0 0 auto;
+}
+
+.personal-space-menu h2 {
+  margin: 0;
+}
+
+.personal-space-menu > p {
+  color: color-mix(in srgb, var(--minima-text-color) 62%, transparent);
+}
+
+.personal-space-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.personal-space-card {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: 1rem;
+  color: var(--minima-text-color);
+  background: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
+  border: 1px solid var(--minima-border-color-01);
+  border-radius: 8px;
+}
+
+.personal-space-card:visited {
+  color: var(--minima-text-color);
+}
+
+.personal-space-card:hover {
+  border-color: var(--minima-border-color-03);
+  text-decoration: none;
+}
+
+.personal-space-card span {
+  font-weight: 800;
+}
+
+.personal-space-card strong {
+  color: color-mix(in srgb, var(--minima-text-color) 62%, transparent);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .personal-space-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tracker-lock-inline {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   input:not([type="checkbox"]):not([type="radio"]),
   select,

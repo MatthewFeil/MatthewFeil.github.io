@@ -7,12 +7,12 @@ permalink: /portfolio/
 <link rel="stylesheet" href="{{ "/assets/css/portfolio.css" | relative_url }}">
 
 <section class="portfolio-app" data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api">
-  <div class="portfolio-lock" id="portfolio-lock">
+  <div class="tracker-lock portfolio-lock" id="portfolio-lock">
     <h2>Portfolio locked</h2>
     <p>Enter the portfolio password to view and update your stock tracker.</p>
-    <form id="portfolio-unlock-form" class="portfolio-form">
+    <form id="portfolio-unlock-form" class="tracker-lock-form portfolio-form">
       <label for="portfolio-password">Password</label>
-      <div class="portfolio-inline">
+      <div class="tracker-lock-inline portfolio-inline">
         <input id="portfolio-password" type="password" autocomplete="current-password" required>
         <button type="submit">Unlock</button>
       </div>
