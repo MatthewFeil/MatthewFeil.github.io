@@ -381,6 +381,9 @@ deno_version = 2
 [functions.portfolio-api]
 verify_jwt = false
 
+[functions.lifting-api]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

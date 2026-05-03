@@ -99,6 +99,10 @@ Deno.serve(async (request) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  if (request.method === 'GET') {
+    return json({ ok: true });
+  }
+
   try {
     assertPassword(request);
     const body = await request.json().catch(() => ({})) as PortfolioBody;
