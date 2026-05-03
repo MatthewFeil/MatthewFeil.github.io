@@ -31,6 +31,11 @@
     logSetOpen: document.getElementById('log-set-open'),
     logSetClose: document.getElementById('log-set-close'),
     logSetModal: document.getElementById('log-set-modal'),
+    liftLogsModal: document.getElementById('lift-logs-modal'),
+    liftLogsClose: document.getElementById('lift-logs-close'),
+    liftLogsTitle: document.getElementById('lift-logs-title'),
+    liftLogsDelete: document.getElementById('lift-logs-delete'),
+    liftLogsContent: document.getElementById('lift-logs-content'),
     addLiftOpen: document.getElementById('add-lift-open'),
     addLiftClose: document.getElementById('add-lift-close'),
     addLiftModal: document.getElementById('add-lift-modal'),
@@ -141,6 +146,18 @@
     `;
   }
 
+  function openLogsModal(liftId) {
+    const lift = state.lifts.find((item) => item.id === liftId);
+    if (!lift) return;
+
+    const logs = getLiftLogs(liftId);
+    els.liftLogsModal.dataset.liftId = liftId;
+    els.liftLogsTitle.textContent = `${lift.name} logs`;
+    els.liftLogsDelete.dataset.deleteLift = liftId;
+    els.liftLogsContent.innerHTML = renderLogs(logs);
+    els.liftLogsModal.showModal();
+  }
+
   function renderList() {
     const allMetrics = state.lifts.map(metricsForLift);
 
@@ -165,28 +182,19 @@
             <strong>${formatWeight(item.realOneRep)}</strong>
           </div>
           <div class="lifting-row-metric">
-            <span>Theoretical 1RM</span>
+            <span>Est. 1RM</span>
             <strong>${formatWeight(item.theoreticalOneRep)}</strong>
           </div>
         </button>
         <div class="lifting-details" id="details-${item.lift.id}" hidden>
           <section>
-            <div class="lifting-metric">
-              <span>True max moved</span>
-              <strong>${formatWeight(item.trueMax)}</strong>
-            </div>
             <div class="lifting-detail-heading">
-              <h4 class="lifting-subhead">Rep targets from best theoretical 1RM</h4>
-              <button class="lifting-action" type="button" data-toggle-logs="${item.lift.id}">Show logs</button>
+              <h4 class="lifting-subhead">Est. Rep Targets</h4>
             </div>
             ${renderRepGrid(item.theoreticalOneRep)}
-          </section>
-          <section class="lifting-logs-section" id="logs-${item.lift.id}" hidden>
-            <div class="lifting-logs-heading">
-              <h4 class="lifting-subhead">Logs</h4>
-              <button class="lifting-action" type="button" data-delete-lift="${item.lift.id}">Delete lift</button>
+            <div class="lifting-detail-actions">
+              <button class="lifting-action" type="button" data-open-logs="${item.lift.id}">View logs</button>
             </div>
-            ${renderLogs(item.logs)}
           </section>
         </div>
       </article>
@@ -253,7 +261,15 @@
     els.logSetModal.close();
   });
 
-  [els.addLiftModal, els.logSetModal].forEach((modal) => {
+  els.liftLogsClose.addEventListener('click', () => {
+    els.liftLogsModal.close();
+  });
+
+  els.liftLogsModal.addEventListener('close', () => {
+    delete els.liftLogsModal.dataset.liftId;
+  });
+
+  [els.addLiftModal, els.logSetModal, els.liftLogsModal].forEach((modal) => {
     modal.addEventListener('click', (event) => {
       if (event.target === modal) {
         modal.close();
@@ -303,7 +319,7 @@
 
   document.addEventListener('click', async (event) => {
     const toggleButton = event.target.closest('[data-toggle-lift]');
-    const logsButton = event.target.closest('[data-toggle-logs]');
+    const logsButton = event.target.closest('[data-open-logs]');
     const deleteLogButton = event.target.closest('[data-delete-log]');
     const deleteLiftButton = event.target.closest('[data-delete-lift]');
 
@@ -317,20 +333,27 @@
       }
 
       if (logsButton) {
-        const logsLiftId = logsButton.dataset.toggleLogs;
-        const logs = document.getElementById(`logs-${logsLiftId}`);
-        const isHidden = logs.hidden;
-        logs.hidden = !isHidden;
-        logsButton.textContent = isHidden ? 'Hide logs' : 'Show logs';
+        openLogsModal(logsButton.dataset.openLogs);
       }
 
       if (deleteLogButton && confirm('Delete this lift log?')) {
+        const openLogsLiftId = els.liftLogsModal.dataset.liftId;
         await api('deleteLog', { id: deleteLogButton.dataset.deleteLog });
         await loadLifts();
+        if (els.liftLogsModal.open && openLogsLiftId) {
+          const lift = state.lifts.find((item) => item.id === openLogsLiftId);
+          if (lift) {
+            els.liftLogsModal.dataset.liftId = openLogsLiftId;
+            els.liftLogsTitle.textContent = `${lift.name} logs`;
+            els.liftLogsDelete.dataset.deleteLift = openLogsLiftId;
+            els.liftLogsContent.innerHTML = renderLogs(getLiftLogs(openLogsLiftId));
+          }
+        }
       }
 
       if (deleteLiftButton && confirm('Delete this lift and all of its logs?')) {
         await api('deleteLift', { id: deleteLiftButton.dataset.deleteLift });
+        els.liftLogsModal.close();
         await loadLifts();
       }
     } catch (error) {
