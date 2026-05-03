@@ -254,6 +254,14 @@
     els.logSetModal.close();
   });
 
+  [els.addLiftModal, els.logSetModal].forEach((modal) => {
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.close();
+      }
+    });
+  });
+
   els.addLiftForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(els.addLiftForm);
