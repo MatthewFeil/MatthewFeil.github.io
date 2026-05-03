@@ -1,0 +1,407 @@
+.lifting-app {
+  --lifting-border: color-mix(in srgb, currentColor 16%, transparent);
+  --lifting-muted: color-mix(in srgb, currentColor 60%, transparent);
+  --lifting-surface: color-mix(in srgb, var(--minima-background-color) 93%, var(--minima-text-color));
+  --lifting-soft: color-mix(in srgb, var(--minima-background-color) 97%, var(--minima-text-color));
+  --lifting-accent: #245f73;
+  --lifting-accent-hover: #1c4e5f;
+  --lifting-good: #16804a;
+  --lifting-warn: #9f6b00;
+  color: var(--minima-text-color);
+}
+
+.lifting-lock,
+.lifting-panel,
+.lifting-card,
+.lifting-modal {
+  border: 1px solid var(--lifting-border);
+  border-radius: 8px;
+  background: var(--lifting-soft);
+}
+
+.lifting-lock,
+.lifting-panel,
+.lifting-card {
+  padding: 1rem;
+}
+
+.lifting-lock {
+  max-width: 520px;
+}
+
+.lifting-lock h2,
+.lifting-toolbar h2,
+.lifting-panel h3,
+.lifting-modal h3 {
+  margin: 0;
+}
+
+.lifting-lock p,
+.lifting-kicker,
+.lifting-status,
+.lifting-muted,
+.lifting-card-meta,
+.lifting-log-date {
+  color: var(--lifting-muted);
+}
+
+.lifting-kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lifting-toolbar,
+.lifting-toolbar-actions,
+.lifting-inline,
+.lifting-panel-head,
+.lifting-logs-heading,
+.lifting-modal-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lifting-toolbar-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.lifting-metric span,
+.lifting-filter label,
+.lifting-form label,
+.lifting-log-form span {
+  display: block;
+  color: var(--lifting-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.lifting-form,
+.lifting-log-form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.lifting-log-form {
+  grid-template-columns: repeat(auto-fit, minmax(8.25rem, 1fr));
+  align-items: end;
+}
+
+.lifting-log-form label,
+.lifting-log-form button {
+  min-width: 0;
+}
+
+.lifting-log-form input,
+.lifting-log-form select,
+.lifting-log-form button {
+  width: 100%;
+}
+
+.lifting-notes-field {
+  grid-column: span 2;
+}
+
+.lifting-form input,
+.lifting-form select,
+.lifting-form button,
+.lifting-log-form input,
+.lifting-log-form select,
+.lifting-log-form button,
+.lifting-filter input,
+.lifting-secondary,
+.lifting-action,
+.lifting-icon-button {
+  box-sizing: border-box;
+  min-height: 2.45rem;
+  padding: 0.5rem 0.65rem;
+  color: var(--minima-text-color);
+  background: var(--lifting-surface);
+  border: 1px solid var(--lifting-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.lifting-form input::placeholder,
+.lifting-log-form input::placeholder,
+.lifting-filter input::placeholder {
+  color: color-mix(in srgb, var(--minima-text-color) 48%, transparent);
+}
+
+.lifting-form button,
+.lifting-log-form button {
+  cursor: pointer;
+  font-weight: 800;
+  background: var(--lifting-accent);
+  color: #fff;
+  border-color: var(--lifting-accent);
+}
+
+.lifting-form button:hover,
+.lifting-log-form button:hover {
+  background: var(--lifting-accent-hover);
+  border-color: var(--lifting-accent-hover);
+}
+
+.lifting-secondary,
+.lifting-action,
+.lifting-icon-button {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.lifting-secondary:disabled,
+.lifting-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.lifting-filter {
+  margin: 0.7rem 0 1rem;
+}
+
+.lifting-filter input {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.lifting-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.lifting-card {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.lifting-row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1.4fr) minmax(7rem, 0.8fr) minmax(8rem, 0.8fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  min-height: 4.2rem;
+  padding: 0.85rem 1rem;
+  color: var(--minima-text-color);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.lifting-row:hover {
+  background: color-mix(in srgb, var(--lifting-surface) 68%, transparent);
+}
+
+.lifting-card-title h3 {
+  margin: 0;
+  font-size: 1.04rem;
+}
+
+.lifting-card-meta {
+  margin-top: 0.15rem;
+  font-size: 0.86rem;
+}
+
+.lifting-metric {
+  margin-bottom: 0.75rem;
+  padding: 0.7rem;
+  border: 1px solid var(--lifting-border);
+  border-radius: 7px;
+  background: var(--lifting-surface);
+}
+
+.lifting-row-metric span,
+.lifting-metric span {
+  display: block;
+  color: var(--lifting-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.lifting-row-metric strong,
+.lifting-metric strong {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 1.12rem;
+}
+
+.lifting-row-cue {
+  color: var(--lifting-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lifting-details {
+  display: grid;
+  gap: 0.9rem;
+  border-top: 1px solid var(--lifting-border);
+  padding: 0.9rem 1rem 1rem;
+}
+
+.lifting-details[hidden],
+.lifting-logs-section[hidden] {
+  display: none;
+}
+
+.lifting-detail-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.lifting-logs-heading {
+  margin-bottom: 0.45rem;
+}
+
+.lifting-subhead {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.lifting-rep-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.lifting-rep-cell {
+  padding: 0.55rem;
+  border: 1px solid var(--lifting-border);
+  border-radius: 6px;
+  background: var(--lifting-surface);
+  text-align: center;
+}
+
+.lifting-rep-cell span {
+  display: block;
+  color: var(--lifting-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.lifting-rep-cell strong {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.lifting-calculator {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: end;
+  margin-top: 0.75rem;
+}
+
+.lifting-log-list {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 20rem;
+  overflow: auto;
+}
+
+.lifting-log {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.65rem;
+  border: 1px solid var(--lifting-border);
+  border-radius: 7px;
+  background: var(--lifting-surface);
+}
+
+.lifting-log strong {
+  display: block;
+}
+
+.lifting-log p {
+  margin: 0.15rem 0 0;
+  color: var(--lifting-muted);
+  font-size: 0.88rem;
+}
+
+.lifting-empty {
+  margin: 0;
+  color: var(--lifting-muted);
+}
+
+.lifting-modal {
+  width: min(92vw, 420px);
+  padding: 1rem;
+  color: var(--minima-text-color);
+}
+
+.lifting-log-modal {
+  width: min(92vw, 460px);
+}
+
+.lifting-modal::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.lifting-icon-button {
+  width: 2.45rem;
+  padding: 0;
+}
+
+@media (max-width: 920px) {
+  .lifting-log-form,
+  .lifting-details {
+    grid-template-columns: 1fr;
+  }
+
+  .lifting-notes-field {
+    grid-column: auto;
+  }
+
+  .lifting-logs-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .lifting-logs-heading button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .lifting-rep-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lifting-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lifting-detail-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .lifting-toolbar,
+  .lifting-inline,
+  .lifting-panel-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .lifting-app {
+    --lifting-accent: #2f7f98;
+    --lifting-accent-hover: #3c9bb8;
+    --lifting-good: #52c985;
+    --lifting-warn: #e0b35b;
+  }
+}
