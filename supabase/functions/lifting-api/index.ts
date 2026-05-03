@@ -52,7 +52,7 @@ function cleanNumber(value: unknown) {
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method === "GET") return json({ ok: true });
+  if (req.method === "GET" || req.method === "HEAD") return json({ ok: true });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
   const unlocked = await assertPassword(req);

@@ -99,7 +99,7 @@ Deno.serve(async (request) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  if (request.method === 'GET') {
+  if (request.method === 'GET' || request.method === 'HEAD') {
     return json({ ok: true });
   }
 
