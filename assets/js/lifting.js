@@ -155,7 +155,7 @@
 
     els.list.innerHTML = filtered.map((item) => `
       <article class="lifting-card">
-        <button class="lifting-row" type="button" data-toggle-lift="${item.lift.id}">
+        <button class="lifting-row" type="button" data-toggle-lift="${item.lift.id}" aria-expanded="false">
           <div class="lifting-card-title">
             <h3>${item.lift.name}</h3>
             <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
@@ -168,7 +168,6 @@
             <span>Theoretical 1RM</span>
             <strong>${formatWeight(item.theoreticalOneRep)}</strong>
           </div>
-          <span class="lifting-row-cue">Show more</span>
         </button>
         <div class="lifting-details" id="details-${item.lift.id}" hidden>
           <section>
@@ -314,7 +313,7 @@
         const details = document.getElementById(`details-${toggleLiftId}`);
         const isHidden = details.hidden;
         details.hidden = !isHidden;
-        toggleButton.querySelector('.lifting-row-cue').textContent = isHidden ? 'Show less' : 'Show more';
+        toggleButton.setAttribute('aria-expanded', String(isHidden));
       }
 
       if (logsButton) {

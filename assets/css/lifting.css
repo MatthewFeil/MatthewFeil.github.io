@@ -139,12 +139,14 @@
   background: var(--lifting-accent);
   color: #fff;
   border-color: var(--lifting-accent);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .lifting-form button:hover,
 .lifting-log-form button:hover {
-  background: var(--lifting-accent-hover);
-  border-color: var(--lifting-accent-hover);
+  background: color-mix(in srgb, var(--lifting-accent) 92%, white);
+  border-color: color-mix(in srgb, var(--lifting-accent) 72%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
 }
 
 .lifting-secondary,
@@ -152,6 +154,15 @@
 .lifting-icon-button {
   cursor: pointer;
   font-weight: 800;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lifting-secondary:hover,
+.lifting-action:hover,
+.lifting-icon-button:hover {
+  background: color-mix(in srgb, var(--lifting-surface) 88%, var(--minima-text-color));
+  border-color: color-mix(in srgb, currentColor 34%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .lifting-secondary:disabled,
@@ -162,6 +173,10 @@
 
 .lifting-filter {
   margin: 0.7rem 0 1rem;
+}
+
+.lifting-workspace > .lifting-status {
+  margin: 0.75rem 0 0;
 }
 
 .lifting-filter input {
@@ -183,7 +198,7 @@
 
 .lifting-row {
   display: grid;
-  grid-template-columns: minmax(10rem, 1.4fr) minmax(7rem, 0.8fr) minmax(8rem, 0.8fr) auto;
+  grid-template-columns: minmax(10rem, 1.4fr) minmax(7rem, 0.8fr) minmax(8rem, 0.8fr);
   gap: 0.75rem;
   align-items: center;
   width: 100%;
@@ -231,13 +246,6 @@
   display: block;
   margin-top: 0.18rem;
   font-size: 1.12rem;
-}
-
-.lifting-row-cue {
-  color: var(--lifting-muted);
-  font-size: 0.86rem;
-  font-weight: 800;
-  white-space: nowrap;
 }
 
 .lifting-details {
@@ -381,7 +389,35 @@
   }
 
   .lifting-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(5.8rem, 1fr) minmax(3.9rem, 0.42fr) minmax(4.7rem, 0.48fr);
+    column-gap: 0.55rem;
+    min-height: 3.25rem;
+    padding: 0.65rem 0.7rem;
+  }
+
+  .lifting-card-title {
+    min-width: 0;
+  }
+
+  .lifting-card-title h3,
+  .lifting-card-meta,
+  .lifting-row-metric strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lifting-card-title h3 {
+    font-size: 0.92rem;
+  }
+
+  .lifting-card-meta,
+  .lifting-row-metric span {
+    font-size: 0.68rem;
+  }
+
+  .lifting-row-metric strong {
+    font-size: 0.88rem;
   }
 
   .lifting-detail-heading {

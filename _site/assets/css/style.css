@@ -1032,13 +1032,16 @@ input[type=reset] {
   border: 1px solid var(--minima-border-color-01);
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 button:hover,
 input[type=button]:hover,
 input[type=submit]:hover,
 input[type=reset]:hover {
-  border-color: var(--minima-border-color-03);
+  background-color: color-mix(in srgb, var(--minima-background-color) 82%, var(--minima-text-color));
+  border-color: color-mix(in srgb, currentColor 34%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .site-header,

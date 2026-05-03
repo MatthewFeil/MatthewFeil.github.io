@@ -126,6 +126,7 @@
 .portfolio-action {
   cursor: pointer;
   font-weight: 700;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .portfolio-form button {
@@ -135,8 +136,17 @@
 }
 
 .portfolio-form button:hover {
-  background: var(--portfolio-button-hover);
-  border-color: var(--portfolio-button-hover);
+  background: color-mix(in srgb, var(--portfolio-button) 92%, white);
+  border-color: color-mix(in srgb, var(--portfolio-button) 72%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
+}
+
+.portfolio-toolbar button:hover,
+.portfolio-action:hover,
+.portfolio-dialog-close:hover {
+  background: color-mix(in srgb, var(--portfolio-surface) 88%, var(--minima-text-color));
+  border-color: color-mix(in srgb, currentColor 34%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .portfolio-table-wrap {
@@ -244,16 +254,35 @@
   color: var(--portfolio-muted);
 }
 
+.portfolio-workspace > .portfolio-status {
+  margin: 0.75rem 0 0;
+}
+
 @media (max-width: 760px) {
   .portfolio-summary {
     grid-template-columns: 1fr;
   }
 
   .portfolio-toolbar,
-  .portfolio-toolbar-actions,
   .portfolio-inline {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .portfolio-toolbar-actions {
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .portfolio-toolbar-actions button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-right: 0.45rem;
+    padding-left: 0.45rem;
+    white-space: nowrap;
   }
 }
 
