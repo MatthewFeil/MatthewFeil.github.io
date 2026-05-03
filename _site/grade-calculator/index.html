@@ -10,16 +10,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
 <meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
-<link rel="canonical" href="http://localhost:4001/grade-calculator/" />
-<meta property="og:url" content="http://localhost:4001/grade-calculator/" />
 <meta property="og:site_name" content="Matthew Feil" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Grade Calculator" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Grade Calculator","url":"http://localhost:4001/grade-calculator/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Grade Calculator","url":"/grade-calculator/"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Matthew Feil" />
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
 </head>
 <body><header class="site-header">
 
@@ -33,7 +31,14 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><a class="page-link" href="/personal-space/">Personal Space</a></div>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><details class="nav-dropdown">
+            <summary class="page-link nav-dropdown-summary">Personal Space</summary>
+            <div class="nav-dropdown-menu">
+              <a class="page-link nav-dropdown-link" href="/lifting/">Lifting Tracker</a>
+              <a class="page-link nav-dropdown-link" href="/portfolio/">Portfolio Tracker</a>
+            </div>
+          </details>
+        </div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">

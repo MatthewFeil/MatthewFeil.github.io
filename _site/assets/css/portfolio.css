@@ -97,6 +97,12 @@
   font-weight: 600;
 }
 
+.portfolio-lock .portfolio-form label {
+  color: color-mix(in srgb, currentColor 60%, transparent);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .portfolio-form input,
 .portfolio-form select,
 .portfolio-form button,

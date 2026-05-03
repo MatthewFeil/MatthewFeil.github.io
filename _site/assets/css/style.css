@@ -1098,58 +1098,69 @@ input[type=reset]:hover {
   flex: 0 0 auto;
 }
 
-.personal-space-menu h2 {
-  margin: 0;
+.site-nav .nav-dropdown {
+  margin-left: 20px;
+  position: relative;
 }
 
-.personal-space-menu > p {
-  color: color-mix(in srgb, var(--minima-text-color) 62%, transparent);
+.site-nav .nav-dropdown-summary {
+  cursor: pointer;
+  list-style: none;
 }
 
-.personal-space-grid {
+.site-nav .nav-dropdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-nav .nav-dropdown-menu {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.personal-space-card {
-  display: grid;
-  gap: 0.35rem;
-  min-height: 7rem;
-  padding: 1rem;
-  color: var(--minima-text-color);
-  background: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
+  gap: 0.1rem;
+  min-width: 11rem;
+  padding: 0.35rem 0;
+  text-align: left;
+  background-color: var(--minima-background-color);
   border: 1px solid var(--minima-border-color-01);
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
-.personal-space-card:visited {
-  color: var(--minima-text-color);
+.site-nav .nav-dropdown-link {
+  margin-left: 0;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
 }
 
-.personal-space-card:hover {
-  border-color: var(--minima-border-color-03);
+.site-nav .nav-dropdown-link:hover {
+  background-color: color-mix(in srgb, var(--minima-background-color) 90%, var(--minima-text-color));
   text-decoration: none;
 }
 
-.personal-space-card span {
-  font-weight: 800;
-}
-
-.personal-space-card strong {
-  color: color-mix(in srgb, var(--minima-text-color) 62%, transparent);
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-
 @media (max-width: 720px) {
-  .personal-space-grid {
-    grid-template-columns: 1fr;
-  }
   .tracker-lock-inline {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+@media screen and (min-width: 600px) {
+  .site-nav .nav-dropdown {
+    display: inline-block;
+    margin-left: 0;
+    vertical-align: baseline;
+  }
+  .site-nav .nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    right: 0;
+    z-index: 10;
+  }
+  .site-nav .nav-dropdown .page-link {
+    display: block;
+  }
+  .site-nav .nav-dropdown-summary.page-link {
+    display: inline;
+  }
+  .site-nav .nav-dropdown-link.page-link,
+  .site-nav .nav-dropdown-link.page-link:not(:last-child) {
+    margin: 0;
   }
 }
 @media (prefers-color-scheme: dark) {

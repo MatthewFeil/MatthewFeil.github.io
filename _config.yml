@@ -28,7 +28,6 @@ plugins:
 header_pages:
 - about.md
 - playlists.html
-- personal-space.html
 
 # Set to `true` to show excerpts on the homepage.
 #show_excerpts: false

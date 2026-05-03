@@ -24,6 +24,13 @@
             <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
+          <details class="nav-dropdown">
+            <summary class="page-link nav-dropdown-summary">Personal Space</summary>
+            <div class="nav-dropdown-menu">
+              <a class="page-link nav-dropdown-link" href="{{ "/lifting/" | relative_url }}">Lifting Tracker</a>
+              <a class="page-link nav-dropdown-link" href="{{ "/portfolio/" | relative_url }}">Portfolio Tracker</a>
+            </div>
+          </details>
         </div>
       </nav>
     {%- endif -%}
