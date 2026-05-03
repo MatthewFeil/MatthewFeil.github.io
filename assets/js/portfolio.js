@@ -15,6 +15,10 @@
     unlockForm: document.getElementById('portfolio-unlock-form'),
     password: document.getElementById('portfolio-password'),
     lockButton: document.getElementById('portfolio-lock-button'),
+    openStockDialog: document.getElementById('open-stock-dialog'),
+    openLogDialog: document.getElementById('open-log-dialog'),
+    stockDialog: document.getElementById('stock-dialog'),
+    logDialog: document.getElementById('log-dialog'),
     stockForm: document.getElementById('stock-form'),
     logForm: document.getElementById('log-form'),
     logStock: document.getElementById('log-stock'),
@@ -34,6 +38,24 @@
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.classList.toggle('portfolio-negative', isError);
+  }
+
+  function openDialog(dialog) {
+    if (typeof dialog.showModal === 'function') {
+      dialog.showModal();
+      return;
+    }
+    dialog.setAttribute('open', '');
+  }
+
+  function closeDialog(dialog) {
+    if (!dialog) return;
+    if (typeof dialog.close === 'function') {
+      if (!dialog.open) return;
+      dialog.close();
+      return;
+    }
+    dialog.removeAttribute('open');
   }
 
   async function api(action, payload = {}) {
@@ -191,8 +213,40 @@
     sessionStorage.removeItem(PASSWORD_KEY);
     state.password = '';
     els.password.value = '';
+    closeDialog(els.stockDialog);
+    closeDialog(els.logDialog);
     els.lock.hidden = false;
     els.workspace.hidden = true;
+  });
+
+  els.openStockDialog.addEventListener('click', () => {
+    openDialog(els.stockDialog);
+    document.getElementById('stock-symbol').focus();
+  });
+
+  els.openLogDialog.addEventListener('click', () => {
+    if (state.stocks.length === 0) {
+      setStatus('Add a stock before adding a log.', true);
+      openDialog(els.stockDialog);
+      document.getElementById('stock-symbol').focus();
+      return;
+    }
+    openDialog(els.logDialog);
+    els.logStock.focus();
+  });
+
+  document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+    button.addEventListener('click', () => {
+      closeDialog(button.closest('dialog'));
+    });
+  });
+
+  [els.stockDialog, els.logDialog].forEach((dialog) => {
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        closeDialog(dialog);
+      }
+    });
   });
 
   els.stockForm.addEventListener('submit', async (event) => {
@@ -203,6 +257,7 @@
     try {
       await api('addStock', { symbol, name });
       els.stockForm.reset();
+      closeDialog(els.stockDialog);
       await loadPortfolio();
     } catch (error) {
       setStatus(error.message, true);
@@ -222,6 +277,7 @@
       });
       els.logForm.reset();
       els.logDate.valueAsDate = new Date();
+      closeDialog(els.logDialog);
       await loadPortfolio();
     } catch (error) {
       setStatus(error.message, true);

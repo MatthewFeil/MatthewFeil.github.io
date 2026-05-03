@@ -10,16 +10,16 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
 <meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
-<link rel="canonical" href="http://localhost:4010/portfolio/" />
-<meta property="og:url" content="http://localhost:4010/portfolio/" />
+<link rel="canonical" href="http://localhost:4001/portfolio/" />
+<meta property="og:url" content="http://localhost:4001/portfolio/" />
 <meta property="og:site_name" content="Matthew Feil" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Stock Portfolio" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Stock Portfolio","url":"http://localhost:4010/portfolio/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Stock Portfolio","url":"http://localhost:4001/portfolio/"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4010/feed.xml" title="Matthew Feil" />
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Matthew Feil" />
 </head>
 <body><header class="site-header">
 
@@ -33,7 +33,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><a class="page-link" href="/portfolio/">Stock Portfolio</a><a class="page-link" href="/lifting/">Lifting Tracker</a><details class="nav-dropdown">
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><details class="nav-dropdown">
             <summary class="page-link nav-dropdown-summary">Personal Space</summary>
             <div class="nav-dropdown-menu">
               <a class="page-link nav-dropdown-link" href="/lifting/">Lifting Tracker</a>
@@ -73,7 +73,11 @@
         <p class="portfolio-kicker">Personal tracker</p>
         <h2>Your holdings</h2>
       </div>
-      <button id="portfolio-lock-button" type="button">Lock</button>
+      <div class="portfolio-toolbar-actions">
+        <button id="open-stock-dialog" type="button">Add stock</button>
+        <button id="open-log-dialog" type="button">Add log</button>
+        <button id="portfolio-lock-button" type="button">Lock</button>
+      </div>
     </div>
 
     <div class="portfolio-summary" id="portfolio-summary">
@@ -95,45 +99,49 @@
       </div>
     </div>
 
-    <div class="portfolio-grid">
-      <section class="portfolio-panel">
+    <dialog class="portfolio-dialog" id="stock-dialog">
+      <div class="portfolio-dialog-head">
         <h3>Add stock</h3>
-        <form id="stock-form" class="portfolio-form">
-          <label for="stock-symbol">Ticker symbol</label>
-          <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
+        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add stock dialog">Close</button>
+      </div>
+      <form id="stock-form" class="portfolio-form">
+        <label for="stock-symbol">Ticker symbol</label>
+        <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
 
-          <label for="stock-name">Name</label>
-          <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
+        <label for="stock-name">Name</label>
+        <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
 
-          <button type="submit">Add stock</button>
-        </form>
-      </section>
+        <button type="submit">Add stock</button>
+      </form>
+    </dialog>
 
-      <section class="portfolio-panel">
+    <dialog class="portfolio-dialog" id="log-dialog">
+      <div class="portfolio-dialog-head">
         <h3>Add investment log</h3>
-        <form id="log-form" class="portfolio-form">
-          <label for="log-stock">Stock</label>
-          <select id="log-stock" name="stock_id" required></select>
+        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add log dialog">Close</button>
+      </div>
+      <form id="log-form" class="portfolio-form">
+        <label for="log-stock">Stock</label>
+        <select id="log-stock" name="stock_id" required></select>
 
-          <label for="log-date">Date</label>
-          <input id="log-date" name="logged_at" type="date" required>
+        <label for="log-date">Date</label>
+        <input id="log-date" name="logged_at" type="date" required>
 
-          <label for="log-type">Type</label>
-          <select id="log-type" name="entry_type">
-            <option value="additional_investment">Additional invested money</option>
-            <option value="reinvested_dividend">Reinvested dividend</option>
-          </select>
+        <label for="log-type">Type</label>
+        <select id="log-type" name="entry_type">
+          <option value="additional_investment">Additional invested money</option>
+          <option value="reinvested_dividend">Reinvested dividend</option>
+        </select>
 
-          <label for="log-price">Purchase price per share</label>
-          <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
+        <label for="log-price">Purchase price per share</label>
+        <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
 
-          <label for="log-amount">Total purchase amount</label>
-          <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
+        <label for="log-amount">Total purchase amount</label>
+        <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
 
-          <button type="submit">Add log</button>
-        </form>
-      </section>
-    </div>
+        <button type="submit">Add log</button>
+      </form>
+    </dialog>
 
     <p class="portfolio-status" id="portfolio-status" role="status"></p>
 

@@ -25,7 +25,11 @@ permalink: /portfolio/
         <p class="portfolio-kicker">Personal tracker</p>
         <h2>Your holdings</h2>
       </div>
-      <button id="portfolio-lock-button" type="button">Lock</button>
+      <div class="portfolio-toolbar-actions">
+        <button id="open-stock-dialog" type="button">Add stock</button>
+        <button id="open-log-dialog" type="button">Add log</button>
+        <button id="portfolio-lock-button" type="button">Lock</button>
+      </div>
     </div>
 
     <div class="portfolio-summary" id="portfolio-summary">
@@ -47,45 +51,49 @@ permalink: /portfolio/
       </div>
     </div>
 
-    <div class="portfolio-grid">
-      <section class="portfolio-panel">
+    <dialog class="portfolio-dialog" id="stock-dialog">
+      <div class="portfolio-dialog-head">
         <h3>Add stock</h3>
-        <form id="stock-form" class="portfolio-form">
-          <label for="stock-symbol">Ticker symbol</label>
-          <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
+        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add stock dialog">Close</button>
+      </div>
+      <form id="stock-form" class="portfolio-form">
+        <label for="stock-symbol">Ticker symbol</label>
+        <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
 
-          <label for="stock-name">Name</label>
-          <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
+        <label for="stock-name">Name</label>
+        <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
 
-          <button type="submit">Add stock</button>
-        </form>
-      </section>
+        <button type="submit">Add stock</button>
+      </form>
+    </dialog>
 
-      <section class="portfolio-panel">
+    <dialog class="portfolio-dialog" id="log-dialog">
+      <div class="portfolio-dialog-head">
         <h3>Add investment log</h3>
-        <form id="log-form" class="portfolio-form">
-          <label for="log-stock">Stock</label>
-          <select id="log-stock" name="stock_id" required></select>
+        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add log dialog">Close</button>
+      </div>
+      <form id="log-form" class="portfolio-form">
+        <label for="log-stock">Stock</label>
+        <select id="log-stock" name="stock_id" required></select>
 
-          <label for="log-date">Date</label>
-          <input id="log-date" name="logged_at" type="date" required>
+        <label for="log-date">Date</label>
+        <input id="log-date" name="logged_at" type="date" required>
 
-          <label for="log-type">Type</label>
-          <select id="log-type" name="entry_type">
-            <option value="additional_investment">Additional invested money</option>
-            <option value="reinvested_dividend">Reinvested dividend</option>
-          </select>
+        <label for="log-type">Type</label>
+        <select id="log-type" name="entry_type">
+          <option value="additional_investment">Additional invested money</option>
+          <option value="reinvested_dividend">Reinvested dividend</option>
+        </select>
 
-          <label for="log-price">Purchase price per share</label>
-          <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
+        <label for="log-price">Purchase price per share</label>
+        <input id="log-price" name="purchase_price" type="number" min="0" step="0.0001" placeholder="125.50" required>
 
-          <label for="log-amount">Total purchase amount</label>
-          <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
+        <label for="log-amount">Total purchase amount</label>
+        <input id="log-amount" name="total_purchase_amount" type="number" min="0" step="0.01" placeholder="250.00" required>
 
-          <button type="submit">Add log</button>
-        </form>
-      </section>
-    </div>
+        <button type="submit">Add log</button>
+      </form>
+    </dialog>
 
     <p class="portfolio-status" id="portfolio-status" role="status"></p>
 

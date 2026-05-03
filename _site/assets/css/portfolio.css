@@ -48,12 +48,18 @@
 }
 
 .portfolio-toolbar,
+.portfolio-toolbar-actions,
 .portfolio-inline,
 .portfolio-log-head {
   display: flex;
   gap: 0.75rem;
   align-items: center;
   justify-content: space-between;
+}
+
+.portfolio-toolbar-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .portfolio-summary {
@@ -79,13 +85,6 @@
   display: block;
   margin-top: 0.2rem;
   font-size: 1.2rem;
-}
-
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .portfolio-form {
@@ -142,6 +141,37 @@
 
 .portfolio-table-wrap {
   overflow-x: auto;
+}
+
+.portfolio-dialog {
+  width: min(92vw, 440px);
+  padding: 1rem;
+  color: var(--minima-text-color);
+  background: var(--portfolio-soft);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px color-mix(in srgb, black 34%, transparent);
+}
+
+.portfolio-dialog::backdrop {
+  background: color-mix(in srgb, black 48%, transparent);
+}
+
+.portfolio-dialog-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.portfolio-dialog-head h3 {
+  margin: 0;
+}
+
+.portfolio-dialog-close {
+  min-height: 2rem;
+  padding: 0.35rem 0.55rem;
 }
 
 .portfolio-table {
@@ -215,12 +245,12 @@
 }
 
 @media (max-width: 760px) {
-  .portfolio-summary,
-  .portfolio-grid {
+  .portfolio-summary {
     grid-template-columns: 1fr;
   }
 
   .portfolio-toolbar,
+  .portfolio-toolbar-actions,
   .portfolio-inline {
     align-items: stretch;
     flex-direction: column;
