@@ -58,7 +58,7 @@
 .lifting-inline,
 .lifting-panel-head,
 .lifting-logs-heading,
-.lifting-logs-modal-actions,
+.lifting-modal-head-actions,
 .lifting-modal-head {
   display: flex;
   gap: 0.75rem;
@@ -366,9 +366,9 @@
   margin-bottom: 0.75rem;
 }
 
-.lifting-logs-modal-actions {
+.lifting-modal-head-actions {
   justify-content: flex-end;
-  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .lifting-modal::backdrop {
@@ -459,9 +459,9 @@
     width: min(94vw, 560px);
   }
 
-  .lifting-logs-modal-actions {
+  .lifting-modal-head-actions {
     align-items: stretch;
-    flex-direction: column;
+    gap: 0.45rem;
   }
 
   .lifting-log {
