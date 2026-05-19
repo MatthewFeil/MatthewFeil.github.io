@@ -1,0 +1,923 @@
+---
+layout: page
+title: Grade Calculator
+permalink: /gradecalculatorv2/
+---
+
+<div class="grade-v2" data-grade-calculator>
+  <div class="grade-v2-hero">
+    <div class="grade-v2-copy">
+      <label for="current-grade">Current grade</label>
+      <div class="grade-v2-entry percent-field">
+        <input type="number" id="current-grade" min="0" max="100" step="0.01" inputmode="decimal" placeholder="92.5" required>
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="control-stack" aria-label="Calculator controls">
+      <div class="adjustment-controls" aria-label="Adjustments">
+        <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Rounding</button>
+        <button type="button" class="secondary-action" data-open-dialog="scale-dialog" aria-label="Adjust grade scale">Grade scale</button>
+        <button type="button" class="secondary-action" data-open-dialog="weight-dialog" aria-label="Adjust final weight">Weight</button>
+      </div>
+      <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Rounding on</button>
+    </div>
+
+    <p class="grade-v2-summary" id="settings-summary">
+      Rounding within 0.5%. Final exam: 20%. Semester grade: 80%.
+    </p>
+  </div>
+
+  <section id="results-panel" class="results-panel" hidden>
+    <div class="results-heading">
+      <h2>Needed on the final</h2>
+    </div>
+
+    <div class="target-table-wrap">
+      <table class="target-table">
+        <thead>
+          <tr>
+            <th>Letter</th>
+            <th>Lowest final score needed</th>
+          </tr>
+        </thead>
+        <tbody id="target-results"></tbody>
+      </table>
+    </div>
+
+    <div class="example-panel">
+      <label for="example-final-grade">Try a final exam grade</label>
+      <div class="example-entry percent-field">
+        <input type="number" id="example-final-grade" min="0" max="100" step="0.01" inputmode="decimal" placeholder="86">
+        <span>%</span>
+      </div>
+      <output id="example-output">Enter a final grade to preview your semester result.</output>
+    </div>
+  </section>
+
+  <p class="legacy-calculator-link">
+    <a href="{{ "/gradecalculatorv1/" | relative_url }}">Go to legacy grade calculator</a>
+  </p>
+</div>
+
+<dialog class="grade-dialog" id="rounding-dialog">
+  <form method="dialog" class="dialog-panel">
+    <div class="dialog-heading">
+      <h2>Rounding</h2>
+      <button type="button" class="icon-close" data-close-dialog aria-label="Close rounding settings">&times;</button>
+    </div>
+    <label for="rounding-window">Round up when within</label>
+    <div class="setting-row percent-field">
+      <input type="number" id="rounding-window" min="0" max="10" step="0.01" value="0.5">
+      <span>%</span>
+    </div>
+    <p class="dialog-help">Default: 0.5%. If rounding is on, a 92.5 can count as a 93.</p>
+    <div class="dialog-actions">
+      <button type="button" class="ghost-action" id="reset-rounding">Reset</button>
+      <button type="button" class="primary-action" id="save-rounding">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="grade-dialog" id="scale-dialog">
+  <form method="dialog" class="dialog-panel wide-dialog">
+    <div class="dialog-heading">
+      <h2>Grade scale</h2>
+      <button type="button" class="icon-close" data-close-dialog aria-label="Close grade scale settings">&times;</button>
+    </div>
+    <p class="dialog-help">Set the lowest semester grade that earns each letter grade.</p>
+    <div class="scale-grid" id="scale-editor"></div>
+    <p class="form-message" id="scale-message" role="alert"></p>
+    <div class="dialog-actions">
+      <button type="button" class="ghost-action" id="reset-scale">Reset</button>
+      <button type="button" class="primary-action" id="save-scale">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="grade-dialog" id="weight-dialog">
+  <form method="dialog" class="dialog-panel">
+    <div class="dialog-heading">
+      <h2>Final weight</h2>
+      <button type="button" class="icon-close" data-close-dialog aria-label="Close final weight settings">&times;</button>
+    </div>
+    <label for="final-weight">Final exam weight</label>
+    <div class="setting-row percent-field">
+      <input type="number" id="final-weight" min="0" max="100" step="0.01" value="20">
+      <span>%</span>
+    </div>
+    <p class="dialog-help" id="weight-help">Semester grade weight: 80%.</p>
+    <div class="dialog-actions">
+      <button type="button" class="ghost-action" id="reset-weight">Reset</button>
+      <button type="button" class="primary-action" id="save-weight">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  :where(.grade-v2, .grade-dialog) {
+    --gc-surface: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
+    --gc-surface-strong: color-mix(in srgb, var(--minima-background-color) 88%, var(--minima-text-color));
+    --gc-border: var(--minima-border-color-01);
+    --gc-muted: color-mix(in srgb, var(--minima-text-color) 68%, var(--minima-background-color));
+    --gc-accent: #2f6f4e;
+    --gc-accent-dark: #24583d;
+    --gc-good: #16703a;
+    --gc-bad: #b3261e;
+    --gc-warn: #8a5a11;
+  }
+
+  .grade-v2 {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 880px;
+  }
+
+  .grade-v2 * {
+    box-sizing: border-box;
+  }
+
+  .grade-v2-hero,
+  .results-panel,
+  .example-panel,
+  .dialog-panel {
+    background: var(--gc-surface);
+    border: 1px solid var(--gc-border);
+    border-radius: 0.75rem;
+    box-shadow: 0 18px 45px color-mix(in srgb, var(--minima-text-color) 10%, transparent);
+  }
+
+  .grade-v2-hero {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(310px, 0.95fr);
+    column-gap: 1.1rem;
+    row-gap: 0.65rem;
+    align-items: start;
+    padding: 0.95rem 1rem 0.85rem;
+  }
+
+  .grade-v2-copy {
+    width: min(100%, 270px);
+    min-width: 0;
+  }
+
+  .grade-v2-copy label,
+  .example-panel label,
+  .dialog-panel label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--gc-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .grade-v2-copy label {
+    font-size: 0.98rem;
+  }
+
+  .grade-v2-entry,
+  .example-entry,
+  .setting-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    background: var(--minima-background-color);
+    border: 1px solid var(--gc-border);
+    border-radius: 0.6rem;
+    overflow: hidden;
+  }
+
+  .grade-v2-entry input,
+  .example-entry input,
+  .setting-row input,
+  .scale-grid input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--minima-text-color);
+    font: inherit;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .grade-v2-entry input,
+  .example-entry input,
+  .setting-row input {
+    padding: 0.7rem 2rem 0.7rem 0.8rem;
+  }
+
+  .grade-v2-entry span,
+  .example-entry span,
+  .setting-row span {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--gc-muted);
+    font-weight: 700;
+  }
+
+  .grade-v2 button,
+  .grade-dialog button {
+    min-height: 2.4rem;
+    border: 1px solid var(--gc-border);
+    border-radius: 0.55rem;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .primary-action {
+    background: var(--gc-accent);
+    border-color: var(--gc-accent);
+    color: #fff;
+    padding: 0.55rem 0.9rem;
+  }
+
+  .primary-action:hover {
+    background: color-mix(in srgb, var(--gc-accent) 88%, white);
+    border-color: color-mix(in srgb, var(--gc-accent) 72%, white);
+  }
+
+  .control-stack {
+    display: grid;
+    justify-self: end;
+    gap: 0.4rem;
+    width: min(100%, 360px);
+  }
+
+  .adjustment-controls {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .ghost-action,
+  .toggle-action,
+  .secondary-action {
+    background: color-mix(in srgb, var(--minima-background-color) 92%, var(--minima-text-color));
+    color: var(--minima-text-color);
+    padding: 0.55rem 0.75rem;
+  }
+
+  .ghost-action:hover,
+  .toggle-action:hover,
+  .secondary-action:hover {
+    background: color-mix(in srgb, var(--minima-background-color) 86%, var(--minima-text-color));
+    border-color: color-mix(in srgb, var(--gc-border) 70%, var(--minima-text-color));
+  }
+
+  .secondary-action {
+    flex: 1 1 0;
+    min-height: 2.12rem;
+    min-width: 0;
+    padding: 0.36rem 0.42rem;
+    border-radius: 0.45rem;
+    color: var(--minima-text-color);
+    font-size: 0.74rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .toggle-action {
+    width: 100%;
+    min-height: 2.12rem;
+    min-width: 0;
+    padding: 0.36rem 0.42rem;
+    border-radius: 0.45rem;
+    background: color-mix(in srgb, var(--minima-background-color) 84%, var(--minima-text-color));
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+
+  .toggle-action[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--gc-accent) 65%, var(--gc-border));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gc-accent) 32%, transparent);
+  }
+
+  .grade-v2-summary {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin: -0.1rem 0 0;
+    color: var(--gc-muted);
+    font-size: 0.86rem;
+    text-align: left;
+  }
+
+  .results-panel {
+    padding: 1rem;
+  }
+
+  .legacy-calculator-link {
+    margin: -0.35rem 0 0;
+    font-size: 0.88rem;
+  }
+
+  .legacy-calculator-link a {
+    color: var(--gc-muted);
+  }
+
+  .legacy-calculator-link a:hover,
+  .legacy-calculator-link a:focus {
+    color: var(--minima-text-color);
+  }
+
+  .results-heading {
+    margin-bottom: 0.7rem;
+  }
+
+  .results-heading h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .target-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--gc-border);
+    border-radius: 0.65rem;
+  }
+
+  .target-table {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .target-table th,
+  .target-table td {
+    padding: 0.78rem 0.9rem;
+    border-bottom: 1px solid var(--gc-border);
+    text-align: left;
+  }
+
+  .target-table th {
+    color: var(--gc-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+
+  .target-table th:first-child,
+  .target-table td:first-child {
+    width: 35%;
+  }
+
+  .target-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .letter-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.45rem;
+    min-height: 2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: var(--gc-surface-strong);
+    border: 1px solid var(--gc-border);
+    font-weight: 800;
+  }
+
+  .score-needed {
+    font-weight: 800;
+  }
+
+  .score-needed.guaranteed {
+    color: var(--gc-good);
+  }
+
+  .score-needed.impossible {
+    color: var(--gc-bad);
+  }
+
+  .score-needed.reachable {
+    color: var(--minima-text-color);
+  }
+
+  .example-panel {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.55fr) minmax(150px, 0.45fr) minmax(220px, 1fr);
+    gap: 0.75rem;
+    align-items: end;
+    margin-top: 1rem;
+    padding: 0.85rem;
+    box-shadow: none;
+  }
+
+  .example-panel label {
+    align-self: center;
+    margin: 0;
+    text-transform: none;
+    font-size: 0.95rem;
+  }
+
+  .example-panel output {
+    color: var(--gc-muted);
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .grade-dialog {
+    width: min(92vw, 460px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--minima-text-color);
+  }
+
+  #scale-dialog {
+    width: min(92vw, 640px);
+  }
+
+  .grade-dialog::backdrop {
+    background: color-mix(in srgb, black 45%, transparent);
+  }
+
+  .dialog-panel {
+    display: grid;
+    gap: 0.85rem;
+    width: 100%;
+    padding: 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .wide-dialog {
+    width: min(92vw, 620px);
+  }
+
+  .dialog-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .dialog-heading h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .icon-close {
+    width: 2.2rem;
+    padding: 0;
+    background: transparent;
+    color: var(--gc-muted);
+  }
+
+  .icon-close:hover {
+    background: var(--gc-surface-strong);
+    color: var(--minima-text-color);
+  }
+
+  .dialog-help,
+  .form-message {
+    margin: 0;
+    color: var(--gc-muted);
+    font-size: 0.92rem;
+  }
+
+  .form-message {
+    min-height: 1.25rem;
+    color: var(--gc-bad);
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.1rem;
+    gap: 0.5rem;
+  }
+
+  .scale-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .scale-field {
+    position: relative;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .scale-field label {
+    margin: 0;
+    color: var(--gc-muted);
+    font-size: 0.76rem;
+  }
+
+  .scale-field input {
+    min-height: 2.4rem;
+    padding: 0.55rem 1.85rem 0.55rem 0.65rem;
+    border: 1px solid var(--gc-border);
+    border-radius: 0.5rem;
+    background: var(--minima-background-color);
+  }
+
+  .scale-field span {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.58rem;
+    color: var(--gc-muted);
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  @media (max-width: 760px) {
+    .grade-v2-hero {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+    }
+
+    .control-stack {
+      justify-self: stretch;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .example-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .adjustment-controls {
+      gap: 0.35rem;
+    }
+
+    .secondary-action {
+      flex: 1 1 0;
+      padding-inline: 0.45rem;
+      white-space: nowrap;
+    }
+
+    .scale-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 420px) {
+    .grade-v2 {
+      gap: 0.9rem;
+    }
+
+    .grade-v2-hero,
+    .results-panel {
+      padding: 0.8rem;
+    }
+
+    .grade-v2-copy {
+      width: min(100%, 240px);
+    }
+
+    .toggle-action {
+      font-size: 0.72rem;
+    }
+
+    .adjustment-controls {
+      gap: 0.25rem;
+    }
+
+    .secondary-action {
+      min-height: 1.95rem;
+      font-size: 0.68rem;
+    }
+
+    .secondary-action {
+      padding-inline: 0.28rem;
+    }
+
+    .toggle-action {
+      padding-inline: 0.28rem;
+    }
+
+    .grade-v2-summary {
+      font-size: 0.78rem;
+    }
+
+    .target-table th,
+    .target-table td {
+      padding: 0.68rem 0.65rem;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const defaultScale = [
+      { name: 'A+', low: 98 },
+      { name: 'A', low: 93 },
+      { name: 'A-', low: 90 },
+      { name: 'B+', low: 87 },
+      { name: 'B', low: 83 },
+      { name: 'B-', low: 80 },
+      { name: 'C+', low: 77 },
+      { name: 'C', low: 73 },
+      { name: 'C-', low: 70 },
+      { name: 'D+', low: 67 },
+      { name: 'D', low: 63 },
+      { name: 'D-', low: 60 },
+      { name: 'F', low: 0 }
+    ];
+
+    const state = {
+      scale: defaultScale.map((grade) => ({ ...grade })),
+      roundingEnabled: true,
+      roundingWindow: 0.5,
+      finalWeight: 20,
+      currentGrade: null
+    };
+
+    const currentInput = document.getElementById('current-grade');
+    const roundingToggle = document.getElementById('rounding-toggle');
+    const settingsSummary = document.getElementById('settings-summary');
+    const resultsPanel = document.getElementById('results-panel');
+    const targetResults = document.getElementById('target-results');
+    const exampleInput = document.getElementById('example-final-grade');
+    const exampleOutput = document.getElementById('example-output');
+    const scaleEditor = document.getElementById('scale-editor');
+    const scaleMessage = document.getElementById('scale-message');
+    const roundingWindowInput = document.getElementById('rounding-window');
+    const finalWeightInput = document.getElementById('final-weight');
+    const weightHelp = document.getElementById('weight-help');
+
+    function formatNumber(value) {
+      return Number(value.toFixed(2)).toString();
+    }
+
+    function activeTarget(low) {
+      return state.roundingEnabled ? low - state.roundingWindow : low;
+    }
+
+    function neededFinal(currentGrade, targetGrade) {
+      const finalRatio = state.finalWeight / 100;
+      const semesterRatio = 1 - finalRatio;
+
+      if (finalRatio === 0) {
+        return currentGrade >= targetGrade ? 0 : Infinity;
+      }
+
+      return (targetGrade - currentGrade * semesterRatio) / finalRatio;
+    }
+
+    function gradeForTotal(totalGrade) {
+      const match = state.scale.find((grade) => totalGrade >= activeTarget(grade.low));
+      return match ? match.name : state.scale[state.scale.length - 1].name;
+    }
+
+    function updateSummary() {
+      const semesterWeight = 100 - state.finalWeight;
+      settingsSummary.textContent = `${state.roundingEnabled ? `Rounding within ${formatNumber(state.roundingWindow)}%` : 'Rounding off'}. Final exam: ${formatNumber(state.finalWeight)}%. Semester grade: ${formatNumber(semesterWeight)}%.`;
+      roundingToggle.textContent = state.roundingEnabled ? 'Rounding on' : 'Rounding off';
+      roundingToggle.setAttribute('aria-pressed', String(state.roundingEnabled));
+      weightHelp.textContent = `Semester grade weight: ${formatNumber(semesterWeight)}%.`;
+    }
+
+    function statusForNeeded(score) {
+      if (score <= 0) return 'guaranteed';
+      if (score > 100 || !Number.isFinite(score)) return 'impossible';
+      return 'reachable';
+    }
+
+    function labelForNeeded(score) {
+      const status = statusForNeeded(score);
+
+      if (status === 'guaranteed') return 'Guaranteed';
+      if (status === 'impossible') return 'Impossible';
+      return `${formatNumber(Math.max(score, 0))}%`;
+    }
+
+    function renderResults() {
+      if (state.currentGrade === null) {
+        targetResults.innerHTML = '';
+        resultsPanel.hidden = true;
+        updateExample();
+        return;
+      }
+
+      targetResults.innerHTML = '';
+
+      for (const grade of state.scale) {
+        const target = activeTarget(grade.low);
+        const needed = neededFinal(state.currentGrade, target);
+        const status = statusForNeeded(needed);
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td><span class="letter-chip">${grade.name}</span></td>
+          <td><span class="score-needed ${status}">${labelForNeeded(needed)}</span></td>
+        `;
+
+        targetResults.appendChild(row);
+
+        if (status === 'guaranteed') break;
+      }
+
+      resultsPanel.hidden = false;
+      updateExample();
+    }
+
+    function updateExample() {
+      if (state.currentGrade === null) {
+        exampleOutput.textContent = 'Enter your current grade first.';
+        return;
+      }
+
+      const finalGrade = Number.parseFloat(exampleInput.value);
+
+      if (!Number.isFinite(finalGrade)) {
+        exampleOutput.textContent = 'Enter a final grade to preview your semester result.';
+        return;
+      }
+
+      const finalRatio = state.finalWeight / 100;
+      const semesterRatio = 1 - finalRatio;
+      const total = state.currentGrade * semesterRatio + finalGrade * finalRatio;
+      const letter = gradeForTotal(total);
+
+      exampleOutput.textContent = `Total grade: ${formatNumber(total)}%. Letter grade: ${letter}.`;
+    }
+
+    function readCurrentGrade() {
+      const currentGrade = Number.parseFloat(currentInput.value);
+
+      if (!Number.isFinite(currentGrade) || currentGrade < 0 || currentGrade > 100) {
+        return null;
+      }
+
+      return currentGrade;
+    }
+
+    function updateFromCurrentGrade() {
+      state.currentGrade = readCurrentGrade();
+      renderResults();
+    }
+
+    function buildScaleEditor() {
+      scaleEditor.innerHTML = '';
+
+      state.scale.forEach((grade, index) => {
+        const field = document.createElement('div');
+        field.className = 'scale-field';
+        field.innerHTML = `
+          <label for="scale-${index}">${grade.name}</label>
+          <input type="number" id="scale-${index}" data-scale-index="${index}" min="0" max="100" step="0.01" value="${grade.low}">
+          <span>%</span>
+        `;
+        scaleEditor.appendChild(field);
+      });
+    }
+
+    function readScaleEditor() {
+      const inputs = [...scaleEditor.querySelectorAll('input')];
+      const updatedScale = inputs.map((input, index) => ({
+        name: state.scale[index].name,
+        low: Number.parseFloat(input.value)
+      }));
+
+      const invalid = updatedScale.some((grade) => !Number.isFinite(grade.low) || grade.low < 0 || grade.low > 100);
+
+      if (invalid) {
+        return { error: 'Use percentages from 0 to 100 for every letter grade.' };
+      }
+
+      for (let index = 1; index < updatedScale.length; index += 1) {
+        if (updatedScale[index].low > updatedScale[index - 1].low) {
+          return { error: 'Each cutoff must be lower than or equal to the grade above it.' };
+        }
+      }
+
+      return { scale: updatedScale };
+    }
+
+    function closeDialog(dialog) {
+      if (dialog && dialog.open) dialog.close();
+    }
+
+    document.querySelectorAll('[data-open-dialog]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const dialog = document.getElementById(button.dataset.openDialog);
+
+        if (!dialog) return;
+
+        if (dialog.id === 'scale-dialog') {
+          scaleMessage.textContent = '';
+          buildScaleEditor();
+        }
+
+        if (dialog.id === 'rounding-dialog') {
+          roundingWindowInput.value = state.roundingWindow;
+        }
+
+        if (dialog.id === 'weight-dialog') {
+          finalWeightInput.value = state.finalWeight;
+          updateSummary();
+        }
+
+        dialog.showModal();
+      });
+    });
+
+    document.querySelectorAll('.grade-dialog').forEach((dialog) => {
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) closeDialog(dialog);
+      });
+    });
+
+    document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+      button.addEventListener('click', () => closeDialog(button.closest('dialog')));
+    });
+
+    roundingToggle.addEventListener('click', () => {
+      state.roundingEnabled = !state.roundingEnabled;
+      updateSummary();
+      renderResults();
+    });
+
+    document.getElementById('save-rounding').addEventListener('click', () => {
+      const nextWindow = Number.parseFloat(roundingWindowInput.value);
+
+      if (!Number.isFinite(nextWindow) || nextWindow < 0 || nextWindow > 10) {
+        roundingWindowInput.focus();
+        return;
+      }
+
+      state.roundingWindow = nextWindow;
+      updateSummary();
+      renderResults();
+      closeDialog(document.getElementById('rounding-dialog'));
+    });
+
+    document.getElementById('reset-rounding').addEventListener('click', () => {
+      state.roundingWindow = 0.5;
+      roundingWindowInput.value = state.roundingWindow;
+      updateSummary();
+      renderResults();
+    });
+
+    document.getElementById('save-scale').addEventListener('click', () => {
+      const result = readScaleEditor();
+
+      if (result.error) {
+        scaleMessage.textContent = result.error;
+        return;
+      }
+
+      state.scale = result.scale;
+      scaleMessage.textContent = '';
+      renderResults();
+      closeDialog(document.getElementById('scale-dialog'));
+    });
+
+    document.getElementById('reset-scale').addEventListener('click', () => {
+      state.scale = defaultScale.map((grade) => ({ ...grade }));
+      scaleMessage.textContent = '';
+      buildScaleEditor();
+      renderResults();
+    });
+
+    document.getElementById('save-weight').addEventListener('click', () => {
+      const nextWeight = Number.parseFloat(finalWeightInput.value);
+
+      if (!Number.isFinite(nextWeight) || nextWeight < 0 || nextWeight > 100) {
+        finalWeightInput.focus();
+        return;
+      }
+
+      state.finalWeight = nextWeight;
+      updateSummary();
+      renderResults();
+      closeDialog(document.getElementById('weight-dialog'));
+    });
+
+    document.getElementById('reset-weight').addEventListener('click', () => {
+      state.finalWeight = 20;
+      finalWeightInput.value = state.finalWeight;
+      updateSummary();
+      renderResults();
+    });
+
+    finalWeightInput.addEventListener('input', () => {
+      const nextWeight = Number.parseFloat(finalWeightInput.value);
+      const semesterWeight = Number.isFinite(nextWeight) ? 100 - nextWeight : 80;
+      weightHelp.textContent = `Semester grade weight: ${formatNumber(Math.max(0, Math.min(100, semesterWeight)))}%.`;
+    });
+
+    currentInput.addEventListener('input', updateFromCurrentGrade);
+    exampleInput.addEventListener('input', updateExample);
+
+    updateSummary();
+  })();
+</script>

@@ -3,21 +3,23 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Grade Calculator | Matthew Feil</title>
+<title>Grade Calculator (Legacy) | Matthew Feil</title>
 <meta name="generator" content="Jekyll v4.4.1" />
-<meta property="og:title" content="Grade Calculator" />
+<meta property="og:title" content="Grade Calculator (Legacy)" />
 <meta name="author" content="Matthew Feil" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
 <meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<link rel="canonical" href="http://localhost:4000/gradecalculatorv1/" />
+<meta property="og:url" content="http://localhost:4000/gradecalculatorv1/" />
 <meta property="og:site_name" content="Matthew Feil" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Grade Calculator" />
+<meta property="twitter:title" content="Grade Calculator (Legacy)" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Grade Calculator","url":"/grade-calculator/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Grade Calculator (Legacy)","url":"http://localhost:4000/gradecalculatorv1/"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Matthew Feil" />
 </head>
 <body><header class="site-header">
 
@@ -46,11 +48,16 @@
         <article class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Grade Calculator</h1>
+    <h1 class="post-title">Grade Calculator (Legacy)</h1>
   </header>
 
   <div class="post-content">
-    <div class="calculator">
+    <div class="legacy-calculator-banner">
+  This is the old version of my grade calculator.
+  <a href="/gradecalculatorv2/">Try the new one here</a>.
+</div>
+
+<div class="calculator">
   <div id="controls">
     <label for="currentGrade">Current Semester Grade (%):</label>
     <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
@@ -94,6 +101,14 @@
   background-color: color-mix(in srgb, #245f73 92%, white);
   border-color: color-mix(in srgb, #245f73 72%, white);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
+}
+
+.legacy-calculator-banner {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--minima-background-color) 90%, var(--minima-text-color));
+  border: 1px solid var(--minima-border-color-01);
+  border-radius: 0.6rem;
 }
   #results th,
   #results td {
