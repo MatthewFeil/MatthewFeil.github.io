@@ -9,7 +9,7 @@ permalink: /gradecalculatorv2/
     <div class="grade-v2-copy">
       <label for="current-grade">Current grade</label>
       <div class="grade-v2-entry percent-field">
-        <input type="number" id="current-grade" min="0" max="100" step="0.01" inputmode="decimal" placeholder="92.5" required>
+        <input type="number" id="current-grade" min="0" max="150" step="0.01" inputmode="decimal" placeholder="92.5" required>
         <span>%</span>
       </div>
     </div>
@@ -631,6 +631,8 @@ permalink: /gradecalculatorv2/
       { name: 'D-', low: 60 },
       { name: 'F', low: 0 }
     ];
+    const maxCurrentGrade = 150;
+    const maxFinalScore = 100;
 
     const state = {
       scale: defaultScale.map((grade) => ({ ...grade })),
@@ -687,7 +689,7 @@ permalink: /gradecalculatorv2/
 
     function statusForNeeded(score) {
       if (score <= 0) return 'guaranteed';
-      if (score > 100 || !Number.isFinite(score)) return 'impossible';
+      if (score > maxFinalScore || !Number.isFinite(score)) return 'impossible';
       return 'reachable';
     }
 
@@ -742,6 +744,11 @@ permalink: /gradecalculatorv2/
         return;
       }
 
+      if (finalGrade < 0 || finalGrade > maxFinalScore) {
+        exampleOutput.textContent = `Final exam grades must be between 0% and ${maxFinalScore}%.`;
+        return;
+      }
+
       const finalRatio = state.finalWeight / 100;
       const semesterRatio = 1 - finalRatio;
       const total = state.currentGrade * semesterRatio + finalGrade * finalRatio;
@@ -753,7 +760,7 @@ permalink: /gradecalculatorv2/
     function readCurrentGrade() {
       const currentGrade = Number.parseFloat(currentInput.value);
 
-      if (!Number.isFinite(currentGrade) || currentGrade < 0 || currentGrade > 100) {
+      if (!Number.isFinite(currentGrade) || currentGrade < 0 || currentGrade > maxCurrentGrade) {
         return null;
       }
 

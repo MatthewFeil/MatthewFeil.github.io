@@ -3,12 +3,13 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-lifting-password",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-personal-token",
+  "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
 };
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const personalSpaceTokenSecret = Deno.env.get("PERSONAL_SPACE_TOKEN_SECRET") || "";
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 function json(body: Record<string, unknown>, status = 200) {
@@ -18,27 +19,58 @@ function json(body: Record<string, unknown>, status = 200) {
   });
 }
 
-async function sha256Hex(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+function base64UrlEncode(value: string | ArrayBuffer) {
+  const binary = typeof value === "string"
+    ? value
+    : String.fromCharCode(...new Uint8Array(value));
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-async function assertPassword(req: Request) {
-  const password = req.headers.get("x-lifting-password") || "";
-  if (!password) return false;
+function base64UrlDecode(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(normalized.length + ((4 - normalized.length % 4) % 4), "=");
+  return atob(padded);
+}
 
-  const { data, error } = await supabase
-    .from("lifting_app_settings")
-    .select("password_salt,password_hash")
-    .eq("id", true)
-    .single();
+function timingSafeEqual(left: string, right: string) {
+  if (left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
 
-  if (error || !data) return false;
-  const candidate = await sha256Hex(`${data.password_salt}${password}`);
-  return candidate === data.password_hash;
+async function signTokenPayload(payloadPart: string) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(personalSpaceTokenSecret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payloadPart));
+  return base64UrlEncode(signature);
+}
+
+async function verifyPersonalSpaceToken(req: Request) {
+  if (!personalSpaceTokenSecret) return false;
+
+  const token = req.headers.get("x-personal-token") || "";
+  const parts = token.split(".");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
+
+  const expectedSignature = await signTokenPayload(parts[0]);
+  if (!timingSafeEqual(parts[1], expectedSignature)) return false;
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(parts[0]));
+    return payload?.scope === "personal-space" &&
+      typeof payload.exp === "number" &&
+      payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 }
 
 function cleanName(name: unknown) {
@@ -55,8 +87,8 @@ Deno.serve(async (req: Request) => {
   if (req.method === "GET" || req.method === "HEAD") return json({ ok: true });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
-  const unlocked = await assertPassword(req);
-  if (!unlocked) return json({ error: "Incorrect password." }, 401);
+  const unlocked = await verifyPersonalSpaceToken(req);
+  if (!unlocked) return json({ error: "Personal Space unlock required." }, 401);
 
   const body = await req.json().catch(() => ({}));
   const action = body.action;

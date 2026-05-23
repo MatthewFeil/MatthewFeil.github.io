@@ -1,7 +1,9 @@
 (() => {
-  const PASSWORD_KEY = 'liftingTrackerPassword';
+  const TOKEN_KEY = 'personalSpaceToken';
+  const TOKEN_EXPIRY_KEY = 'personalSpaceTokenExpiresAt';
   const app = document.querySelector('.lifting-app');
   const apiUrl = app.dataset.apiUrl;
+  const personalUrl = app.dataset.personalUrl || '/personal/';
   const repPercent = {
     1: 1,
     2: 0.95,
@@ -16,17 +18,14 @@
   };
 
   const state = {
-    password: sessionStorage.getItem(PASSWORD_KEY) || '',
+    token: sessionStorage.getItem(TOKEN_KEY) || '',
     lifts: [],
     logs: [],
     query: ''
   };
 
   const els = {
-    lock: document.getElementById('lifting-lock'),
     workspace: document.getElementById('lifting-workspace'),
-    unlockForm: document.getElementById('lifting-unlock-form'),
-    password: document.getElementById('lifting-password'),
     lockButton: document.getElementById('lifting-lock-button'),
     logSetOpen: document.getElementById('log-set-open'),
     logSetClose: document.getElementById('log-set-close'),
@@ -54,19 +53,37 @@
     els.status.style.color = isError ? 'var(--lifting-warn)' : '';
   }
 
+  function sessionIsFresh() {
+    const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
+    return Boolean(state.token && Number.isFinite(expiresAt) && expiresAt > Date.now());
+  }
+
+  function clearSession() {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
+    state.token = '';
+  }
+
+  function redirectToPersonal() {
+    const next = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
+    window.location.href = `${personalUrl}?next=${next}`;
+  }
+
   async function api(action, payload = {}) {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-lifting-password': state.password
+        'x-personal-token': state.token
       },
       body: JSON.stringify({ action, ...payload })
     });
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.error || 'The lifting tracker request failed.');
+      const error = new Error(data.error || 'The lifting tracker request failed.');
+      error.status = response.status;
+      throw error;
     }
     return data;
   }
@@ -215,32 +232,12 @@
     setStatus(`Updated ${new Date().toLocaleTimeString()}.`);
   }
 
-  async function unlock(password) {
-    state.password = password;
-    await loadLifts();
-    sessionStorage.setItem(PASSWORD_KEY, password);
-    els.lock.hidden = true;
-    els.workspace.hidden = false;
-  }
-
   els.logDate.valueAsDate = new Date();
 
-  els.unlockForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    try {
-      await unlock(els.password.value);
-    } catch (error) {
-      setStatus(error.message, true);
-      alert(error.message);
-    }
-  });
-
   els.lockButton.addEventListener('click', () => {
-    sessionStorage.removeItem(PASSWORD_KEY);
-    state.password = '';
-    els.password.value = '';
-    els.lock.hidden = false;
     els.workspace.hidden = true;
+    clearSession();
+    redirectToPersonal();
   });
 
   els.addLiftOpen.addEventListener('click', () => {
@@ -361,10 +358,26 @@
     }
   });
 
-  if (state.password) {
-    unlock(state.password).catch(() => {
-      sessionStorage.removeItem(PASSWORD_KEY);
-      state.password = '';
-    });
+  async function boot() {
+    if (!sessionIsFresh()) {
+      clearSession();
+      redirectToPersonal();
+      return;
+    }
+
+    els.workspace.hidden = false;
+
+    try {
+      await loadLifts();
+    } catch (error) {
+      if (error.status === 401 || error.status === 403) {
+        clearSession();
+        redirectToPersonal();
+        return;
+      }
+      setStatus(error instanceof Error ? error.message : 'The lifting tracker request failed.', true);
+    }
   }
+
+  boot();
 })();

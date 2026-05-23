@@ -6,19 +6,11 @@ permalink: /lifting/
 
 <link rel="stylesheet" href="{{ "/assets/css/lifting.css" | relative_url }}">
 
-<section class="lifting-app" data-api-url="https://nurewbriwdvfojjeqsvy.functions.supabase.co/lifting-api">
-  <div class="tracker-lock lifting-lock" id="lifting-lock">
-    <h2>Lifting tracker locked</h2>
-    <p>Enter the lifting tracker password to view and update your lift tracker.</p>
-    <form id="lifting-unlock-form" class="tracker-lock-form lifting-form">
-      <label for="lifting-password">Password</label>
-      <div class="tracker-lock-inline lifting-inline">
-        <input id="lifting-password" type="password" autocomplete="current-password" required>
-        <button type="submit">Unlock</button>
-      </div>
-    </form>
-  </div>
-
+<section
+  class="lifting-app"
+  data-api-url="https://nurewbriwdvfojjeqsvy.functions.supabase.co/lifting-api"
+  data-personal-url="{{ "/personal/" | relative_url }}"
+>
   <div class="lifting-workspace" id="lifting-workspace" hidden>
     <div class="lifting-toolbar">
       <div>

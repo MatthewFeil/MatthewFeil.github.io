@@ -1,0 +1,197 @@
+.personal-app {
+  --personal-border: color-mix(in srgb, currentColor 16%, transparent);
+  --personal-muted: color-mix(in srgb, currentColor 62%, transparent);
+  --personal-surface: color-mix(in srgb, var(--minima-background-color) 94%, var(--minima-text-color));
+  --personal-soft: color-mix(in srgb, var(--minima-background-color) 97%, var(--minima-text-color));
+  --personal-accent: #245f73;
+  --personal-warn: #9f6b00;
+  display: grid;
+  gap: 1rem;
+}
+
+.personal-lock,
+.personal-workspace {
+  border: 1px solid var(--personal-border);
+  border-radius: 8px;
+  background: var(--personal-soft);
+  padding: 1rem;
+}
+
+.personal-lock {
+  max-width: 520px;
+}
+
+.personal-lock h2,
+.personal-heading h2 {
+  margin: 0;
+}
+
+.personal-lock p,
+.personal-kicker,
+.personal-status,
+.personal-card span {
+  color: var(--personal-muted);
+}
+
+.personal-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.personal-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.personal-form label {
+  color: var(--personal-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.personal-inline,
+.personal-heading {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.personal-inline input,
+.personal-inline button,
+.personal-heading button {
+  min-height: 2.55rem;
+  border: 1px solid var(--personal-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.personal-inline input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  background: var(--minima-background-color);
+  color: var(--minima-text-color);
+}
+
+.personal-inline button,
+.personal-heading button {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.personal-inline button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: var(--personal-accent);
+  border-color: var(--personal-accent);
+  color: #fff;
+  padding: 0.55rem 0.9rem;
+}
+
+.personal-inline button:disabled {
+  cursor: wait;
+  opacity: 0.86;
+}
+
+.personal-button-spinner {
+  display: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid color-mix(in srgb, white 38%, transparent);
+  border-top-color: #fff;
+  border-radius: 999px;
+  animation: personal-spin 0.75s linear infinite;
+}
+
+.personal-inline button.is-loading .personal-button-spinner {
+  display: inline-block;
+}
+
+@keyframes personal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.personal-heading {
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.personal-heading button {
+  background: var(--personal-surface);
+  color: var(--minima-text-color);
+  padding: 0.55rem 0.8rem;
+}
+
+.personal-inline button:hover {
+  background: color-mix(in srgb, var(--personal-accent) 92%, white);
+  border-color: color-mix(in srgb, var(--personal-accent) 72%, white);
+}
+
+.personal-heading button:hover,
+.personal-card:hover {
+  background: color-mix(in srgb, var(--personal-surface) 88%, var(--minima-text-color));
+  border-color: color-mix(in srgb, var(--personal-border) 70%, var(--minima-text-color));
+}
+
+.personal-status {
+  min-height: 0;
+  margin: 0;
+}
+
+.personal-status.is-error {
+  margin-top: 0.65rem;
+  color: var(--personal-warn);
+}
+
+.personal-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.personal-card {
+  display: flex;
+  align-items: center;
+  min-height: 3.1rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--personal-border);
+  border-radius: 8px;
+  background: var(--personal-surface);
+  color: var(--minima-text-color);
+  text-decoration: none;
+}
+
+.personal-card:visited {
+  color: var(--minima-text-color);
+}
+
+.personal-card span {
+  color: var(--minima-text-color);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+@media (max-width: 560px) {
+  .personal-inline,
+  .personal-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-inline,
+  .personal-heading {
+    display: grid;
+    align-items: stretch;
+  }
+}

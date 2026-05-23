@@ -1,0 +1,51 @@
+---
+layout: page
+title: Personal Space
+permalink: /personal/
+---
+
+<link rel="stylesheet" href="{{ "/assets/css/personal.css" | relative_url }}">
+
+<section
+  class="personal-app"
+  data-personal-app
+  data-auth-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
+>
+  <div class="personal-lock" id="personal-lock">
+    <p class="personal-kicker">Private tools</p>
+    <h2>Personal Space</h2>
+    <p>Enter your password to open your private trackers on this device.</p>
+    <form id="personal-unlock-form" class="personal-form">
+      <label for="personal-password">Password</label>
+      <div class="personal-inline">
+        <input id="personal-password" type="password" autocomplete="current-password" required>
+        <button type="submit" id="personal-unlock-button">
+          <span class="personal-button-label">Unlock</span>
+          <span class="personal-button-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </form>
+    <p class="personal-status" id="personal-status" role="status"></p>
+  </div>
+
+  <div class="personal-workspace" id="personal-workspace" hidden>
+    <div class="personal-heading">
+      <div>
+        <p class="personal-kicker">Private tools</p>
+        <h2>Personal Space</h2>
+      </div>
+      <button id="personal-lock-button" type="button">Lock</button>
+    </div>
+
+    <div class="personal-card-grid" aria-label="Personal tracker links">
+      <a class="personal-card" href="{{ "/portfolio/" | relative_url }}">
+        <span>Portfolio Tracker</span>
+      </a>
+      <a class="personal-card" href="{{ "/lifting/" | relative_url }}">
+        <span>Lifting Tracker</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script src="{{ "/assets/js/personal.js" | relative_url }}" defer></script>

@@ -1,19 +1,18 @@
 (() => {
-  const PASSWORD_KEY = 'stockPortfolioPassword';
+  const TOKEN_KEY = 'personalSpaceToken';
+  const TOKEN_EXPIRY_KEY = 'personalSpaceTokenExpiresAt';
   const app = document.querySelector('.portfolio-app');
   const apiUrl = app.dataset.apiUrl;
+  const personalUrl = app.dataset.personalUrl || '/personal/';
   const state = {
-    password: sessionStorage.getItem(PASSWORD_KEY) || '',
+    token: sessionStorage.getItem(TOKEN_KEY) || '',
     stocks: [],
     logs: [],
     quotes: {}
   };
 
   const els = {
-    lock: document.getElementById('portfolio-lock'),
     workspace: document.getElementById('portfolio-workspace'),
-    unlockForm: document.getElementById('portfolio-unlock-form'),
-    password: document.getElementById('portfolio-password'),
     lockButton: document.getElementById('portfolio-lock-button'),
     openStockDialog: document.getElementById('open-stock-dialog'),
     openLogDialog: document.getElementById('open-log-dialog'),
@@ -40,6 +39,22 @@
     els.status.classList.toggle('portfolio-negative', isError);
   }
 
+  function sessionIsFresh() {
+    const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
+    return Boolean(state.token && Number.isFinite(expiresAt) && expiresAt > Date.now());
+  }
+
+  function clearSession() {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
+    state.token = '';
+  }
+
+  function redirectToPersonal() {
+    const next = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
+    window.location.href = `${personalUrl}?next=${next}`;
+  }
+
   function openDialog(dialog) {
     if (typeof dialog.showModal === 'function') {
       dialog.showModal();
@@ -63,14 +78,16 @@
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-portfolio-password': state.password
+        'x-personal-token': state.token
       },
       body: JSON.stringify({ action, ...payload })
     });
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.error || 'The portfolio request failed.');
+      const error = new Error(data.error || 'The portfolio request failed.');
+      error.status = response.status;
+      throw error;
     }
     return data;
   }
@@ -189,34 +206,14 @@
     setStatus(`Updated ${new Date().toLocaleTimeString()}.`);
   }
 
-  async function unlock(password) {
-    state.password = password;
-    await loadPortfolio();
-    sessionStorage.setItem(PASSWORD_KEY, password);
-    els.lock.hidden = true;
-    els.workspace.hidden = false;
-  }
-
   els.logDate.valueAsDate = new Date();
 
-  els.unlockForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    try {
-      await unlock(els.password.value);
-    } catch (error) {
-      setStatus(error.message, true);
-      alert(error.message);
-    }
-  });
-
   els.lockButton.addEventListener('click', () => {
-    sessionStorage.removeItem(PASSWORD_KEY);
-    state.password = '';
-    els.password.value = '';
+    clearSession();
     closeDialog(els.stockDialog);
     closeDialog(els.logDialog);
-    els.lock.hidden = false;
     els.workspace.hidden = true;
+    redirectToPersonal();
   });
 
   els.openStockDialog.addEventListener('click', () => {
@@ -301,10 +298,26 @@
     }
   });
 
-  if (state.password) {
-    unlock(state.password).catch(() => {
-      sessionStorage.removeItem(PASSWORD_KEY);
-      state.password = '';
-    });
+  async function boot() {
+    if (!sessionIsFresh()) {
+      clearSession();
+      redirectToPersonal();
+      return;
+    }
+
+    els.workspace.hidden = false;
+
+    try {
+      await loadPortfolio();
+    } catch (error) {
+      if (error.status === 401 || error.status === 403) {
+        clearSession();
+        redirectToPersonal();
+        return;
+      }
+      setStatus(error instanceof Error ? error.message : 'The portfolio request failed.', true);
+    }
   }
+
+  boot();
 })();
