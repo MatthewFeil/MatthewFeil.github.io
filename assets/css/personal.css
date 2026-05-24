@@ -208,3 +208,12 @@
     align-items: stretch;
   }
 }
+
+@media (hover: none), (pointer: coarse) {
+  .personal-inline button:hover,
+  .personal-heading button:hover,
+  .personal-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
+}

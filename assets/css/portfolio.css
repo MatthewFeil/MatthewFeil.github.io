@@ -314,6 +314,16 @@
   margin: 0.75rem 0 0;
 }
 
+@media (hover: none), (pointer: coarse) {
+  .portfolio-form button:hover,
+  .portfolio-toolbar button:hover,
+  .portfolio-action:hover,
+  .portfolio-dialog-close:hover {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
 @media (max-width: 760px) {
   .portfolio-summary {
     grid-template-columns: 1fr;

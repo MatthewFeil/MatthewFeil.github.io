@@ -551,6 +551,13 @@ table {
   color: var(--site-bad);
 }
 
+@media (hover: none), (pointer: coarse) {
+  .nav-toggle:hover,
+  .post-content button:not(.lifting-row):hover {
+    box-shadow: none;
+    transform: none;
+  }
+}
 .post-content input,
 .post-content select,
 .post-content textarea {
@@ -691,9 +698,6 @@ table {
   }
 }
 @media (max-width: 560px) {
-  :root {
-    --header-height: auto;
-  }
   .site-header-inner,
   .site-main,
   .site-footer-inner {

@@ -540,6 +540,18 @@
   }
 }
 
+@media (hover: none), (pointer: coarse) {
+  .lifting-form button:hover,
+  .lifting-log-form button:hover,
+  .lifting-secondary:hover,
+  .lifting-action:hover,
+  .lifting-icon-button:hover,
+  .lifting-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
 @media (max-width: 520px) {
   .lifting-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
