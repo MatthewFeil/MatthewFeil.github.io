@@ -15,6 +15,10 @@
 
     {%- include footer.html -%}
 
+    {%- if jekyll.environment == "production" -%}
+      <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "93bc5e1dbcba4824be147e6f3fd81f8a"}'></script><!-- End Cloudflare Web Analytics -->
+    {%- endif -%}
+
     <script src="{{ "/assets/js/site.js" | relative_url }}" defer></script>
 
   </body>
