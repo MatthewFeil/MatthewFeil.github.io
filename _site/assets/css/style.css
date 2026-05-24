@@ -241,6 +241,8 @@ table {
 .home {
   display: grid;
   gap: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .home-hero {
@@ -248,6 +250,7 @@ table {
   grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.55fr);
   gap: clamp(2rem, 6vw, 6rem);
   align-items: center;
+  min-width: 0;
   min-height: calc(100svh - var(--header-height) - clamp(1.3rem, 3.5vw, 3rem));
   padding-bottom: clamp(1.2rem, 4vw, 3rem);
   border-bottom: 2px solid var(--site-border);
@@ -255,6 +258,7 @@ table {
 
 .home-title-block {
   align-self: center;
+  min-width: 0;
 }
 
 .home h1 {
@@ -276,6 +280,7 @@ table {
   display: grid;
   gap: clamp(1.2rem, 3vw, 2rem);
   align-self: center;
+  min-width: 0;
   padding-bottom: 0.4rem;
 }
 
@@ -284,6 +289,7 @@ table {
   grid-template-columns: minmax(12rem, 0.35fr) minmax(0, 0.65fr);
   gap: clamp(1rem, 4vw, 3rem);
   align-items: start;
+  min-width: 0;
   padding: clamp(2rem, 5vw, 4rem) 0;
 }
 
@@ -310,6 +316,7 @@ table {
 }
 
 .home-about p {
+  min-width: 0;
   margin: 0;
   color: var(--site-text);
   font-family: var(--font-body);
@@ -320,6 +327,7 @@ table {
 
 .home-link-list {
   display: grid;
+  min-width: 0;
   border-top: 2px solid var(--site-border);
 }
 
@@ -347,6 +355,7 @@ table {
 
 .post-list {
   display: grid;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -636,17 +645,30 @@ table {
     display: contents;
   }
   .trigger {
-    display: none;
+    display: flex;
     grid-column: 1/-1;
     justify-self: stretch;
     align-items: flex-end;
     flex-direction: column;
     gap: 0.6rem;
     width: 100%;
-    padding-top: 0.2rem;
+    max-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-0.35rem);
+    visibility: hidden;
+    transition: max-height 0.28s ease, padding-top 0.28s ease, opacity 0.2s ease, transform 0.28s ease, visibility 0s linear 0.28s;
   }
   .nav-trigger:checked ~ .trigger {
-    display: flex;
+    max-height: 18rem;
+    padding-top: 0.2rem;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    visibility: visible;
+    transition: max-height 0.32s ease, padding-top 0.32s ease, opacity 0.22s ease 0.04s, transform 0.32s ease, visibility 0s;
   }
   .home-hero {
     grid-template-columns: 1fr;
@@ -680,6 +702,20 @@ table {
   }
   .site-header-inner {
     gap: 0.8rem;
+  }
+  .home h1 {
+    max-width: 100%;
+    font-size: clamp(2.75rem, 13.5vw, 4.1rem);
+    letter-spacing: 0.005em;
+  }
+  .home-about,
+  .post-list,
+  .post-list li {
+    width: 100%;
+  }
+  .home-about p,
+  .post-link {
+    overflow-wrap: anywhere;
   }
   .post-title,
   .page-heading {
