@@ -315,12 +315,37 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .portfolio-form button:hover,
   .portfolio-toolbar button:hover,
-  .portfolio-action:hover,
-  .portfolio-dialog-close:hover {
+  .portfolio-action:hover {
+    background: var(--portfolio-surface);
+    border-color: var(--portfolio-border);
+    color: var(--site-text);
     box-shadow: none;
     transform: none;
+  }
+
+  .portfolio-form button:hover {
+    background: var(--portfolio-button);
+    border-color: var(--portfolio-button);
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .portfolio-dialog-close:hover {
+    background: transparent;
+    border-color: var(--portfolio-border);
+    color: var(--portfolio-muted);
+    box-shadow: none;
+    transform: none;
+  }
+
+  [data-delete-stock]:hover,
+  .portfolio-log [data-delete-log]:hover,
+  #portfolio-lock-button:hover {
+    background: var(--portfolio-surface);
+    border-color: var(--portfolio-border);
+    color: var(--site-text);
   }
 }
 

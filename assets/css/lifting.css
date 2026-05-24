@@ -541,14 +541,40 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .lifting-form button:hover,
-  .lifting-log-form button:hover,
   .lifting-secondary:hover,
   .lifting-action:hover,
-  .lifting-icon-button:hover,
-  .lifting-card:hover {
+  .lifting-icon-button:hover {
+    background: var(--lifting-surface);
+    border-color: var(--lifting-border);
+    color: var(--site-text);
     box-shadow: none;
     transform: none;
+  }
+
+  .lifting-form button:hover,
+  .lifting-log-form button:hover {
+    background: var(--lifting-accent);
+    border-color: var(--lifting-accent);
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .lifting-card:hover {
+    border-color: var(--lifting-border);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .lifting-row:hover {
+    background: transparent;
+  }
+
+  #lifting-lock-button:hover,
+  .lifting-action:is([data-delete-log], [data-delete-lift], #lift-logs-delete):hover {
+    background: var(--lifting-surface);
+    border-color: var(--lifting-border);
+    color: var(--site-text);
   }
 }
 

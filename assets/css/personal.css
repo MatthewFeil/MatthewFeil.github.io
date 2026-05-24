@@ -210,9 +210,25 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .personal-inline button:hover,
-  .personal-heading button:hover,
+  .personal-inline button:hover {
+    background: var(--personal-accent);
+    border-color: var(--personal-accent);
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .personal-heading button:hover {
+    background: var(--personal-surface);
+    border-color: var(--personal-border);
+    color: var(--site-text);
+    box-shadow: none;
+    transform: none;
+  }
+
   .personal-card:hover {
+    background: var(--personal-surface);
+    border-color: var(--personal-border);
     box-shadow: none;
     transform: none;
   }

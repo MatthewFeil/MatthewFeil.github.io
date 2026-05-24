@@ -2,6 +2,7 @@
 layout: post
 title: Improved Grade Calculator
 date: 2026-05-18 21:37:00 -05:00
+tagline: "Introducing the updated finals grade calculator with instant results and more customization!"
 ---
 
 ## Try the improved calculator [here]({{ "/gradecalculatorv2/" | relative_url }})!

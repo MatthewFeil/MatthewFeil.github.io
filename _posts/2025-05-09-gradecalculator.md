@@ -2,6 +2,7 @@
 layout: post
 title:  Finals Grade Calculator
 date:   2025-05-09 8:50:00 -05:00
+tagline: "Now you can know you need a 92% on the final to get that A!"
 ---
 
 ## Try the calculator [here](/gradecalculatorv1/)!

@@ -359,23 +359,41 @@ table {
 
 .post-list {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.1rem);
   min-width: 0;
-  margin: 0;
+  margin: clamp(1rem, 2.6vw, 1.45rem) 0 0;
   padding: 0;
   list-style: none;
 }
 
 .post-list li {
-  display: grid;
-  grid-template-columns: minmax(7rem, 0.2fr) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-  border-top: 1px solid var(--site-soft-border);
-  padding: 1rem 0;
+  min-width: 0;
 }
 
-.post-list li:last-child {
-  border-bottom: 1px solid var(--site-soft-border);
+.post-card {
+  display: grid;
+  align-content: space-between;
+  gap: clamp(1.25rem, 4vw, 2.25rem);
+  min-height: clamp(8rem, 17vw, 12rem);
+  min-width: 0;
+  height: 100%;
+  padding: clamp(0.85rem, 2.2vw, 1.2rem);
+  border: 1px solid var(--site-soft-border);
+  background: var(--site-surface);
+  color: var(--site-text);
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.post-card:hover,
+.post-card:focus-visible {
+  background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
+  border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  color: var(--site-text);
+  outline: none;
+  transform: translate(-2px, -2px);
 }
 
 .post-meta {
@@ -386,10 +404,23 @@ table {
   text-transform: uppercase;
 }
 
+.post-card-copy {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
 .post-list h3 {
   margin: 0;
-  font-size: clamp(1.12rem, 2.4vw, 2rem);
+  font-size: clamp(1.15rem, 2.1vw, 1.75rem);
   line-height: 1.05;
+}
+
+.post-tagline {
+  color: var(--site-muted);
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  font-weight: 650;
+  line-height: 1.25;
 }
 
 .post-link {
@@ -556,10 +587,37 @@ table {
 }
 
 @media (hover: none), (pointer: coarse) {
-  .nav-toggle:hover,
+  .nav-toggle:hover {
+    background: transparent;
+    border-color: var(--site-border);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .page-link:hover {
+    color: var(--site-muted);
+  }
+
+  .home-link-list a:hover,
+  .post-link:hover {
+    color: var(--site-text);
+  }
+
+  .post-card:hover,
+  .post-card:focus-visible {
+    background: var(--site-surface);
+    border-color: var(--site-soft-border);
+    box-shadow: none;
+    transform: none;
+  }
+
   .post-content button:not(.lifting-row):hover {
     box-shadow: none;
     transform: none;
+  }
+
+  .post-content button:is([id$="-lock-button"], [data-delete-stock], [data-delete-log], [data-delete-lift]):hover {
+    color: inherit;
   }
 }
 

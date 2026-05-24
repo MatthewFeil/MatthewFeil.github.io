@@ -679,6 +679,32 @@ permalink: /gradecalculatorv2/
       box-shadow: none;
       transform: none;
     }
+
+    .primary-action:hover {
+      background: var(--gc-accent);
+      border-color: var(--gc-accent);
+    }
+
+    .ghost-action:hover,
+    .secondary-action:hover {
+      background: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+      border-color: var(--gc-border);
+    }
+
+    .toggle-action:hover {
+      background: var(--gc-off);
+      border-color: var(--gc-border);
+    }
+
+    .toggle-action[aria-pressed="true"]:hover {
+      background: var(--gc-off);
+      border-color: var(--gc-good);
+    }
+
+    .icon-close:hover {
+      background: transparent;
+      color: var(--gc-muted);
+    }
   }
 </style>
 
