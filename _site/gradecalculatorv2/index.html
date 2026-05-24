@@ -3,43 +3,51 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Grade Calculator | Matthew Feil</title>
+<title>Finals Grade Calculator | Matthew Feil</title>
 <meta name="generator" content="Jekyll v4.4.1" />
-<meta property="og:title" content="Grade Calculator" />
+<meta property="og:title" content="Finals Grade Calculator" />
 <meta name="author" content="Matthew Feil" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
 <meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
-<link rel="canonical" href="http://localhost:4001/gradecalculatorv2/" />
-<meta property="og:url" content="http://localhost:4001/gradecalculatorv2/" />
 <meta property="og:site_name" content="Matthew Feil" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Grade Calculator" />
+<meta property="twitter:title" content="Finals Grade Calculator" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Grade Calculator","url":"http://localhost:4001/gradecalculatorv2/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Finals Grade Calculator","url":"/gradecalculatorv2/"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Matthew Feil" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logo.png">
+  <link rel="apple-touch-icon" href="/assets/images/logo.png">
+  <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
 </head>
 <body><header class="site-header">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/">Matthew Feil</a><nav class="site-nav">
-        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-        <label for="nav-trigger">
-          <span class="menu-icon">
-            <svg viewBox="0 0 18 15" width="18px" height="15px">
-              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
-            </svg>
-          </span>
-        </label>
+  <div class="site-header-inner">
+    <a class="site-title" rel="author" href="/">Matthew Feil</a>
 
-        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/playlists.html/">My Playlists</a><a class="page-link" href="/personal/">Personal Space</a>
-        </div>
-      </nav></div>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label class="nav-toggle" for="nav-trigger">Menu</label>
+
+      <div class="trigger">
+        <a class="page-link" href="/#about">About</a>
+        <a class="page-link" href="/#posts">Posts</a>
+        <a class="page-link" href="/playlists.html/">Playlists</a>
+        <a class="page-link" href="/gradecalculatorv2/">Grade Calculator</a>
+        <a class="page-link" href="/personal/">Personal Space</a>
+      </div>
+    </nav>
+  </div>
 </header>
 <main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <article class="post"><div class="post-content">
+      <div class="site-main">
+        <article class="post"><header class="post-header">
+    <h1 class="post-title">Finals Grade Calculator</h1>
+  </header><div class="post-content">
     <div class="grade-v2" data-grade-calculator>
   <div class="grade-v2-hero">
     <div class="grade-v2-copy">
@@ -152,12 +160,13 @@
 
 <style>
   :where(.grade-v2, .grade-dialog) {
-    --gc-surface: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
-    --gc-surface-strong: color-mix(in srgb, var(--minima-background-color) 88%, var(--minima-text-color));
-    --gc-border: var(--minima-border-color-01);
-    --gc-muted: color-mix(in srgb, var(--minima-text-color) 68%, var(--minima-background-color));
-    --gc-accent: #2f6f4e;
-    --gc-accent-dark: #24583d;
+    --gc-surface: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+    --gc-surface-strong: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
+    --gc-off: color-mix(in srgb, var(--site-bg) 86%, var(--site-text));
+    --gc-border: var(--site-border);
+    --gc-muted: color-mix(in srgb, var(--site-text) 68%, var(--site-bg));
+    --gc-accent: var(--site-accent);
+    --gc-accent-dark: var(--site-accent-strong);
     --gc-good: #16703a;
     --gc-bad: #b3261e;
     --gc-warn: #8a5a11;
@@ -166,7 +175,8 @@
   .grade-v2 {
     display: grid;
     gap: 1.25rem;
-    max-width: 880px;
+    max-width: 1280px;
+    font-family: var(--font-body);
   }
 
   .grade-v2 * {
@@ -179,21 +189,21 @@
   .dialog-panel {
     background: var(--gc-surface);
     border: 1px solid var(--gc-border);
-    border-radius: 0.75rem;
-    box-shadow: 0 18px 45px color-mix(in srgb, var(--minima-text-color) 10%, transparent);
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .grade-v2-hero {
     display: grid;
-    grid-template-columns: minmax(220px, 0.8fr) minmax(310px, 0.95fr);
-    column-gap: 1.1rem;
-    row-gap: 0.65rem;
-    align-items: start;
-    padding: 0.95rem 1rem 0.85rem;
+    grid-template-columns: minmax(18rem, 0.45fr) minmax(28rem, 1fr);
+    column-gap: clamp(1rem, 3vw, 2rem);
+    row-gap: 0.85rem;
+    align-items: end;
+    padding: 1rem;
   }
 
   .grade-v2-copy {
-    width: min(100%, 270px);
+    width: 100%;
     min-width: 0;
   }
 
@@ -219,10 +229,10 @@
     position: relative;
     display: flex;
     align-items: center;
-    min-height: 2.75rem;
-    background: var(--minima-background-color);
+    min-height: 3rem;
+    background: var(--site-bg);
     border: 1px solid var(--gc-border);
-    border-radius: 0.6rem;
+    border-radius: 0;
     overflow: hidden;
   }
 
@@ -234,7 +244,7 @@
     min-width: 0;
     border: 0;
     background: transparent;
-    color: var(--minima-text-color);
+    color: var(--site-text);
     font: inherit;
     font-size: 1rem;
     outline: none;
@@ -260,15 +270,21 @@
 
   .grade-v2 button,
   .grade-dialog button {
-    min-height: 2.4rem;
+    min-height: 3rem;
     border: 1px solid var(--gc-border);
-    border-radius: 0.55rem;
+    border-radius: 0;
     cursor: pointer;
     font: inherit;
     font-size: 0.92rem;
     font-weight: 700;
     letter-spacing: 0;
-    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+
+  .grade-v2 button:hover,
+  .grade-dialog button:hover {
+    box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+    transform: translate(-2px, -2px);
   }
 
   .primary-action {
@@ -285,42 +301,37 @@
 
   .control-stack {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
     justify-self: end;
-    gap: 0.4rem;
-    width: min(100%, 360px);
+    gap: 0.55rem;
+    width: 100%;
   }
 
   .adjustment-controls {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.4rem;
-    width: 100%;
+    display: contents;
   }
 
   .ghost-action,
   .toggle-action,
   .secondary-action {
-    background: color-mix(in srgb, var(--minima-background-color) 92%, var(--minima-text-color));
-    color: var(--minima-text-color);
+    background: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+    color: var(--site-text);
     padding: 0.55rem 0.75rem;
   }
 
   .ghost-action:hover,
   .toggle-action:hover,
   .secondary-action:hover {
-    background: color-mix(in srgb, var(--minima-background-color) 86%, var(--minima-text-color));
-    border-color: color-mix(in srgb, var(--gc-border) 70%, var(--minima-text-color));
+    background: color-mix(in srgb, var(--site-bg) 86%, var(--site-text));
+    border-color: color-mix(in srgb, var(--gc-border) 70%, var(--site-text));
   }
 
   .secondary-action {
-    flex: 1 1 0;
-    min-height: 2.12rem;
+    min-height: 3rem;
     min-width: 0;
-    padding: 0.36rem 0.42rem;
-    border-radius: 0.45rem;
-    color: var(--minima-text-color);
+    padding: 0.48rem 0.62rem;
+    border-radius: 0;
+    color: var(--site-text);
     font-size: 0.74rem;
     font-weight: 700;
     white-space: nowrap;
@@ -328,24 +339,31 @@
 
   .toggle-action {
     width: 100%;
-    min-height: 2.12rem;
+    min-height: 3rem;
     min-width: 0;
-    padding: 0.36rem 0.42rem;
-    border-radius: 0.45rem;
-    background: color-mix(in srgb, var(--minima-background-color) 84%, var(--minima-text-color));
+    padding: 0.48rem 0.62rem;
+    border-radius: 0;
+    background: var(--gc-off);
     font-size: 0.74rem;
     white-space: nowrap;
   }
 
   .toggle-action[aria-pressed="true"] {
-    border-color: color-mix(in srgb, var(--gc-accent) 65%, var(--gc-border));
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gc-accent) 32%, transparent);
+    background: var(--gc-off);
+    border-color: var(--gc-good);
+    color: var(--site-text);
+  }
+
+  .toggle-action[aria-pressed="true"]:hover {
+    background: color-mix(in srgb, var(--site-bg) 82%, var(--site-text));
+    border-color: var(--gc-good);
+    color: var(--site-text);
   }
 
   .grade-v2-summary {
     grid-column: 1 / -1;
     justify-self: start;
-    margin: -0.1rem 0 0;
+    margin: -0.2rem 0 0;
     color: var(--gc-muted);
     font-size: 0.86rem;
     text-align: left;
@@ -366,7 +384,7 @@
 
   .legacy-calculator-link a:hover,
   .legacy-calculator-link a:focus {
-    color: var(--minima-text-color);
+    color: var(--site-text);
   }
 
   .results-heading {
@@ -382,7 +400,7 @@
     width: 100%;
     overflow-x: auto;
     border: 1px solid var(--gc-border);
-    border-radius: 0.65rem;
+    border-radius: 0;
   }
 
   .target-table {
@@ -422,7 +440,7 @@
     min-width: 2.45rem;
     min-height: 2rem;
     padding: 0.2rem 0.55rem;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--gc-surface-strong);
     border: 1px solid var(--gc-border);
     font-weight: 800;
@@ -441,14 +459,14 @@
   }
 
   .score-needed.reachable {
-    color: var(--minima-text-color);
+    color: var(--site-text);
   }
 
   .example-panel {
     display: grid;
-    grid-template-columns: minmax(180px, 0.55fr) minmax(150px, 0.45fr) minmax(220px, 1fr);
+    grid-template-columns: minmax(180px, 0.32fr) minmax(160px, 0.25fr) minmax(280px, 0.43fr);
     gap: 0.75rem;
-    align-items: end;
+    align-items: stretch;
     margin-top: 1rem;
     padding: 0.85rem;
     box-shadow: none;
@@ -458,13 +476,57 @@
     align-self: center;
     margin: 0;
     text-transform: none;
-    font-size: 0.95rem;
+    color: var(--site-text);
+    font-size: 1.08rem;
+    font-weight: 800;
+    line-height: 1.15;
   }
 
   .example-panel output {
+    display: grid;
+    align-content: center;
+    min-height: 3rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--gc-border);
+    border-radius: 0;
+    background: var(--site-bg);
     color: var(--gc-muted);
     font-size: 0.95rem;
     line-height: 1.35;
+  }
+
+  .example-panel output[data-result="true"] {
+    color: var(--site-text);
+  }
+
+  .example-result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .example-result-grid span {
+    min-width: 0;
+  }
+
+  .example-result-grid strong {
+    display: block;
+    color: var(--gc-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  .example-result-grid b {
+    display: block;
+    margin-top: 0.15rem;
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
   }
 
   .grade-dialog {
@@ -472,7 +534,7 @@
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--minima-text-color);
+    color: var(--site-text);
   }
 
   #scale-dialog {
@@ -516,7 +578,7 @@
 
   .icon-close:hover {
     background: var(--gc-surface-strong);
-    color: var(--minima-text-color);
+    color: var(--site-text);
   }
 
   .dialog-help,
@@ -560,8 +622,8 @@
     min-height: 2.4rem;
     padding: 0.55rem 1.85rem 0.55rem 0.65rem;
     border: 1px solid var(--gc-border);
-    border-radius: 0.5rem;
-    background: var(--minima-background-color);
+    border-radius: 0;
+    background: var(--site-bg);
   }
 
   .scale-field span {
@@ -573,24 +635,33 @@
     pointer-events: none;
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 860px) {
     .grade-v2-hero {
       grid-template-columns: 1fr;
       gap: 0.65rem;
     }
 
     .control-stack {
+      grid-template-columns: 1fr;
       justify-self: stretch;
       width: 100%;
-      max-width: 380px;
+      max-width: none;
     }
 
     .example-panel {
       grid-template-columns: 1fr;
     }
 
+    .example-panel output {
+      width: 100%;
+    }
+
     .adjustment-controls {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
       gap: 0.35rem;
+      width: 100%;
     }
 
     .secondary-action {
@@ -614,10 +685,6 @@
       padding: 0.8rem;
     }
 
-    .grade-v2-copy {
-      width: min(100%, 240px);
-    }
-
     .toggle-action {
       font-size: 0.72rem;
     }
@@ -627,7 +694,7 @@
     }
 
     .secondary-action {
-      min-height: 1.95rem;
+      min-height: 2.6rem;
       font-size: 0.68rem;
     }
 
@@ -737,6 +804,27 @@
       return `${formatNumber(Math.max(score, 0))}%`;
     }
 
+    function setExampleMessage(message) {
+      exampleOutput.removeAttribute('data-result');
+      exampleOutput.textContent = message;
+    }
+
+    function setExampleResult(totalGrade, letterGrade) {
+      exampleOutput.setAttribute('data-result', 'true');
+      exampleOutput.innerHTML = `
+        <span class="example-result-grid">
+          <span>
+            <strong>Total grade</strong>
+            <b>${formatNumber(totalGrade)}%</b>
+          </span>
+          <span>
+            <strong>Letter grade</strong>
+            <b>${letterGrade}</b>
+          </span>
+        </span>
+      `;
+    }
+
     function renderResults() {
       if (state.currentGrade === null) {
         targetResults.innerHTML = '';
@@ -769,19 +857,19 @@
 
     function updateExample() {
       if (state.currentGrade === null) {
-        exampleOutput.textContent = 'Enter your current grade first.';
+        setExampleMessage('Enter your current grade first.');
         return;
       }
 
       const finalGrade = Number.parseFloat(exampleInput.value);
 
       if (!Number.isFinite(finalGrade)) {
-        exampleOutput.textContent = 'Enter a final grade to preview your semester result.';
+        setExampleMessage('Enter a final grade to preview your semester result.');
         return;
       }
 
       if (finalGrade < 0 || finalGrade > maxFinalScore) {
-        exampleOutput.textContent = `Final exam grades must be between 0% and ${maxFinalScore}%.`;
+        setExampleMessage(`Final exam grades must be between 0% and ${maxFinalScore}%.`);
         return;
       }
 
@@ -790,7 +878,7 @@
       const total = state.currentGrade * semesterRatio + finalGrade * finalRatio;
       const letter = gradeForTotal(total);
 
-      exampleOutput.textContent = `Total grade: ${formatNumber(total)}%. Letter grade: ${letter}.`;
+      setExampleResult(total, letter);
     }
 
     function readCurrentGrade() {
@@ -970,29 +1058,11 @@
 </article>
 
       </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/"></data>
-
-  <div class="wrapper">
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col">
-        <ul class="contact-list">
-          <li class="p-name">Matthew Feil</li>
-          
-        </ul>
-      </div>
-      <div class="footer-col">
-        <p>The website of Matthew Feil, a high school student with a passion for music and technology.
-</p>
-      </div>
-    </div>
-
-    <div class="social-links"><ul class="social-media-list"></ul>
-</div>
-
+    </main><footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Matthew Feil</p>
+    <p>The website of a highschooler with a passion for music, technology, and learning.</p>
   </div>
-
 </footer>
 </body>
 

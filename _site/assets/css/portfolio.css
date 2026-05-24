@@ -1,13 +1,14 @@
 .portfolio-app {
   --portfolio-border: color-mix(in srgb, currentColor 18%, transparent);
   --portfolio-muted: color-mix(in srgb, currentColor 62%, transparent);
-  --portfolio-surface: color-mix(in srgb, var(--minima-background-color) 92%, var(--minima-text-color));
-  --portfolio-soft: color-mix(in srgb, var(--minima-background-color) 96%, var(--minima-text-color));
-  --portfolio-button: #245f73;
-  --portfolio-button-hover: #1c4e5f;
+  --portfolio-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+  --portfolio-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --portfolio-button: var(--site-accent);
+  --portfolio-button-hover: var(--site-accent-strong);
   --portfolio-good: #16804a;
   --portfolio-bad: #c43434;
-  color: var(--minima-text-color);
+  color: var(--site-text);
+  font-family: var(--font-body);
 }
 
 .portfolio-lock,
@@ -15,7 +16,7 @@
 .portfolio-summary,
 .portfolio-table-wrap {
   border: 1px solid var(--portfolio-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--portfolio-soft);
 }
 
@@ -84,7 +85,19 @@
 .portfolio-summary strong {
   display: block;
   margin-top: 0.2rem;
+  font-family: var(--font-display);
   font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.portfolio-panel h3,
+.portfolio-dialog-head h3,
+.portfolio-log strong {
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .portfolio-form {
@@ -106,27 +119,42 @@
 .portfolio-form select,
 .portfolio-form button,
 .portfolio-toolbar button,
-.portfolio-action {
+.portfolio-action,
+.portfolio-dialog-close {
   box-sizing: border-box;
   min-height: 2.45rem;
   padding: 0.5rem 0.65rem;
-  color: var(--minima-text-color);
+  color: var(--site-text);
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-border);
-  border-radius: 6px;
+  border-radius: 0;
   font: inherit;
 }
 
+.portfolio-form select {
+  appearance: none;
+  padding-right: 3rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.45rem) 50%,
+    calc(100% - 1.15rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.32rem 0.32rem;
+}
+
 .portfolio-form input::placeholder {
-  color: color-mix(in srgb, var(--minima-text-color) 52%, transparent);
+  color: color-mix(in srgb, var(--site-text) 52%, transparent);
 }
 
 .portfolio-form button,
 .portfolio-toolbar button,
-.portfolio-action {
+.portfolio-action,
+.portfolio-dialog-close {
   cursor: pointer;
   font-weight: 700;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .portfolio-form button {
@@ -138,29 +166,38 @@
 .portfolio-form button:hover {
   background: color-mix(in srgb, var(--portfolio-button) 92%, white);
   border-color: color-mix(in srgb, var(--portfolio-button) 72%, white);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
 }
 
 .portfolio-toolbar button:hover,
 .portfolio-action:hover,
 .portfolio-dialog-close:hover {
-  background: color-mix(in srgb, var(--portfolio-surface) 88%, var(--minima-text-color));
+  background: color-mix(in srgb, var(--portfolio-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.portfolio-form button:hover,
+.portfolio-toolbar button:hover,
+.portfolio-action:hover,
+.portfolio-dialog-close:hover {
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
 }
 
 .portfolio-table-wrap {
+  border: 1px solid var(--portfolio-border);
+  border-radius: 0;
+  background: var(--portfolio-soft);
   overflow-x: auto;
 }
 
 .portfolio-dialog {
   width: min(92vw, 440px);
-  padding: 1rem;
-  color: var(--minima-text-color);
-  background: var(--portfolio-soft);
-  border: 1px solid var(--portfolio-border);
-  border-radius: 8px;
-  box-shadow: 0 24px 70px color-mix(in srgb, black 34%, transparent);
+  padding: 1.25rem;
+  color: var(--site-text);
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .portfolio-dialog::backdrop {
@@ -177,19 +214,29 @@
 
 .portfolio-dialog-head h3 {
   margin: 0;
+  font-size: 1.25rem;
 }
 
 .portfolio-dialog-close {
-  min-height: 2rem;
-  padding: 0.35rem 0.55rem;
+  width: 2.2rem;
+  min-height: 2.2rem;
+  padding: 0;
+  background: transparent;
+  color: var(--portfolio-muted);
 }
 
+.portfolio-dialog-close:hover {
+  color: var(--site-text);
+}
+
+.post-content .portfolio-table,
 .portfolio-table {
   width: 100%;
   min-width: 880px;
+  border: 0;
   border-collapse: collapse;
   margin: 0;
-  color: var(--minima-text-color);
+  color: var(--site-text);
   background: var(--portfolio-surface);
 }
 
@@ -205,7 +252,7 @@
 
 .portfolio-table th {
   background: var(--portfolio-soft);
-  color: var(--minima-text-color);
+  color: var(--site-text);
 }
 
 .portfolio-table th:first-child,
@@ -219,6 +266,7 @@
 
 .portfolio-symbol {
   display: block;
+  font-family: var(--font-body);
   font-weight: 800;
 }
 
@@ -252,6 +300,14 @@
 .portfolio-log p {
   margin: 0.2rem 0 0;
   color: var(--portfolio-muted);
+}
+
+[data-delete-stock]:hover,
+.portfolio-log [data-delete-log]:hover,
+#portfolio-lock-button:hover {
+  background: var(--site-bg);
+  border-color: var(--portfolio-bad);
+  color: var(--portfolio-bad);
 }
 
 .portfolio-workspace > .portfolio-status {
@@ -288,8 +344,8 @@
 
 @media (prefers-color-scheme: dark) {
   .portfolio-app {
-    --portfolio-button: #2f7f98;
-    --portfolio-button-hover: #3c9bb8;
+    --portfolio-button: var(--site-accent);
+    --portfolio-button-hover: var(--site-accent-strong);
     --portfolio-good: #52c985;
     --portfolio-bad: #ff7a7a;
   }

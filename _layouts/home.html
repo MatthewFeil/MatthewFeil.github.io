@@ -3,11 +3,26 @@ layout: base
 ---
 
 <div class="home">
-  {%- if page.title -%}
-    <h1 class="page-heading">{{ page.title }}</h1>
-  {%- endif -%}
+  <section class="home-hero" aria-labelledby="home-title">
+    <div class="home-title-block">
+      <h1 id="home-title">Matthew Feil</h1>
+    </div>
+    <div class="home-intro-block">
+      <div class="home-link-list" aria-label="Featured pages">
+        <a href="#about">About</a>
+        <a href="#posts">Posts</a>
+        <a href="{{ "/gradecalculatorv2/" | relative_url }}">Grade Calculator</a>
+        <a href="{{ "/playlists.html/" | relative_url }}">My Playlists</a>
+      </div>
+    </div>
+  </section>
 
   {{ content }}
+
+  <section class="home-about" id="about" aria-labelledby="about-heading">
+    <h2 id="about-heading">About Me</h2>
+    <p>{{ page.intro }}</p>
+  </section>
 
 
   {% if site.paginate %}
@@ -19,10 +34,12 @@ layout: base
 
   {%- if posts.size > 0 -%}
     {%- if page.list_title -%}
-      <h2 class="post-list-heading">{{ page.list_title }}</h2>
+      <h2 class="post-list-heading" id="posts">{{ page.list_title }}</h2>
+    {%- else -%}
+      <h2 class="post-list-heading" id="posts">Recent Posts</h2>
     {%- endif -%}
     <ul class="post-list">
-      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+      {%- assign date_format = site.date_format | default: "%b %-d, %Y" -%}
       {%- for post in posts -%}
       <li>
         <span class="post-meta">{{ post.date | date: date_format }}</span>

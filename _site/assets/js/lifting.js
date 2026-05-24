@@ -205,9 +205,6 @@
         </button>
         <div class="lifting-details" id="details-${item.lift.id}" hidden>
           <section>
-            <div class="lifting-detail-heading">
-              <h4 class="lifting-subhead">Est. Rep Targets</h4>
-            </div>
             ${renderRepGrid(item.theoreticalOneRep)}
             <div class="lifting-detail-actions">
               <button class="lifting-action" type="button" data-open-logs="${item.lift.id}">View logs</button>

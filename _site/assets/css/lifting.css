@@ -1,13 +1,14 @@
 .lifting-app {
   --lifting-border: color-mix(in srgb, currentColor 16%, transparent);
   --lifting-muted: color-mix(in srgb, currentColor 60%, transparent);
-  --lifting-surface: color-mix(in srgb, var(--minima-background-color) 93%, var(--minima-text-color));
-  --lifting-soft: color-mix(in srgb, var(--minima-background-color) 97%, var(--minima-text-color));
-  --lifting-accent: #245f73;
-  --lifting-accent-hover: #1c4e5f;
+  --lifting-surface: color-mix(in srgb, var(--site-bg) 93%, var(--site-text));
+  --lifting-soft: color-mix(in srgb, var(--site-bg) 97%, var(--site-text));
+  --lifting-accent: var(--site-accent);
+  --lifting-accent-hover: var(--site-accent-strong);
   --lifting-good: #16804a;
   --lifting-warn: #9f6b00;
-  color: var(--minima-text-color);
+  color: var(--site-text);
+  font-family: var(--font-body);
 }
 
 .lifting-lock,
@@ -15,7 +16,7 @@
 .lifting-card,
 .lifting-modal {
   border: 1px solid var(--lifting-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--lifting-soft);
 }
 
@@ -120,17 +121,31 @@
   box-sizing: border-box;
   min-height: 2.45rem;
   padding: 0.5rem 0.65rem;
-  color: var(--minima-text-color);
+  color: var(--site-text);
   background: var(--lifting-surface);
   border: 1px solid var(--lifting-border);
-  border-radius: 6px;
+  border-radius: 0;
   font: inherit;
+}
+
+.lifting-form select,
+.lifting-log-form select {
+  appearance: none;
+  padding-right: 3rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.45rem) 50%,
+    calc(100% - 1.15rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.32rem 0.32rem;
 }
 
 .lifting-form input::placeholder,
 .lifting-log-form input::placeholder,
 .lifting-filter input::placeholder {
-  color: color-mix(in srgb, var(--minima-text-color) 48%, transparent);
+  color: color-mix(in srgb, var(--site-text) 48%, transparent);
 }
 
 .lifting-form button,
@@ -140,14 +155,13 @@
   background: var(--lifting-accent);
   color: #fff;
   border-color: var(--lifting-accent);
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .lifting-form button:hover,
 .lifting-log-form button:hover {
   background: color-mix(in srgb, var(--lifting-accent) 92%, white);
   border-color: color-mix(in srgb, var(--lifting-accent) 72%, white);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
 }
 
 .lifting-secondary,
@@ -155,15 +169,30 @@
 .lifting-icon-button {
   cursor: pointer;
   font-weight: 800;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .lifting-secondary:hover,
 .lifting-action:hover,
 .lifting-icon-button:hover {
-  background: color-mix(in srgb, var(--lifting-surface) 88%, var(--minima-text-color));
+  background: color-mix(in srgb, var(--lifting-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.lifting-form button:hover,
+.lifting-log-form button:hover,
+.lifting-secondary:hover,
+.lifting-action:hover,
+.lifting-icon-button:hover {
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
+}
+
+#lifting-lock-button:hover,
+.lifting-action:is([data-delete-log], [data-delete-lift], #lift-logs-delete):hover {
+  background: var(--site-bg);
+  border-color: var(--site-bad);
+  color: var(--site-bad);
 }
 
 .lifting-secondary:disabled,
@@ -195,6 +224,13 @@
   gap: 0;
   padding: 0;
   overflow: hidden;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.lifting-card:hover {
+  border-color: color-mix(in srgb, var(--site-text) 34%, transparent);
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--site-text) 22%, transparent);
+  transform: translate(-2px, -2px);
 }
 
 .lifting-row {
@@ -205,7 +241,7 @@
   width: 100%;
   min-height: 4.2rem;
   padding: 0.85rem 1rem;
-  color: var(--minima-text-color);
+  color: var(--site-text);
   text-align: left;
   background: transparent;
   border: 0;
@@ -218,7 +254,18 @@
 
 .lifting-card-title h3 {
   margin: 0;
+  font-family: var(--font-body);
   font-size: 1.04rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.lifting-panel h3,
+.lifting-modal h3,
+.lifting-subhead {
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .lifting-card-meta {
@@ -230,7 +277,7 @@
   margin-bottom: 0.75rem;
   padding: 0.7rem;
   border: 1px solid var(--lifting-border);
-  border-radius: 7px;
+  border-radius: 0;
   background: var(--lifting-surface);
 }
 
@@ -246,7 +293,11 @@
 .lifting-metric strong {
   display: block;
   margin-top: 0.18rem;
+  font-family: var(--font-display);
   font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .lifting-details {
@@ -289,7 +340,7 @@
 .lifting-rep-cell {
   padding: 0.4rem 0.35rem;
   border: 1px solid var(--lifting-border);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--lifting-surface);
   text-align: center;
 }
@@ -304,7 +355,10 @@
 .lifting-rep-cell strong {
   display: block;
   margin-top: 0.08rem;
+  font-family: var(--font-display);
   font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
 .lifting-calculator {
@@ -329,12 +383,15 @@
   align-items: center;
   padding: 0.65rem;
   border: 1px solid var(--lifting-border);
-  border-radius: 7px;
+  border-radius: 0;
   background: var(--lifting-surface);
 }
 
 .lifting-log strong {
   display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
 .lifting-log p {
@@ -350,8 +407,12 @@
 
 .lifting-modal {
   width: min(92vw, 420px);
-  padding: 1rem;
-  color: var(--minima-text-color);
+  padding: 1.25rem;
+  color: var(--site-text);
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .lifting-log-modal {
@@ -496,8 +557,8 @@
 
 @media (prefers-color-scheme: dark) {
   .lifting-app {
-    --lifting-accent: #2f7f98;
-    --lifting-accent-hover: #3c9bb8;
+    --lifting-accent: var(--site-accent);
+    --lifting-accent-hover: var(--site-accent-strong);
     --lifting-good: #52c985;
     --lifting-warn: #e0b35b;
   }

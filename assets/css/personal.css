@@ -1,9 +1,9 @@
 .personal-app {
   --personal-border: color-mix(in srgb, currentColor 16%, transparent);
   --personal-muted: color-mix(in srgb, currentColor 62%, transparent);
-  --personal-surface: color-mix(in srgb, var(--minima-background-color) 94%, var(--minima-text-color));
-  --personal-soft: color-mix(in srgb, var(--minima-background-color) 97%, var(--minima-text-color));
-  --personal-accent: #245f73;
+  --personal-surface: color-mix(in srgb, var(--site-bg) 94%, var(--site-text));
+  --personal-soft: color-mix(in srgb, var(--site-bg) 97%, var(--site-text));
+  --personal-accent: var(--site-accent);
   --personal-warn: #9f6b00;
   display: grid;
   gap: 1rem;
@@ -12,7 +12,7 @@
 .personal-lock,
 .personal-workspace {
   border: 1px solid var(--personal-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--personal-soft);
   padding: 1rem;
 }
@@ -67,7 +67,7 @@
 .personal-heading button {
   min-height: 2.55rem;
   border: 1px solid var(--personal-border);
-  border-radius: 6px;
+  border-radius: 0;
   font: inherit;
 }
 
@@ -75,14 +75,15 @@
   flex: 1;
   min-width: 0;
   padding: 0.55rem 0.7rem;
-  background: var(--minima-background-color);
-  color: var(--minima-text-color);
+  background: var(--site-bg);
+  color: var(--site-text);
 }
 
 .personal-inline button,
 .personal-heading button {
   cursor: pointer;
   font-weight: 700;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .personal-inline button {
@@ -129,19 +130,30 @@
 
 .personal-heading button {
   background: var(--personal-surface);
-  color: var(--minima-text-color);
+  color: var(--site-text);
   padding: 0.55rem 0.8rem;
 }
 
 .personal-inline button:hover {
   background: color-mix(in srgb, var(--personal-accent) 92%, white);
   border-color: color-mix(in srgb, var(--personal-accent) 72%, white);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
 }
 
-.personal-heading button:hover,
+.personal-heading button:hover {
+  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
+  border-color: var(--site-bad);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  color: var(--site-bad);
+  transform: translate(-2px, -2px);
+}
+
 .personal-card:hover {
-  background: color-mix(in srgb, var(--personal-surface) 88%, var(--minima-text-color));
-  border-color: color-mix(in srgb, var(--personal-border) 70%, var(--minima-text-color));
+  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
+  border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
 }
 
 .personal-status {
@@ -166,18 +178,19 @@
   min-height: 3.1rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--personal-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--personal-surface);
-  color: var(--minima-text-color);
+  color: var(--site-text);
   text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .personal-card:visited {
-  color: var(--minima-text-color);
+  color: var(--site-text);
 }
 
 .personal-card span {
-  color: var(--minima-text-color);
+  color: var(--site-text);
   font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: 0;
