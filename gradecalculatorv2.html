@@ -172,7 +172,7 @@ permalink: /gradecalculatorv2/
     color: var(--gc-muted);
     font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
@@ -233,7 +233,7 @@ permalink: /gradecalculatorv2/
     cursor: pointer;
     font: inherit;
     font-size: 0.92rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0;
     transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
   }
@@ -378,6 +378,8 @@ permalink: /gradecalculatorv2/
   .target-table th {
     color: var(--gc-muted);
     font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
@@ -432,11 +434,13 @@ permalink: /gradecalculatorv2/
   .example-panel label {
     align-self: center;
     margin: 0;
-    text-transform: none;
     color: var(--site-text);
-    font-size: 1.08rem;
-    font-weight: 800;
-    line-height: 1.15;
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+    text-transform: uppercase;
   }
 
   .example-panel output {
@@ -573,6 +577,7 @@ permalink: /gradecalculatorv2/
     margin: 0;
     color: var(--gc-muted);
     font-size: 0.76rem;
+    letter-spacing: 0.06em;
   }
 
   .scale-field input {

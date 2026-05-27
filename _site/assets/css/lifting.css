@@ -80,6 +80,8 @@
   color: var(--lifting-muted);
   font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .lifting-form,
@@ -304,7 +306,7 @@
   display: grid;
   gap: 0.5rem;
   border-top: 1px solid var(--lifting-border);
-  padding: 0 1rem 1rem;
+  padding: 0.75rem 1rem 1rem;
 }
 
 .lifting-details[hidden],
@@ -578,6 +580,29 @@
   }
 }
 
+@media (max-width: 760px) {
+  .lifting-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .lifting-toolbar-actions {
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .lifting-toolbar-actions button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-right: 0.45rem;
+    padding-left: 0.45rem;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 520px) {
   .lifting-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -585,11 +610,6 @@
 
   .lifting-card-title {
     grid-column: 1 / -1;
-  }
-
-  .lifting-toolbar {
-    align-items: stretch;
-    flex-direction: column;
   }
 }
 

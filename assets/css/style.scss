@@ -579,20 +579,24 @@ table {
 
 .playlist-label {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   align-items: baseline;
   justify-content: space-between;
+  min-width: 0;
   border-bottom: 1px solid var(--site-soft-border);
   padding-bottom: 0.65rem;
 }
 
 .playlist-label h2 {
+  min-width: 0;
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.4vw, 1.65rem);
   letter-spacing: 0;
   line-height: 1;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .playlist-label span {
@@ -908,5 +912,11 @@ table {
   .post-content th,
   .post-content td {
     padding: 0.6rem;
+  }
+
+  .playlist-label {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 }
