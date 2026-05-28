@@ -356,16 +356,16 @@ permalink: /gradecalculatorv2/
   .target-table-wrap {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid var(--gc-border);
-    border-radius: 0;
   }
 
-  .target-table {
+  .grade-v2 .target-table {
     width: 100%;
     min-width: 100%;
     margin: 0;
+    border: 1px solid var(--gc-border);
     border-collapse: collapse;
     table-layout: fixed;
+    background: var(--gc-surface);
   }
 
   .target-table th,
@@ -395,8 +395,8 @@ permalink: /gradecalculatorv2/
   .letter-chip {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 2.45rem;
+    justify-content: flex-start;
+    width: 2.75rem;
     min-height: 2rem;
     padding: 0.2rem 0.55rem;
     border-radius: 0;
@@ -831,6 +831,8 @@ permalink: /gradecalculatorv2/
 
       targetResults.innerHTML = '';
 
+      let lowestImpossibleRow = null;
+
       for (const grade of state.scale) {
         const target = activeTarget(grade.low);
         const needed = neededFinal(state.currentGrade, target);
@@ -842,9 +844,23 @@ permalink: /gradecalculatorv2/
           <td><span class="score-needed ${status}">${labelForNeeded(needed)}</span></td>
         `;
 
+        if (status === 'impossible') {
+          lowestImpossibleRow = row;
+          continue;
+        }
+
+        if (lowestImpossibleRow) {
+          targetResults.appendChild(lowestImpossibleRow);
+          lowestImpossibleRow = null;
+        }
+
         targetResults.appendChild(row);
 
         if (status === 'guaranteed') break;
+      }
+
+      if (lowestImpossibleRow) {
+        targetResults.appendChild(lowestImpossibleRow);
       }
 
       resultsPanel.hidden = false;
