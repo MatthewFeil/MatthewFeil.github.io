@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const navTrigger = document.getElementById("nav-trigger");
   const navPanel = document.querySelector(".site-nav .trigger");
-  const navLinks = document.querySelectorAll(".site-nav .page-link");
+  const navLinks = document.querySelectorAll(".site-nav a.page-link");
 
   if (!navTrigger || navLinks.length === 0) {
     return;
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const waitForMenuCollapse = (wasOpen) => {
-    const isMobileNav = window.matchMedia("(max-width: 840px)").matches;
+    const isMobileNav = window.matchMedia("(max-width: 1040px)").matches;
 
     if (!wasOpen || !isMobileNav || !navPanel) {
       return Promise.resolve();

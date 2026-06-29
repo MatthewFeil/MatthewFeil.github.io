@@ -1,0 +1,473 @@
+.investment-app {
+  --investment-border: color-mix(in srgb, currentColor 18%, transparent);
+  --investment-muted: color-mix(in srgb, currentColor 62%, transparent);
+  --investment-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+  --investment-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --investment-button: var(--site-accent);
+  --investment-good: #16804a;
+  --investment-bad: #c43434;
+  color: var(--site-text);
+  font-family: var(--font-body);
+}
+
+.investment-form,
+.investment-results,
+.investment-table-wrap {
+  border: 1px solid var(--investment-border);
+  border-radius: 0;
+  background: var(--investment-soft);
+}
+
+.investment-form,
+.investment-results {
+  padding: 0.85rem;
+}
+
+.investment-app h2 {
+  margin: 0;
+}
+
+.investment-tool-switcher {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--investment-border);
+  background: var(--investment-border);
+}
+
+.investment-tool-switcher a {
+  min-width: 7rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--investment-surface);
+  color: var(--site-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.investment-tool-switcher a + a {
+  border-left: 1px solid var(--investment-border);
+}
+
+.investment-tool-switcher a:hover,
+.investment-tool-switcher a:focus-visible {
+  background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
+  color: var(--site-text);
+}
+
+.investment-tool-switcher a.is-active {
+  background: var(--investment-button);
+  color: #fff;
+}
+
+.investment-results-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.investment-status,
+.investment-results-head span,
+.investment-results-actions span {
+  color: var(--investment-muted);
+}
+
+.investment-results-head h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.85rem);
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.investment-input-grid {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 0.85fr) minmax(8rem, 0.9fr) minmax(8rem, 0.9fr) minmax(6.5rem, 0.7fr) auto;
+  gap: 0.65rem;
+  align-items: end;
+}
+
+.interest-input-grid {
+  grid-template-columns: minmax(7.5rem, 0.85fr) minmax(8rem, 0.9fr) minmax(8rem, 0.9fr) minmax(6.25rem, 0.65fr) minmax(7.25rem, 0.75fr) auto;
+}
+
+.investment-field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.investment-field > span:first-child {
+  color: var(--investment-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.investment-field input,
+.investment-field select,
+.investment-money-field,
+.investment-percent-field,
+.investment-input-grid button,
+.investment-details-toggle {
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.65rem;
+  color: var(--site-text);
+  background: var(--investment-surface);
+  border: 1px solid var(--investment-border);
+  border-radius: 0;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.investment-field input {
+  width: 100%;
+  font-weight: 800;
+}
+
+.investment-field select {
+  width: 100%;
+  appearance: none;
+  padding-right: 2.45rem;
+  font-weight: 800;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.25rem) 50%,
+    calc(100% - 0.95rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.32rem 0.32rem;
+}
+
+.investment-money-field {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+}
+
+.investment-money-field > span {
+  padding-left: 0.65rem;
+  color: var(--investment-muted);
+  font-weight: 800;
+}
+
+.investment-percent-field {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+}
+
+.investment-percent-field span {
+  padding-right: 0.65rem;
+  color: var(--investment-muted);
+  font-weight: 800;
+}
+
+.investment-money-field input,
+.investment-percent-field input {
+  min-width: 0;
+  min-height: calc(2.5rem - 2px);
+  border: 0;
+  background: transparent;
+  padding-left: 0.25rem;
+  outline: none;
+}
+
+.investment-percent-field input {
+  padding-left: 0.65rem;
+  padding-right: 0.2rem;
+}
+
+.investment-field input::placeholder {
+  color: color-mix(in srgb, var(--site-text) 52%, transparent);
+}
+
+.investment-input-grid button,
+.investment-details-toggle {
+  cursor: pointer;
+  font-weight: 800;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.investment-input-grid button {
+  background: var(--investment-button);
+  border-color: var(--investment-button);
+  color: #fff;
+}
+
+.investment-input-grid button:hover {
+  background: color-mix(in srgb, var(--investment-button) 92%, white);
+  border-color: color-mix(in srgb, var(--investment-button) 72%, white);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
+}
+
+.investment-input-grid button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.investment-details-toggle {
+  min-height: 2.25rem;
+  padding-right: 0.85rem;
+  padding-left: 0.85rem;
+  background: var(--investment-surface);
+  font-size: 0.82rem;
+}
+
+.investment-details-toggle:hover {
+  background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
+  border-color: color-mix(in srgb, currentColor 34%, transparent);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  transform: translate(-2px, -2px);
+}
+
+.investment-status {
+  min-height: 1.35rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.92rem;
+}
+
+.investment-status:empty {
+  display: none;
+}
+
+.investment-status[data-tone="error"] {
+  color: var(--site-bad);
+}
+
+.investment-results {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.investment-results[hidden] {
+  display: none;
+}
+
+.investment-results-head span {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.investment-results-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.investment-values,
+.investment-gains {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--investment-border);
+  border-radius: 0;
+  background: var(--investment-border);
+}
+
+.investment-values {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.investment-gains {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.investment-result-card {
+  min-width: 0;
+  padding: 0.85rem;
+  background: var(--investment-surface);
+}
+
+.investment-result-card > span:first-child {
+  display: block;
+  color: var(--investment-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.investment-result-card strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.investment-result-card-large {
+  padding: 1rem;
+}
+
+.investment-result-card-large strong {
+  font-size: clamp(1.85rem, 5.2vw, 4rem);
+  letter-spacing: -0.045em;
+}
+
+.investment-result-card small {
+  display: inline-block;
+  margin-left: 0.25rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.86rem, 1.25vw, 1rem);
+  font-weight: 850;
+  letter-spacing: 0;
+  vertical-align: 0.08em;
+}
+
+.investment-positive {
+  color: var(--investment-good);
+}
+
+.investment-negative {
+  color: var(--investment-bad);
+}
+
+.investment-table-wrap {
+  overflow-x: auto;
+}
+
+.post-content .investment-table,
+.investment-table {
+  width: 100%;
+  min-width: 620px;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  color: var(--site-text);
+  background: var(--investment-surface);
+}
+
+.investment-table th,
+.investment-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--investment-border);
+}
+
+.investment-table th {
+  width: 1%;
+  border-right: 1px solid var(--investment-border);
+  background: var(--investment-soft);
+  color: var(--investment-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.investment-table td {
+  text-align: right;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.investment-table tr:last-child th,
+.investment-table tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .investment-input-grid button:hover {
+    background: var(--investment-button);
+    border-color: var(--investment-button);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .investment-details-toggle:hover {
+    background: var(--investment-surface);
+    border-color: var(--investment-border);
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 880px) {
+  .investment-input-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .interest-input-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .investment-input-grid button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .investment-results-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .investment-results-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .investment-results-actions span {
+    text-align: left;
+  }
+
+  .investment-details-toggle {
+    width: 100%;
+  }
+
+  .investment-input-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .investment-field {
+    min-width: 0;
+  }
+
+  .investment-field input,
+  .investment-field select,
+  .investment-money-field,
+  .investment-percent-field {
+    min-width: 0;
+  }
+
+  .investment-values,
+  .investment-gains {
+    grid-template-columns: 1fr;
+  }
+
+  .investment-table {
+    min-width: 520px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .investment-app {
+    --investment-good: #52c985;
+    --investment-bad: #ff7a7a;
+  }
+}

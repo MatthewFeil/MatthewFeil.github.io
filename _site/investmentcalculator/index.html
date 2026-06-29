@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Stock Return Calculator | Matthew Feil</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Stock Return Calculator" />
+<meta name="author" content="Matthew Feil" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:site_name" content="Matthew Feil" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Stock Return Calculator" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Stock Return Calculator","url":"/investmentcalculator/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logo.png">
+  <link rel="apple-touch-icon" href="/assets/images/logo.png">
+  <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+</head>
+<body><header class="site-header">
+
+  <div class="site-header-inner">
+    <a class="site-title" rel="author" href="/">Matthew Feil</a>
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label class="nav-toggle" for="nav-trigger">Menu</label>
+
+      <div class="trigger">
+        <a class="page-link" href="/#about">About</a>
+        <a class="page-link" href="/#posts">Posts</a>
+        <a class="page-link" href="/playlists.html/">Playlists</a>
+        <div class="nav-dropdown">
+          <button class="page-link nav-dropdown-summary" type="button">Tools</button>
+          <div class="nav-dropdown-menu">
+            <a class="page-link" href="/gradecalculatorv2/">Finals Grade Calculator</a>
+            <a class="page-link" href="/investmentcalculator/">Stock Return Calculator</a>
+            <a class="page-link" href="/interestcalculator/">Interest Calculator</a>
+          </div>
+        </div>
+        <a class="page-link" href="/personal/">Personal Space</a>
+      </div>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="site-main">
+        <article class="post"><header class="post-header">
+    <h1 class="post-title">Stock Return Calculator</h1>
+  </header><div class="post-content">
+    <link rel="stylesheet" href="/assets/css/investmentcalculator.css">
+
+<section
+  class="investment-app"
+  data-investment-calculator
+  data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
+>
+  <nav class="investment-tool-switcher" aria-label="Calculator type">
+    <a class="is-active" href="/investmentcalculator/">Stock Return</a>
+    <a href="/interestcalculator/">Interest</a>
+  </nav>
+
+  <form class="investment-form" id="investment-form">
+    <div class="investment-input-grid" aria-label="Investment calculator inputs">
+      <label class="investment-field" for="investment-amount">
+        <span>Invest</span>
+        <span class="investment-money-field">
+          <span aria-hidden="true">$</span>
+          <input id="investment-amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" value="1000" required>
+        </span>
+      </label>
+
+      <label class="investment-field" for="investment-date">
+        <span>Start date</span>
+        <input id="investment-date" name="date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="investment-end-date">
+        <span>End date</span>
+        <input id="investment-end-date" name="end-date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="investment-symbol">
+        <span>In ticker</span>
+        <input id="investment-symbol" name="symbol" type="text" value="SPY" autocapitalize="characters" autocomplete="off" spellcheck="false" required>
+      </label>
+
+      <button id="investment-submit" type="submit">Calculate</button>
+    </div>
+
+    <p class="investment-status" id="investment-status" role="status"></p>
+  </form>
+
+  <section class="investment-results" id="investment-results" hidden>
+    <div class="investment-results-head">
+      <h2 id="investment-result-title">SPY</h2>
+      <div class="investment-results-actions">
+        <span id="investment-result-range"></span>
+        <button class="investment-details-toggle" id="investment-details-toggle" type="button" aria-expanded="false" aria-controls="investment-details">
+          Details
+        </button>
+      </div>
+    </div>
+
+    <div class="investment-values" aria-label="Investment values">
+      <div class="investment-result-card investment-result-card-large">
+        <span>End value</span>
+        <strong id="result-current-value">$0.00</strong>
+      </div>
+      <div class="investment-result-card investment-result-card-large">
+        <span>Inflation adjusted value</span>
+        <strong id="result-real-value">$0.00</strong>
+      </div>
+    </div>
+
+    <div class="investment-gains" aria-label="Investment gains">
+      <div class="investment-result-card">
+        <span>Total gain</span>
+        <strong>
+          <span id="result-total-gain">$0.00</span>
+          <small id="result-gain-percent">(0.00%)</small>
+        </strong>
+      </div>
+      <div class="investment-result-card">
+        <span>Inflation adjusted gain</span>
+        <strong>
+          <span id="result-real-gain">$0.00</span>
+          <small id="result-real-percent">(0.00%)</small>
+        </strong>
+      </div>
+    </div>
+
+    <div class="investment-table-wrap" id="investment-details" hidden>
+      <table class="investment-table">
+        <tbody>
+          <tr>
+            <th>Shares</th>
+            <td id="result-shares">0</td>
+          </tr>
+          <tr>
+            <th>Amount invested</th>
+            <td id="detail-amount">$0.00</td>
+          </tr>
+          <tr>
+            <th>Purchase date</th>
+            <td id="detail-purchase-date">--</td>
+          </tr>
+          <tr>
+            <th>Purchase price</th>
+            <td id="detail-purchase-price">$0.00</td>
+          </tr>
+          <tr>
+            <th>End price date</th>
+            <td id="detail-current-date">--</td>
+          </tr>
+          <tr>
+            <th>End price</th>
+            <td id="detail-current-price">$0.00</td>
+          </tr>
+          <tr>
+            <th>Original amount at end date</th>
+            <td id="detail-inflated-amount">$0.00</td>
+          </tr>
+          <tr>
+            <th>Inflation</th>
+            <td id="result-inflation-percent">0.00%</td>
+          </tr>
+          <tr>
+            <th>Price data</th>
+            <td id="detail-price-source">--</td>
+          </tr>
+          <tr>
+            <th>Inflation data</th>
+            <td id="detail-inflation-source">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script src="/assets/js/investmentcalculator.js" defer></script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Matthew Feil</p>
+    <p>The website of a highschooler with a passion for music, technology, and learning.</p>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+
+  </body>
+
+</html>

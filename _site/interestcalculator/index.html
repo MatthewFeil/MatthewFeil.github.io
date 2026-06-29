@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Interest Calculator | Matthew Feil</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Interest Calculator" />
+<meta name="author" content="Matthew Feil" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
+<meta property="og:site_name" content="Matthew Feil" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Interest Calculator" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Interest Calculator","url":"/interestcalculator/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logo.png">
+  <link rel="apple-touch-icon" href="/assets/images/logo.png">
+  <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+</head>
+<body><header class="site-header">
+
+  <div class="site-header-inner">
+    <a class="site-title" rel="author" href="/">Matthew Feil</a>
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label class="nav-toggle" for="nav-trigger">Menu</label>
+
+      <div class="trigger">
+        <a class="page-link" href="/#about">About</a>
+        <a class="page-link" href="/#posts">Posts</a>
+        <a class="page-link" href="/playlists.html/">Playlists</a>
+        <div class="nav-dropdown">
+          <button class="page-link nav-dropdown-summary" type="button">Tools</button>
+          <div class="nav-dropdown-menu">
+            <a class="page-link" href="/gradecalculatorv2/">Finals Grade Calculator</a>
+            <a class="page-link" href="/investmentcalculator/">Stock Return Calculator</a>
+            <a class="page-link" href="/interestcalculator/">Interest Calculator</a>
+          </div>
+        </div>
+        <a class="page-link" href="/personal/">Personal Space</a>
+      </div>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="site-main">
+        <article class="post"><header class="post-header">
+    <h1 class="post-title">Interest Calculator</h1>
+  </header><div class="post-content">
+    <link rel="stylesheet" href="/assets/css/investmentcalculator.css">
+
+<section
+  class="investment-app"
+  data-interest-calculator
+  data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
+>
+  <nav class="investment-tool-switcher" aria-label="Calculator type">
+    <a href="/investmentcalculator/">Stock Return</a>
+    <a class="is-active" href="/interestcalculator/">Interest</a>
+  </nav>
+
+  <form class="investment-form" id="interest-form">
+    <div class="investment-input-grid interest-input-grid" aria-label="Interest calculator inputs">
+      <label class="investment-field" for="interest-principal">
+        <span>Initial balance</span>
+        <span class="investment-money-field">
+          <span aria-hidden="true">$</span>
+          <input id="interest-principal" name="principal" type="number" min="1" step="0.01" inputmode="decimal" value="1000" required>
+        </span>
+      </label>
+
+      <label class="investment-field" for="interest-date">
+        <span>Investment date</span>
+        <input id="interest-date" name="date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="interest-end-date">
+        <span>End date</span>
+        <input id="interest-end-date" name="end-date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="interest-rate">
+        <span>Annual interest</span>
+        <span class="investment-percent-field">
+          <input id="interest-rate" name="rate" type="number" min="-100" step="0.01" inputmode="decimal" value="5" required>
+          <span aria-hidden="true">%</span>
+        </span>
+      </label>
+
+      <label class="investment-field" for="interest-method">
+        <span>Interest type</span>
+        <select id="interest-method" name="method" required>
+          <option value="compound" selected>Compound</option>
+          <option value="simple">Simple</option>
+        </select>
+      </label>
+
+      <button id="interest-submit" type="submit">Calculate</button>
+    </div>
+
+    <p class="investment-status" id="interest-status" role="status"></p>
+  </form>
+
+  <section class="investment-results" id="interest-results" hidden>
+    <div class="investment-results-head">
+      <h2 id="interest-result-title">Interest</h2>
+      <div class="investment-results-actions">
+        <span id="interest-result-range"></span>
+        <button class="investment-details-toggle" id="interest-details-toggle" type="button" aria-expanded="false" aria-controls="interest-details">
+          Details
+        </button>
+      </div>
+    </div>
+
+    <div class="investment-values" aria-label="Interest values">
+      <div class="investment-result-card investment-result-card-large">
+        <span>End value</span>
+        <strong id="interest-current-value">$0.00</strong>
+      </div>
+      <div class="investment-result-card investment-result-card-large">
+        <span>Inflation adjusted value</span>
+        <strong id="interest-real-value">$0.00</strong>
+      </div>
+    </div>
+
+    <div class="investment-gains" aria-label="Interest gains">
+      <div class="investment-result-card">
+        <span>Total gain</span>
+        <strong>
+          <span id="interest-total-gain">$0.00</span>
+          <small id="interest-gain-percent">(0.00%)</small>
+        </strong>
+      </div>
+      <div class="investment-result-card">
+        <span>Inflation adjusted gain</span>
+        <strong>
+          <span id="interest-real-gain">$0.00</span>
+          <small id="interest-real-percent">(0.00%)</small>
+        </strong>
+      </div>
+    </div>
+
+    <div class="investment-table-wrap" id="interest-details" hidden>
+      <table class="investment-table">
+        <tbody>
+          <tr>
+            <th>Starting amount</th>
+            <td id="interest-detail-principal">$0.00</td>
+          </tr>
+          <tr>
+            <th>Start date</th>
+            <td id="interest-detail-start-date">--</td>
+          </tr>
+          <tr>
+            <th>End date</th>
+            <td id="interest-detail-end-date">--</td>
+          </tr>
+          <tr>
+            <th>Years elapsed</th>
+            <td id="interest-detail-years">0</td>
+          </tr>
+          <tr>
+            <th>Annual interest</th>
+            <td id="interest-detail-rate">0.00%</td>
+          </tr>
+          <tr>
+            <th>Interest type</th>
+            <td id="interest-detail-method">Compound</td>
+          </tr>
+          <tr>
+            <th>Original amount at end date</th>
+            <td id="interest-detail-inflated-amount">$0.00</td>
+          </tr>
+          <tr>
+            <th>Inflation</th>
+            <td id="interest-inflation-percent">0.00%</td>
+          </tr>
+          <tr>
+            <th>Inflation data</th>
+            <td id="interest-detail-inflation-source">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script src="/assets/js/interestcalculator.js" defer></script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Matthew Feil</p>
+    <p>The website of a highschooler with a passion for music, technology, and learning.</p>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+
+  </body>
+
+</html>

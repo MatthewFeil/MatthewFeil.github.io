@@ -1,0 +1,146 @@
+---
+layout: page
+title: Interest Calculator
+show_page_title: true
+permalink: /interestcalculator/
+---
+
+<link rel="stylesheet" href="{{ "/assets/css/investmentcalculator.css" | relative_url }}">
+
+<section
+  class="investment-app"
+  data-interest-calculator
+  data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
+>
+  <nav class="investment-tool-switcher" aria-label="Calculator type">
+    <a href="{{ "/investmentcalculator/" | relative_url }}">Stock Return</a>
+    <a class="is-active" href="{{ "/interestcalculator/" | relative_url }}">Interest</a>
+  </nav>
+
+  <form class="investment-form" id="interest-form">
+    <div class="investment-input-grid interest-input-grid" aria-label="Interest calculator inputs">
+      <label class="investment-field" for="interest-principal">
+        <span>Initial balance</span>
+        <span class="investment-money-field">
+          <span aria-hidden="true">$</span>
+          <input id="interest-principal" name="principal" type="number" min="1" step="0.01" inputmode="decimal" value="1000" required>
+        </span>
+      </label>
+
+      <label class="investment-field" for="interest-date">
+        <span>Investment date</span>
+        <input id="interest-date" name="date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="interest-end-date">
+        <span>End date</span>
+        <input id="interest-end-date" name="end-date" type="date" required>
+      </label>
+
+      <label class="investment-field" for="interest-rate">
+        <span>Annual interest</span>
+        <span class="investment-percent-field">
+          <input id="interest-rate" name="rate" type="number" min="-100" step="0.01" inputmode="decimal" value="5" required>
+          <span aria-hidden="true">%</span>
+        </span>
+      </label>
+
+      <label class="investment-field" for="interest-method">
+        <span>Interest type</span>
+        <select id="interest-method" name="method" required>
+          <option value="compound" selected>Compound</option>
+          <option value="simple">Simple</option>
+        </select>
+      </label>
+
+      <button id="interest-submit" type="submit">Calculate</button>
+    </div>
+
+    <p class="investment-status" id="interest-status" role="status"></p>
+  </form>
+
+  <section class="investment-results" id="interest-results" hidden>
+    <div class="investment-results-head">
+      <h2 id="interest-result-title">Interest</h2>
+      <div class="investment-results-actions">
+        <span id="interest-result-range"></span>
+        <button class="investment-details-toggle" id="interest-details-toggle" type="button" aria-expanded="false" aria-controls="interest-details">
+          Details
+        </button>
+      </div>
+    </div>
+
+    <div class="investment-values" aria-label="Interest values">
+      <div class="investment-result-card investment-result-card-large">
+        <span>End value</span>
+        <strong id="interest-current-value">$0.00</strong>
+      </div>
+      <div class="investment-result-card investment-result-card-large">
+        <span>Inflation adjusted value</span>
+        <strong id="interest-real-value">$0.00</strong>
+      </div>
+    </div>
+
+    <div class="investment-gains" aria-label="Interest gains">
+      <div class="investment-result-card">
+        <span>Total gain</span>
+        <strong>
+          <span id="interest-total-gain">$0.00</span>
+          <small id="interest-gain-percent">(0.00%)</small>
+        </strong>
+      </div>
+      <div class="investment-result-card">
+        <span>Inflation adjusted gain</span>
+        <strong>
+          <span id="interest-real-gain">$0.00</span>
+          <small id="interest-real-percent">(0.00%)</small>
+        </strong>
+      </div>
+    </div>
+
+    <div class="investment-table-wrap" id="interest-details" hidden>
+      <table class="investment-table">
+        <tbody>
+          <tr>
+            <th>Starting amount</th>
+            <td id="interest-detail-principal">$0.00</td>
+          </tr>
+          <tr>
+            <th>Start date</th>
+            <td id="interest-detail-start-date">--</td>
+          </tr>
+          <tr>
+            <th>End date</th>
+            <td id="interest-detail-end-date">--</td>
+          </tr>
+          <tr>
+            <th>Years elapsed</th>
+            <td id="interest-detail-years">0</td>
+          </tr>
+          <tr>
+            <th>Annual interest</th>
+            <td id="interest-detail-rate">0.00%</td>
+          </tr>
+          <tr>
+            <th>Interest type</th>
+            <td id="interest-detail-method">Compound</td>
+          </tr>
+          <tr>
+            <th>Original amount at end date</th>
+            <td id="interest-detail-inflated-amount">$0.00</td>
+          </tr>
+          <tr>
+            <th>Inflation</th>
+            <td id="interest-inflation-percent">0.00%</td>
+          </tr>
+          <tr>
+            <th>Inflation data</th>
+            <td id="interest-detail-inflation-source">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script src="{{ "/assets/js/interestcalculator.js" | relative_url }}" defer></script>
