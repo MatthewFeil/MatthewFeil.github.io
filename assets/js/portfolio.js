@@ -8,7 +8,58 @@
     token: sessionStorage.getItem(TOKEN_KEY) || '',
     stocks: [],
     logs: [],
-    quotes: {}
+    quotes: {},
+    performancePeriod: 'all'
+  };
+
+  const periods = {
+    all: {
+      label: 'All time',
+      gainLabel: 'Total gain/loss',
+      percentLabel: 'Total gain/loss %',
+      tableGainLabel: 'Gain/loss',
+      tablePercentLabel: 'Gain/loss %'
+    },
+    year: {
+      label: 'Last year',
+      gainLabel: 'Last year gain/loss',
+      percentLabel: 'Last year gain/loss %',
+      tableGainLabel: 'Last year gain/loss',
+      tablePercentLabel: 'Last year %',
+      startDate: () => shiftedDate({ years: -1 })
+    },
+    quarter: {
+      label: 'Last quarter',
+      gainLabel: 'Last quarter gain/loss',
+      percentLabel: 'Last quarter gain/loss %',
+      tableGainLabel: 'Last quarter gain/loss',
+      tablePercentLabel: 'Last quarter %',
+      startDate: () => shiftedDate({ months: -3 })
+    },
+    month: {
+      label: 'Last month',
+      gainLabel: 'Last month gain/loss',
+      percentLabel: 'Last month gain/loss %',
+      tableGainLabel: 'Last month gain/loss',
+      tablePercentLabel: 'Last month %',
+      startDate: () => shiftedDate({ months: -1 })
+    },
+    week: {
+      label: 'Last week',
+      gainLabel: 'Last week gain/loss',
+      percentLabel: 'Last week gain/loss %',
+      tableGainLabel: 'Last week gain/loss',
+      tablePercentLabel: 'Last week %',
+      startDate: () => shiftedDate({ days: -7 })
+    },
+    day: {
+      label: 'Last day',
+      gainLabel: 'Last day gain/loss',
+      percentLabel: 'Last day gain/loss %',
+      tableGainLabel: 'Last day gain/loss',
+      tablePercentLabel: 'Last day %',
+      startDate: () => shiftedDate({ days: -1 })
+    }
   };
 
   const els = {
@@ -25,10 +76,15 @@
     rows: document.getElementById('portfolio-rows'),
     logs: document.getElementById('portfolio-logs'),
     status: document.getElementById('portfolio-status'),
+    performancePeriod: document.getElementById('performance-period'),
     summaryValue: document.getElementById('summary-value'),
     summaryCost: document.getElementById('summary-cost'),
+    summaryGainLabel: document.getElementById('summary-gain-label'),
+    summaryPercentLabel: document.getElementById('summary-percent-label'),
     summaryGain: document.getElementById('summary-gain'),
-    summaryPercent: document.getElementById('summary-percent')
+    summaryPercent: document.getElementById('summary-percent'),
+    tableGainHeading: document.getElementById('table-gain-heading'),
+    tablePercentHeading: document.getElementById('table-percent-heading')
   };
 
   const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -96,12 +152,60 @@
     return Number(log.total_purchase_amount) / Number(log.purchase_price);
   }
 
-  function metricsForStock(stock) {
-    const stockLogs = state.logs.filter((log) => log.stock_id === stock.id);
-    const costBasis = stockLogs.reduce((sum, log) => {
+  function shiftedDate({ years = 0, months = 0, days = 0 }) {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    if (years) date.setFullYear(date.getFullYear() + years);
+    if (months) date.setMonth(date.getMonth() + months);
+    if (days) date.setDate(date.getDate() + days);
+    return date;
+  }
+
+  function dateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function logIsBefore(log, key) {
+    return String(log.logged_at) < key;
+  }
+
+  function logIsOnOrAfter(log, key) {
+    return String(log.logged_at) >= key;
+  }
+
+  function historicalCloseAtOrBefore(symbol, key) {
+    const history = state.quotes[symbol]?.history || [];
+    for (let index = history.length - 1; index >= 0; index -= 1) {
+      if (history[index].date <= key && Number.isFinite(Number(history[index].close))) {
+        return Number(history[index].close);
+      }
+    }
+    return null;
+  }
+
+  function costBasisForLogs(logs) {
+    return logs.reduce((sum, log) => {
       if (log.entry_type === 'reinvested_dividend') return sum;
       return sum + Number(log.total_purchase_amount);
     }, 0);
+  }
+
+  function startingPriceForPeriod(item, startKey, startingShares) {
+    const historicalClose = historicalCloseAtOrBefore(item.stock.symbol, startKey);
+    if (historicalClose !== null) return historicalClose;
+    if (startingShares <= 0) return 0;
+
+    const earlierLogs = item.stockLogs.filter((log) => logIsBefore(log, startKey));
+    const earlierCostBasis = costBasisForLogs(earlierLogs);
+    return earlierCostBasis > 0 ? earlierCostBasis / startingShares : item.avgPrice;
+  }
+
+  function metricsForStock(stock) {
+    const stockLogs = state.logs.filter((log) => log.stock_id === stock.id);
+    const costBasis = costBasisForLogs(stockLogs);
     const shares = stockLogs.reduce((sum, log) => sum + sharesForLog(log), 0);
     const avgPrice = shares > 0 ? costBasis / shares : 0;
     const currentPrice = Number(state.quotes[stock.symbol]?.price || 0);
@@ -117,21 +221,77 @@
     return '';
   }
 
+  function performanceForStock(item) {
+    const period = periods[state.performancePeriod] || periods.all;
+    if (state.performancePeriod === 'all') {
+      return {
+        gain: item.gain,
+        gainPercent: item.gainPercent,
+        basis: item.costBasis,
+        available: true
+      };
+    }
+
+    const startKey = dateKey(period.startDate());
+    const startingShares = item.stockLogs
+      .filter((log) => logIsBefore(log, startKey))
+      .reduce((sum, log) => sum + sharesForLog(log), 0);
+    const newExternalInvestment = item.stockLogs
+      .filter((log) => logIsOnOrAfter(log, startKey) && log.entry_type !== 'reinvested_dividend')
+      .reduce((sum, log) => sum + Number(log.total_purchase_amount), 0);
+    const startPrice = startingPriceForPeriod(item, startKey, startingShares);
+
+    const startingValue = startingShares * startPrice;
+    const basis = startingValue + newExternalInvestment;
+    const gain = item.totalValue - startingValue - newExternalInvestment;
+    const gainPercent = basis > 0 ? (gain / basis) * 100 : 0;
+
+    return {
+      gain,
+      gainPercent,
+      basis,
+      available: true
+    };
+  }
+
+  function formatPerformanceAmount(item) {
+    if (!item.performance.available) return 'Unavailable';
+    return money.format(item.performance.gain);
+  }
+
+  function formatPerformancePercent(item) {
+    if (!item.performance.available) return 'Unavailable';
+    return `${item.performance.gainPercent.toFixed(2)}%`;
+  }
+
+  function renderPeriodLabels() {
+    const period = periods[state.performancePeriod] || periods.all;
+    els.summaryGainLabel.textContent = period.gainLabel;
+    els.summaryPercentLabel.textContent = period.percentLabel;
+    els.tableGainHeading.textContent = period.tableGainLabel;
+    els.tablePercentHeading.textContent = period.tablePercentLabel;
+  }
+
   function renderSummary(allMetrics) {
     const totals = allMetrics.reduce((acc, item) => {
       acc.cost += item.costBasis;
       acc.value += item.totalValue;
+      if (item.performance.available) {
+        acc.performanceGain += item.performance.gain;
+        acc.performanceBasis += item.performance.basis;
+      } else {
+        acc.performanceAvailable = false;
+      }
       return acc;
-    }, { cost: 0, value: 0 });
-    const gain = totals.value - totals.cost;
-    const percent = totals.cost > 0 ? (gain / totals.cost) * 100 : 0;
+    }, { cost: 0, value: 0, performanceGain: 0, performanceBasis: 0, performanceAvailable: true });
+    const percent = totals.performanceBasis > 0 ? (totals.performanceGain / totals.performanceBasis) * 100 : 0;
 
     els.summaryValue.textContent = money.format(totals.value);
     els.summaryCost.textContent = money.format(totals.cost);
-    els.summaryGain.textContent = money.format(gain);
-    els.summaryPercent.textContent = `${percent.toFixed(2)}%`;
-    els.summaryGain.className = gainClass(gain);
-    els.summaryPercent.className = gainClass(percent);
+    els.summaryGain.textContent = totals.performanceAvailable ? money.format(totals.performanceGain) : 'Unavailable';
+    els.summaryPercent.textContent = totals.performanceAvailable ? `${percent.toFixed(2)}%` : 'Unavailable';
+    els.summaryGain.className = totals.performanceAvailable ? gainClass(totals.performanceGain) : '';
+    els.summaryPercent.className = totals.performanceAvailable ? gainClass(percent) : '';
   }
 
   function renderStockOptions() {
@@ -141,7 +301,10 @@
   }
 
   function renderTable() {
-    const allMetrics = state.stocks.map((stock) => ({ stock, ...metricsForStock(stock) }));
+    const allMetrics = state.stocks
+      .map((stock) => ({ stock, ...metricsForStock(stock) }))
+      .map((item) => ({ ...item, performance: performanceForStock(item) }));
+    renderPeriodLabels();
     renderSummary(allMetrics);
 
     if (state.stocks.length === 0) {
@@ -160,8 +323,8 @@
         <td>${item.currentPrice ? money.format(item.currentPrice) : 'Unavailable'}</td>
         <td>${money.format(item.costBasis)}</td>
         <td>${money.format(item.totalValue)}</td>
-        <td class="${gainClass(item.gain)}">${money.format(item.gain)}</td>
-        <td class="${gainClass(item.gainPercent)}">${item.gainPercent.toFixed(2)}%</td>
+        <td class="${item.performance.available ? gainClass(item.performance.gain) : ''}">${formatPerformanceAmount(item)}</td>
+        <td class="${item.performance.available ? gainClass(item.performance.gainPercent) : ''}">${formatPerformancePercent(item)}</td>
         <td><button class="portfolio-action" type="button" data-delete-stock="${item.stock.id}">Delete</button></td>
       </tr>
     `).join('');
@@ -207,6 +370,12 @@
   }
 
   els.logDate.valueAsDate = new Date();
+  els.performancePeriod.value = state.performancePeriod;
+
+  els.performancePeriod.addEventListener('change', () => {
+    state.performancePeriod = periods[els.performancePeriod.value] ? els.performancePeriod.value : 'all';
+    renderTable();
+  });
 
   els.lockButton.addEventListener('click', () => {
     clearSession();

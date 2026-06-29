@@ -60,8 +60,17 @@
 }
 
 .portfolio-toolbar-actions {
-  flex-wrap: wrap;
+  align-items: center;
+  flex-wrap: nowrap;
   justify-content: flex-end;
+}
+
+.portfolio-toolbar-actions > * {
+  flex: 0 0 auto;
+}
+
+.portfolio-period-control {
+  width: min(100%, 10.5rem);
 }
 
 .portfolio-summary {
@@ -116,6 +125,7 @@
 
 .portfolio-form input,
 .portfolio-form select,
+.portfolio-select,
 .portfolio-form button,
 .portfolio-toolbar button,
 .portfolio-action,
@@ -130,7 +140,8 @@
   font: inherit;
 }
 
-.portfolio-form select {
+.portfolio-form select,
+.portfolio-select {
   appearance: none;
   padding-right: 3rem;
   background-image:
@@ -141,6 +152,16 @@
     calc(100% - 1.15rem) 50%;
   background-repeat: no-repeat;
   background-size: 0.32rem 0.32rem;
+}
+
+.portfolio-select {
+  width: 100%;
+}
+
+.portfolio-period-control .portfolio-select {
+  min-height: 2.75rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .portfolio-form input::placeholder {
@@ -154,6 +175,10 @@
   cursor: pointer;
   font-weight: 800;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.portfolio-toolbar button {
+  white-space: nowrap;
 }
 
 .portfolio-form button {
@@ -366,8 +391,14 @@
   .portfolio-toolbar-actions {
     align-items: center;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.5rem;
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .portfolio-period-control {
+    flex: 1 1 100%;
     width: 100%;
   }
 

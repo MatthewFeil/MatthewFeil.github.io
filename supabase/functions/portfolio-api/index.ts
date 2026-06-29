@@ -16,6 +16,11 @@ type Stock = {
   name: string | null;
 };
 
+type PricePoint = {
+  date: string;
+  close: number;
+};
+
 type PortfolioBody = {
   action?: string;
   password?: string;
@@ -141,7 +146,7 @@ async function assertPersonalSpaceToken(request: Request) {
 async function getQuotes(stocks: Stock[]) {
   if (stocks.length === 0) return {};
   const entries = await Promise.all(stocks.map(async (stock) => {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.symbol)}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.symbol)}?interval=1d&range=2y`;
     const response = await fetch(url, {
       headers: {
         'user-agent': 'Mozilla/5.0'
@@ -149,14 +154,29 @@ async function getQuotes(stocks: Stock[]) {
     });
     if (!response.ok) return null;
     const data = await response.json();
-    const meta = data?.chart?.result?.[0]?.meta;
-    if (!meta?.regularMarketPrice) return null;
+    const result = data?.chart?.result?.[0];
+    const meta = result?.meta;
+    if (!meta) return null;
+    const timestamps = result?.timestamp || [];
+    const closes = result?.indicators?.quote?.[0]?.close || [];
+    const history = timestamps
+      .map((timestamp: number, index: number) => ({
+        date: new Date(timestamp * 1000).toISOString().slice(0, 10),
+        close: closes[index]
+      }))
+      .filter((item: { date: string; close: unknown }): item is PricePoint => (
+        typeof item.close === 'number' && Number.isFinite(item.close)
+      ));
+    const lastClose = history.length > 0 ? history[history.length - 1].close : null;
+    const price = typeof meta.regularMarketPrice === 'number' ? meta.regularMarketPrice : lastClose;
+    if (!price) return null;
     return [
       stock.symbol,
       {
-        price: meta.regularMarketPrice,
+        price,
         marketTime: meta.regularMarketTime,
-        currency: meta.currency
+        currency: meta.currency,
+        history
       }
     ];
   }));

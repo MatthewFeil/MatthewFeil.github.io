@@ -18,6 +18,16 @@ permalink: /portfolio/
         <h2>Your holdings</h2>
       </div>
       <div class="portfolio-toolbar-actions">
+        <div class="portfolio-period-control">
+          <select id="performance-period" class="portfolio-select" aria-label="Performance period">
+            <option value="all" selected>All time</option>
+            <option value="year">Last year</option>
+            <option value="quarter">Last quarter</option>
+            <option value="month">Last month</option>
+            <option value="week">Last week</option>
+            <option value="day">Last day</option>
+          </select>
+        </div>
         <button id="open-stock-dialog" type="button">Add stock</button>
         <button id="open-log-dialog" type="button">Add log</button>
         <button id="portfolio-lock-button" type="button">Lock</button>
@@ -34,11 +44,11 @@ permalink: /portfolio/
         <strong id="summary-cost">$0.00</strong>
       </div>
       <div>
-        <span>Total gain/loss</span>
+        <span id="summary-gain-label">Total gain/loss</span>
         <strong id="summary-gain">$0.00</strong>
       </div>
       <div>
-        <span>Gain/loss %</span>
+        <span id="summary-percent-label">Total gain/loss %</span>
         <strong id="summary-percent">0.00%</strong>
       </div>
     </div>
@@ -97,8 +107,8 @@ permalink: /portfolio/
             <th>Current price</th>
             <th>Cost basis</th>
             <th>Total value</th>
-            <th>Gain/loss</th>
-            <th>Gain/loss %</th>
+            <th id="table-gain-heading">Gain/loss</th>
+            <th id="table-percent-heading">Gain/loss %</th>
             <th></th>
           </tr>
         </thead>
