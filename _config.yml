@@ -15,5 +15,12 @@ plugins:
 
 date_format: "%b %-d, %Y"
 
+exclude:
+  - Library.xml
+  - supabase
+  - .env
+  - .env.local
+  - .env.*.local
+
 # Set to `true` to show excerpts on the homepage.
 #show_excerpts: false

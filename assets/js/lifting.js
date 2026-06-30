@@ -21,7 +21,8 @@
     token: sessionStorage.getItem(TOKEN_KEY) || '',
     lifts: [],
     logs: [],
-    query: ''
+    query: '',
+    logLiftQuery: ''
   };
 
   const els = {
@@ -41,6 +42,8 @@
     addLiftForm: document.getElementById('add-lift-form'),
     liftName: document.getElementById('lift-name'),
     logForm: document.getElementById('log-form'),
+    logLiftSearch: document.getElementById('log-lift-search'),
+    logLiftSearchStatus: document.getElementById('log-lift-search-status'),
     logLift: document.getElementById('log-lift'),
     logDate: document.getElementById('log-date'),
     search: document.getElementById('lift-search'),
@@ -93,6 +96,16 @@
     return `${Math.round(value * 2) / 2} lb`;
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[character]);
+  }
+
   function estimateOneRepMax(log) {
     return Number(log.weight) / repPercent[Number(log.reps)];
   }
@@ -112,18 +125,37 @@
   }
 
   function renderLiftOptions() {
+    const submitButton = els.logForm.querySelector('button[type="submit"]');
+
     if (!state.lifts.length) {
       els.logLift.innerHTML = '<option value="">Add a lift first</option>';
-      els.logForm.querySelector('button').disabled = true;
+      els.logLiftSearch.value = '';
+      els.logLiftSearch.disabled = true;
+      els.logLiftSearchStatus.textContent = '';
+      submitButton.disabled = true;
       els.logSetOpen.disabled = true;
       return;
     }
 
-    els.logForm.querySelector('button').disabled = false;
+    const query = state.logLiftQuery.toLowerCase();
+    const filteredLifts = state.lifts.filter((lift) => lift.name.toLowerCase().includes(query));
+    const currentSelection = els.logLift.value;
+    const nextSelection = filteredLifts.some((lift) => lift.id === currentSelection)
+      ? currentSelection
+      : filteredLifts[0]?.id || '';
+
+    els.logLiftSearch.disabled = false;
     els.logSetOpen.disabled = false;
-    els.logLift.innerHTML = state.lifts
-      .map((lift) => `<option value="${lift.id}">${lift.name}</option>`)
-      .join('');
+    submitButton.disabled = !filteredLifts.length;
+    els.logLift.innerHTML = filteredLifts.length
+      ? filteredLifts
+      .map((lift) => `<option value="${escapeHtml(lift.id)}">${escapeHtml(lift.name)}</option>`)
+      .join('')
+      : '<option value="">No matching lifts</option>';
+    els.logLift.value = nextSelection;
+    els.logLiftSearchStatus.textContent = state.logLiftQuery && !filteredLifts.length
+      ? 'No matching lifts.'
+      : '';
   }
 
   function renderRepGrid(theoreticalOneRep) {
@@ -154,9 +186,9 @@
           <article class="lifting-log">
             <div>
               <strong>${formatWeight(Number(log.weight))} x ${log.reps}</strong>
-              <p><span class="lifting-log-date">${log.lifted_at}</span>${log.notes ? ` - ${log.notes}` : ''}</p>
+              <p><span class="lifting-log-date">${escapeHtml(log.lifted_at)}</span>${log.notes ? ` - ${escapeHtml(log.notes)}` : ''}</p>
             </div>
-            <button class="lifting-action" type="button" data-delete-log="${log.id}">Delete</button>
+            <button class="lifting-action" type="button" data-delete-log="${escapeHtml(log.id)}">Delete</button>
           </article>
         `).join('')}
       </div>
@@ -189,9 +221,9 @@
 
     els.list.innerHTML = filtered.map((item) => `
       <article class="lifting-card">
-        <button class="lifting-row" type="button" data-toggle-lift="${item.lift.id}" aria-expanded="false">
+        <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
           <div class="lifting-card-title">
-            <h3>${item.lift.name}</h3>
+            <h3>${escapeHtml(item.lift.name)}</h3>
             <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
           </div>
           <div class="lifting-row-metric">
@@ -203,11 +235,11 @@
             <strong>${formatWeight(item.theoreticalOneRep)}</strong>
           </div>
         </button>
-        <div class="lifting-details" id="details-${item.lift.id}" hidden>
+        <div class="lifting-details" id="details-${escapeHtml(item.lift.id)}" hidden>
           <section>
             ${renderRepGrid(item.theoreticalOneRep)}
             <div class="lifting-detail-actions">
-              <button class="lifting-action" type="button" data-open-logs="${item.lift.id}">View logs</button>
+              <button class="lifting-action" type="button" data-open-logs="${escapeHtml(item.lift.id)}">View logs</button>
             </div>
           </section>
         </div>
@@ -247,8 +279,11 @@
   });
 
   els.logSetOpen.addEventListener('click', () => {
+    state.logLiftQuery = '';
+    els.logLiftSearch.value = '';
+    renderLiftOptions();
     els.logSetModal.showModal();
-    els.logLift.focus();
+    els.logLiftSearch.focus();
   });
 
   els.logSetClose.addEventListener('click', () => {
@@ -297,6 +332,8 @@
       });
       const selectedLift = els.logLift.value;
       els.logForm.reset();
+      state.logLiftQuery = '';
+      els.logLiftSearch.value = '';
       els.logDate.valueAsDate = new Date();
       els.logLift.value = selectedLift;
       els.logSetModal.close();
@@ -309,6 +346,11 @@
   els.search.addEventListener('input', () => {
     state.query = els.search.value.trim();
     renderList();
+  });
+
+  els.logLiftSearch.addEventListener('input', () => {
+    state.logLiftQuery = els.logLiftSearch.value.trim();
+    renderLiftOptions();
   });
 
   document.addEventListener('click', async (event) => {

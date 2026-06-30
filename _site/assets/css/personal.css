@@ -1,10 +1,10 @@
 .personal-app {
-  --personal-border: color-mix(in srgb, currentColor 16%, transparent);
-  --personal-muted: color-mix(in srgb, currentColor 62%, transparent);
-  --personal-surface: color-mix(in srgb, var(--site-bg) 94%, var(--site-text));
-  --personal-soft: color-mix(in srgb, var(--site-bg) 97%, var(--site-text));
+  --personal-border: var(--tool-border);
+  --personal-muted: var(--tool-muted);
+  --personal-surface: var(--tool-surface);
+  --personal-soft: var(--tool-soft);
   --personal-accent: var(--site-accent);
-  --personal-warn: #9f6b00;
+  --personal-warn: var(--site-warn);
   display: grid;
   gap: 1rem;
 }
@@ -37,7 +37,7 @@
   margin: 0 0 0.25rem;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -51,7 +51,7 @@
   color: var(--personal-muted);
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -65,7 +65,7 @@
 .personal-inline input,
 .personal-inline button,
 .personal-heading button {
-  min-height: 2.55rem;
+  min-height: var(--tool-control-height);
   border: 1px solid var(--personal-border);
   border-radius: 0;
   font: inherit;
@@ -79,10 +79,18 @@
   color: var(--site-text);
 }
 
+.personal-inline input:focus-visible,
+.personal-inline button:focus-visible,
+.personal-heading button:focus-visible,
+.personal-card:focus-visible {
+  border-color: var(--site-accent);
+}
+
 .personal-inline button,
 .personal-heading button {
   cursor: pointer;
   font-weight: 800;
+  line-height: 1.1;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
@@ -137,14 +145,14 @@
 .personal-inline button:hover {
   background: color-mix(in srgb, var(--personal-accent) 92%, white);
   border-color: color-mix(in srgb, var(--personal-accent) 72%, white);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
 .personal-heading button:hover {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
   border-color: var(--site-bad);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   color: var(--site-bad);
   transform: translate(-2px, -2px);
 }
@@ -152,13 +160,14 @@
 .personal-card:hover {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
 .personal-status {
   min-height: 0;
   margin: 0;
+  line-height: 1.35;
 }
 
 .personal-status.is-error {

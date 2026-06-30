@@ -12,6 +12,14 @@
   --site-good: #16703a;
   --site-warn: #9b6300;
   --site-bad: #b91c1c;
+  --tool-border: color-mix(in srgb, var(--site-text) 18%, transparent);
+  --tool-border-subtle: color-mix(in srgb, var(--site-text) 12%, transparent);
+  --tool-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+  --tool-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --tool-muted: color-mix(in srgb, var(--site-text) 62%, transparent);
+  --tool-hover-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  --tool-label-spacing: 0.07em;
+  --tool-control-height: 2.5rem;
   --font-display: "Archivo Black", Impact, sans-serif;
   --font-body: "Inter", Arial, sans-serif;
   --page-gutter: clamp(1rem, 3.6vw, 3rem);
@@ -92,6 +100,14 @@ input,
 select,
 textarea {
   font-family: var(--font-body);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
 }
 
 table {
@@ -255,8 +271,10 @@ table {
 }
 
 .nav-dropdown-menu .page-link {
-  display: block;
-  padding: 0.55rem 0.6rem;
+  display: inline-block;
+  justify-self: start;
+  margin: 0 0.6rem;
+  padding: 0.55rem 0;
   font-size: 0.72rem;
 }
 
@@ -795,6 +813,7 @@ table {
 .portfolio-app,
 .lifting-app,
 .personal-app,
+.investment-app,
 .grade-v2 {
   width: 100%;
 }
@@ -812,14 +831,25 @@ table {
 
 .portfolio-kicker,
 .lifting-kicker,
+.personal-kicker,
 .personal-form label,
 .portfolio-form label,
 .lifting-form label,
 .lifting-filter label,
+.investment-field > span:first-child,
+.investment-results-head span,
+.investment-result-card > span:first-child,
 .target-table th,
 .scale-field label {
-  letter-spacing: 0.07em;
+  letter-spacing: var(--tool-label-spacing);
   text-transform: uppercase;
+}
+
+.portfolio-status,
+.lifting-status,
+.personal-status,
+.investment-status {
+  line-height: 1.35;
 }
 
 @media (max-width: 1040px) {
@@ -892,6 +922,8 @@ table {
     display: grid;
   }
   .nav-dropdown-menu .page-link {
+    justify-self: end;
+    margin: 0;
     padding: 0.35rem 0;
     font-size: 0.7rem;
     text-align: right;

@@ -1,12 +1,12 @@
 .portfolio-app {
-  --portfolio-border: color-mix(in srgb, currentColor 18%, transparent);
-  --portfolio-muted: color-mix(in srgb, currentColor 62%, transparent);
-  --portfolio-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
-  --portfolio-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --portfolio-border: var(--tool-border);
+  --portfolio-muted: var(--tool-muted);
+  --portfolio-surface: var(--tool-surface);
+  --portfolio-soft: var(--tool-soft);
   --portfolio-button: var(--site-accent);
   --portfolio-button-hover: var(--site-accent-strong);
-  --portfolio-good: #16804a;
-  --portfolio-bad: #c43434;
+  --portfolio-good: var(--site-good);
+  --portfolio-bad: var(--site-bad);
   color: var(--site-text);
   font-family: var(--font-body);
 }
@@ -45,7 +45,7 @@
   margin: 0 0 0.15rem;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -119,7 +119,6 @@
   color: var(--portfolio-muted);
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -131,7 +130,7 @@
 .portfolio-action,
 .portfolio-dialog-close {
   box-sizing: border-box;
-  min-height: 2.45rem;
+  min-height: var(--tool-control-height);
   padding: 0.5rem 0.65rem;
   color: var(--site-text);
   background: var(--portfolio-surface);
@@ -168,12 +167,23 @@
   color: color-mix(in srgb, var(--site-text) 52%, transparent);
 }
 
+.portfolio-form input:focus-visible,
+.portfolio-form select:focus-visible,
+.portfolio-select:focus-visible,
+.portfolio-form button:focus-visible,
+.portfolio-toolbar button:focus-visible,
+.portfolio-action:focus-visible,
+.portfolio-dialog-close:focus-visible {
+  border-color: var(--site-accent);
+}
+
 .portfolio-form button,
 .portfolio-toolbar button,
 .portfolio-action,
 .portfolio-dialog-close {
   cursor: pointer;
   font-weight: 800;
+  line-height: 1.1;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
@@ -203,7 +213,7 @@
 .portfolio-toolbar button:hover,
 .portfolio-action:hover,
 .portfolio-dialog-close:hover {
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -247,6 +257,7 @@
   padding: 0;
   background: transparent;
   color: var(--portfolio-muted);
+  line-height: 1;
 }
 
 .portfolio-dialog-close:hover {
@@ -279,7 +290,6 @@
   color: var(--portfolio-muted);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -340,6 +350,10 @@
 
 .portfolio-workspace > .portfolio-status {
   margin: 0.75rem 0 0;
+}
+
+.portfolio-status:empty {
+  display: none;
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -415,7 +429,7 @@
   .portfolio-app {
     --portfolio-button: var(--site-accent);
     --portfolio-button-hover: var(--site-accent-strong);
-    --portfolio-good: #52c985;
-    --portfolio-bad: #ff7a7a;
+    --portfolio-good: var(--site-good);
+    --portfolio-bad: var(--site-bad);
   }
 }

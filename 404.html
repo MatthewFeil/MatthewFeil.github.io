@@ -3,22 +3,47 @@ layout: base
 ---
 
 <style type="text/css" media="screen">
-  .container {
-    margin: 10px auto;
-    max-width: 600px;
-    text-align: center;
+  .not-found {
+    display: grid;
+    gap: 0.9rem;
+    width: min(100%, 680px);
+    margin: clamp(1.5rem, 8vw, 5rem) auto;
+    border: 1px solid var(--tool-border);
+    background: var(--tool-soft);
+    padding: clamp(1rem, 4vw, 2rem);
   }
-  h1 {
-    margin: 30px 0;
-    font-size: 4em;
-    line-height: 1;
-    letter-spacing: -1px;
+
+  .not-found h1 {
+    margin: 0;
+    color: var(--site-accent);
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 16vw, 9rem);
+    letter-spacing: 0;
+    line-height: 0.85;
+    text-transform: uppercase;
+  }
+
+  .not-found p {
+    max-width: 42rem;
+    margin: 0;
+    color: var(--tool-muted);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .not-found strong {
+    color: var(--site-text);
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 4vw, 2.4rem);
+    letter-spacing: 0;
+    line-height: 0.95;
+    text-transform: uppercase;
   }
 </style>
 
-<div class="container">
+<div class="not-found">
   <h1>404</h1>
 
-  <p><strong>Page not found :(</strong></p>
+  <p><strong>Page not found</strong></p>
   <p>The requested page could not be found.</p>
 </div>

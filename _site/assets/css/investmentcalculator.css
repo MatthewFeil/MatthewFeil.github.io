@@ -1,11 +1,11 @@
 .investment-app {
-  --investment-border: color-mix(in srgb, currentColor 18%, transparent);
-  --investment-muted: color-mix(in srgb, currentColor 62%, transparent);
-  --investment-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
-  --investment-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --investment-border: var(--tool-border);
+  --investment-muted: var(--tool-muted);
+  --investment-surface: var(--tool-surface);
+  --investment-soft: var(--tool-soft);
   --investment-button: var(--site-accent);
-  --investment-good: #16804a;
-  --investment-bad: #c43434;
+  --investment-good: var(--site-good);
+  --investment-bad: var(--site-bad);
   color: var(--site-text);
   font-family: var(--font-body);
 }
@@ -42,7 +42,7 @@
   color: var(--site-text);
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tool-label-spacing);
   line-height: 1;
   text-align: center;
   text-decoration: none;
@@ -106,7 +106,6 @@
   color: var(--investment-muted);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
   line-height: 1.1;
   text-transform: uppercase;
 }
@@ -118,7 +117,7 @@
 .investment-input-grid button,
 .investment-details-toggle {
   box-sizing: border-box;
-  min-height: 2.5rem;
+  min-height: var(--tool-control-height);
   padding: 0.5rem 0.65rem;
   color: var(--site-text);
   background: var(--investment-surface);
@@ -184,6 +183,19 @@
   outline: none;
 }
 
+.investment-field input:focus-visible,
+.investment-field select:focus-visible,
+.investment-input-grid button:focus-visible,
+.investment-details-toggle:focus-visible,
+.investment-tool-switcher a:focus-visible {
+  border-color: var(--site-accent);
+}
+
+.investment-money-field:focus-within,
+.investment-percent-field:focus-within {
+  border-color: var(--site-accent);
+}
+
 .investment-percent-field input {
   padding-left: 0.65rem;
   padding-right: 0.2rem;
@@ -197,6 +209,7 @@
 .investment-details-toggle {
   cursor: pointer;
   font-weight: 800;
+  line-height: 1.1;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
@@ -209,7 +222,7 @@
 .investment-input-grid button:hover {
   background: color-mix(in srgb, var(--investment-button) 92%, white);
   border-color: color-mix(in srgb, var(--investment-button) 72%, white);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -229,7 +242,7 @@
 .investment-details-toggle:hover {
   background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -237,6 +250,7 @@
   min-height: 1.35rem;
   margin: 0.75rem 0 0;
   font-size: 0.92rem;
+  line-height: 1.35;
 }
 
 .investment-status:empty {
@@ -260,7 +274,7 @@
 .investment-results-head span {
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-align: right;
   text-transform: uppercase;
 }
@@ -301,7 +315,6 @@
   color: var(--investment-muted);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
   line-height: 1.15;
   text-transform: uppercase;
 }
@@ -372,7 +385,7 @@
   color: var(--investment-muted);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tool-label-spacing);
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
@@ -390,6 +403,17 @@
 }
 
 @media (hover: none), (pointer: coarse) {
+  .investment-tool-switcher a:hover,
+  .investment-tool-switcher a:focus-visible {
+    background: var(--investment-surface);
+  }
+
+  .investment-tool-switcher a.is-active:hover,
+  .investment-tool-switcher a.is-active:focus-visible {
+    background: var(--investment-button);
+    color: #fff;
+  }
+
   .investment-input-grid button:hover {
     background: var(--investment-button);
     border-color: var(--investment-button);
@@ -467,7 +491,7 @@
 
 @media (prefers-color-scheme: dark) {
   .investment-app {
-    --investment-good: #52c985;
-    --investment-bad: #ff7a7a;
+    --investment-good: var(--site-good);
+    --investment-bad: var(--site-bad);
   }
 }

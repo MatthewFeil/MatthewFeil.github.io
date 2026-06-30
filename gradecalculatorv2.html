@@ -15,18 +15,22 @@ permalink: /gradecalculatorv2/
       </div>
     </div>
 
-    <div class="control-stack" aria-label="Calculator controls">
-      <div class="adjustment-controls" aria-label="Adjustments">
+    <div class="settings-card" aria-label="Calculator settings">
+      <div class="settings-card-head">
+        <span>Calculator settings</span>
+        <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Rounding on</button>
+      </div>
+
+      <p class="grade-v2-summary" id="settings-summary">
+        Rounding within 0.5%. Final exam: 20%. Semester grade: 80%.
+      </p>
+
+      <div class="control-stack" aria-label="Calculator controls">
         <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Rounding</button>
         <button type="button" class="secondary-action" data-open-dialog="scale-dialog" aria-label="Adjust grade scale">Grade scale</button>
         <button type="button" class="secondary-action" data-open-dialog="weight-dialog" aria-label="Adjust final weight">Weight</button>
       </div>
-      <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Rounding on</button>
     </div>
-
-    <p class="grade-v2-summary" id="settings-summary">
-      Rounding within 0.5%. Final exam: 20%. Semester grade: 80%.
-    </p>
   </div>
 
   <section id="results-panel" class="results-panel" hidden>
@@ -118,21 +122,22 @@ permalink: /gradecalculatorv2/
 <style>
   :where(.grade-v2, .grade-dialog) {
     --gc-surface: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
-    --gc-surface-strong: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
-    --gc-off: color-mix(in srgb, var(--site-bg) 86%, var(--site-text));
-    --gc-border: var(--site-border);
-    --gc-muted: color-mix(in srgb, var(--site-text) 68%, var(--site-bg));
+    --gc-surface-strong: var(--tool-surface);
+    --gc-field: var(--tool-surface);
+    --gc-off: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
+    --gc-border: var(--tool-border);
+    --gc-muted: var(--tool-muted);
     --gc-accent: var(--site-accent);
     --gc-accent-dark: var(--site-accent-strong);
-    --gc-good: #16703a;
-    --gc-bad: #b3261e;
-    --gc-warn: #8a5a11;
+    --gc-good: var(--site-good);
+    --gc-bad: var(--site-bad);
+    --gc-warn: var(--site-warn);
   }
 
   .grade-v2 {
     display: grid;
-    gap: 1.25rem;
-    max-width: 1280px;
+    gap: 1rem;
+    max-width: 1180px;
     font-family: var(--font-body);
   }
 
@@ -152,14 +157,16 @@ permalink: /gradecalculatorv2/
 
   .grade-v2-hero {
     display: grid;
-    grid-template-columns: minmax(18rem, 0.45fr) minmax(28rem, 1fr);
-    column-gap: clamp(1rem, 3vw, 2rem);
-    row-gap: 0.85rem;
-    align-items: end;
-    padding: 1rem;
+    grid-template-columns: minmax(17rem, 0.9fr) minmax(20rem, 1.1fr);
+    gap: clamp(0.8rem, 2vw, 1.2rem);
+    align-items: stretch;
+    padding: 0.85rem;
   }
 
   .grade-v2-copy {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.45rem;
     width: 100%;
     min-width: 0;
   }
@@ -172,12 +179,14 @@ permalink: /gradecalculatorv2/
     color: var(--gc-muted);
     font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tool-label-spacing);
+    line-height: 1.2;
     text-transform: uppercase;
   }
 
   .grade-v2-copy label {
-    font-size: 0.98rem;
+    margin: 0;
+    font-size: 0.82rem;
   }
 
   .grade-v2-entry,
@@ -186,8 +195,8 @@ permalink: /gradecalculatorv2/
     position: relative;
     display: flex;
     align-items: center;
-    min-height: 3rem;
-    background: var(--site-bg);
+    min-height: 2.5rem;
+    background: var(--gc-field);
     border: 1px solid var(--gc-border);
     border-radius: 0;
     overflow: hidden;
@@ -207,10 +216,40 @@ permalink: /gradecalculatorv2/
     outline: none;
   }
 
+  .grade-v2-entry:focus-within,
+  .example-entry:focus-within,
+  .setting-row:focus-within {
+    border-color: var(--site-accent);
+  }
+
+  .scale-grid input:focus-visible,
+  .grade-v2 button:focus-visible,
+  .grade-dialog button:focus-visible {
+    border-color: var(--site-accent);
+    outline: 2px solid var(--site-accent);
+    outline-offset: 2px;
+  }
+
   .grade-v2-entry input,
   .example-entry input,
   .setting-row input {
     padding: 0.7rem 2rem 0.7rem 0.8rem;
+  }
+
+  .grade-v2-entry {
+    height: 100%;
+    min-height: 5.2rem;
+    background: var(--site-bg);
+  }
+
+  .grade-v2-entry input {
+    height: 100%;
+    padding: 0.1rem 3.3rem 0.1rem 0.8rem;
+    font-family: var(--font-display);
+    font-size: 4.35rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 0.9;
   }
 
   .grade-v2-entry span,
@@ -225,9 +264,16 @@ permalink: /gradecalculatorv2/
     font-weight: 700;
   }
 
+  .grade-v2-entry span {
+    right: 0.9rem;
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 900;
+  }
+
   .grade-v2 button,
   .grade-dialog button {
-    min-height: 3rem;
+    min-height: var(--tool-control-height);
     border: 1px solid var(--gc-border);
     border-radius: 0;
     cursor: pointer;
@@ -235,12 +281,13 @@ permalink: /gradecalculatorv2/
     font-size: 0.92rem;
     font-weight: 800;
     letter-spacing: 0;
+    line-height: 1.1;
     transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
   }
 
   .grade-v2 button:hover,
   .grade-dialog button:hover {
-    box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+    box-shadow: var(--tool-hover-shadow);
     transform: translate(-2px, -2px);
   }
 
@@ -258,20 +305,41 @@ permalink: /gradecalculatorv2/
 
   .control-stack {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-    justify-self: end;
-    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
     width: 100%;
   }
 
-  .adjustment-controls {
-    display: contents;
+  .settings-card {
+    display: grid;
+    gap: 0.65rem;
+    align-content: start;
+    min-width: 0;
+    padding: 0.85rem;
+    background: var(--gc-surface-strong);
+    border: 1px solid var(--gc-border);
+  }
+
+  .settings-card-head {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .settings-card-head span {
+    color: var(--gc-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: var(--tool-label-spacing);
+    line-height: 1.1;
+    text-transform: uppercase;
   }
 
   .ghost-action,
   .toggle-action,
   .secondary-action {
-    background: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+    background: var(--gc-field);
     color: var(--site-text);
     padding: 0.55rem 0.75rem;
   }
@@ -284,24 +352,24 @@ permalink: /gradecalculatorv2/
   }
 
   .secondary-action {
-    min-height: 3rem;
+    min-height: 2.5rem;
     min-width: 0;
-    padding: 0.48rem 0.62rem;
+    padding: 0.5rem 0.62rem;
     border-radius: 0;
     color: var(--site-text);
-    font-size: 0.74rem;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 800;
     white-space: nowrap;
   }
 
   .toggle-action {
-    width: 100%;
-    min-height: 3rem;
+    width: auto;
+    min-height: 2.35rem;
     min-width: 0;
-    padding: 0.48rem 0.62rem;
+    padding: 0.45rem 0.7rem;
     border-radius: 0;
     background: var(--gc-off);
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     white-space: nowrap;
   }
 
@@ -318,16 +386,21 @@ permalink: /gradecalculatorv2/
   }
 
   .grade-v2-summary {
-    grid-column: 1 / -1;
-    justify-self: start;
-    margin: -0.2rem 0 0;
+    margin: 0;
     color: var(--gc-muted);
-    font-size: 0.86rem;
+    font-size: 0.9rem;
+    line-height: 1.35;
     text-align: left;
   }
 
   .results-panel {
-    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.85rem;
+  }
+
+  .results-panel[hidden] {
+    display: none;
   }
 
   .legacy-calculator-link {
@@ -345,27 +418,38 @@ permalink: /gradecalculatorv2/
   }
 
   .results-heading {
-    margin-bottom: 0.7rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
   }
 
   .results-heading h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 0.92;
+    text-transform: uppercase;
   }
 
   .target-table-wrap {
     width: 100%;
     overflow-x: auto;
+    border: 1px solid var(--gc-border);
+    background: var(--gc-surface);
   }
 
   .grade-v2 .target-table {
     width: 100%;
     min-width: 100%;
     margin: 0;
-    border: 1px solid var(--gc-border);
+    border: 0;
     border-collapse: collapse;
     table-layout: fixed;
-    background: var(--gc-surface);
+    background: transparent;
   }
 
   .target-table th,
@@ -375,11 +459,19 @@ permalink: /gradecalculatorv2/
     text-align: left;
   }
 
+  .target-table tbody tr {
+    background: transparent;
+  }
+
+  .target-table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--gc-surface-strong) 64%, transparent);
+  }
+
   .target-table th {
     color: var(--gc-muted);
     font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tool-label-spacing);
     text-transform: uppercase;
   }
 
@@ -423,11 +515,11 @@ permalink: /gradecalculatorv2/
 
   .example-panel {
     display: grid;
-    grid-template-columns: minmax(180px, 0.32fr) minmax(160px, 0.25fr) minmax(280px, 0.43fr);
-    gap: 0.75rem;
+    grid-template-columns: minmax(150px, 0.3fr) minmax(140px, 0.24fr) minmax(240px, 0.46fr);
+    gap: 0.65rem;
     align-items: stretch;
-    margin-top: 1rem;
-    padding: 0.85rem;
+    margin-top: 0;
+    padding: 0.75rem;
     box-shadow: none;
   }
 
@@ -436,9 +528,9 @@ permalink: /gradecalculatorv2/
     margin: 0;
     color: var(--site-text);
     font-family: var(--font-display);
-    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    font-size: 1.2rem;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 0.98;
     text-transform: uppercase;
   }
@@ -448,9 +540,9 @@ permalink: /gradecalculatorv2/
     align-content: center;
     min-height: 3rem;
     padding: 0.65rem 0.75rem;
-    border: 1px solid var(--gc-border);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
     border-radius: 0;
-    background: var(--site-bg);
+    background: var(--gc-field);
     color: var(--gc-muted);
     font-size: 0.95rem;
     line-height: 1.35;
@@ -475,7 +567,7 @@ permalink: /gradecalculatorv2/
     color: var(--gc-muted);
     font-size: 0.72rem;
     font-weight: 800;
-    letter-spacing: 0.07em;
+    letter-spacing: var(--tool-label-spacing);
     line-height: 1.1;
     text-transform: uppercase;
   }
@@ -486,7 +578,7 @@ permalink: /gradecalculatorv2/
     font-family: var(--font-display);
     font-size: 1.08rem;
     font-weight: 900;
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
     line-height: 1.05;
   }
 
@@ -577,7 +669,7 @@ permalink: /gradecalculatorv2/
     margin: 0;
     color: var(--gc-muted);
     font-size: 0.76rem;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tool-label-spacing);
   }
 
   .scale-field input {
@@ -585,7 +677,7 @@ permalink: /gradecalculatorv2/
     padding: 0.55rem 1.85rem 0.55rem 0.65rem;
     border: 1px solid var(--gc-border);
     border-radius: 0;
-    background: var(--site-bg);
+    background: var(--gc-field);
   }
 
   .scale-field span {
@@ -600,14 +692,7 @@ permalink: /gradecalculatorv2/
   @media (max-width: 860px) {
     .grade-v2-hero {
       grid-template-columns: 1fr;
-      gap: 0.65rem;
-    }
-
-    .control-stack {
-      grid-template-columns: 1fr;
-      justify-self: stretch;
-      width: 100%;
-      max-width: none;
+      gap: 0.75rem;
     }
 
     .example-panel {
@@ -616,20 +701,6 @@ permalink: /gradecalculatorv2/
 
     .example-panel output {
       width: 100%;
-    }
-
-    .adjustment-controls {
-      display: flex;
-      flex-wrap: nowrap;
-      justify-content: flex-start;
-      gap: 0.35rem;
-      width: 100%;
-    }
-
-    .secondary-action {
-      flex: 1 1 0;
-      padding-inline: 0.45rem;
-      white-space: nowrap;
     }
 
     .scale-grid {
@@ -647,29 +718,52 @@ permalink: /gradecalculatorv2/
       padding: 0.8rem;
     }
 
-    .toggle-action {
-      font-size: 0.72rem;
+    .settings-card {
+      padding: 0.75rem;
     }
 
-    .adjustment-controls {
-      gap: 0.25rem;
+    .settings-card-head {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-stack {
+      grid-template-columns: 1fr;
+    }
+
+    .toggle-action {
+      font-size: 0.72rem;
+      width: 100%;
     }
 
     .secondary-action {
       min-height: 2.6rem;
-      font-size: 0.68rem;
+      font-size: 0.74rem;
     }
 
     .secondary-action {
-      padding-inline: 0.28rem;
+      padding-inline: 0.45rem;
     }
 
     .toggle-action {
-      padding-inline: 0.28rem;
+      padding-inline: 0.45rem;
     }
 
     .grade-v2-summary {
       font-size: 0.78rem;
+    }
+
+    .grade-v2-entry {
+      min-height: 4.4rem;
+    }
+
+    .grade-v2-entry input {
+      font-size: 3rem;
+    }
+
+    .grade-v2-entry span {
+      font-size: 1.3rem;
     }
 
     .target-table th,
@@ -692,7 +786,7 @@ permalink: /gradecalculatorv2/
 
     .ghost-action:hover,
     .secondary-action:hover {
-      background: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+      background: var(--gc-field);
       border-color: var(--gc-border);
     }
 

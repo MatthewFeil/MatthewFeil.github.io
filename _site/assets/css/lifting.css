@@ -1,12 +1,12 @@
 .lifting-app {
-  --lifting-border: color-mix(in srgb, currentColor 16%, transparent);
-  --lifting-muted: color-mix(in srgb, currentColor 60%, transparent);
-  --lifting-surface: color-mix(in srgb, var(--site-bg) 93%, var(--site-text));
-  --lifting-soft: color-mix(in srgb, var(--site-bg) 97%, var(--site-text));
+  --lifting-border: var(--tool-border);
+  --lifting-muted: var(--tool-muted);
+  --lifting-surface: var(--tool-surface);
+  --lifting-soft: var(--tool-soft);
   --lifting-accent: var(--site-accent);
   --lifting-accent-hover: var(--site-accent-strong);
-  --lifting-good: #16804a;
-  --lifting-warn: #9f6b00;
+  --lifting-good: var(--site-good);
+  --lifting-warn: var(--site-warn);
   color: var(--site-text);
   font-family: var(--font-body);
 }
@@ -42,7 +42,8 @@
 .lifting-status,
 .lifting-muted,
 .lifting-card-meta,
-.lifting-log-date {
+.lifting-log-date,
+.lifting-select-status {
   color: var(--lifting-muted);
 }
 
@@ -50,7 +51,7 @@
   margin: 0 0 0.15rem;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -80,7 +81,7 @@
   color: var(--lifting-muted);
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -88,6 +89,12 @@
 .lifting-log-form {
   display: grid;
   gap: 0.65rem;
+}
+
+.lifting-select-status {
+  min-height: 1.2rem;
+  margin: -0.35rem 0 0;
+  font-size: 0.88rem;
 }
 
 .lifting-log-form {
@@ -121,7 +128,7 @@
 .lifting-action,
 .lifting-icon-button {
   box-sizing: border-box;
-  min-height: 2.45rem;
+  min-height: var(--tool-control-height);
   padding: 0.5rem 0.65rem;
   color: var(--site-text);
   background: var(--lifting-surface);
@@ -150,10 +157,23 @@
   color: color-mix(in srgb, var(--site-text) 48%, transparent);
 }
 
+.lifting-form input:focus-visible,
+.lifting-form select:focus-visible,
+.lifting-log-form input:focus-visible,
+.lifting-log-form select:focus-visible,
+.lifting-filter input:focus-visible,
+.lifting-secondary:focus-visible,
+.lifting-action:focus-visible,
+.lifting-icon-button:focus-visible,
+.lifting-row:focus-visible {
+  border-color: var(--site-accent);
+}
+
 .lifting-form button,
 .lifting-log-form button {
   cursor: pointer;
   font-weight: 800;
+  line-height: 1.1;
   background: var(--lifting-accent);
   color: #fff;
   border-color: var(--lifting-accent);
@@ -171,6 +191,7 @@
 .lifting-icon-button {
   cursor: pointer;
   font-weight: 800;
+  line-height: 1.1;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
@@ -186,7 +207,7 @@
 .lifting-secondary:hover,
 .lifting-action:hover,
 .lifting-icon-button:hover {
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -209,6 +230,10 @@
 
 .lifting-workspace > .lifting-status {
   margin: 0.75rem 0 0;
+}
+
+.lifting-status:empty {
+  display: none;
 }
 
 .lifting-filter input {
@@ -405,6 +430,7 @@
 .lifting-empty {
   margin: 0;
   color: var(--lifting-muted);
+  line-height: 1.35;
 }
 
 .lifting-modal {
@@ -617,7 +643,7 @@
   .lifting-app {
     --lifting-accent: var(--site-accent);
     --lifting-accent-hover: var(--site-accent-strong);
-    --lifting-good: #52c985;
-    --lifting-warn: #e0b35b;
+    --lifting-good: var(--site-good);
+    --lifting-warn: var(--site-warn);
   }
 }

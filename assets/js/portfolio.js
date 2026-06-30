@@ -95,6 +95,16 @@
     els.status.classList.toggle('portfolio-negative', isError);
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[character]);
+  }
+
   function sessionIsFresh() {
     const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
     return Boolean(state.token && Number.isFinite(expiresAt) && expiresAt > Date.now());
@@ -296,7 +306,7 @@
 
   function renderStockOptions() {
     els.logStock.innerHTML = state.stocks
-      .map((stock) => `<option value="${stock.id}">${stock.symbol}</option>`)
+      .map((stock) => `<option value="${escapeHtml(stock.id)}">${escapeHtml(stock.symbol)}</option>`)
       .join('');
   }
 
@@ -315,8 +325,8 @@
     els.rows.innerHTML = allMetrics.map((item) => `
       <tr>
         <td>
-          <span class="portfolio-symbol">${item.stock.symbol}</span>
-          <span class="portfolio-name">${item.stock.name || 'No name saved'}</span>
+          <span class="portfolio-symbol">${escapeHtml(item.stock.symbol)}</span>
+          <span class="portfolio-name">${escapeHtml(item.stock.name || 'No name saved')}</span>
         </td>
         <td>${number.format(item.shares)}</td>
         <td>${money.format(item.avgPrice)}</td>
@@ -325,7 +335,7 @@
         <td>${money.format(item.totalValue)}</td>
         <td class="${item.performance.available ? gainClass(item.performance.gain) : ''}">${formatPerformanceAmount(item)}</td>
         <td class="${item.performance.available ? gainClass(item.performance.gainPercent) : ''}">${formatPerformancePercent(item)}</td>
-        <td><button class="portfolio-action" type="button" data-delete-stock="${item.stock.id}">Delete</button></td>
+        <td><button class="portfolio-action" type="button" data-delete-stock="${escapeHtml(item.stock.id)}">Delete</button></td>
       </tr>
     `).join('');
   }
@@ -344,10 +354,10 @@
       return `
         <article class="portfolio-log">
           <div class="portfolio-log-head">
-            <strong>${stock?.symbol || 'Deleted stock'} - ${type}</strong>
-            <button class="portfolio-action" type="button" data-delete-log="${log.id}">Delete</button>
+            <strong>${escapeHtml(stock?.symbol || 'Deleted stock')} - ${type}</strong>
+            <button class="portfolio-action" type="button" data-delete-log="${escapeHtml(log.id)}">Delete</button>
           </div>
-          <p>${log.logged_at}: ${money.format(Number(log.total_purchase_amount))} at ${money.format(Number(log.purchase_price))} per share, ${number.format(shares)} shares.</p>
+          <p>${escapeHtml(log.logged_at)}: ${money.format(Number(log.total_purchase_amount))} at ${money.format(Number(log.purchase_price))} per share, ${number.format(shares)} shares.</p>
         </article>
       `;
     }).join('');
