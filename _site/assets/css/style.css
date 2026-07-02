@@ -927,8 +927,7 @@ table {
     transform: translateX(0.35rem);
     transition: max-height 0.22s ease, margin-top 0.22s ease, padding-top 0.22s ease, padding-bottom 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
   }
-  .nav-dropdown:hover .nav-dropdown-menu,
-  .nav-dropdown:focus-within .nav-dropdown-menu {
+  .nav-dropdown.is-open .nav-dropdown-menu {
     max-height: 10rem;
     margin-top: 0.32rem;
     border-right-color: var(--site-accent);

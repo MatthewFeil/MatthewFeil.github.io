@@ -963,8 +963,7 @@ table {
       transform 0.22s ease;
   }
 
-  .nav-dropdown:hover .nav-dropdown-menu,
-  .nav-dropdown:focus-within .nav-dropdown-menu {
+  .nav-dropdown.is-open .nav-dropdown-menu {
     max-height: 10rem;
     margin-top: 0.32rem;
     border-right-color: var(--site-accent);

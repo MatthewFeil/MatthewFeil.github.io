@@ -359,7 +359,7 @@
     const form = new FormData(els.addLiftForm);
     const submitButton = els.addLiftForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Creating...');
-    setStatus('Creating lift...');
+    setStatus('');
     try {
       await api('addLift', { name: form.get('name') });
       els.addLiftForm.reset();
@@ -377,7 +377,7 @@
     const form = new FormData(els.logForm);
     const submitButton = els.logForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Adding...');
-    setStatus('Adding log...');
+    setStatus('');
     try {
       await api('addLog', {
         lift_id: form.get('lift_id'),
@@ -407,7 +407,7 @@
     const id = String(form.get('id') || '');
     const submitButton = els.renameLiftForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Saving...');
-    setStatus('Renaming lift...');
+    setStatus('');
     try {
       await api('renameLift', {
         id,
@@ -464,7 +464,7 @@
       if (deleteLogButton && confirm('Delete this lift log?')) {
         const openLogsLiftId = els.liftLogsModal.dataset.liftId;
         setButtonLoading(deleteLogButton, true, 'Deleting...');
-        setStatus('Deleting log...');
+        setStatus('');
         await api('deleteLog', { id: deleteLogButton.dataset.deleteLog });
         await loadLifts();
         if (els.liftLogsModal.open && openLogsLiftId) {
@@ -480,7 +480,7 @@
 
       if (deleteLiftButton && confirm('Delete this lift and all of its logs?')) {
         setButtonLoading(deleteLiftButton, true, 'Deleting...');
-        setStatus('Deleting lift...');
+        setStatus('');
         await api('deleteLift', { id: deleteLiftButton.dataset.deleteLift });
         els.liftLogsModal.close();
         await loadLifts();

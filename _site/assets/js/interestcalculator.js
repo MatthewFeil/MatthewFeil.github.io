@@ -251,7 +251,7 @@
       return;
     }
 
-    setStatus('Calculating...', 'loading');
+    setStatus('');
     setLoading(true);
 
     try {

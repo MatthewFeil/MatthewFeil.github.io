@@ -445,7 +445,7 @@
     const symbol = String(form.get('symbol')).trim().toUpperCase();
     const name = String(form.get('name')).trim();
     setButtonLoading(submitButton, true, 'Adding...');
-    setStatus('Adding stock...');
+    setStatus('');
     try {
       await api('addStock', { symbol, name });
       els.stockForm.reset();
@@ -463,7 +463,7 @@
     const form = new FormData(els.logForm);
     const submitButton = els.logForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Adding...');
-    setStatus('Adding log...');
+    setStatus('');
     try {
       await api('addLog', {
         stock_id: form.get('stock_id'),
@@ -491,13 +491,13 @@
     try {
       if (stockId && confirm('Delete this stock and all of its logs?')) {
         setButtonLoading(stockButton, true, 'Deleting...');
-        setStatus('Deleting stock...');
+        setStatus('');
         await api('deleteStock', { id: stockId });
         await loadPortfolio();
       }
       if (logId && confirm('Delete this log?')) {
         setButtonLoading(logButton, true, 'Deleting...');
-        setStatus('Deleting log...');
+        setStatus('');
         await api('deleteLog', { id: logId });
         await loadPortfolio();
       }

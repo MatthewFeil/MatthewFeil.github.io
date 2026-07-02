@@ -273,7 +273,7 @@
     }
 
     symbolInput.value = symbol;
-    setStatus('Calculating...', 'loading');
+    setStatus('');
     setLoading(true);
 
     try {

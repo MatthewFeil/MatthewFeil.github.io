@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const navTrigger = document.getElementById("nav-trigger");
   const navPanel = document.querySelector(".site-nav .trigger");
   const navLinks = document.querySelectorAll(".site-nav a.page-link");
+  const toolsDropdown = document.querySelector(".site-nav .nav-dropdown");
+  const toolsButton = document.querySelector(".site-nav .nav-dropdown-summary");
+  const mobileNavQuery = window.matchMedia("(max-width: 1040px)");
 
   if (!navTrigger || navLinks.length === 0) {
     return;
@@ -10,6 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const getPathKey = (path) => {
     const cleanPath = path.replace(/\/index\.html$/, "/").replace(/\/$/, "");
     return cleanPath || "/";
+  };
+
+  const closeToolsDropdown = () => {
+    if (!toolsDropdown || !toolsButton) {
+      return;
+    }
+
+    toolsDropdown.classList.remove("is-open");
+    toolsButton.setAttribute("aria-expanded", "false");
   };
 
   const scrollToHashTarget = (hash) => {
@@ -36,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const waitForMenuCollapse = (wasOpen) => {
-    const isMobileNav = window.matchMedia("(max-width: 1040px)").matches;
+    const isMobileNav = mobileNavQuery.matches;
 
     if (!wasOpen || !isMobileNav || !navPanel) {
       return Promise.resolve();
@@ -66,6 +78,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  if (toolsDropdown && toolsButton) {
+    toolsButton.setAttribute("aria-expanded", "false");
+
+    toolsButton.addEventListener("click", (event) => {
+      if (!mobileNavQuery.matches) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const isOpen = toolsDropdown.classList.toggle("is-open");
+      toolsButton.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    navTrigger.addEventListener("change", () => {
+      if (!navTrigger.checked) {
+        closeToolsDropdown();
+      }
+    });
+
+    mobileNavQuery.addEventListener("change", (event) => {
+      if (!event.matches) {
+        closeToolsDropdown();
+      }
+    });
+  }
+
   navLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
       const url = new URL(link.href, window.location.href);
@@ -73,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const wasOpen = navTrigger.checked;
 
       navTrigger.checked = false;
+      closeToolsDropdown();
 
       if (!url.hash || !samePage) {
         return;

@@ -21,6 +21,7 @@
 .investment-form,
 .investment-results {
   padding: 0.85rem;
+  min-width: 0;
 }
 
 .investment-app h2 {
@@ -90,6 +91,8 @@
   grid-template-columns: minmax(7.5rem, 0.85fr) minmax(8rem, 0.9fr) minmax(8rem, 0.9fr) minmax(6.5rem, 0.7fr) auto;
   gap: 0.65rem;
   align-items: end;
+  width: 100%;
+  min-width: 0;
 }
 
 .interest-input-grid {
@@ -99,6 +102,7 @@
 .investment-field {
   display: grid;
   gap: 0.35rem;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -134,8 +138,13 @@
 }
 
 .investment-field input[type="date"] {
+  display: block;
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  max-inline-size: 100%;
   min-inline-size: 0;
+  overflow: hidden;
 }
 
 .investment-field input {
@@ -488,6 +497,13 @@
   }
 }
 
+@media (max-width: 760px) {
+  .investment-input-grid,
+  .interest-input-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .investment-results-head {
     align-items: stretch;
@@ -509,7 +525,7 @@
 
   .investment-input-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.5rem;
   }
 
