@@ -77,13 +77,55 @@
   }
 
   function parseInputDate(value) {
-    const [year, month, day] = value.split('-').map(Number);
+    const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
-    if (!year || !month || !day) {
+    if (!match) {
       return null;
     }
 
-    return new Date(Date.UTC(year, month - 1, day));
+    const [, yearText, monthText, dayText] = match;
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    if (
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
+  }
+
+  function updateDateDisplay(input) {
+    const display = document.querySelector(`[data-date-display="${input.id}"]`);
+
+    if (!display) {
+      return;
+    }
+
+    display.textContent = input.value || 'YYYY-MM-DD';
+  }
+
+  function openDatePicker(input) {
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+
+    if (typeof input.showPicker !== 'function') {
+      return;
+    }
+
+    try {
+      input.showPicker();
+    } catch {
+      // Some browsers only allow the native picker from the input's own default tap.
+    }
   }
 
   function formatDate(date) {
@@ -294,12 +336,21 @@
     endDateInput.max = toLocalInputDate(today);
     dateInput.value = toLocalInputDate(defaultDate);
     endDateInput.value = toLocalInputDate(today);
+    updateDateDisplay(dateInput);
+    updateDateDisplay(endDateInput);
   }
 
   initDefaults();
   setDetailsOpen(false);
   detailsToggle.addEventListener('click', () => {
     setDetailsOpen(detailsPanel.hidden);
+  });
+  [dateInput, endDateInput].forEach((input) => {
+    input.addEventListener('input', () => updateDateDisplay(input));
+    input.addEventListener('change', () => updateDateDisplay(input));
+    input.closest('.investment-date-control')?.addEventListener('click', () => {
+      openDatePicker(input);
+    });
   });
   form.addEventListener('submit', handleSubmit);
 })();

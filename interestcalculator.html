@@ -29,12 +29,18 @@ extra_css:
 
       <label class="investment-field" for="interest-date">
         <span>Investment date</span>
-        <input id="interest-date" name="date" type="date" required>
+        <span class="investment-date-control">
+          <span class="investment-date-display" data-date-display="interest-date" aria-hidden="true">YYYY-MM-DD</span>
+          <input class="investment-date-input" id="interest-date" name="date" type="date" required>
+        </span>
       </label>
 
       <label class="investment-field" for="interest-end-date">
         <span>End date</span>
-        <input id="interest-end-date" name="end-date" type="date" required>
+        <span class="investment-date-control">
+          <span class="investment-date-display" data-date-display="interest-end-date" aria-hidden="true">YYYY-MM-DD</span>
+          <input class="investment-date-input" id="interest-end-date" name="end-date" type="date" required>
+        </span>
       </label>
 
       <label class="investment-field" for="interest-rate">

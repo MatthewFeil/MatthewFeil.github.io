@@ -29,12 +29,18 @@ extra_css:
 
       <label class="investment-field" for="investment-date">
         <span>Start date</span>
-        <input id="investment-date" name="date" type="date" required>
+        <span class="investment-date-control">
+          <span class="investment-date-display" data-date-display="investment-date" aria-hidden="true">YYYY-MM-DD</span>
+          <input class="investment-date-input" id="investment-date" name="date" type="date" required>
+        </span>
       </label>
 
       <label class="investment-field" for="investment-end-date">
         <span>End date</span>
-        <input id="investment-end-date" name="end-date" type="date" required>
+        <span class="investment-date-control">
+          <span class="investment-date-display" data-date-display="investment-end-date" aria-hidden="true">YYYY-MM-DD</span>
+          <input class="investment-date-input" id="investment-end-date" name="end-date" type="date" required>
+        </span>
       </label>
 
       <label class="investment-field" for="investment-symbol">
