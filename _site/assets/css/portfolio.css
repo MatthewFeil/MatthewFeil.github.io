@@ -181,6 +181,10 @@
 .portfolio-toolbar button,
 .portfolio-action,
 .portfolio-dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
@@ -197,24 +201,50 @@
   border-color: var(--portfolio-button);
 }
 
-.portfolio-form button:hover {
+.portfolio-form button:not(:disabled):hover {
   background: color-mix(in srgb, var(--portfolio-button) 92%, white);
   border-color: color-mix(in srgb, var(--portfolio-button) 72%, white);
 }
 
-.portfolio-toolbar button:hover,
-.portfolio-action:hover,
-.portfolio-dialog-close:hover {
+.portfolio-toolbar button:not(:disabled):hover,
+.portfolio-action:not(:disabled):hover,
+.portfolio-dialog-close:not(:disabled):hover {
   background: color-mix(in srgb, var(--portfolio-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
 }
 
-.portfolio-form button:hover,
-.portfolio-toolbar button:hover,
-.portfolio-action:hover,
-.portfolio-dialog-close:hover {
+.portfolio-form button:not(:disabled):hover,
+.portfolio-toolbar button:not(:disabled):hover,
+.portfolio-action:not(:disabled):hover,
+.portfolio-dialog-close:not(:disabled):hover {
   box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
+}
+
+.portfolio-form button:disabled,
+.portfolio-toolbar button:disabled,
+.portfolio-action:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.portfolio-form button.is-loading::before,
+.portfolio-action.is-loading::before {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid color-mix(in srgb, currentColor 32%, transparent);
+  border-top-color: currentColor;
+  border-radius: 999px;
+  content: "";
+  animation: portfolio-spin 0.75s linear infinite;
+}
+
+@keyframes portfolio-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .portfolio-table-wrap {
@@ -340,20 +370,35 @@
   color: var(--portfolio-muted);
 }
 
-[data-delete-stock]:hover,
-.portfolio-log [data-delete-log]:hover,
-#portfolio-lock-button:hover {
+[data-delete-stock]:not(:disabled):hover,
+.portfolio-log [data-delete-log]:not(:disabled):hover,
+#portfolio-lock-button:not(:disabled):hover {
   background: var(--site-bg);
   border-color: var(--portfolio-bad);
   color: var(--portfolio-bad);
 }
 
 .portfolio-workspace > .portfolio-status {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
   margin: 0.75rem 0 0;
 }
 
 .portfolio-status:empty {
   display: none;
+}
+
+.portfolio-status.is-loading::before {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid color-mix(in srgb, var(--portfolio-muted) 32%, transparent);
+  border-top-color: var(--portfolio-muted);
+  border-radius: 999px;
+  content: "";
+  animation: portfolio-spin 0.75s linear infinite;
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -382,9 +427,9 @@
     transform: none;
   }
 
-  [data-delete-stock]:hover,
-  .portfolio-log [data-delete-log]:hover,
-  #portfolio-lock-button:hover {
+  [data-delete-stock]:not(:disabled):hover,
+  .portfolio-log [data-delete-log]:not(:disabled):hover,
+  #portfolio-lock-button:not(:disabled):hover {
     background: var(--portfolio-surface);
     border-color: var(--portfolio-border);
     color: var(--site-text);

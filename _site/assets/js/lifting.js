@@ -41,6 +41,11 @@
     addLiftModal: document.getElementById('add-lift-modal'),
     addLiftForm: document.getElementById('add-lift-form'),
     liftName: document.getElementById('lift-name'),
+    renameLiftModal: document.getElementById('rename-lift-modal'),
+    renameLiftClose: document.getElementById('rename-lift-close'),
+    renameLiftForm: document.getElementById('rename-lift-form'),
+    renameLiftId: document.getElementById('rename-lift-id'),
+    renameLiftName: document.getElementById('rename-lift-name'),
     logForm: document.getElementById('log-form'),
     logLiftSearch: document.getElementById('log-lift-search'),
     logLiftSearchStatus: document.getElementById('log-lift-search-status'),
@@ -54,6 +59,19 @@
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.style.color = isError ? 'var(--lifting-warn)' : '';
+    els.status.classList.toggle('is-loading', !isError && message.endsWith('...'));
+    els.status.setAttribute('aria-busy', String(!isError && message.endsWith('...')));
+  }
+
+  function setButtonLoading(button, isLoading, loadingText = 'Working...') {
+    if (!button) return;
+    if (!button.dataset.defaultText) {
+      button.dataset.defaultText = button.textContent;
+    }
+    button.disabled = isLoading;
+    button.classList.toggle('is-loading', isLoading);
+    button.setAttribute('aria-busy', String(isLoading));
+    button.textContent = isLoading ? loadingText : button.dataset.defaultText;
   }
 
   function sessionIsFresh() {
@@ -116,12 +134,9 @@
 
   function metricsForLift(lift) {
     const logs = getLiftLogs(lift.id);
-    const realOneRep = logs
-      .filter((log) => Number(log.reps) === 1)
-      .reduce((max, log) => Math.max(max, Number(log.weight)), 0);
+    const realOneRep = logs.reduce((max, log) => Math.max(max, Number(log.weight)), 0);
     const theoreticalOneRep = logs.reduce((max, log) => Math.max(max, estimateOneRepMax(log)), 0);
-    const trueMax = logs.reduce((max, log) => Math.max(max, Number(log.weight)), 0);
-    return { lift, logs, realOneRep, theoreticalOneRep, trueMax };
+    return { lift, logs, realOneRep, theoreticalOneRep };
   }
 
   function renderLiftOptions() {
@@ -207,6 +222,31 @@
     els.liftLogsModal.showModal();
   }
 
+  function openRenameModal(liftId) {
+    const lift = state.lifts.find((item) => item.id === liftId);
+    if (!lift) return;
+
+    els.renameLiftId.value = lift.id;
+    els.renameLiftName.value = lift.name;
+    els.renameLiftModal.showModal();
+    els.renameLiftName.focus();
+    els.renameLiftName.select();
+  }
+
+  function openLogSetModal(liftId = '') {
+    state.logLiftQuery = '';
+    els.logLiftSearch.value = '';
+    renderLiftOptions();
+
+    const hasLift = liftId && state.lifts.some((lift) => lift.id === liftId);
+    if (hasLift) {
+      els.logLift.value = liftId;
+    }
+
+    els.logSetModal.showModal();
+    (hasLift ? document.getElementById('log-weight') : els.logLiftSearch).focus();
+  }
+
   function renderList() {
     const allMetrics = state.lifts.map(metricsForLift);
 
@@ -221,25 +261,29 @@
 
     els.list.innerHTML = filtered.map((item) => `
       <article class="lifting-card">
-        <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
-          <div class="lifting-card-title">
-            <h3>${escapeHtml(item.lift.name)}</h3>
-            <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
-          </div>
-          <div class="lifting-row-metric">
-            <span>Actual 1RM</span>
-            <strong>${formatWeight(item.realOneRep)}</strong>
-          </div>
-          <div class="lifting-row-metric">
-            <span>Est. 1RM</span>
-            <strong>${formatWeight(item.theoreticalOneRep)}</strong>
-          </div>
-        </button>
+        <div class="lifting-card-summary">
+          <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
+            <div class="lifting-card-title">
+              <h3>${escapeHtml(item.lift.name)}</h3>
+              <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
+            </div>
+            <div class="lifting-row-metric">
+              <span>Actual 1RM</span>
+              <strong>${formatWeight(item.realOneRep)}</strong>
+            </div>
+            <div class="lifting-row-metric">
+              <span>Est. 1RM</span>
+              <strong>${formatWeight(item.theoreticalOneRep)}</strong>
+            </div>
+          </button>
+          <button class="lifting-action lifting-card-log" type="button" data-log-lift="${escapeHtml(item.lift.id)}">Log</button>
+        </div>
         <div class="lifting-details" id="details-${escapeHtml(item.lift.id)}" hidden>
           <section>
             ${renderRepGrid(item.theoreticalOneRep)}
             <div class="lifting-detail-actions">
               <button class="lifting-action" type="button" data-open-logs="${escapeHtml(item.lift.id)}">View logs</button>
+              <button class="lifting-action" type="button" data-rename-lift="${escapeHtml(item.lift.id)}">Rename</button>
             </div>
           </section>
         </div>
@@ -279,11 +323,7 @@
   });
 
   els.logSetOpen.addEventListener('click', () => {
-    state.logLiftQuery = '';
-    els.logLiftSearch.value = '';
-    renderLiftOptions();
-    els.logSetModal.showModal();
-    els.logLiftSearch.focus();
+    openLogSetModal();
   });
 
   els.logSetClose.addEventListener('click', () => {
@@ -294,11 +334,19 @@
     els.liftLogsModal.close();
   });
 
+  els.renameLiftClose.addEventListener('click', () => {
+    els.renameLiftModal.close();
+  });
+
   els.liftLogsModal.addEventListener('close', () => {
     delete els.liftLogsModal.dataset.liftId;
   });
 
-  [els.addLiftModal, els.logSetModal, els.liftLogsModal].forEach((modal) => {
+  els.renameLiftModal.addEventListener('close', () => {
+    els.renameLiftForm.reset();
+  });
+
+  [els.addLiftModal, els.logSetModal, els.renameLiftModal, els.liftLogsModal].forEach((modal) => {
     modal.addEventListener('click', (event) => {
       if (event.target === modal) {
         modal.close();
@@ -309,6 +357,9 @@
   els.addLiftForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(els.addLiftForm);
+    const submitButton = els.addLiftForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitButton, true, 'Creating...');
+    setStatus('Creating lift...');
     try {
       await api('addLift', { name: form.get('name') });
       els.addLiftForm.reset();
@@ -316,12 +367,17 @@
       await loadLifts();
     } catch (error) {
       setStatus(error.message, true);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(els.logForm);
+    const submitButton = els.logForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitButton, true, 'Adding...');
+    setStatus('Adding log...');
     try {
       await api('addLog', {
         lift_id: form.get('lift_id'),
@@ -340,6 +396,29 @@
       await loadLifts();
     } catch (error) {
       setStatus(error.message, true);
+    } finally {
+      setButtonLoading(submitButton, false);
+    }
+  });
+
+  els.renameLiftForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = new FormData(els.renameLiftForm);
+    const id = String(form.get('id') || '');
+    const submitButton = els.renameLiftForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitButton, true, 'Saving...');
+    setStatus('Renaming lift...');
+    try {
+      await api('renameLift', {
+        id,
+        name: form.get('name')
+      });
+      els.renameLiftModal.close();
+      await loadLifts();
+    } catch (error) {
+      setStatus(error.message, true);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 
@@ -356,6 +435,8 @@
   document.addEventListener('click', async (event) => {
     const toggleButton = event.target.closest('[data-toggle-lift]');
     const logsButton = event.target.closest('[data-open-logs]');
+    const logLiftButton = event.target.closest('[data-log-lift]');
+    const renameLiftButton = event.target.closest('[data-rename-lift]');
     const deleteLogButton = event.target.closest('[data-delete-log]');
     const deleteLiftButton = event.target.closest('[data-delete-lift]');
 
@@ -372,8 +453,18 @@
         openLogsModal(logsButton.dataset.openLogs);
       }
 
+      if (logLiftButton) {
+        openLogSetModal(logLiftButton.dataset.logLift);
+      }
+
+      if (renameLiftButton) {
+        openRenameModal(renameLiftButton.dataset.renameLift);
+      }
+
       if (deleteLogButton && confirm('Delete this lift log?')) {
         const openLogsLiftId = els.liftLogsModal.dataset.liftId;
+        setButtonLoading(deleteLogButton, true, 'Deleting...');
+        setStatus('Deleting log...');
         await api('deleteLog', { id: deleteLogButton.dataset.deleteLog });
         await loadLifts();
         if (els.liftLogsModal.open && openLogsLiftId) {
@@ -388,12 +479,16 @@
       }
 
       if (deleteLiftButton && confirm('Delete this lift and all of its logs?')) {
+        setButtonLoading(deleteLiftButton, true, 'Deleting...');
+        setStatus('Deleting lift...');
         await api('deleteLift', { id: deleteLiftButton.dataset.deleteLift });
         els.liftLogsModal.close();
         await loadLifts();
       }
     } catch (error) {
       setStatus(error.message, true);
+      setButtonLoading(deleteLogButton, false);
+      setButtonLoading(deleteLiftButton, false);
     }
   });
 

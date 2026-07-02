@@ -71,7 +71,7 @@
 
   els.form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    setStatus('');
+    setStatus('Unlocking...');
     setLoading(true);
     try {
       await unlock(els.password.value);

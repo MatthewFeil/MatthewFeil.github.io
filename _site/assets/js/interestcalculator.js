@@ -97,7 +97,9 @@
 
   function setLoading(isLoading) {
     submitButton.disabled = isLoading;
-    submitButton.textContent = isLoading ? 'Calculating' : 'Calculate';
+    submitButton.classList.toggle('is-loading', isLoading);
+    submitButton.setAttribute('aria-busy', String(isLoading));
+    submitButton.textContent = isLoading ? 'Calculating...' : 'Calculate';
   }
 
   function setSigned(element, value, formatter) {
@@ -249,7 +251,7 @@
       return;
     }
 
-    setStatus('');
+    setStatus('Calculating...', 'loading');
     setLoading(true);
 
     try {

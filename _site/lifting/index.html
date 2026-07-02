@@ -122,6 +122,19 @@
     </form>
   </dialog>
 
+  <dialog class="lifting-modal" id="rename-lift-modal">
+    <form id="rename-lift-form" class="lifting-form" method="dialog">
+      <div class="lifting-modal-head">
+        <h3>Rename lift</h3>
+        <button id="rename-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
+      </div>
+      <input id="rename-lift-id" name="id" type="hidden">
+      <label for="rename-lift-name">Lift name</label>
+      <input id="rename-lift-name" name="name" type="text" required>
+      <button type="submit">Save name</button>
+    </form>
+  </dialog>
+
   <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal">
     <div class="lifting-modal-head">
       <h3 id="lift-logs-title">Logs</h3>

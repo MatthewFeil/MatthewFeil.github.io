@@ -171,6 +171,10 @@
 
 .lifting-form button,
 .lifting-log-form button {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
@@ -180,8 +184,8 @@
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
-.lifting-form button:hover,
-.lifting-log-form button:hover {
+.lifting-form button:not(:disabled):hover,
+.lifting-log-form button:not(:disabled):hover {
   background: color-mix(in srgb, var(--lifting-accent) 92%, white);
   border-color: color-mix(in srgb, var(--lifting-accent) 72%, white);
 }
@@ -189,39 +193,65 @@
 .lifting-secondary,
 .lifting-action,
 .lifting-icon-button {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
-.lifting-secondary:hover,
-.lifting-action:hover,
-.lifting-icon-button:hover {
+.lifting-secondary:not(:disabled):hover,
+.lifting-action:not(:disabled):hover,
+.lifting-icon-button:not(:disabled):hover {
   background: color-mix(in srgb, var(--lifting-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
 }
 
-.lifting-form button:hover,
-.lifting-log-form button:hover,
-.lifting-secondary:hover,
-.lifting-action:hover,
-.lifting-icon-button:hover {
+.lifting-form button:not(:disabled):hover,
+.lifting-log-form button:not(:disabled):hover,
+.lifting-secondary:not(:disabled):hover,
+.lifting-action:not(:disabled):hover,
+.lifting-icon-button:not(:disabled):hover {
   box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
-#lifting-lock-button:hover,
-.lifting-action:is([data-delete-log], [data-delete-lift], #lift-logs-delete):hover {
+#lifting-lock-button:not(:disabled):hover,
+.lifting-action:is([data-delete-log], [data-delete-lift], #lift-logs-delete):not(:disabled):hover {
   background: var(--site-bg);
   border-color: var(--site-bad);
   color: var(--site-bad);
 }
 
 .lifting-secondary:disabled,
-.lifting-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
+.lifting-action:disabled,
+.lifting-form button:disabled,
+.lifting-log-form button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.lifting-form button.is-loading::before,
+.lifting-log-form button.is-loading::before,
+.lifting-action.is-loading::before {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid color-mix(in srgb, currentColor 32%, transparent);
+  border-top-color: currentColor;
+  border-radius: 999px;
+  content: "";
+  animation: lifting-spin 0.75s linear infinite;
+}
+
+@keyframes lifting-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .lifting-filter {
@@ -229,11 +259,26 @@
 }
 
 .lifting-workspace > .lifting-status {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
   margin: 0.75rem 0 0;
 }
 
 .lifting-status:empty {
   display: none;
+}
+
+.lifting-status.is-loading::before {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid color-mix(in srgb, var(--lifting-muted) 32%, transparent);
+  border-top-color: var(--lifting-muted);
+  border-radius: 999px;
+  content: "";
+  animation: lifting-spin 0.75s linear infinite;
 }
 
 .lifting-filter input {
@@ -244,6 +289,13 @@
 .lifting-list {
   display: grid;
   gap: 0.55rem;
+}
+
+.lifting-card-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: stretch;
 }
 
 .lifting-card {
@@ -273,6 +325,15 @@
   background: transparent;
   border: 0;
   cursor: pointer;
+}
+
+.lifting-card-log {
+  align-self: center;
+  min-width: 4.35rem;
+  margin-right: 1rem;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  text-align: center;
 }
 
 .lifting-row:hover {
@@ -345,6 +406,7 @@
 
 .lifting-detail-actions {
   display: flex;
+  gap: 0.5rem;
   justify-content: flex-end;
   margin-top: 0.65rem;
 }
@@ -514,6 +576,19 @@
     padding: 0.75rem;
   }
 
+  .lifting-card-summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem;
+  }
+
+  .lifting-card-log {
+    min-width: 3.5rem;
+    margin-right: 0.75rem;
+    padding-right: 0.45rem;
+    padding-left: 0.45rem;
+    font-size: 0.78rem;
+  }
+
   .lifting-card-title {
     min-width: 0;
   }
@@ -539,9 +614,13 @@
     font-size: 0.88rem;
   }
 
-  .lifting-detail-actions,
-  .lifting-detail-actions .lifting-action {
+  .lifting-detail-actions {
     width: 100%;
+  }
+
+  .lifting-detail-actions .lifting-action {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .lifting-logs-modal {
@@ -630,8 +709,19 @@
 }
 
 @media (max-width: 520px) {
+  .lifting-card-summary {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
   .lifting-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lifting-card-log {
+    justify-self: stretch;
+    width: auto;
+    margin: 0 0.75rem 0.75rem;
   }
 
   .lifting-card-title {

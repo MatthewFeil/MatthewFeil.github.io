@@ -127,13 +127,22 @@
   font-size: 0.95rem;
 }
 
-.investment-field input {
+.investment-field input,
+.investment-field select {
   width: 100%;
+  min-width: 0;
+}
+
+.investment-field input[type="date"] {
+  max-width: 100%;
+  min-inline-size: 0;
+}
+
+.investment-field input {
   font-weight: 800;
 }
 
 .investment-field select {
-  width: 100%;
   appearance: none;
   padding-right: 2.45rem;
   font-weight: 800;
@@ -207,6 +216,10 @@
 
 .investment-input-grid button,
 .investment-details-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
@@ -219,7 +232,7 @@
   color: #fff;
 }
 
-.investment-input-grid button:hover {
+.investment-input-grid button:not(:disabled):hover {
   background: color-mix(in srgb, var(--investment-button) 92%, white);
   border-color: color-mix(in srgb, var(--investment-button) 72%, white);
   box-shadow: var(--tool-hover-shadow);
@@ -229,6 +242,23 @@
 .investment-input-grid button:disabled {
   cursor: wait;
   opacity: 0.68;
+}
+
+.investment-input-grid button.is-loading::before {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid color-mix(in srgb, white 38%, transparent);
+  border-top-color: #fff;
+  border-radius: 999px;
+  content: "";
+  animation: investment-spin 0.75s linear infinite;
+}
+
+@keyframes investment-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .investment-details-toggle {
@@ -247,6 +277,9 @@
 }
 
 .investment-status {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
   min-height: 1.35rem;
   margin: 0.75rem 0 0;
   font-size: 0.92rem;
@@ -259,6 +292,18 @@
 
 .investment-status[data-tone="error"] {
   color: var(--site-bad);
+}
+
+.investment-status[data-tone="loading"]::before {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid color-mix(in srgb, var(--investment-muted) 32%, transparent);
+  border-top-color: var(--investment-muted);
+  border-radius: 999px;
+  content: "";
+  animation: investment-spin 0.75s linear infinite;
 }
 
 .investment-results {
@@ -431,7 +476,7 @@
 
 @media (max-width: 880px) {
   .investment-input-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .interest-input-grid {

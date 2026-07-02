@@ -120,6 +120,21 @@ Deno.serve(async (req: Request) => {
       return json({ lift: data });
     }
 
+    if (action === "renameLift") {
+      const id = String(body.id || "");
+      const name = cleanName(body.name);
+      if (!id) return json({ error: "Choose a lift." }, 400);
+      if (!name) return json({ error: "Lift name is required." }, 400);
+      const { data, error } = await supabase
+        .from("lifting_lifts")
+        .update({ name })
+        .eq("id", id)
+        .select("id,name,created_at")
+        .single();
+      if (error) throw error;
+      return json({ lift: data });
+    }
+
     if (action === "addLog") {
       const weight = cleanNumber(body.weight);
       const reps = Math.trunc(cleanNumber(body.reps));

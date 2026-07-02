@@ -931,30 +931,53 @@ table {
   .nav-dropdown {
     display: grid;
     justify-items: end;
+    width: min(100%, 18rem);
+  }
+
+  .nav-dropdown-summary::after {
+    display: none;
   }
 
   .nav-dropdown-menu {
     position: static;
-    display: none;
+    display: grid;
     min-width: 0;
-    padding: 0.15rem 0 0;
+    width: min(100%, 16.5rem);
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0;
     border: 0;
+    border-right: 2px solid transparent;
+    padding: 0 0.65rem 0 0;
     background: transparent;
     box-shadow: none;
     opacity: 1;
-    pointer-events: auto;
-    transform: none;
+    pointer-events: none;
+    transform: translateX(0.35rem);
+    transition:
+      max-height 0.22s ease,
+      margin-top 0.22s ease,
+      padding-top 0.22s ease,
+      padding-bottom 0.22s ease,
+      border-color 0.22s ease,
+      transform 0.22s ease;
   }
 
   .nav-dropdown:hover .nav-dropdown-menu,
   .nav-dropdown:focus-within .nav-dropdown-menu {
-    display: grid;
+    max-height: 10rem;
+    margin-top: 0.32rem;
+    border-right-color: var(--site-accent);
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    pointer-events: auto;
+    transform: translateX(-0.55rem);
   }
 
   .nav-dropdown-menu .page-link {
     justify-self: end;
     margin: 0;
-    padding: 0.35rem 0;
+    padding: 0.4rem 0;
     font-size: 0.7rem;
     text-align: right;
   }

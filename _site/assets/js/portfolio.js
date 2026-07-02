@@ -93,6 +93,19 @@
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.classList.toggle('portfolio-negative', isError);
+    els.status.classList.toggle('is-loading', !isError && message.endsWith('...'));
+    els.status.setAttribute('aria-busy', String(!isError && message.endsWith('...')));
+  }
+
+  function setButtonLoading(button, isLoading, loadingText = 'Working...') {
+    if (!button) return;
+    if (!button.dataset.defaultText) {
+      button.dataset.defaultText = button.textContent;
+    }
+    button.disabled = isLoading;
+    button.classList.toggle('is-loading', isLoading);
+    button.setAttribute('aria-busy', String(isLoading));
+    button.textContent = isLoading ? loadingText : button.dataset.defaultText;
   }
 
   function escapeHtml(value) {
@@ -428,8 +441,11 @@
   els.stockForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(els.stockForm);
+    const submitButton = els.stockForm.querySelector('button[type="submit"]');
     const symbol = String(form.get('symbol')).trim().toUpperCase();
     const name = String(form.get('name')).trim();
+    setButtonLoading(submitButton, true, 'Adding...');
+    setStatus('Adding stock...');
     try {
       await api('addStock', { symbol, name });
       els.stockForm.reset();
@@ -437,12 +453,17 @@
       await loadPortfolio();
     } catch (error) {
       setStatus(error.message, true);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(els.logForm);
+    const submitButton = els.logForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitButton, true, 'Adding...');
+    setStatus('Adding log...');
     try {
       await api('addLog', {
         stock_id: form.get('stock_id'),
@@ -457,23 +478,33 @@
       await loadPortfolio();
     } catch (error) {
       setStatus(error.message, true);
+    } finally {
+      setButtonLoading(submitButton, false);
     }
   });
 
   document.addEventListener('click', async (event) => {
-    const stockId = event.target.dataset?.deleteStock;
-    const logId = event.target.dataset?.deleteLog;
+    const stockButton = event.target.closest('[data-delete-stock]');
+    const logButton = event.target.closest('[data-delete-log]');
+    const stockId = stockButton?.dataset.deleteStock;
+    const logId = logButton?.dataset.deleteLog;
     try {
       if (stockId && confirm('Delete this stock and all of its logs?')) {
+        setButtonLoading(stockButton, true, 'Deleting...');
+        setStatus('Deleting stock...');
         await api('deleteStock', { id: stockId });
         await loadPortfolio();
       }
       if (logId && confirm('Delete this log?')) {
+        setButtonLoading(logButton, true, 'Deleting...');
+        setStatus('Deleting log...');
         await api('deleteLog', { id: logId });
         await loadPortfolio();
       }
     } catch (error) {
       setStatus(error.message, true);
+      setButtonLoading(stockButton, false);
+      setButtonLoading(logButton, false);
     }
   });
 
