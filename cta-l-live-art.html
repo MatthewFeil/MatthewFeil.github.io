@@ -1,0 +1,28 @@
+---
+layout: null
+title: CTA L Live Art
+permalink: /cta-l-live-art/
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTA L Live Art</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      window.CTA_LIVE_ART_CONFIG = {
+        apiUrl: "https://cta-l-live-art.matthewfeil.workers.dev/api/trains",
+        sampleUrl: "{{ "/assets/cta-l-live-art/sample-snapshot.json" | relative_url }}",
+        homeUrl: "{{ "/" | relative_url }}"
+      };
+    </script>
+    <script type="module" crossorigin src="{{ "/assets/cta-l-live-art/index-F68Sk4xw.js" | relative_url }}"></script>
+    <link rel="stylesheet" crossorigin href="{{ "/assets/cta-l-live-art/index-BLVMm24k.css" | relative_url }}">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

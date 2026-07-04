@@ -5,3 +5,6 @@
 .env
 .env.local
 .env.*.local
+.dev.vars
+.wrangler-home
+node_modules

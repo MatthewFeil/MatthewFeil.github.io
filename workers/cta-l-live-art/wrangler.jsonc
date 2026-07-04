@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "cta-l-live-art",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "secrets": {
+    "required": ["CTA_TRAIN_TRACKER_API_KEY"]
+  }
+}
