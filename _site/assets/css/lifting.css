@@ -710,18 +710,27 @@
 
 @media (max-width: 520px) {
   .lifting-card-summary {
+    position: relative;
     grid-template-columns: 1fr;
     gap: 0;
   }
 
   .lifting-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.65rem 4.45rem 0.65rem 0.65rem;
   }
 
   .lifting-card-log {
-    justify-self: stretch;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    min-width: 3.35rem;
+    min-height: 2rem;
     width: auto;
-    margin: 0 0.75rem 0.75rem;
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.72rem;
   }
 
   .lifting-card-title {

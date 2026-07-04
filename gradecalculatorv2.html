@@ -8,14 +8,17 @@ permalink: /gradecalculatorv2/
 <div class="grade-v2" data-grade-calculator>
   <div class="grade-v2-hero">
     <div class="grade-v2-copy">
-      <label for="current-grade">Current grade</label>
+      <div class="grade-v2-copy-head">
+        <label for="current-grade">Current Grade</label>
+        <button type="button" class="mobile-settings-open" id="mobile-settings-open" aria-expanded="false" aria-controls="mobile-settings-panel">Settings</button>
+      </div>
       <div class="grade-v2-entry percent-field">
         <input type="number" id="current-grade" min="0" max="150" step="0.01" inputmode="decimal" placeholder="92.5" required>
         <span>%</span>
       </div>
     </div>
 
-    <div class="settings-card" aria-label="Calculator settings">
+    <div class="settings-card" id="mobile-settings-panel" aria-label="Calculator settings">
       <div class="settings-card-head">
         <span>Calculator settings</span>
         <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Rounding on</button>
@@ -171,6 +174,14 @@ permalink: /gradecalculatorv2/
     min-width: 0;
   }
 
+  .grade-v2-copy-head {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
   .grade-v2-copy label,
   .example-panel label,
   .dialog-panel label {
@@ -289,6 +300,10 @@ permalink: /gradecalculatorv2/
   .grade-dialog button:hover {
     box-shadow: var(--tool-hover-shadow);
     transform: translate(-2px, -2px);
+  }
+
+  .mobile-settings-open {
+    display: none;
   }
 
   .primary-action {
@@ -690,9 +705,74 @@ permalink: /gradecalculatorv2/
   }
 
   @media (max-width: 860px) {
+    .grade-v2 {
+      --gc-mobile-pad: 0.75rem;
+      --gc-mobile-gap: 0.6rem;
+    }
+
     .grade-v2-hero {
       grid-template-columns: 1fr;
-      gap: 0.75rem;
+      gap: 0;
+      padding: var(--gc-mobile-pad);
+    }
+
+    .grade-v2-copy {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      align-items: stretch;
+      gap: var(--gc-mobile-gap);
+    }
+
+    .grade-v2-copy-head {
+      min-height: 1.55rem;
+      gap: var(--gc-mobile-gap);
+    }
+
+    .grade-v2-copy label {
+      min-width: 0;
+      color: var(--gc-muted);
+      font-size: 0.95rem;
+      letter-spacing: var(--tool-label-spacing);
+    }
+
+    .grade-v2-entry {
+      min-height: 4.45rem;
+    }
+
+    .grade-v2 .mobile-settings-open {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      min-width: 6rem;
+      min-height: 1.55rem;
+      padding: 0.3rem 0.62rem;
+      background: var(--gc-field);
+      color: var(--site-text);
+      font-size: 0.82rem;
+    }
+
+    .settings-card {
+      display: grid;
+      max-height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      margin-top: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: max-height 0.24s ease, padding 0.24s ease, margin 0.24s ease, opacity 0.18s ease;
+    }
+
+    .settings-card.is-open {
+      max-height: 16rem;
+      padding-top: var(--gc-mobile-pad);
+      padding-bottom: var(--gc-mobile-pad);
+      border-width: 1px;
+      margin-top: var(--gc-mobile-gap);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .example-panel {
@@ -710,16 +790,14 @@ permalink: /gradecalculatorv2/
 
   @media (max-width: 420px) {
     .grade-v2 {
-      gap: 0.9rem;
+      gap: 0.75rem;
+      --gc-mobile-pad: 0.65rem;
+      --gc-mobile-gap: 0.55rem;
     }
 
-    .grade-v2-hero,
     .results-panel {
-      padding: 0.8rem;
-    }
-
-    .settings-card {
-      padding: 0.75rem;
+      gap: 0.65rem;
+      padding: 0.65rem;
     }
 
     .settings-card-head {
@@ -729,7 +807,8 @@ permalink: /gradecalculatorv2/
     }
 
     .control-stack {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gc-mobile-gap);
     }
 
     .toggle-action {
@@ -738,7 +817,7 @@ permalink: /gradecalculatorv2/
     }
 
     .secondary-action {
-      min-height: 2.6rem;
+      min-height: 2.4rem;
       font-size: 0.74rem;
     }
 
@@ -755,7 +834,7 @@ permalink: /gradecalculatorv2/
     }
 
     .grade-v2-entry {
-      min-height: 4.4rem;
+      min-height: 4rem;
     }
 
     .grade-v2-entry input {
@@ -768,7 +847,16 @@ permalink: /gradecalculatorv2/
 
     .target-table th,
     .target-table td {
-      padding: 0.68rem 0.65rem;
+      padding: 0.58rem 0.6rem;
+    }
+
+    .example-panel {
+      gap: 0.5rem;
+      padding: 0.6rem;
+    }
+
+    .example-panel label {
+      font-size: 1rem;
     }
   }
 
@@ -785,7 +873,8 @@ permalink: /gradecalculatorv2/
     }
 
     .ghost-action:hover,
-    .secondary-action:hover {
+    .secondary-action:hover,
+    .mobile-settings-open:hover {
       background: var(--gc-field);
       border-color: var(--gc-border);
     }
@@ -847,6 +936,9 @@ permalink: /gradecalculatorv2/
     const roundingWindowInput = document.getElementById('rounding-window');
     const finalWeightInput = document.getElementById('final-weight');
     const weightHelp = document.getElementById('weight-help');
+    const mobileSettingsButton = document.getElementById('mobile-settings-open');
+    const mobileSettingsPanel = document.getElementById('mobile-settings-panel');
+    const mobileSettingsMedia = window.matchMedia('(max-width: 860px)');
 
     function formatNumber(value) {
       return Number(value.toFixed(2)).toString();
@@ -1043,6 +1135,34 @@ permalink: /gradecalculatorv2/
       if (dialog && dialog.open) dialog.close();
     }
 
+    function setMobileSettingsOpen(isOpen) {
+      const shouldOpen = mobileSettingsMedia.matches && isOpen;
+      const shouldHide = mobileSettingsMedia.matches && !shouldOpen;
+      mobileSettingsPanel.classList.toggle('is-open', shouldOpen);
+      mobileSettingsPanel.toggleAttribute('inert', shouldHide);
+      mobileSettingsPanel.setAttribute('aria-hidden', String(shouldHide));
+      mobileSettingsButton.setAttribute('aria-expanded', String(shouldOpen));
+    }
+
+    function closeMobileSettings() {
+      setMobileSettingsOpen(false);
+    }
+
+    mobileSettingsButton.addEventListener('click', () => {
+      setMobileSettingsOpen(!mobileSettingsPanel.classList.contains('is-open'));
+    });
+
+    mobileSettingsMedia.addEventListener('change', (event) => {
+      if (!event.matches) closeMobileSettings();
+      setMobileSettingsOpen(mobileSettingsPanel.classList.contains('is-open'));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && mobileSettingsPanel.classList.contains('is-open')) {
+        closeMobileSettings();
+      }
+    });
+
     document.querySelectorAll('[data-open-dialog]').forEach((button) => {
       button.addEventListener('click', () => {
         const dialog = document.getElementById(button.dataset.openDialog);
@@ -1155,6 +1275,7 @@ permalink: /gradecalculatorv2/
     currentInput.addEventListener('input', updateFromCurrentGrade);
     exampleInput.addEventListener('input', updateExample);
 
+    setMobileSettingsOpen(false);
     updateSummary();
   })();
 </script>
