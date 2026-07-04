@@ -82,7 +82,7 @@
 
       <div class="control-stack" aria-label="Calculator controls">
         <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Rounding</button>
-        <button type="button" class="secondary-action" data-open-dialog="scale-dialog" aria-label="Adjust grade scale">Grade scale</button>
+        <button type="button" class="secondary-action grade-scale-action" data-open-dialog="scale-dialog" aria-label="Adjust grade scale"><span class="scale-label-full">Grade scale</span><span class="scale-label-compact">Scale</span></button>
         <button type="button" class="secondary-action" data-open-dialog="weight-dialog" aria-label="Adjust final weight">Weight</button>
       </div>
     </div>
@@ -355,6 +355,10 @@
   }
 
   .mobile-settings-open {
+    display: none;
+  }
+
+  .scale-label-compact {
     display: none;
   }
 
@@ -863,14 +867,22 @@
       gap: var(--gc-mobile-gap);
     }
 
+    .scale-label-full {
+      display: none;
+    }
+
+    .scale-label-compact {
+      display: inline;
+    }
+
     .toggle-action {
       font-size: 0.72rem;
       width: 100%;
     }
 
-    .secondary-action {
+    .control-stack .secondary-action {
       min-height: 2.4rem;
-      font-size: 0.74rem;
+      font-size: 0.7rem;
     }
 
     .secondary-action {
