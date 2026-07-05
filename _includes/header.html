@@ -12,15 +12,21 @@
         <a class="page-link" href="{{ "/#posts" | relative_url }}">Posts</a>
         <a class="page-link" href="{{ "/playlists.html/" | relative_url }}">Playlists</a>
         <a class="page-link" href="{{ "/cta-l-live-art/" | relative_url }}">CTA Live Art</a>
-        <div class="nav-dropdown">
-          <button class="page-link nav-dropdown-summary" type="button">Tools</button>
+        <div class="nav-dropdown nav-dropdown-tools">
+          <button class="page-link nav-dropdown-summary" type="button" aria-expanded="false" aria-haspopup="true">Tools</button>
           <div class="nav-dropdown-menu">
             <a class="page-link" href="{{ "/gradecalculatorv2/" | relative_url }}">Finals Grade Calculator</a>
             <a class="page-link" href="{{ "/investmentcalculator/" | relative_url }}">Stock Return Calculator</a>
             <a class="page-link" href="{{ "/interestcalculator/" | relative_url }}">Interest Calculator</a>
           </div>
         </div>
-        <a class="page-link" href="{{ "/personal/" | relative_url }}">Personal Space</a>
+        <div class="nav-dropdown nav-dropdown-personal">
+          <button class="page-link nav-dropdown-summary" type="button" aria-expanded="false" aria-haspopup="true">Personal Space</button>
+          <div class="nav-dropdown-menu">
+            <a class="page-link" href="{{ "/portfolio/" | relative_url }}">Portfolio Tracker</a>
+            <a class="page-link" href="{{ "/lifting/" | relative_url }}">Lifting Tracker</a>
+          </div>
+        </div>
       </div>
     </nav>
   </div>

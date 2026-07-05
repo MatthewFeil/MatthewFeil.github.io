@@ -2,8 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const navTrigger = document.getElementById("nav-trigger");
   const navPanel = document.querySelector(".site-nav .trigger");
   const navLinks = document.querySelectorAll(".site-nav a.page-link");
-  const toolsDropdown = document.querySelector(".site-nav .nav-dropdown");
-  const toolsButton = document.querySelector(".site-nav .nav-dropdown-summary");
+  const navDropdowns = document.querySelectorAll(".site-nav .nav-dropdown");
   const mobileNavQuery = window.matchMedia("(max-width: 1040px)");
 
   if (!navTrigger || navLinks.length === 0) {
@@ -15,13 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return cleanPath || "/";
   };
 
-  const closeToolsDropdown = () => {
-    if (!toolsDropdown || !toolsButton) {
-      return;
-    }
+  const closeNavDropdowns = (exceptDropdown = null) => {
+    navDropdowns.forEach((dropdown) => {
+      if (dropdown === exceptDropdown) {
+        return;
+      }
 
-    toolsDropdown.classList.remove("is-open");
-    toolsButton.setAttribute("aria-expanded", "false");
+      dropdown.classList.remove("is-open");
+      dropdown.querySelector(".nav-dropdown-summary")?.setAttribute("aria-expanded", "false");
+    });
   };
 
   const scrollToHashTarget = (hash) => {
@@ -78,29 +79,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  if (toolsDropdown && toolsButton) {
-    toolsButton.setAttribute("aria-expanded", "false");
+  navDropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector(".nav-dropdown-summary");
 
-    toolsButton.addEventListener("click", (event) => {
+    if (!button) {
+      return;
+    }
+
+    button.setAttribute("aria-expanded", "false");
+
+    button.addEventListener("click", (event) => {
       if (!mobileNavQuery.matches) {
         return;
       }
 
       event.preventDefault();
 
-      const isOpen = toolsDropdown.classList.toggle("is-open");
-      toolsButton.setAttribute("aria-expanded", String(isOpen));
+      const isOpen = !dropdown.classList.contains("is-open");
+      closeNavDropdowns(dropdown);
+      dropdown.classList.toggle("is-open", isOpen);
+      button.setAttribute("aria-expanded", String(isOpen));
     });
+  });
 
+  if (navDropdowns.length > 0) {
     navTrigger.addEventListener("change", () => {
       if (!navTrigger.checked) {
-        closeToolsDropdown();
+        closeNavDropdowns();
       }
     });
 
     mobileNavQuery.addEventListener("change", (event) => {
       if (!event.matches) {
-        closeToolsDropdown();
+        closeNavDropdowns();
       }
     });
   }
@@ -112,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const wasOpen = navTrigger.checked;
 
       navTrigger.checked = false;
-      closeToolsDropdown();
+      closeNavDropdowns();
 
       if (!url.hash || !samePage) {
         return;
