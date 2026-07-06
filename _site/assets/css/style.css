@@ -27,6 +27,17 @@
   --radius: 0;
 }
 
+@keyframes tool-loading-dash {
+  0% {
+    transform: translateX(-42%) scaleX(0.16);
+  }
+  50% {
+    transform: translateX(42%) scaleX(0.42);
+  }
+  100% {
+    transform: translateX(120%) scaleX(0.16);
+  }
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --site-bg: #090909;

@@ -269,6 +269,7 @@
 
 .investment-input-grid button,
 .investment-details-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -294,24 +295,26 @@
 
 .investment-input-grid button:disabled {
   cursor: wait;
-  opacity: 0.68;
+  opacity: 0.82;
 }
 
-.investment-input-grid button.is-loading::before {
-  display: inline-block;
-  width: 0.9rem;
-  height: 0.9rem;
-  border: 2px solid color-mix(in srgb, white 38%, transparent);
-  border-top-color: #fff;
-  border-radius: 999px;
+.investment-input-grid button.is-loading {
+  overflow: hidden;
+}
+
+.investment-input-grid button.is-loading::after,
+.investment-status[data-tone="loading"]::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
   content: "";
-  animation: investment-spin 0.75s linear infinite;
-}
-
-@keyframes investment-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  opacity: 0.9;
+  transform: translateX(-42%) scaleX(0.16);
+  transform-origin: left center;
+  animation: tool-loading-dash 0.9s ease-in-out infinite;
 }
 
 .investment-details-toggle {
@@ -330,9 +333,8 @@
 }
 
 .investment-status {
-  display: inline-flex;
-  gap: 0.45rem;
-  align-items: center;
+  position: relative;
+  display: inline-block;
   min-height: 1.35rem;
   margin: 0.75rem 0 0;
   font-size: 0.92rem;
@@ -347,16 +349,9 @@
   color: var(--site-bad);
 }
 
-.investment-status[data-tone="loading"]::before {
-  display: inline-block;
-  flex: 0 0 auto;
-  width: 0.75rem;
-  height: 0.75rem;
-  border: 2px solid color-mix(in srgb, var(--investment-muted) 32%, transparent);
-  border-top-color: var(--investment-muted);
-  border-radius: 999px;
-  content: "";
-  animation: investment-spin 0.75s linear infinite;
+.investment-status[data-tone="loading"] {
+  padding-bottom: 0.35rem;
+  color: var(--investment-muted);
 }
 
 .investment-results {

@@ -14,12 +14,97 @@
         homeUrl: "/"
       };
     </script>
+    <script>
+      (() => {
+        const config = window.CTA_LIVE_ART_CONFIG ?? {};
+        const liveApiUrl = config.apiUrl ? new URL(config.apiUrl, window.location.href).toString() : null;
+        const originalFetch = window.fetch.bind(window);
+        let usageUnavailable = false;
+
+        const usageResponse = () => new Response(JSON.stringify({
+          error: "daily_usage_unavailable",
+          detail: "Page unavailable due to higher usage than expected. Try again the next day."
+        }), {
+          status: 429,
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const isLiveApiRequest = (resource) => {
+          if (!liveApiUrl) return false;
+          const requestUrl = typeof resource === "string" || resource instanceof URL ? resource : resource?.url;
+          if (!requestUrl) return false;
+          return new URL(requestUrl, window.location.href).toString() === liveApiUrl;
+        };
+
+        const isUsageExhaustedMessage = (text) => {
+          const normalized = String(text).toLowerCase();
+          return normalized.includes("usage")
+            && (normalized.includes("daily") || normalized.includes("today"))
+            && (
+              normalized.includes("used")
+              || normalized.includes("limit")
+              || normalized.includes("quota")
+              || normalized.includes("exceeded")
+            );
+        };
+
+        const markUsageUnavailable = () => {
+          usageUnavailable = true;
+          const applyClass = () => document.body?.classList.add("cta-usage-unavailable");
+
+          if (document.body) {
+            applyClass();
+            return;
+          }
+
+          document.addEventListener("DOMContentLoaded", applyClass, { once: true });
+        };
+
+        window.fetch = async (resource, init) => {
+          const isLiveRequest = isLiveApiRequest(resource);
+          if (usageUnavailable && isLiveRequest) {
+            return usageResponse();
+          }
+
+          const response = await originalFetch(resource, init);
+          if (!isLiveRequest) {
+            return response;
+          }
+
+          const text = await response.clone().text().catch(() => "");
+          if (isUsageExhaustedMessage(text)) {
+            markUsageUnavailable();
+            return usageResponse();
+          }
+
+          return response;
+        };
+      })();
+    </script>
     <script type="module" crossorigin src="/assets/cta-l-live-art/index-DFaGMNlx.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/cta-l-live-art/index-DD-OmGjU.css">
     <style>
+      .usage-banner {
+        display: none;
+      }
+
       .pause-banner {
         top: auto;
         bottom: max(0.72rem, env(safe-area-inset-bottom));
+      }
+
+      body.cta-usage-unavailable .usage-banner {
+        display: flex;
+      }
+
+      body.cta-usage-unavailable .train-canvas {
+        filter: grayscale(1);
+        opacity: 0.34;
+        transition: filter 0.24s ease, opacity 0.24s ease;
+      }
+
+      body.cta-usage-unavailable .system-note {
+        display: none;
       }
 
       @media (max-width: 720px) {
@@ -31,6 +116,9 @@
     </style>
   </head>
   <body>
+    <div class="pause-banner usage-banner" role="status" aria-live="polite">
+      Page unavailable due to higher usage than expected. Try again the next day.
+    </div>
     <div id="root"></div>
   </body>
 </html>

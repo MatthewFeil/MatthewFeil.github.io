@@ -181,6 +181,7 @@
 .portfolio-toolbar button,
 .portfolio-action,
 .portfolio-dialog-close {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -225,26 +226,28 @@
 .portfolio-toolbar button:disabled,
 .portfolio-action:disabled {
   cursor: wait;
-  opacity: 0.68;
+  opacity: 0.82;
 }
 
-.portfolio-form button.is-loading::before,
-.portfolio-action.is-loading::before {
-  display: inline-block;
-  flex: 0 0 auto;
-  width: 0.9rem;
-  height: 0.9rem;
-  border: 2px solid color-mix(in srgb, currentColor 32%, transparent);
-  border-top-color: currentColor;
-  border-radius: 999px;
+.portfolio-form button.is-loading,
+.portfolio-action.is-loading {
+  overflow: hidden;
+}
+
+.portfolio-form button.is-loading::after,
+.portfolio-action.is-loading::after,
+.portfolio-status.is-loading::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
   content: "";
-  animation: portfolio-spin 0.75s linear infinite;
-}
-
-@keyframes portfolio-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  opacity: 0.9;
+  transform: translateX(-42%) scaleX(0.16);
+  transform-origin: left center;
+  animation: tool-loading-dash 0.9s ease-in-out infinite;
 }
 
 .portfolio-table-wrap {
@@ -379,9 +382,8 @@
 }
 
 .portfolio-workspace > .portfolio-status {
-  display: inline-flex;
-  gap: 0.45rem;
-  align-items: center;
+  position: relative;
+  display: inline-block;
   margin: 0.75rem 0 0;
 }
 
@@ -389,16 +391,9 @@
   display: none;
 }
 
-.portfolio-status.is-loading::before {
-  display: inline-block;
-  flex: 0 0 auto;
-  width: 0.75rem;
-  height: 0.75rem;
-  border: 2px solid color-mix(in srgb, var(--portfolio-muted) 32%, transparent);
-  border-top-color: var(--portfolio-muted);
-  border-radius: 999px;
-  content: "";
-  animation: portfolio-spin 0.75s linear infinite;
+.portfolio-status.is-loading {
+  padding-bottom: 0.35rem;
+  color: var(--portfolio-muted);
 }
 
 @media (hover: none), (pointer: coarse) {

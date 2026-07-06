@@ -52,13 +52,7 @@
             <a class="page-link" href="/interestcalculator/">Interest Calculator</a>
           </div>
         </div>
-        <div class="nav-dropdown nav-dropdown-personal">
-          <button class="page-link nav-dropdown-summary" type="button" aria-expanded="false" aria-haspopup="true">Personal Space</button>
-          <div class="nav-dropdown-menu">
-            <a class="page-link" href="/portfolio/">Portfolio Tracker</a>
-            <a class="page-link" href="/lifting/">Lifting Tracker</a>
-          </div>
-        </div>
+        <a class="page-link" href="/personal/">Personal Space</a>
       </div>
     </nav>
   </div>
@@ -71,19 +65,27 @@
   data-personal-app
   data-auth-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
 >
+  <a class="personal-wordmark" href="/">Matthew Feil</a>
+
   <div class="personal-lock" id="personal-lock">
-    <h2>Personal Space</h2>
+    <div class="personal-lock-copy">
+      <h1>Thou Shall Not Pass</h1>
+      <p class="personal-subhead">Not that you'd really want to anyways</p>
+      <p class="personal-description">This section of my website has a few tools for my personal use. Nothing that cool, trust me.</p>
+    </div>
+
     <form id="personal-unlock-form" class="personal-form">
-      <label for="personal-password">Password</label>
-      <div class="personal-inline">
-        <input id="personal-password" type="password" autocomplete="current-password" required>
+      <div class="personal-password-line">
+        <input id="personal-password" type="password" autocomplete="current-password" placeholder="PASSWORD" aria-label="Password" aria-describedby="personal-status" required>
         <button type="submit" id="personal-unlock-button">
-          <span class="personal-button-label">Unlock</span>
+          <span class="personal-button-label">Enter</span>
           <span class="personal-button-spinner" aria-hidden="true"></span>
         </button>
       </div>
+      <p class="personal-status" id="personal-status" role="status" aria-live="polite"></p>
     </form>
-    <p class="personal-status" id="personal-status" role="status"></p>
+
+    <a class="personal-home-link" href="/">Return to the home page</a>
   </div>
 
   <div class="personal-workspace" id="personal-workspace" hidden>

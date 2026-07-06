@@ -10,6 +10,7 @@
     form: document.getElementById('personal-unlock-form'),
     password: document.getElementById('personal-password'),
     unlockButton: document.getElementById('personal-unlock-button'),
+    unlockLabel: document.querySelector('.personal-button-label'),
     status: document.getElementById('personal-status'),
     lockButton: document.getElementById('personal-lock-button')
   };
@@ -28,22 +29,28 @@
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.classList.toggle('is-error', isError);
+    app.classList.toggle('is-denied', isError);
   }
 
   function setLoading(isLoading) {
     els.unlockButton.disabled = isLoading;
     els.unlockButton.classList.toggle('is-loading', isLoading);
     els.unlockButton.setAttribute('aria-busy', String(isLoading));
+    app.classList.toggle('is-loading', isLoading);
+    els.unlockLabel.textContent = isLoading ? 'Checking' : 'Enter';
   }
 
   function showWorkspace() {
     els.lock.hidden = true;
     els.workspace.hidden = false;
+    app.classList.add('is-unlocked');
+    app.classList.remove('is-denied', 'is-loading');
   }
 
   function showLock() {
     els.workspace.hidden = true;
     els.lock.hidden = false;
+    app.classList.remove('is-unlocked');
     els.password.focus();
   }
 
@@ -85,14 +92,22 @@
       showWorkspace();
     } catch (error) {
       clearSession();
-      setStatus(error instanceof Error ? error.message : 'Unlock failed.', true);
+      setStatus('Incorrect password.', true);
     } finally {
       setLoading(false);
     }
   });
 
+  els.password.addEventListener('input', () => {
+    if (app.classList.contains('is-denied')) {
+      setStatus('');
+    }
+  });
+
   els.lockButton.addEventListener('click', () => {
     clearSession();
+    els.password.value = '';
+    setStatus('');
     showLock();
   });
 

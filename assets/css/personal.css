@@ -1,178 +1,378 @@
+body:has(.personal-app:not(.is-unlocked)) {
+  background: #050505;
+}
+
+body:has(.personal-app:not(.is-unlocked)) .site-header,
+body:has(.personal-app:not(.is-unlocked)) .site-footer {
+  display: none;
+}
+
+body:has(.personal-app:not(.is-unlocked)) .page-content,
+body:has(.personal-app:not(.is-unlocked)) .site-main,
+body:has(.personal-app:not(.is-unlocked)) .post,
+body:has(.personal-app:not(.is-unlocked)) .post-content {
+  width: 100%;
+  max-width: none;
+  min-height: 100svh;
+  margin: 0;
+  padding: 0;
+}
+
 .personal-app {
   --personal-border: var(--tool-border);
-  --personal-muted: var(--tool-muted);
   --personal-surface: var(--tool-surface);
   --personal-soft: var(--tool-soft);
-  --personal-accent: var(--site-accent);
-  --personal-warn: var(--site-warn);
+  --personal-bg: #050505;
+  --personal-ink: #f7f8fa;
+  --personal-muted: rgba(247, 248, 250, 0.66);
+  --personal-dim: rgba(247, 248, 250, 0.38);
+  --personal-red: #ff2738;
+  --personal-red-deep: #7c050d;
+  --personal-line: rgba(247, 248, 250, 0.3);
+  position: relative;
   display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(145, 150, 158, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(145, 150, 158, 0.09) 1px, transparent 1px),
+    radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.05), transparent 30rem),
+    var(--personal-bg);
+  background-size: 48px 48px, 48px 48px, auto;
+  color: var(--personal-ink);
+  isolation: isolate;
+}
+
+.personal-app::before,
+.personal-app::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+}
+
+.personal-app::before {
+  background: radial-gradient(circle at 18% 52%, rgba(255, 255, 255, 0.06), transparent 22rem);
+  opacity: 0.72;
+}
+
+.personal-app.is-unlocked {
+  --personal-muted: var(--tool-muted);
+  min-height: auto;
+  overflow: visible;
+  background: transparent;
+  color: var(--site-text);
   gap: 1rem;
+}
+
+.personal-app.is-unlocked::before,
+.personal-app.is-unlocked::after,
+.personal-app.is-unlocked .personal-wordmark {
+  display: none;
+}
+
+.personal-app::after {
+  display: none;
+}
+
+.personal-wordmark {
+  position: fixed;
+  top: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2rem);
+  z-index: 3;
+  color: var(--personal-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.16s ease;
+}
+
+.personal-wordmark:hover,
+.personal-wordmark:focus-visible {
+  color: var(--personal-red);
+  outline: none;
 }
 
 .personal-lock,
 .personal-workspace {
-  border: 1px solid var(--personal-border);
-  border-radius: 0;
-  background: var(--personal-soft);
+  display: grid;
+  width: min(100%, 1680px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(5.5rem, 12vw, 9rem) clamp(1rem, 5vw, 5rem) clamp(2rem, 5vw, 4rem);
+}
+
+.personal-app.is-unlocked .personal-workspace {
+  width: auto;
+  min-height: 0;
+  margin: 0;
   padding: 1rem;
 }
 
-.personal-lock {
-  max-width: 520px;
+.personal-lock[hidden],
+.personal-workspace[hidden] {
+  display: none;
 }
 
-.personal-lock h2,
-.personal-heading h2 {
+.personal-lock {
+  align-content: center;
+  gap: clamp(0.85rem, 2vw, 1.35rem);
+}
+
+.personal-lock-copy {
+  display: grid;
+  gap: clamp(0.55rem, 1.35vw, 0.85rem);
+  max-width: 70rem;
+}
+
+.personal-lock h1 {
   margin: 0;
 }
 
-.personal-lock p,
-.personal-kicker,
-.personal-status,
-.personal-card span {
-  color: var(--personal-muted);
+.personal-lock h1 {
+  max-width: 11ch;
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 9.2vw, 10.5rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.82;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
-.personal-kicker {
-  margin: 0 0 0.25rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.2;
+.personal-lock h1::first-letter {
+  color: var(--personal-red);
+}
+
+.personal-subhead {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--personal-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2vw, 2.1rem);
+  letter-spacing: 0.02em;
+  line-height: 1.05;
   text-transform: uppercase;
+}
+
+.personal-description {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--personal-muted);
+  font-size: clamp(0.95rem, 1.4vw, 1.12rem);
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .personal-form {
   display: grid;
-  gap: 0.55rem;
-  margin-top: 1rem;
+  gap: 0.45rem;
+  width: min(100%, 24rem);
 }
 
-.personal-form label {
-  color: var(--personal-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.2;
+.personal-password-line {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.62rem;
+  align-items: stretch;
+  padding-bottom: 0.36rem;
+}
+
+.personal-password-line::before,
+.personal-password-line::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  content: "";
+}
+
+.personal-password-line::before {
+  background: color-mix(in srgb, var(--personal-line) 55%, transparent);
+}
+
+.personal-password-line::after {
+  background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
+  opacity: 0;
+  transform: scaleX(0.08);
+  transform-origin: left center;
+}
+
+.personal-app.is-loading .personal-password-line::after {
+  animation: tool-loading-dash 0.9s ease-in-out infinite;
+  opacity: 1;
+}
+
+.personal-app.is-denied .personal-password-line::before {
+  background: var(--personal-red);
+  box-shadow: 0 0 24px rgba(255, 39, 56, 0.72);
+}
+
+.personal-password-line input {
+  width: 100%;
+  height: var(--tool-control-height);
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--personal-ink) 72%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.2vw, 2.4rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.personal-password-line input::placeholder {
+  color: var(--personal-dim);
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 1;
   text-transform: uppercase;
 }
 
-.personal-inline,
-.personal-heading {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
+.personal-password-line input:focus-visible {
+  box-shadow: none;
 }
 
-.personal-inline input,
-.personal-inline button,
-.personal-heading button {
-  min-height: var(--tool-control-height);
-  border: 1px solid var(--personal-border);
-  border-radius: 0;
-  font: inherit;
-}
-
-.personal-inline input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.55rem 0.7rem;
-  background: var(--site-bg);
-  color: var(--site-text);
-}
-
-.personal-inline input:focus-visible,
-.personal-inline button:focus-visible,
-.personal-heading button:focus-visible,
-.personal-card:focus-visible {
-  border-color: var(--site-accent);
-}
-
-.personal-inline button,
-.personal-heading button {
-  cursor: pointer;
-  font-weight: 800;
-  line-height: 1.1;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
-}
-
-.personal-inline button {
-  position: relative;
+.personal-password-line button,
+.personal-home-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  background: var(--personal-accent);
-  border-color: var(--personal-accent);
-  color: #fff;
-  padding: 0.55rem 0.9rem;
+  min-height: var(--tool-control-height);
+  border: 1px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
-.personal-inline button:disabled {
+.personal-password-line button {
+  gap: 0.5rem;
+  border-color: color-mix(in srgb, var(--personal-ink) 46%, transparent);
+  color: var(--personal-muted);
+  padding: 0.6rem 0.78rem;
+}
+
+.personal-home-link {
+  width: fit-content;
+  border-width: 2px;
+  color: var(--personal-ink);
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  padding: 1.05rem 1.3rem;
+}
+
+.personal-password-line button:hover,
+.personal-password-line button:focus-visible,
+.personal-home-link:hover,
+.personal-home-link:focus-visible {
+  background: var(--personal-ink);
+  color: var(--personal-bg);
+  box-shadow: 5px 5px 0 rgba(255, 39, 56, 0.5);
+  transform: translate(-2px, -2px);
+}
+
+.personal-password-line button:disabled {
   cursor: wait;
-  opacity: 0.86;
+  opacity: 0.76;
 }
 
 .personal-button-spinner {
   display: none;
-  width: 0.9rem;
-  height: 0.9rem;
-  border: 2px solid color-mix(in srgb, white 38%, transparent);
-  border-top-color: #fff;
-  border-radius: 999px;
-  animation: personal-spin 0.75s linear infinite;
-}
-
-.personal-inline button.is-loading .personal-button-spinner {
-  display: inline-block;
-}
-
-@keyframes personal-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.personal-heading {
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.personal-heading button {
-  background: var(--personal-surface);
-  color: var(--site-text);
-  padding: 0.55rem 0.8rem;
-}
-
-.personal-inline button:hover {
-  background: color-mix(in srgb, var(--personal-accent) 92%, white);
-  border-color: color-mix(in srgb, var(--personal-accent) 72%, white);
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
-}
-
-.personal-heading button:hover {
-  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
-  border-color: var(--site-bad);
-  box-shadow: var(--tool-hover-shadow);
-  color: var(--site-bad);
-  transform: translate(-2px, -2px);
-}
-
-.personal-card:hover {
-  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
-  border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
 }
 
 .personal-status {
   min-height: 0;
   margin: 0;
-  line-height: 1.35;
+  color: var(--personal-muted);
+  font-family: var(--font-display);
+  font-size: clamp(0.82rem, 1.25vw, 1rem);
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.personal-status:empty {
+  display: none;
+}
+
+.personal-status:not(:empty) {
+  margin-top: 0.45rem;
 }
 
 .personal-status.is-error {
-  margin-top: 0.65rem;
-  color: var(--personal-warn);
+  color: var(--personal-red);
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: 0 0 18px rgba(255, 39, 56, 0.7);
+}
+
+.personal-app.is-denied .personal-lock {
+  animation: personal-denied-shake 0.32s ease both;
+}
+
+.personal-workspace {
+  border: 1px solid var(--personal-border);
+  border-radius: 0;
+  background: var(--personal-soft);
+}
+
+.personal-workspace h2 {
+  margin: 0;
+}
+
+.personal-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.personal-heading h2 {
+  margin: 0;
+}
+
+.personal-heading button {
+  min-height: var(--tool-control-height);
+  border: 1px solid var(--personal-border);
+  border-radius: 0;
+  background: var(--personal-surface);
+  color: var(--site-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  line-height: 1.1;
+  padding: 0.55rem 0.8rem;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.personal-heading button:hover,
+.personal-heading button:focus-visible {
+  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
+  border-color: var(--site-bad);
+  box-shadow: var(--tool-hover-shadow);
+  color: var(--site-bad);
+  transform: translate(-2px, -2px);
 }
 
 .personal-card-grid {
@@ -194,6 +394,14 @@
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
+.personal-card:hover,
+.personal-card:focus-visible {
+  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
+  border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
+  box-shadow: var(--tool-hover-shadow);
+  transform: translate(-2px, -2px);
+}
+
 .personal-card:visited {
   color: var(--site-text);
 }
@@ -206,24 +414,79 @@
   line-height: 1.15;
 }
 
-@media (max-width: 560px) {
-  .personal-inline,
-  .personal-heading {
-    grid-template-columns: 1fr;
+@keyframes personal-denied-shake {
+  0%,
+  100% {
+    transform: translateX(0);
   }
 
-  .personal-inline,
+  20% {
+    transform: translateX(-0.45rem);
+  }
+
+  40% {
+    transform: translateX(0.35rem);
+  }
+
+  60% {
+    transform: translateX(-0.22rem);
+  }
+
+  80% {
+    transform: translateX(0.12rem);
+  }
+}
+
+@media (max-width: 760px) {
+  .personal-lock,
+  .personal-workspace {
+    padding-top: 5.8rem;
+  }
+
+  .personal-lock h1 {
+    max-width: 8ch;
+  }
+
+  .personal-password-line {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+  }
+
+  .personal-form {
+    width: 100%;
+  }
+
+  .personal-home-link {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 560px) {
   .personal-heading {
     display: grid;
+    grid-template-columns: 1fr;
     align-items: stretch;
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .personal-app,
+  .personal-app *,
+  .personal-app *::before,
+  .personal-app *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
-  .personal-inline button:hover {
-    background: var(--personal-accent);
-    border-color: var(--personal-accent);
-    color: #fff;
+  .personal-password-line button:hover,
+  .personal-home-link:hover,
+  .personal-heading button:hover,
+  .personal-card:hover {
     box-shadow: none;
     transform: none;
   }
@@ -232,14 +495,10 @@
     background: var(--personal-surface);
     border-color: var(--personal-border);
     color: var(--site-text);
-    box-shadow: none;
-    transform: none;
   }
 
   .personal-card:hover {
     background: var(--personal-surface);
     border-color: var(--personal-border);
-    box-shadow: none;
-    transform: none;
   }
 }
