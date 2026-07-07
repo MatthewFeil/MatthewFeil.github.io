@@ -454,6 +454,22 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   animation: tool-loading-dash 0.9s ease-in-out infinite;
 }
 
+.personal-widget.is-empty {
+  align-content: stretch;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.personal-widget.is-empty .personal-agenda-list,
+.personal-widget.is-empty .personal-task-list {
+  align-self: stretch;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.personal-widget.is-empty .personal-empty-message {
+  min-height: 0;
+}
+
 .personal-widget-calendar {
   grid-column: span 6;
 }
@@ -592,6 +608,32 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   font-size: 0.82rem;
   font-weight: 650;
   line-height: 1.25;
+}
+
+.personal-agenda-list .personal-empty-message,
+.personal-task-list .personal-empty-message {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 6rem;
+  place-items: center;
+  border-top: 1px solid var(--tool-border-subtle);
+  color: var(--personal-muted);
+  font-size: 0.95rem;
+  font-weight: 750;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.personal-agenda-list .personal-empty-message:first-child,
+.personal-task-list .personal-empty-message:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.personal-empty-message span {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .personal-agenda-list a,
@@ -809,6 +851,15 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   .personal-widget-calendar,
   .personal-widget-todoist {
     grid-column: 1 / -1;
+  }
+
+  .personal-widget.is-empty {
+    min-height: 8.5rem;
+    gap: 0.7rem;
+  }
+
+  .personal-widget.is-empty .personal-empty-message {
+    min-height: 3.25rem;
   }
 }
 

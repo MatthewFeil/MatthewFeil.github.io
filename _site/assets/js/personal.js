@@ -17,6 +17,11 @@
     ]
   };
 
+  const emptyMessages = {
+    calendar: 'No events left today.',
+    todoist: 'No tasks left today.'
+  };
+
   const pendingTodoistCompletions = new Map();
 
   const els = {
@@ -171,7 +176,18 @@
     const calendar = Array.isArray(data.calendar) ? data.calendar : demoDashboard.calendar;
     const todoist = Array.isArray(data.todoist) ? data.todoist : demoDashboard.todoist;
 
+    renderCalendar(calendar);
+    renderTodoist(todoist);
+  }
+
+  function renderCalendar(calendar) {
     els.calendarCount.textContent = String(calendar.length);
+    setWidgetEmpty(els.calendarWidget, calendar.length === 0);
+    if (!calendar.length) {
+      renderEmptyState(els.calendarList, emptyMessages.calendar);
+      return;
+    }
+
     els.calendarList.innerHTML = calendar.map((event) => `
       <li>
         <a href="${escapeHtml(event.url || 'https://calendar.google.com/calendar/u/0/r/day')}" target="_blank" rel="noopener">
@@ -181,8 +197,16 @@
         </a>
       </li>
     `).join('');
+  }
 
+  function renderTodoist(todoist) {
     els.todoistCount.textContent = String(todoist.length);
+    setWidgetEmpty(els.todoistWidget, todoist.length === 0);
+    if (!todoist.length) {
+      renderEmptyState(els.todoistList, emptyMessages.todoist);
+      return;
+    }
+
     els.todoistList.innerHTML = todoist.map((task) => `
       <li data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}">
         <button class="personal-task-check" type="button" data-complete-task="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" aria-label="Complete ${escapeHtml(task.title)}"></button>
@@ -194,6 +218,18 @@
     `).join('');
   }
 
+  function renderEmptyState(list, message) {
+    list.innerHTML = `
+      <li class="personal-empty-message">
+        <span>${escapeHtml(message)}</span>
+      </li>
+    `;
+  }
+
+  function setWidgetEmpty(widget, isEmpty) {
+    widget?.classList.toggle('is-empty', isEmpty);
+  }
+
   function taskDetails(task) {
     if (Array.isArray(task.details)) {
       return task.details.filter(Boolean);
@@ -202,7 +238,18 @@
   }
 
   function updateTodoistCount() {
-    els.todoistCount.textContent = String(els.todoistList.querySelectorAll('li:not(.is-removing)').length);
+    els.todoistCount.textContent = String(visibleTodoistTaskCount());
+  }
+
+  function visibleTodoistTaskCount() {
+    return els.todoistList.querySelectorAll('[data-task-id]:not(.is-removing)').length;
+  }
+
+  function syncTodoistEmptyState() {
+    if (visibleTodoistTaskCount() === 0) {
+      setWidgetEmpty(els.todoistWidget, true);
+      renderEmptyState(els.todoistList, emptyMessages.todoist);
+    }
   }
 
   async function completeTodoistTask(taskId) {
@@ -270,6 +317,7 @@
       updateTodoistCount();
       window.setTimeout(() => {
         taskRow.remove();
+        syncTodoistEmptyState();
       }, 360);
     } catch (error) {
       taskRow.classList.remove('is-complete', 'is-pending-complete');
