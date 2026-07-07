@@ -180,36 +180,43 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.62rem;
   align-items: stretch;
-  padding-bottom: 0.36rem;
 }
 
-.personal-password-line::before,
-.personal-password-line::after {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+.personal-password-field {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 2px;
+  gap: 0.36rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.personal-password-track {
+  position: relative;
+  display: block;
+  width: 100%;
   height: 2px;
-  content: "";
-}
-
-.personal-password-line::before {
+  overflow: hidden;
   background: color-mix(in srgb, var(--personal-line) 55%, transparent);
 }
 
-.personal-password-line::after {
+.personal-password-track::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
   background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
+  content: "";
   opacity: 0;
-  transform: scaleX(0.08);
-  transform-origin: left center;
+  width: 18%;
 }
 
-.personal-app.is-loading .personal-password-line::after {
-  animation: tool-loading-dash 0.9s ease-in-out infinite;
+.personal-app.is-loading .personal-password-track::after {
+  animation: personal-password-loading-dash 0.9s ease-in-out infinite;
   opacity: 1;
 }
 
-.personal-app.is-denied .personal-password-line::before {
+.personal-app.is-denied .personal-password-track {
   background: var(--personal-red);
   box-shadow: 0 0 24px rgba(255, 39, 56, 0.72);
 }
@@ -330,14 +337,27 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   animation: personal-denied-shake 0.32s ease both;
 }
 
+@keyframes personal-password-loading-dash {
+  0% {
+    left: 0;
+    width: 18%;
+  }
+
+  50% {
+    left: 29%;
+    width: 42%;
+  }
+
+  100% {
+    left: 82%;
+    width: 18%;
+  }
+}
+
 .personal-workspace {
   border: 1px solid var(--personal-border);
   border-radius: 0;
   background: var(--personal-soft);
-}
-
-.personal-workspace h2 {
-  margin: 0;
 }
 
 .personal-heading {
@@ -349,7 +369,22 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
 }
 
 .personal-heading h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 7vw, 5.4rem);
+  letter-spacing: 0;
+  line-height: 0.9;
   margin: 0;
+  text-transform: uppercase;
+}
+
+.personal-heading p {
+  margin: 0.35rem 0 0;
+  color: var(--personal-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: var(--tool-label-spacing);
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .personal-heading button {
@@ -363,55 +398,358 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   font-weight: 800;
   line-height: 1.1;
   padding: 0.55rem 0.8rem;
+  text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .personal-heading button:hover,
 .personal-heading button:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
-  border-color: var(--site-bad);
   box-shadow: var(--tool-hover-shadow);
-  color: var(--site-bad);
   transform: translate(-2px, -2px);
+  border-color: var(--site-bad);
+  color: var(--site-bad);
 }
 
-.personal-card-grid {
+.personal-dashboard {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.6rem;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 0.75rem;
 }
 
-.personal-card {
-  display: flex;
-  align-items: center;
-  min-height: 3.25rem;
-  padding: 0.75rem 0.9rem;
+.personal-tracker-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--personal-border);
+  padding-bottom: 1rem;
+}
+
+.personal-widget {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  min-height: 12rem;
+  overflow: hidden;
   border: 1px solid var(--personal-border);
   border-radius: 0;
   background: var(--personal-surface);
-  color: var(--site-text);
-  text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  padding: clamp(0.85rem, 2vw, 1.05rem);
 }
 
-.personal-card:hover,
-.personal-card:focus-visible {
+.personal-widget.is-loading::before {
+  position: absolute;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
+  content: "";
+  opacity: 0.92;
+  transform: translateX(-42%) scaleX(0.16);
+  transform-origin: left center;
+  animation: tool-loading-dash 0.9s ease-in-out infinite;
+}
+
+.personal-widget-calendar {
+  grid-column: span 6;
+}
+
+.personal-widget-todoist {
+  grid-column: span 6;
+}
+
+.personal-widget-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.personal-widget h3,
+.personal-widget h3 a {
+  margin: 0;
+}
+
+.personal-widget h3 {
+  font-family: var(--font-body);
+  font-size: clamp(1.08rem, 2vw, 1.45rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.personal-widget h3 a {
+  color: var(--site-text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.personal-widget h3 a:visited {
+  color: var(--site-text);
+}
+
+.personal-widget h3 a:hover,
+.personal-widget h3 a:focus-visible {
+  color: var(--site-accent);
+}
+
+.personal-widget-head span,
+.personal-tracker-link {
+  color: var(--personal-muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: var(--tool-label-spacing);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.personal-tracker-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.25rem;
+  border: 1px solid var(--personal-border);
+  background: var(--personal-surface);
+  color: var(--site-text);
+  font-size: clamp(1rem, 1.65vw, 1.22rem);
+  line-height: 1;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.personal-tracker-link:visited {
+  color: var(--site-text);
+}
+
+.personal-tracker-link:hover,
+.personal-tracker-link:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
   box-shadow: var(--tool-hover-shadow);
+  color: var(--site-accent);
   transform: translate(-2px, -2px);
 }
 
-.personal-card:visited {
+.personal-widget-head span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.05rem;
+  min-height: 2.05rem;
+  border: 1px solid var(--personal-border);
   color: var(--site-text);
 }
 
-.personal-card span {
+.personal-widget-note {
+  margin: 0;
+  color: var(--personal-muted);
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.personal-agenda-list,
+.personal-task-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personal-agenda-list li,
+.personal-task-list li {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--tool-border-subtle);
+}
+
+.personal-agenda-list li:first-child,
+.personal-task-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.personal-agenda-list strong,
+.personal-task-list strong {
   color: var(--site-text);
-  font-size: 0.98rem;
-  font-weight: 800;
+  font-size: 0.96rem;
+  font-weight: 850;
   letter-spacing: 0;
-  line-height: 1.15;
+  line-height: 1.18;
+}
+
+.personal-agenda-list span,
+.personal-task-list span {
+  color: var(--personal-muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.personal-agenda-list a,
+.personal-task-list a {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.personal-agenda-list a:visited,
+.personal-task-list a:visited {
+  color: inherit;
+}
+
+.personal-agenda-list a:hover,
+.personal-agenda-list a:focus-visible,
+.personal-task-list a:hover,
+.personal-task-list a:focus-visible {
+  color: var(--site-accent);
+}
+
+.personal-task-list li {
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.55rem;
+  align-items: start;
+  max-height: var(--task-row-height, 14rem);
+  overflow: hidden;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    max-height 0.32s ease,
+    opacity 0.24s ease,
+    padding 0.32s ease;
+}
+
+.personal-task-list .personal-task-check {
+  --task-priority-color: var(--personal-muted);
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  width: 1.8rem;
+  min-width: 1.8rem;
+  max-width: 1.8rem;
+  height: 1.8rem;
+  min-height: 1.8rem;
+  max-height: 1.8rem;
+  box-sizing: border-box;
+  flex: 0 0 1.8rem;
+  margin: -0.28rem -0.28rem 0 -0.18rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--task-priority-color);
+  cursor: pointer;
+  font-size: 0;
+  line-height: 0;
+  transform: none;
+  transition: none;
+}
+
+.personal-task-list .personal-task-check::before {
+  content: "";
+  position: absolute;
+  width: 1.08rem;
+  height: 1.08rem;
+  box-sizing: border-box;
+  border: 2px solid var(--task-priority-color);
+  border-radius: 0.2rem;
+  background: color-mix(in srgb, var(--task-priority-color) 10%, transparent);
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.personal-task-list .personal-task-check::after {
+  content: "";
+  position: absolute;
+  width: 0.28rem;
+  height: 0.54rem;
+  border-right: 2px solid var(--personal-surface);
+  border-bottom: 2px solid var(--personal-surface);
+  opacity: 0;
+  transform: translateY(-0.06rem) rotate(42deg);
+  transition: opacity 0.16s ease;
+}
+
+.personal-task-list li[data-priority="4"],
+.personal-task-check[data-priority="4"] {
+  --task-priority-color: #de4c4a;
+}
+
+.personal-task-list li[data-priority="3"],
+.personal-task-check[data-priority="3"] {
+  --task-priority-color: #f49c18;
+}
+
+.personal-task-list li[data-priority="2"],
+.personal-task-check[data-priority="2"] {
+  --task-priority-color: #4073ff;
+}
+
+.personal-task-list li[data-priority="1"],
+.personal-task-check[data-priority="1"] {
+  --task-priority-color: color-mix(in srgb, var(--site-text) 38%, transparent);
+}
+
+.post-content .personal-task-list .personal-task-check:hover,
+.post-content .personal-task-list .personal-task-check:focus-visible {
+  outline: none;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.post-content .personal-task-list .personal-task-check:hover::before,
+.post-content .personal-task-list .personal-task-check:focus-visible::before {
+  border-color: color-mix(in srgb, var(--task-priority-color) 78%, var(--site-text));
+  background: color-mix(in srgb, var(--task-priority-color) 22%, transparent);
+}
+
+.personal-task-list .personal-task-check[aria-busy="true"] {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.personal-task-list li.is-complete .personal-task-check,
+.personal-task-list .personal-task-check[aria-pressed="true"] {
+  background: transparent;
+  border: 0;
+}
+
+.personal-task-list li.is-complete .personal-task-check::before,
+.personal-task-list .personal-task-check[aria-pressed="true"]::before {
+  background: var(--task-priority-color);
+  border-color: var(--task-priority-color);
+}
+
+.personal-task-list li.is-complete .personal-task-check::after,
+.personal-task-list .personal-task-check[aria-pressed="true"]::after {
+  opacity: 1;
+}
+
+.personal-task-list li.is-complete a {
+  color: var(--personal-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 0.08em;
+  transition: color 0.16s ease;
+}
+
+.personal-task-list li.is-removing {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-color: transparent;
 }
 
 @keyframes personal-denied-shake {
@@ -434,6 +772,13 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
 
   80% {
     transform: translateX(0.12rem);
+  }
+}
+
+@media (max-width: 1040px) {
+  .personal-widget-calendar,
+  .personal-widget-todoist {
+    grid-column: span 6;
   }
 }
 
@@ -460,6 +805,11 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
     width: 100%;
   }
 
+  .personal-dashboard,
+  .personal-widget-calendar,
+  .personal-widget-todoist {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 560px) {
@@ -468,6 +818,16 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
     grid-template-columns: 1fr;
     align-items: stretch;
   }
+
+  .personal-widget-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .personal-tracker-links {
+    grid-template-columns: 1fr;
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -486,7 +846,8 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   .personal-password-line button:hover,
   .personal-home-link:hover,
   .personal-heading button:hover,
-  .personal-card:hover {
+  .personal-tracker-link:hover,
+  .personal-task-check:hover {
     box-shadow: none;
     transform: none;
   }
@@ -497,8 +858,9 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
     color: var(--site-text);
   }
 
-  .personal-card:hover {
+  .personal-tracker-link:hover {
     background: var(--personal-surface);
     border-color: var(--personal-border);
+    color: var(--site-text);
   }
 }

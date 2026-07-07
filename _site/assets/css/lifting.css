@@ -244,8 +244,7 @@
 
 .lifting-form button.is-loading::after,
 .lifting-log-form button.is-loading::after,
-.lifting-action.is-loading::after,
-.lifting-status.is-loading::after {
+.lifting-action.is-loading::after {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -274,7 +273,6 @@
 }
 
 .lifting-status.is-loading {
-  padding-bottom: 0.35rem;
   color: var(--lifting-muted);
 }
 

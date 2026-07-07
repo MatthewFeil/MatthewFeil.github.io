@@ -302,8 +302,7 @@
   overflow: hidden;
 }
 
-.investment-input-grid button.is-loading::after,
-.investment-status[data-tone="loading"]::after {
+.investment-input-grid button.is-loading::after {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -350,7 +349,6 @@
 }
 
 .investment-status[data-tone="loading"] {
-  padding-bottom: 0.35rem;
   color: var(--investment-muted);
 }
 

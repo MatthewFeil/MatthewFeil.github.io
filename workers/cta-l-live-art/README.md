@@ -1,4 +1,4 @@
-# CTA L Live Art Worker
+# Chicago 'L' Live Art Worker
 
 Cloudflare Worker proxy for the CTA Train Tracker API. The browser page should
 call this Worker instead of calling CTA directly, so the CTA API key stays out

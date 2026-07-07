@@ -235,8 +235,7 @@
 }
 
 .portfolio-form button.is-loading::after,
-.portfolio-action.is-loading::after,
-.portfolio-status.is-loading::after {
+.portfolio-action.is-loading::after {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -392,7 +391,6 @@
 }
 
 .portfolio-status.is-loading {
-  padding-bottom: 0.35rem;
   color: var(--portfolio-muted);
 }
 

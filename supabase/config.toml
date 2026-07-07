@@ -384,6 +384,9 @@ verify_jwt = false
 [functions.lifting-api]
 verify_jwt = false
 
+[functions.personal-dashboard-api]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

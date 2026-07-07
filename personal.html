@@ -10,6 +10,8 @@ extra_css:
   class="personal-app"
   data-personal-app
   data-auth-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/portfolio-api"
+  data-dashboard-mode="live"
+  data-dashboard-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/personal-dashboard-api"
 >
   <a class="personal-wordmark" href="{{ "/" | relative_url }}">Matthew Feil</a>
 
@@ -22,7 +24,10 @@ extra_css:
 
     <form id="personal-unlock-form" class="personal-form">
       <div class="personal-password-line">
-        <input id="personal-password" type="password" autocomplete="current-password" placeholder="PASSWORD" aria-label="Password" aria-describedby="personal-status" required>
+        <span class="personal-password-field">
+          <input id="personal-password" type="password" autocomplete="current-password" placeholder="PASSWORD" aria-label="Password" aria-describedby="personal-status" required>
+          <span class="personal-password-track" aria-hidden="true"></span>
+        </span>
         <button type="submit" id="personal-unlock-button">
           <span class="personal-button-label">Enter</span>
           <span class="personal-button-spinner" aria-hidden="true"></span>
@@ -38,17 +43,36 @@ extra_css:
     <div class="personal-heading">
       <div>
         <h2>Personal Space</h2>
+        <p id="personal-dashboard-date"></p>
       </div>
       <button id="personal-lock-button" type="button">Lock</button>
     </div>
 
-    <div class="personal-card-grid" aria-label="Personal tracker links">
-      <a class="personal-card" href="{{ "/portfolio/" | relative_url }}">
-        <span>Portfolio Tracker</span>
-      </a>
-      <a class="personal-card" href="{{ "/lifting/" | relative_url }}">
-        <span>Lifting Tracker</span>
-      </a>
+    <nav class="personal-tracker-links" aria-label="Personal tracker links">
+      <a class="personal-tracker-link" href="{{ "/lifting/" | relative_url }}">Lifting Tracker</a>
+      <a class="personal-tracker-link" href="{{ "/portfolio/" | relative_url }}">Portfolio Tracker</a>
+    </nav>
+
+    <div class="personal-dashboard" aria-label="Personal dashboard">
+      <section class="personal-widget personal-widget-calendar" id="personal-calendar-widget" aria-labelledby="personal-calendar-title">
+        <div class="personal-widget-head">
+          <h3 id="personal-calendar-title">
+            <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" rel="noopener">Calendar</a>
+          </h3>
+          <span id="personal-calendar-count">0</span>
+        </div>
+        <ol class="personal-agenda-list" id="personal-calendar-list"></ol>
+      </section>
+
+      <section class="personal-widget personal-widget-todoist" id="personal-todoist-widget" aria-labelledby="personal-todoist-title">
+        <div class="personal-widget-head">
+          <h3 id="personal-todoist-title">
+            <a href="https://todoist.com/app/today" target="_blank" rel="noopener">Todoist</a>
+          </h3>
+          <span id="personal-todoist-count">0</span>
+        </div>
+        <ol class="personal-task-list" id="personal-todoist-list"></ol>
+      </section>
     </div>
   </div>
 </section>
