@@ -243,7 +243,11 @@ function todayRange(timeZone: string) {
 }
 
 function localDateString(timeZone: string) {
-  const parts = partsInTimeZone(new Date(), timeZone);
+  return dateStringInTimeZone(new Date(), timeZone);
+}
+
+function dateStringInTimeZone(date: Date, timeZone: string) {
+  const parts = partsInTimeZone(date, timeZone);
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
@@ -387,15 +391,39 @@ async function getTodoistProjectMap() {
 }
 
 function todoistDueDate(task: TodoistTask) {
-  const value = task.due?.datetime || task.due?.date || "";
-  return value.slice(0, 10);
+  const dueDateTime = todoistDueDateTime(task);
+  if (dueDateTime) return dateStringInTimeZone(dueDateTime, dashboardTimeZone);
+  return (task.due?.date || "").slice(0, 10);
 }
 
 function todoistDueDateTime(task: TodoistTask) {
-  const value = task.due?.datetime || "";
+  const value = todoistDueDateTimeValue(task);
   if (!value) return null;
-  const date = new Date(value);
+  const hasExplicitZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(value);
+  const date = hasExplicitZone
+    ? new Date(value)
+    : parseTodoistLocalDateTime(value, task.due?.timezone || dashboardTimeZone);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function todoistDueDateTimeValue(task: TodoistTask) {
+  const dueDate = task.due?.date || "";
+  if (task.due?.datetime) return task.due.datetime;
+  return dueDate.includes("T") ? dueDate : "";
+}
+
+function parseTodoistLocalDateTime(value: string, timeZone: string) {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return new Date(value);
+  const [, year, month, day, hour, minute] = match;
+  return zonedTimeToUtc(
+    Number(year),
+    Number(month),
+    Number(day),
+    Number(hour),
+    Number(minute),
+    timeZone,
+  );
 }
 
 function compareTodoistTasks(left: TodoistTask, right: TodoistTask) {
@@ -403,8 +431,7 @@ function compareTodoistTasks(left: TodoistTask, right: TodoistTask) {
   const rightDate = todoistDueDateTime(right);
 
   if (leftDate && rightDate) {
-    return leftDate.getTime() - rightDate.getTime() ||
-      Number(right.priority || 1) - Number(left.priority || 1);
+    return leftDate.getTime() - rightDate.getTime();
   }
 
   if (leftDate) return -1;
@@ -447,6 +474,7 @@ function formatTodoistTask(task: TodoistTask, projectMap: Map<string, TodoistPro
     title: task.content || "Untitled task",
     details,
     time,
+    sortTime: dueDateTime ? dueDateTime.getTime() : null,
     priority,
     priorityClass: `p${Math.max(1, Math.min(4, priority))}`,
     url: task.url || `https://todoist.com/app/task/${encodeURIComponent(String(task.id))}`,

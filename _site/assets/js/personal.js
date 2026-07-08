@@ -11,7 +11,7 @@
       { id: 'demo-review', time: '8:00 PM', title: 'Review tomorrow', detail: 'Calendar and task reset', url: 'https://calendar.google.com/calendar/u/0/r/day' }
     ],
     todoist: [
-      { id: 'demo-dashboard', title: 'Finish personal dashboard wiring', details: ['8:30 AM', 'Personal site'], priority: 4, priorityClass: 'p4', url: 'https://todoist.com/app/today' },
+      { id: 'demo-dashboard', title: 'Finish personal dashboard wiring', time: '8:30 AM', sortTime: 30600000, details: ['Personal site'], priority: 4, priorityClass: 'p4', url: 'https://todoist.com/app/today' },
       { id: 'demo-lift', title: 'Log today’s lift', details: ['Fitness'], priority: 3, priorityClass: 'p3', url: 'https://todoist.com/app/today' },
       { id: 'demo-portfolio', title: 'Check portfolio notes', details: ['Finance'], priority: 2, priorityClass: 'p2', url: 'https://todoist.com/app/today' }
     ]
@@ -177,7 +177,7 @@
     const todoist = Array.isArray(data.todoist) ? data.todoist : demoDashboard.todoist;
 
     renderCalendar(calendar);
-    renderTodoist(todoist);
+    renderTodoist(sortTodoistTasks(todoist));
   }
 
   function renderCalendar(calendar) {
@@ -211,7 +211,10 @@
       <li data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}">
         <button class="personal-task-check" type="button" data-complete-task="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" aria-label="Complete ${escapeHtml(task.title)}"></button>
         <a href="${escapeHtml(task.url || 'https://todoist.com/app/today')}" target="_blank" rel="noopener">
-          <strong>${escapeHtml(task.title)}</strong>
+          <span class="personal-task-title-line">
+            ${taskTime(task) ? `<span class="personal-task-time">${escapeHtml(taskTime(task))}</span>` : ''}
+            <strong>${escapeHtml(task.title)}</strong>
+          </span>
           ${taskDetails(task).map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}
         </a>
       </li>
@@ -231,10 +234,56 @@
   }
 
   function taskDetails(task) {
+    const time = taskTime(task);
     if (Array.isArray(task.details)) {
-      return task.details.filter(Boolean);
+      return task.details.filter((detail) => detail && String(detail).trim() !== time);
     }
     return task.detail ? [task.detail] : [];
+  }
+
+  function taskTime(task) {
+    return String(task.time || '').trim();
+  }
+
+  function taskSortTime(task) {
+    if (task.sortTime !== null && task.sortTime !== undefined && task.sortTime !== '') {
+      const numericSortTime = Number(task.sortTime);
+      if (Number.isFinite(numericSortTime)) return numericSortTime;
+    }
+
+    const time = taskTime(task);
+    if (!time) return Number.POSITIVE_INFINITY;
+
+    const match = time.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+    if (!match) return Number.POSITIVE_INFINITY;
+
+    let hour = Number(match[1]);
+    const minute = Number(match[2] || 0);
+    const meridiem = match[3]?.toUpperCase();
+    if (meridiem === 'AM' && hour === 12) hour = 0;
+    if (meridiem === 'PM' && hour !== 12) hour += 12;
+    return (hour * 60) + minute;
+  }
+
+  function sortTodoistTasks(tasks) {
+    return tasks
+      .map((task, index) => ({ task, index }))
+      .sort((left, right) => {
+        const leftSortTime = taskSortTime(left.task);
+        const rightSortTime = taskSortTime(right.task);
+        const leftIsTimed = Number.isFinite(leftSortTime);
+        const rightIsTimed = Number.isFinite(rightSortTime);
+
+        if (leftIsTimed && rightIsTimed) {
+          return leftSortTime - rightSortTime || left.index - right.index;
+        }
+        if (leftIsTimed) return -1;
+        if (rightIsTimed) return 1;
+
+        return Number(right.task.priority || 1) - Number(left.task.priority || 1) ||
+          left.index - right.index;
+      })
+      .map(({ task }) => task);
   }
 
   function updateTodoistCount() {

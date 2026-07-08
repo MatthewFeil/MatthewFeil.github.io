@@ -610,6 +610,33 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   line-height: 1.25;
 }
 
+.personal-task-list .personal-task-title-line {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.18;
+}
+
+.personal-task-list .personal-task-title-line strong {
+  display: inline;
+  overflow-wrap: anywhere;
+}
+
+.personal-task-list .personal-task-time {
+  display: inline-block;
+  border: 1px solid var(--personal-border);
+  color: var(--site-text);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: var(--tool-label-spacing);
+  line-height: 1;
+  margin-right: 0.45rem;
+  padding: 0.24rem 0.34rem;
+  text-transform: uppercase;
+  vertical-align: baseline;
+}
+
 .personal-agenda-list .personal-empty-message,
 .personal-task-list .personal-empty-message {
   display: grid;
