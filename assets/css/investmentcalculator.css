@@ -20,7 +20,7 @@
 
 .investment-form,
 .investment-results {
-  padding: 0.85rem;
+  padding: var(--tool-panel-padding);
   min-width: 0;
 }
 
@@ -67,7 +67,7 @@
 
 .investment-results-head {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--tool-section-gap);
   align-items: center;
   justify-content: space-between;
 }
@@ -89,7 +89,7 @@
 .investment-input-grid {
   display: grid;
   grid-template-columns: minmax(7.5rem, 0.85fr) minmax(8rem, 0.9fr) minmax(8rem, 0.9fr) minmax(6.5rem, 0.7fr) auto;
-  gap: 0.65rem;
+  gap: var(--tool-gap);
   align-items: end;
   width: 100%;
   min-width: 0;
@@ -354,7 +354,7 @@
 
 .investment-results {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--tool-section-gap);
   margin-top: 1rem;
 }
 
@@ -397,7 +397,7 @@
 
 .investment-result-card {
   min-width: 0;
-  padding: 0.85rem;
+  padding: var(--tool-panel-padding);
   background: var(--investment-surface);
 }
 
@@ -422,7 +422,7 @@
 }
 
 .investment-result-card-large {
-  padding: 1rem;
+  padding: var(--tool-panel-padding-roomy);
 }
 
 .investment-result-card-large strong {
@@ -542,6 +542,13 @@
 }
 
 @media (max-width: 640px) {
+  .investment-tool-switcher a {
+    display: flex;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: center;
+  }
+
   .investment-results-head {
     align-items: stretch;
     flex-direction: column;

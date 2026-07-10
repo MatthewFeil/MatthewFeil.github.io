@@ -23,7 +23,7 @@
 .lifting-lock,
 .lifting-panel,
 .lifting-card {
-  padding: 1rem;
+  padding: var(--tool-panel-padding-roomy);
 }
 
 .lifting-lock {
@@ -63,7 +63,7 @@
 .lifting-modal-head-actions,
 .lifting-modal-head {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--tool-section-gap);
   align-items: center;
   justify-content: space-between;
 }
@@ -88,7 +88,7 @@
 .lifting-form,
 .lifting-log-form {
   display: grid;
-  gap: 0.65rem;
+  gap: var(--tool-gap);
 }
 
 .lifting-select-status {
@@ -303,7 +303,7 @@
 
 .lifting-card:hover {
   border-color: color-mix(in srgb, var(--site-text) 34%, transparent);
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--site-text) 22%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -721,7 +721,7 @@
     right: 0.5rem;
     z-index: 2;
     min-width: 3.35rem;
-    min-height: 2rem;
+    min-height: var(--touch-target);
     width: auto;
     margin: 0;
     padding: 0.35rem 0.5rem;

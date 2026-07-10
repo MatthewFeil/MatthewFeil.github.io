@@ -22,7 +22,7 @@
 
 .portfolio-lock,
 .portfolio-panel {
-  padding: 1rem;
+  padding: var(--tool-panel-padding-roomy);
 }
 
 .portfolio-lock {
@@ -54,7 +54,7 @@
 .portfolio-inline,
 .portfolio-log-head {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--tool-section-gap);
   align-items: center;
   justify-content: space-between;
 }
@@ -112,7 +112,7 @@
 
 .portfolio-form {
   display: grid;
-  gap: 0.55rem;
+  gap: var(--tool-gap);
 }
 
 .portfolio-form label {

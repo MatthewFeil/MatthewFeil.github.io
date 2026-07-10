@@ -23,6 +23,11 @@
   --tool-hover-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
   --tool-label-spacing: 0.07em;
   --tool-control-height: 2.5rem;
+  --tool-panel-padding: 0.85rem;
+  --tool-panel-padding-roomy: 1rem;
+  --tool-gap: 0.65rem;
+  --tool-section-gap: 0.75rem;
+  --touch-target: 2.75rem;
   --font-display: "Archivo Black", Impact, sans-serif;
   --font-body: "Inter", Arial, sans-serif;
   --page-gutter: clamp(1rem, 3.6vw, 3rem);
@@ -207,7 +212,7 @@ table {
 .nav-toggle:focus-visible {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -270,7 +275,7 @@ table {
 
 .nav-dropdown-menu {
   position: absolute;
-  top: calc(100% + 0.1rem);
+  top: 100%;
   right: 0;
   z-index: 40;
   display: grid;
@@ -335,8 +340,9 @@ table {
 }
 
 .site-main {
-  padding-top: clamp(1.3rem, 3.5vw, 3rem);
-  padding-bottom: clamp(2rem, 5vw, 4rem);
+  min-width: 0;
+  padding-top: clamp(1.15rem, 2.5vw, 2rem);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
 }
 
 .site-footer {
@@ -519,7 +525,7 @@ table {
 .post-card:focus-visible {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   color: var(--site-text);
   outline: none;
   transform: translate(-2px, -2px);
@@ -570,9 +576,13 @@ table {
 .post-header {
   display: grid;
   gap: 0.6rem;
-  margin-bottom: clamp(1.2rem, 4vw, 2.8rem);
+  margin-bottom: clamp(1.1rem, 2.6vw, 2rem);
   border-bottom: 2px solid var(--site-border);
-  padding-bottom: clamp(1rem, 3vw, 2rem);
+  padding-bottom: clamp(0.85rem, 2vw, 1.35rem);
+}
+
+.post:has(:is(.grade-v2, .investment-app, .portfolio-app, .lifting-app, .personal-app)) .post-header {
+  margin-bottom: var(--tool-section-gap);
 }
 
 .post-title,
@@ -682,7 +692,7 @@ table {
 .playlist-card:focus-within {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -774,7 +784,7 @@ table {
 }
 
 .post-content button:not(.lifting-row):hover {
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
@@ -907,6 +917,11 @@ table {
 }
 
 @media (max-width: 1040px) {
+  .site-header {
+    background: var(--site-bg);
+    backdrop-filter: none;
+  }
+
   .site-header-inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -924,9 +939,12 @@ table {
   }
 
   .nav-toggle {
-    display: block;
+    display: inline-flex;
     grid-column: 2;
     justify-self: end;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: center;
   }
 
   .site-nav {
@@ -956,8 +974,16 @@ table {
       visibility 0s linear 0.28s;
   }
 
+  .trigger > .page-link,
+  .nav-dropdown-summary,
+  .nav-dropdown-menu .page-link {
+    display: flex;
+    min-height: var(--touch-target);
+    align-items: center;
+  }
+
   .nav-trigger:checked ~ .trigger {
-    max-height: 28rem;
+    max-height: 34rem;
     padding-top: 0.2rem;
     opacity: 1;
     pointer-events: auto;
@@ -1059,6 +1085,10 @@ table {
 }
 
 @media (max-width: 560px) {
+  :root {
+    --tool-control-height: var(--touch-target);
+  }
+
   .site-header-inner,
   .site-main,
   .site-footer-inner {

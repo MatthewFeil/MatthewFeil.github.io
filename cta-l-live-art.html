@@ -89,6 +89,20 @@ permalink: /cta-l-live-art/
     <script type="module" crossorigin src="{{ "/assets/cta-l-live-art/index-DFaGMNlx.js" | relative_url }}"></script>
     <link rel="stylesheet" crossorigin href="{{ "/assets/cta-l-live-art/index-DD-OmGjU.css" | relative_url }}">
     <style>
+      button,
+      .status-pill,
+      .settings-panel,
+      .toggle-chip,
+      .line-toggle,
+      .pause-banner,
+      .mono-color-row input {
+        border-radius: 0;
+      }
+
+      .settings-panel {
+        box-shadow: -5px 0 0 rgba(255, 255, 255, 0.12);
+      }
+
       .usage-banner {
         display: none;
       }
@@ -96,6 +110,7 @@ permalink: /cta-l-live-art/
       .pause-banner {
         top: auto;
         bottom: max(0.72rem, env(safe-area-inset-bottom));
+        box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.14);
       }
 
       body.cta-usage-unavailable .usage-banner {
@@ -113,6 +128,11 @@ permalink: /cta-l-live-art/
       }
 
       @media (max-width: 720px) {
+        button,
+        .status-pill {
+          min-height: 2.75rem;
+        }
+
         .pause-banner {
           top: auto;
           bottom: max(0.58rem, env(safe-area-inset-bottom));

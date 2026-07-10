@@ -279,6 +279,18 @@ function eventStartTime(event: Record<string, unknown>) {
   return Number.MAX_SAFE_INTEGER;
 }
 
+function eventEndTime(event: Record<string, unknown>, timeZone: string) {
+  const end = event.end as Record<string, string> | undefined;
+  if (end?.dateTime) return new Date(end.dateTime).getTime();
+  if (end?.date) {
+    const [year, month, day] = end.date.split("-").map(Number);
+    if ([year, month, day].every(Number.isFinite)) {
+      return zonedTimeToUtc(year, month, day, 0, 0, timeZone).getTime();
+    }
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
+
 async function getReadableCalendarIds(accessToken: string): Promise<string[]> {
   if (googleCalendarIds.length > 0) return googleCalendarIds;
 
@@ -323,6 +335,7 @@ async function getCalendarEventsForCalendar(accessToken: string, calendarId: str
     id: String(event.id || ""),
     calendarId,
     sortTime: eventStartTime(event),
+    endTime: eventEndTime(event, dashboardTimeZone),
     time: formatEventTime(event, dashboardTimeZone),
     title: String(event.summary || "Untitled event"),
     detail: String(event.location || event.description || ""),
@@ -332,6 +345,7 @@ async function getCalendarEventsForCalendar(accessToken: string, calendarId: str
 
 async function getCalendarEvents() {
   const { start, end } = todayRange(dashboardTimeZone);
+  const now = Date.now();
   const accessToken = await getGoogleAccessToken();
   const calendarIds = await getReadableCalendarIds(accessToken);
   const results = await Promise.allSettled(
@@ -340,9 +354,10 @@ async function getCalendarEvents() {
 
   return results
     .flatMap((result) => result.status === "fulfilled" ? result.value : [])
+    .filter((event) => event.endTime > now)
     .sort((left, right) => left.sortTime - right.sortTime)
     .slice(0, 8)
-    .map(({ sortTime: _sortTime, ...event }) => event);
+    .map(({ sortTime: _sortTime, endTime: _endTime, ...event }) => event);
 }
 
 async function todoist(path: string, init: RequestInit = {}) {
