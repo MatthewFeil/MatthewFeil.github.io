@@ -4,12 +4,13 @@ import {
   jsonResponse,
   optionsResponse,
   requireAllowedOrigin,
-  verifyPersonalSpaceToken,
+  verifyPersonalSpaceUser,
 } from "../_shared/personal-security.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-const personalSpaceTokenSecret = Deno.env.get("PERSONAL_SPACE_TOKEN_SECRET") || "";
+const publishableKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+const ownerUserId = Deno.env.get("PERSONAL_OWNER_USER_ID") || "";
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 function cleanName(name: unknown) {
@@ -32,7 +33,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === "GET" || req.method === "HEAD") return json({ ok: true });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
-  const unlocked = await verifyPersonalSpaceToken(req, personalSpaceTokenSecret);
+  const unlocked = await verifyPersonalSpaceUser(req, supabaseUrl, publishableKey, ownerUserId);
   if (!unlocked) return json({ error: "Personal Space unlock required." }, 401);
 
   const body = await req.json().catch(() => ({}));

@@ -1,6 +1,4 @@
 (() => {
-  const TOKEN_KEY = 'personalSpaceToken';
-  const TOKEN_EXPIRY_KEY = 'personalSpaceTokenExpiresAt';
   const app = document.querySelector('.lifting-app');
   const apiUrl = app.dataset.apiUrl;
   const personalUrl = app.dataset.personalUrl || '/personal/';
@@ -18,7 +16,6 @@
   };
 
   const state = {
-    token: sessionStorage.getItem(TOKEN_KEY) || '',
     lifts: [],
     logs: [],
     query: '',
@@ -74,15 +71,8 @@
     button.textContent = isLoading ? loadingText : button.dataset.defaultText;
   }
 
-  function sessionIsFresh() {
-    const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
-    return Boolean(state.token && Number.isFinite(expiresAt) && expiresAt > Date.now());
-  }
-
-  function clearSession() {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
-    state.token = '';
+  async function hasSession() {
+    return Boolean(await window.PersonalAuth.session());
   }
 
   function redirectToPersonal() {
@@ -91,11 +81,10 @@
   }
 
   async function api(action, payload = {}) {
-    const response = await fetch(apiUrl, {
+    const response = await window.PersonalAuth.authorizedFetch(apiUrl, {
       method: 'POST',
       headers: {
-        'content-type': 'application/json',
-        'x-personal-token': state.token
+        'content-type': 'application/json'
       },
       body: JSON.stringify({ action, ...payload })
     });
@@ -307,9 +296,9 @@
 
   els.logDate.valueAsDate = new Date();
 
-  els.lockButton.addEventListener('click', () => {
+  els.lockButton.addEventListener('click', async () => {
     els.workspace.hidden = true;
-    clearSession();
+    await window.PersonalAuth.signOut().catch(() => {});
     redirectToPersonal();
   });
 
@@ -493,19 +482,17 @@
   });
 
   async function boot() {
-    if (!sessionIsFresh()) {
-      clearSession();
-      redirectToPersonal();
-      return;
-    }
-
-    els.workspace.hidden = false;
-
     try {
+      if (!await hasSession()) {
+        redirectToPersonal();
+        return;
+      }
+
+      els.workspace.hidden = false;
       await loadLifts();
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
-        clearSession();
+        await window.PersonalAuth.signOut().catch(() => {});
         redirectToPersonal();
         return;
       }

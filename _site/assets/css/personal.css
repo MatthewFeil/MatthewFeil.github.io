@@ -1,60 +1,17 @@
-body:has(.personal-app:not(.is-unlocked)) {
-  background: #050505;
-}
-
-body:has(.personal-app:not(.is-unlocked)) .site-header,
-body:has(.personal-app:not(.is-unlocked)) .site-footer {
-  display: none;
-}
-
-body:has(.personal-app:not(.is-unlocked)) .page-content,
-body:has(.personal-app:not(.is-unlocked)) .site-main,
-body:has(.personal-app:not(.is-unlocked)) .post,
-body:has(.personal-app:not(.is-unlocked)) .post-content {
-  width: 100%;
-  max-width: none;
-  min-height: 100svh;
-  margin: 0;
-  padding: 0;
-}
-
 .personal-app {
   --personal-border: var(--tool-border);
   --personal-surface: var(--tool-surface);
   --personal-soft: var(--tool-soft);
-  --personal-bg: #050505;
-  --personal-ink: #f7f8fa;
-  --personal-muted: rgba(247, 248, 250, 0.66);
-  --personal-dim: rgba(247, 248, 250, 0.38);
-  --personal-red: #ff2738;
-  --personal-red-deep: #7c050d;
-  --personal-line: rgba(247, 248, 250, 0.3);
+  --personal-bg: var(--site-bg);
+  --personal-ink: var(--site-text);
+  --personal-muted: var(--tool-muted);
+  --personal-dim: color-mix(in srgb, var(--site-text) 50%, transparent);
+  --personal-red: var(--site-bad);
+  --personal-line: var(--tool-border);
   position: relative;
-  display: grid;
-  min-height: 100svh;
-  overflow: hidden;
-  background:
-    linear-gradient(rgba(145, 150, 158, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(145, 150, 158, 0.09) 1px, transparent 1px),
-    radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.05), transparent 30rem),
-    var(--personal-bg);
-  background-size: 48px 48px, 48px 48px, auto;
+  display: block;
   color: var(--personal-ink);
-  isolation: isolate;
-}
-
-.personal-app::before,
-.personal-app::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  content: "";
-}
-
-.personal-app::before {
-  background: radial-gradient(circle at 18% 52%, rgba(255, 255, 255, 0.06), transparent 22rem);
-  opacity: 0.72;
+  font-family: var(--font-body);
 }
 
 .personal-app.is-unlocked {
@@ -66,38 +23,6 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   gap: 0;
 }
 
-.personal-app.is-unlocked::before,
-.personal-app.is-unlocked::after,
-.personal-app.is-unlocked .personal-wordmark {
-  display: none;
-}
-
-.personal-app::after {
-  display: none;
-}
-
-.personal-wordmark {
-  position: fixed;
-  top: clamp(1rem, 3vw, 2rem);
-  left: clamp(1rem, 3vw, 2rem);
-  z-index: 3;
-  color: var(--personal-ink);
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2vw, 1.45rem);
-  letter-spacing: 0.02em;
-  line-height: 1;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.16s ease;
-}
-
-.personal-wordmark:hover,
-.personal-wordmark:focus-visible {
-  color: var(--personal-red);
-  outline: none;
-}
-
-.personal-lock,
 .personal-workspace {
   display: grid;
   width: min(100%, 1680px);
@@ -119,137 +44,123 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
 }
 
 .personal-lock {
-  align-content: center;
-  gap: clamp(0.85rem, 2vw, 1.35rem);
+  display: grid;
+  align-content: start;
+  width: min(100%, 42rem);
+  min-height: 0;
+  margin: 0;
+  gap: var(--tool-section-gap);
+  padding: 0;
 }
 
 .personal-lock-copy {
   display: grid;
-  gap: clamp(0.55rem, 1.35vw, 0.85rem);
-  max-width: 70rem;
+  gap: 1.2rem;
+  max-width: 40rem;
 }
 
 .personal-lock h1 {
   margin: 0;
-}
-
-.personal-lock h1 {
-  max-width: 11ch;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 9.2vw, 10.5rem);
+  font-size: clamp(2.15rem, 4.8vw, 4.6rem);
   font-weight: 900;
-  letter-spacing: 0;
-  line-height: 0.82;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
   text-transform: uppercase;
   text-wrap: balance;
 }
 
 .personal-lock h1::first-letter {
-  color: var(--personal-red);
-}
-
-.personal-subhead {
-  max-width: 42rem;
-  margin: 0;
-  color: var(--personal-ink);
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2vw, 2.1rem);
-  letter-spacing: 0.02em;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-
-.personal-description {
-  max-width: 36rem;
-  margin: 0;
-  color: var(--personal-muted);
-  font-size: clamp(0.95rem, 1.4vw, 1.12rem);
-  font-weight: 650;
-  line-height: 1.5;
+  color: var(--site-accent);
 }
 
 .personal-form {
-  display: grid;
-  gap: 0.45rem;
-  width: min(100%, 24rem);
-}
-
-.personal-password-line {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.62rem;
-  align-items: stretch;
-}
-
-.personal-password-field {
-  position: relative;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) 2px;
-  gap: 0.36rem;
-  min-width: 0;
+  gap: 1rem;
+  width: min(100%, 30rem);
   overflow: hidden;
+  border: 1px solid var(--personal-border);
+  background: var(--personal-soft);
+  padding: clamp(1.1rem, 3vw, 1.4rem);
 }
 
-.personal-password-track {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 2px;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--personal-line) 55%, transparent);
-}
-
-.personal-password-track::after {
+.personal-form::after {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -1px;
+  bottom: auto;
   left: 0;
+  width: 18%;
+  height: 2px;
   background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
   content: "";
   opacity: 0;
-  width: 18%;
 }
 
-.personal-app.is-loading .personal-password-track::after {
+.personal-app.is-loading .personal-form::after {
   animation: personal-password-loading-dash 0.9s ease-in-out infinite;
   opacity: 1;
 }
 
-.personal-app.is-denied .personal-password-track {
-  background: var(--personal-red);
-  box-shadow: 0 0 24px rgba(255, 39, 56, 0.72);
+.personal-app.is-denied .personal-form {
+  border-color: var(--site-bad);
 }
 
-.personal-password-line input {
-  width: 100%;
-  height: var(--tool-control-height);
-  min-width: 0;
-  border: 0;
-  border-radius: 0;
-  outline: 0;
-  background: transparent;
-  color: color-mix(in srgb, var(--personal-ink) 72%, transparent);
+.personal-form h2 {
+  margin: 0 0 0.2rem;
+  color: var(--site-text);
   font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2.2vw, 2.4rem);
-  letter-spacing: 0.04em;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
   line-height: 1;
-}
-
-.personal-password-line input::placeholder {
-  color: var(--personal-dim);
-  font-family: var(--font-body);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  opacity: 1;
   text-transform: uppercase;
 }
 
-.personal-password-line input:focus-visible {
+.personal-login-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.personal-login-field label {
+  color: var(--personal-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.personal-login-field input {
+  width: 100%;
+  height: var(--tool-control-height);
+  min-width: 0;
+  border: 1px solid var(--personal-border);
+  border-radius: 0;
+  outline: 0;
+  background: var(--personal-surface);
+  color: var(--site-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 0.7rem 0.8rem;
+}
+
+.personal-login-field input::placeholder {
+  color: var(--personal-dim);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+  opacity: 1;
+}
+
+.personal-login-field input:focus-visible {
+  border-color: var(--site-accent);
   box-shadow: none;
 }
 
-.personal-password-line button,
+.personal-form button,
 .personal-home-link {
   display: inline-flex;
   align-items: center;
@@ -270,38 +181,39 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
   transition: background 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
-.personal-password-line button {
-  gap: 0.5rem;
-  border-color: color-mix(in srgb, var(--personal-ink) 46%, transparent);
-  color: var(--personal-muted);
-  padding: 0.6rem 0.78rem;
+.personal-form button {
+  width: fit-content;
+  margin-top: 0.2rem;
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: #fff;
+  padding: 0.7rem 1rem;
 }
 
 .personal-home-link {
-  width: fit-content;
-  border-width: 2px;
-  color: var(--personal-ink);
-  font-size: clamp(1rem, 1.45vw, 1.22rem);
-  padding: 1.05rem 1.3rem;
+  box-sizing: border-box;
+  width: min(100%, 30rem);
+  border-color: var(--personal-border);
+  background: var(--personal-surface);
+  color: var(--site-text);
+  font-size: 0.78rem;
+  padding: 0.7rem 0.9rem;
 }
 
-.personal-password-line button:hover,
-.personal-password-line button:focus-visible,
+.personal-form button:hover,
+.personal-form button:focus-visible,
 .personal-home-link:hover,
 .personal-home-link:focus-visible {
-  background: var(--personal-ink);
-  color: var(--personal-bg);
-  box-shadow: 5px 5px 0 rgba(255, 39, 56, 0.5);
+  border-color: var(--site-accent);
+  background: color-mix(in srgb, var(--site-accent) 90%, white);
+  color: #fff;
+  box-shadow: var(--tool-hover-shadow);
   transform: translate(-2px, -2px);
 }
 
-.personal-password-line button:disabled {
+.personal-form button:disabled {
   cursor: wait;
   opacity: 0.76;
-}
-
-.personal-button-spinner {
-  display: none;
 }
 
 .personal-status {
@@ -855,18 +767,8 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
 }
 
 @media (max-width: 760px) {
-  .personal-lock,
   .personal-workspace {
     padding-top: 5.8rem;
-  }
-
-  .personal-lock h1 {
-    max-width: 8ch;
-  }
-
-  .personal-password-line {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: stretch;
   }
 
   .personal-form {
@@ -924,7 +826,7 @@ body:has(.personal-app:not(.is-unlocked)) .post-content {
 }
 
 @media (hover: none), (pointer: coarse) {
-  .personal-password-line button:hover,
+  .personal-form button:hover,
   .personal-home-link:hover,
   .personal-heading button:hover,
   .personal-tracker-link:hover,

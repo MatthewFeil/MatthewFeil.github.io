@@ -4,12 +4,13 @@ import {
   jsonResponse,
   optionsResponse,
   requireAllowedOrigin,
-  verifyPersonalSpaceToken,
+  verifyPersonalSpaceUser,
 } from "../_shared/personal-security.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-const personalSpaceTokenSecret = Deno.env.get("PERSONAL_SPACE_TOKEN_SECRET") || "";
+const publishableKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+const ownerUserId = Deno.env.get("PERSONAL_OWNER_USER_ID") || "";
 const googleServiceAccountJson = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_JSON") || "";
 const googleCalendarId = Deno.env.get("GOOGLE_CALENDAR_ID") || "primary";
 const googleCalendarIds = (Deno.env.get("GOOGLE_CALENDAR_IDS") || "")
@@ -533,7 +534,7 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
   try {
-    const unlocked = await verifyPersonalSpaceToken(request, personalSpaceTokenSecret);
+    const unlocked = await verifyPersonalSpaceUser(request, supabaseUrl, publishableKey, ownerUserId);
     if (!unlocked) return json({ error: "Personal Space unlock required." }, 401);
 
     const body = await request.json().catch(() => ({})) as DashboardBody;

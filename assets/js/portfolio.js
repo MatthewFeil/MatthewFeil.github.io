@@ -1,11 +1,8 @@
 (() => {
-  const TOKEN_KEY = 'personalSpaceToken';
-  const TOKEN_EXPIRY_KEY = 'personalSpaceTokenExpiresAt';
   const app = document.querySelector('.portfolio-app');
   const apiUrl = app.dataset.apiUrl;
   const personalUrl = app.dataset.personalUrl || '/personal/';
   const state = {
-    token: sessionStorage.getItem(TOKEN_KEY) || '',
     stocks: [],
     logs: [],
     quotes: {},
@@ -118,15 +115,8 @@
     })[character]);
   }
 
-  function sessionIsFresh() {
-    const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
-    return Boolean(state.token && Number.isFinite(expiresAt) && expiresAt > Date.now());
-  }
-
-  function clearSession() {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
-    state.token = '';
+  async function hasSession() {
+    return Boolean(await window.PersonalAuth.session());
   }
 
   function redirectToPersonal() {
@@ -153,11 +143,10 @@
   }
 
   async function api(action, payload = {}) {
-    const response = await fetch(apiUrl, {
+    const response = await window.PersonalAuth.authorizedFetch(apiUrl, {
       method: 'POST',
       headers: {
-        'content-type': 'application/json',
-        'x-personal-token': state.token
+        'content-type': 'application/json'
       },
       body: JSON.stringify({ action, ...payload })
     });
@@ -400,8 +389,8 @@
     renderTable();
   });
 
-  els.lockButton.addEventListener('click', () => {
-    clearSession();
+  els.lockButton.addEventListener('click', async () => {
+    await window.PersonalAuth.signOut().catch(() => {});
     closeDialog(els.stockDialog);
     closeDialog(els.logDialog);
     els.workspace.hidden = true;
@@ -509,19 +498,17 @@
   });
 
   async function boot() {
-    if (!sessionIsFresh()) {
-      clearSession();
-      redirectToPersonal();
-      return;
-    }
-
-    els.workspace.hidden = false;
-
     try {
+      if (!await hasSession()) {
+        redirectToPersonal();
+        return;
+      }
+
+      els.workspace.hidden = false;
       await loadPortfolio();
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
-        clearSession();
+        await window.PersonalAuth.signOut().catch(() => {});
         redirectToPersonal();
         return;
       }

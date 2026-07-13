@@ -390,7 +390,7 @@ table {
   gap: clamp(2rem, 6vw, 6rem);
   align-items: center;
   min-width: 0;
-  min-height: calc(100svh - var(--header-height) - clamp(1.3rem, 3.5vw, 3rem));
+  min-height: calc(100svh - var(--header-height));
   padding-bottom: clamp(1.2rem, 4vw, 3rem);
   border-bottom: 2px solid var(--site-border);
 }

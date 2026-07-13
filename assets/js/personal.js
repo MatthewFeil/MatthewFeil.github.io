@@ -1,6 +1,4 @@
 (() => {
-  const TOKEN_KEY = 'personalSpaceToken';
-  const TOKEN_EXPIRY_KEY = 'personalSpaceTokenExpiresAt';
   const app = document.querySelector('[data-personal-app]');
   if (!app) return;
 
@@ -28,6 +26,7 @@
     lock: document.getElementById('personal-lock'),
     workspace: document.getElementById('personal-workspace'),
     form: document.getElementById('personal-unlock-form'),
+    email: document.getElementById('personal-email'),
     password: document.getElementById('personal-password'),
     unlockButton: document.getElementById('personal-unlock-button'),
     unlockLabel: document.querySelector('.personal-button-label'),
@@ -58,19 +57,8 @@
     })[character]);
   }
 
-  function storedSessionIsFresh() {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    const expiresAt = Number(sessionStorage.getItem(TOKEN_EXPIRY_KEY));
-    return Boolean(token && Number.isFinite(expiresAt) && expiresAt > Date.now());
-  }
-
-  function clearSession() {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
-  }
-
-  function sessionToken() {
-    return sessionStorage.getItem(TOKEN_KEY) || '';
+  async function hasSession() {
+    return Boolean(await window.PersonalAuth.session());
   }
 
   function setStatus(message, isError = false) {
@@ -84,7 +72,7 @@
     els.unlockButton.classList.toggle('is-loading', isLoading);
     els.unlockButton.setAttribute('aria-busy', String(isLoading));
     app.classList.toggle('is-loading', isLoading);
-    els.unlockLabel.textContent = isLoading ? 'Checking' : 'Enter';
+    els.unlockLabel.textContent = isLoading ? 'Checking' : 'Sign in';
   }
 
   function setWidgetLoading(widget, isLoading) {
@@ -117,7 +105,7 @@
     els.workspace.hidden = true;
     els.lock.hidden = false;
     app.classList.remove('is-unlocked');
-    els.password.focus();
+    (els.email.value ? els.password : els.email).focus();
   }
 
   function nextPath() {
@@ -126,20 +114,8 @@
     return next;
   }
 
-  async function unlock(password) {
-    const response = await fetch(app.dataset.authUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ action: 'unlockPersonal', password })
-    });
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(data.error || 'The password was not accepted.');
-    }
-
-    sessionStorage.setItem(TOKEN_KEY, data.token);
-    sessionStorage.setItem(TOKEN_EXPIRY_KEY, String(data.expiresAt));
+  async function unlock(email, password) {
+    await window.PersonalAuth.signIn(email, password);
   }
 
   async function loadDashboard() {
@@ -152,11 +128,10 @@
 
     setDashboardLoading(true);
     try {
-      const response = await fetch(app.dataset.dashboardUrl, {
+      const response = await window.PersonalAuth.authorizedFetch(app.dataset.dashboardUrl, {
         method: 'POST',
         headers: {
-          'content-type': 'application/json',
-          'x-personal-token': sessionToken()
+          'content-type': 'application/json'
         },
         body: JSON.stringify({ action: 'summary' })
       });
@@ -347,11 +322,10 @@
 
     try {
       if (app.dataset.dashboardMode === 'live') {
-        const response = await fetch(app.dataset.dashboardUrl, {
+        const response = await window.PersonalAuth.authorizedFetch(app.dataset.dashboardUrl, {
           method: 'POST',
           headers: {
-            'content-type': 'application/json',
-            'x-personal-token': sessionToken()
+            'content-type': 'application/json'
           },
           body: JSON.stringify({ action: 'completeTodoistTask', taskId })
         });
@@ -391,31 +365,33 @@
     setStatus('');
     setLoading(true);
     try {
-      await unlock(els.password.value);
+      await unlock(els.email.value, els.password.value);
       const redirectPath = nextPath();
       if (redirectPath) {
         window.location.href = redirectPath;
         return;
       }
       setStatus('');
+      els.email.value = '';
       els.password.value = '';
       showWorkspace();
     } catch (error) {
-      clearSession();
-      setStatus('Incorrect password.', true);
+      await window.PersonalAuth.signOut().catch(() => {});
+      setStatus('Incorrect email or password.', true);
     } finally {
       setLoading(false);
     }
   });
 
-  els.password.addEventListener('input', () => {
+  [els.email, els.password].forEach((input) => input.addEventListener('input', () => {
     if (app.classList.contains('is-denied')) {
       setStatus('');
     }
-  });
+  }));
 
-  els.lockButton.addEventListener('click', () => {
-    clearSession();
+  els.lockButton.addEventListener('click', async () => {
+    await window.PersonalAuth.signOut().catch(() => {});
+    els.email.value = '';
     els.password.value = '';
     setStatus('');
     showLock();
@@ -427,10 +403,17 @@
     completeTodoistTask(button.dataset.completeTask);
   });
 
-  if (storedSessionIsFresh()) {
-    showWorkspace();
-  } else {
-    clearSession();
+  async function boot() {
+    try {
+      if (await hasSession()) {
+        showWorkspace();
+        return;
+      }
+    } catch {
+      await window.PersonalAuth.signOut().catch(() => {});
+    }
     showLock();
   }
+
+  boot();
 })();
