@@ -2,22 +2,14 @@
   const app = document.querySelector('[data-personal-app]');
   if (!app) return;
 
-  const demoDashboard = {
-    calendar: [
-      { id: 'demo-school', time: '7:45 AM', title: 'School', detail: 'Classes and commute', url: 'https://calendar.google.com/calendar/u/0/r/day' },
-      { id: 'demo-practice', time: '3:30 PM', title: 'Practice block', detail: 'Open time after school', url: 'https://calendar.google.com/calendar/u/0/r/day' },
-      { id: 'demo-review', time: '8:00 PM', title: 'Review tomorrow', detail: 'Calendar and task reset', url: 'https://calendar.google.com/calendar/u/0/r/day' }
-    ],
-    todoist: [
-      { id: 'demo-dashboard', title: 'Finish personal dashboard wiring', time: '8:30 AM', sortTime: 30600000, details: ['Personal site'], priority: 4, priorityClass: 'p4', url: 'https://todoist.com/app/today' },
-      { id: 'demo-lift', title: 'Log today’s lift', details: ['Fitness'], priority: 3, priorityClass: 'p3', url: 'https://todoist.com/app/today' },
-      { id: 'demo-portfolio', title: 'Check portfolio notes', details: ['Finance'], priority: 2, priorityClass: 'p2', url: 'https://todoist.com/app/today' }
-    ]
-  };
-
   const emptyMessages = {
     calendar: 'No events left today.',
     todoist: 'No tasks left today.'
+  };
+
+  const reloadMessages = {
+    calendar: 'Refresh to load events',
+    todoist: 'Refresh to load tasks'
   };
 
   const pendingTodoistCompletions = new Map();
@@ -122,7 +114,7 @@
     els.dashboardDate.textContent = today.format(new Date());
 
     if (app.dataset.dashboardMode !== 'live') {
-      renderDashboard(demoDashboard);
+      renderDashboard({});
       return;
     }
 
@@ -141,18 +133,24 @@
       }
       renderDashboard(data);
     } catch (error) {
-      renderDashboard(demoDashboard);
+      renderDashboard({});
     } finally {
       setDashboardLoading(false);
     }
   }
 
   function renderDashboard(data) {
-    const calendar = Array.isArray(data.calendar) ? data.calendar : demoDashboard.calendar;
-    const todoist = Array.isArray(data.todoist) ? data.todoist : demoDashboard.todoist;
+    if (Array.isArray(data.calendar)) {
+      renderCalendar(data.calendar);
+    } else {
+      renderReloadState(els.calendarWidget, els.calendarCount, els.calendarList, reloadMessages.calendar);
+    }
 
-    renderCalendar(calendar);
-    renderTodoist(sortTodoistTasks(todoist));
+    if (Array.isArray(data.todoist)) {
+      renderTodoist(sortTodoistTasks(data.todoist));
+    } else {
+      renderReloadState(els.todoistWidget, els.todoistCount, els.todoistList, reloadMessages.todoist);
+    }
   }
 
   function renderCalendar(calendar) {
@@ -200,6 +198,16 @@
     list.innerHTML = `
       <li class="personal-empty-message">
         <span>${escapeHtml(message)}</span>
+      </li>
+    `;
+  }
+
+  function renderReloadState(widget, count, list, message) {
+    count.textContent = '0';
+    setWidgetEmpty(widget, true);
+    list.innerHTML = `
+      <li class="personal-empty-message">
+        <button class="personal-reload-message" type="button">${escapeHtml(message)}</button>
       </li>
     `;
   }
@@ -402,6 +410,11 @@
     if (!button) return;
     completeTodoistTask(button.dataset.completeTask);
   });
+
+  [els.calendarList, els.todoistList].forEach((list) => list.addEventListener('click', (event) => {
+    if (!event.target.closest('.personal-reload-message')) return;
+    window.location.reload();
+  }));
 
   async function boot() {
     try {
