@@ -105,7 +105,7 @@
 .portfolio-panel h3,
 .portfolio-dialog-head h3,
 .portfolio-log strong {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -137,6 +137,7 @@
   border: 1px solid var(--portfolio-border);
   border-radius: 0;
   font: inherit;
+  font-family: var(--font-ui);
 }
 
 .portfolio-form select,
@@ -336,7 +337,7 @@
 
 .portfolio-symbol {
   display: block;
-  font-family: var(--font-body);
+  font-family: var(--font-ui);
   font-weight: 800;
 }
 

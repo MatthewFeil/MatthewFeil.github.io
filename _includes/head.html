@@ -3,11 +3,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {%- seo -%}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="{{ "/assets/images/logo.png" | relative_url }}">
-  <link rel="apple-touch-icon" href="{{ "/assets/images/logo.png" | relative_url }}">
+  <link rel="preload" href="{{ "/assets/fonts/montserrat-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ "/assets/fonts/inter-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ "/assets/css/fonts.css" | relative_url }}">
+  <link rel="icon" type="image/png" href="{{ "/assets/images/favicon.png" | relative_url }}">
+  <link rel="apple-touch-icon" href="{{ "/assets/images/favicon.png" | relative_url }}">
   <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
   {% if page.extra_css %}
     {% for stylesheet in page.extra_css %}

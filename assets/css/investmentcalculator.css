@@ -41,6 +41,7 @@
   padding: 0.55rem 0.8rem;
   background: var(--investment-surface);
   color: var(--site-text);
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: var(--tool-label-spacing);
@@ -129,6 +130,7 @@
   border: 1px solid var(--investment-border);
   border-radius: 0;
   font: inherit;
+  font-family: var(--font-ui);
   font-size: 0.95rem;
 }
 
@@ -176,6 +178,7 @@
   color: transparent;
   cursor: pointer;
   font: inherit;
+  font-family: var(--font-ui);
   font-weight: 800;
   caret-color: transparent;
   -webkit-text-fill-color: transparent;

@@ -9,9 +9,9 @@ permalink: /cta-l-live-art/
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chicago 'L' Live Art</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="{{ "/assets/fonts/montserrat-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ "/assets/fonts/inter-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ "/assets/css/fonts.css" | relative_url }}">
     <script>
       window.CTA_LIVE_ART_CONFIG = {
         apiUrl: "https://cta-l-live-art.matthewfeil.workers.dev/api/trains",
@@ -89,6 +89,27 @@ permalink: /cta-l-live-art/
     <script type="module" crossorigin src="{{ "/assets/cta-l-live-art/index-DFaGMNlx.js" | relative_url }}"></script>
     <link rel="stylesheet" crossorigin href="{{ "/assets/cta-l-live-art/index-DD-OmGjU.css" | relative_url }}">
     <style>
+      :root {
+        --font-display: "Montserrat", "Avenir Next", Arial, sans-serif;
+        --font-ui: "Montserrat", "Avenir Next", Arial, sans-serif;
+        --font-body: "Inter", Arial, sans-serif;
+        font-family: var(--font-body);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      button,
+      label,
+      .status-pill {
+        font-family: var(--font-ui);
+      }
+
+      .site-home-link {
+        font-weight: 800;
+      }
+
       button,
       .status-pill,
       .settings-panel,
