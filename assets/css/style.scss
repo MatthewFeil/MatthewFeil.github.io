@@ -155,7 +155,7 @@ table {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: color-mix(in srgb, var(--site-bg) 85%, transparent);
+  background: color-mix(in srgb, var(--site-bg) 90%, transparent);
   border-bottom: 2px solid var(--site-border);
   backdrop-filter: blur(14px);
   transition: padding-bottom 0.22s ease;
