@@ -302,7 +302,7 @@
     const timeoutId = window.setTimeout(() => {
       pendingTodoistCompletions.delete(taskId);
       finishTodoistCompletion(taskId, taskRow, button);
-    }, 3000);
+    }, 1500);
     pendingTodoistCompletions.set(taskId, timeoutId);
     syncTodoistCompletionLoading();
   }

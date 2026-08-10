@@ -545,6 +545,11 @@
 }
 
 @media (max-width: 640px) {
+  .investment-tool-switcher {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
   .investment-tool-switcher a {
     display: flex;
     min-height: var(--touch-target);

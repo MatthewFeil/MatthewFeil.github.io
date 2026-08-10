@@ -335,11 +335,10 @@
         <div class="lifting-card-summary">
           <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
             <div class="lifting-card-title">
-              <h3>
-                ${escapeHtml(item.lift.name)}
-                ${equipmentTypeForLift(item.lift) === 'other' ? '' : `<span class="lifting-equipment-badge" title="${escapeHtml(equipmentForLift(item.lift).label)} lift" aria-label="${escapeHtml(equipmentForLift(item.lift).label)} lift">${escapeHtml(equipmentForLift(item.lift).badge)}</span>`}
-              </h3>
-              <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
+              <h3>${escapeHtml(item.lift.name)}</h3>
+              <div class="lifting-card-meta">
+                <span class="lifting-equipment-badge" title="${escapeHtml(equipmentForLift(item.lift).label)} lift" aria-label="${escapeHtml(equipmentForLift(item.lift).label)} lift">${escapeHtml(equipmentForLift(item.lift).badge)}</span>
+              </div>
             </div>
             <div class="lifting-row-metric">
               <span>Actual 1RM</span>

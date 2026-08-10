@@ -148,7 +148,7 @@ table {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: color-mix(in srgb, var(--site-bg) 94%, transparent);
+  background: color-mix(in srgb, var(--site-bg) 85%, transparent);
   border-bottom: 2px solid var(--site-border);
   backdrop-filter: blur(14px);
   transition: padding-bottom 0.22s ease;
@@ -950,10 +950,6 @@ table {
 }
 
 @media (max-width: 1040px) {
-  .site-header {
-    background: var(--site-bg);
-    backdrop-filter: none;
-  }
   .site-header-inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;

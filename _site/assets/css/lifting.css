@@ -441,10 +441,6 @@
   letter-spacing: 0;
 }
 
-.lifting-card-title .lifting-equipment-badge {
-  margin-left: 0.35rem;
-}
-
 .lifting-panel h3,
 .lifting-modal h3,
 .lifting-subhead {
@@ -831,7 +827,7 @@
 
   .lifting-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0.65rem 4.45rem 0.65rem 0.65rem;
+    padding: 0.65rem 4rem 0.65rem 0.65rem;
   }
 
   .lifting-card-log {
