@@ -22,6 +22,14 @@ function cleanNumber(value: unknown) {
   return Number.isFinite(num) ? num : NaN;
 }
 
+const equipmentTypes = new Set(["dumbbell", "machine", "barbell", "other"]);
+
+function cleanEquipmentType(value: unknown, usesDumbbells: unknown) {
+  const equipmentType = String(value || "").trim().toLowerCase();
+  if (equipmentTypes.has(equipmentType)) return equipmentType;
+  return usesDumbbells === true ? "dumbbell" : "other";
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return optionsResponse(req);
 
@@ -42,7 +50,7 @@ Deno.serve(async (req: Request) => {
   try {
     if (action === "list") {
       const [{ data: lifts, error: liftsError }, { data: logs, error: logsError }] = await Promise.all([
-        supabase.from("lifting_lifts").select("id,name,created_at").order("name", { ascending: true }),
+        supabase.from("lifting_lifts").select("id,name,equipment_type,uses_dumbbells,created_at").order("name", { ascending: true }),
         supabase
           .from("lifting_logs")
           .select("id,lift_id,lifted_at,weight,reps,notes,created_at")
@@ -56,12 +64,16 @@ Deno.serve(async (req: Request) => {
 
     if (action === "addLift") {
       const name = cleanName(body.name);
+      const equipmentType = cleanEquipmentType(body.equipment_type, body.uses_dumbbells);
       if (!name) return json({ error: "Lift name is required." }, 400);
       const { data, error } = await supabase
         .from("lifting_lifts")
-        .insert({ name })
-        .select("id,name,created_at")
+        .insert({ name, equipment_type: equipmentType, uses_dumbbells: equipmentType === "dumbbell" })
+        .select("id,name,equipment_type,uses_dumbbells,created_at")
         .single();
+      if (error?.code === "23505") {
+        return json({ error: "A lift with this name and equipment type already exists." }, 409);
+      }
       if (error) throw error;
       return json({ lift: data });
     }
@@ -69,14 +81,18 @@ Deno.serve(async (req: Request) => {
     if (action === "renameLift") {
       const id = String(body.id || "");
       const name = cleanName(body.name);
+      const equipmentType = cleanEquipmentType(body.equipment_type, body.uses_dumbbells);
       if (!id) return json({ error: "Choose a lift." }, 400);
       if (!name) return json({ error: "Lift name is required." }, 400);
       const { data, error } = await supabase
         .from("lifting_lifts")
-        .update({ name })
+        .update({ name, equipment_type: equipmentType, uses_dumbbells: equipmentType === "dumbbell" })
         .eq("id", id)
-        .select("id,name,created_at")
+        .select("id,name,equipment_type,uses_dumbbells,created_at")
         .single();
+      if (error?.code === "23505") {
+        return json({ error: "A lift with this name and equipment type already exists." }, 409);
+      }
       if (error) throw error;
       return json({ lift: data });
     }

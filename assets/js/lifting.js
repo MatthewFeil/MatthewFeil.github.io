@@ -14,6 +14,28 @@
     9: 0.77,
     10: 0.75
   };
+  const equipmentTypes = {
+    dumbbell: {
+      label: 'Dumbbell',
+      badge: 'Dumbbell',
+      instruction: 'Enter the weight of one dumbbell.'
+    },
+    machine: {
+      label: 'Machine',
+      badge: 'Machine',
+      instruction: 'Enter the weight set on the machine.'
+    },
+    barbell: {
+      label: 'Barbell',
+      badge: 'Barbell',
+      instruction: 'Enter the total weight or use the plate calculator.'
+    },
+    other: {
+      label: 'Other',
+      badge: 'Other',
+      instruction: 'Enter the total weight.'
+    }
+  };
 
   const state = {
     lifts: [],
@@ -37,16 +59,25 @@
     addLiftClose: document.getElementById('add-lift-close'),
     addLiftModal: document.getElementById('add-lift-modal'),
     addLiftForm: document.getElementById('add-lift-form'),
+    addLiftError: document.getElementById('add-lift-error'),
     liftName: document.getElementById('lift-name'),
     renameLiftModal: document.getElementById('rename-lift-modal'),
     renameLiftClose: document.getElementById('rename-lift-close'),
     renameLiftForm: document.getElementById('rename-lift-form'),
     renameLiftId: document.getElementById('rename-lift-id'),
     renameLiftName: document.getElementById('rename-lift-name'),
+    renameLiftEquipmentType: document.getElementById('rename-lift-equipment-type'),
     logForm: document.getElementById('log-form'),
     logLiftSearch: document.getElementById('log-lift-search'),
     logLiftSearchStatus: document.getElementById('log-lift-search-status'),
     logLift: document.getElementById('log-lift'),
+    logEquipmentNote: document.getElementById('log-equipment-note'),
+    logEquipmentBadge: document.getElementById('log-equipment-badge'),
+    logEquipmentInstruction: document.getElementById('log-equipment-instruction'),
+    barbellCalculator: document.getElementById('barbell-calculator'),
+    barbellTotal: document.getElementById('barbell-total'),
+    plateInputs: [...document.querySelectorAll('[data-plate-weight]')],
+    logWeight: document.getElementById('log-weight'),
     logDate: document.getElementById('log-date'),
     search: document.getElementById('lift-search'),
     list: document.getElementById('lifting-list'),
@@ -128,6 +159,50 @@
     return { lift, logs, realOneRep, theoreticalOneRep };
   }
 
+  function equipmentTypeForLift(lift) {
+    if (equipmentTypes[lift?.equipment_type]) return lift.equipment_type;
+    return lift?.uses_dumbbells ? 'dumbbell' : 'other';
+  }
+
+  function equipmentForLift(lift) {
+    return equipmentTypes[equipmentTypeForLift(lift)];
+  }
+
+  function updatePlateCalculator() {
+    const platesPerSide = els.plateInputs.reduce((total, input) => {
+      const plateCount = Math.max(0, Math.trunc(Number(input.value) || 0));
+      input.value = String(plateCount);
+      return total + (Number(input.dataset.plateWeight) * plateCount);
+    }, 0);
+    const totalWeight = 45 + (platesPerSide * 2);
+    els.barbellTotal.textContent = `${totalWeight} lb total`;
+    els.logWeight.value = String(totalWeight);
+  }
+
+  function resetPlateCalculator() {
+    els.plateInputs.forEach((input) => {
+      input.value = '0';
+    });
+    els.barbellTotal.textContent = '45 lb total';
+  }
+
+  function updateLogEquipmentInterface() {
+    const selectedLift = state.lifts.find((lift) => lift.id === els.logLift.value);
+    if (!selectedLift) {
+      els.logEquipmentNote.hidden = true;
+      els.barbellCalculator.hidden = true;
+      return;
+    }
+
+    const equipment = equipmentForLift(selectedLift);
+    els.logEquipmentBadge.textContent = equipment.badge;
+    els.logEquipmentInstruction.textContent = equipment.instruction;
+    els.logEquipmentNote.hidden = false;
+    const equipmentType = equipmentTypeForLift(selectedLift);
+    els.barbellCalculator.hidden = equipmentType !== 'barbell';
+    if (equipmentType === 'barbell') updatePlateCalculator();
+  }
+
   function renderLiftOptions() {
     const submitButton = els.logForm.querySelector('button[type="submit"]');
 
@@ -136,6 +211,8 @@
       els.logLiftSearch.value = '';
       els.logLiftSearch.disabled = true;
       els.logLiftSearchStatus.textContent = '';
+      els.logEquipmentNote.hidden = true;
+      els.barbellCalculator.hidden = true;
       submitButton.disabled = true;
       els.logSetOpen.disabled = true;
       return;
@@ -153,13 +230,14 @@
     submitButton.disabled = !filteredLifts.length;
     els.logLift.innerHTML = filteredLifts.length
       ? filteredLifts
-      .map((lift) => `<option value="${escapeHtml(lift.id)}">${escapeHtml(lift.name)}</option>`)
+      .map((lift) => `<option value="${escapeHtml(lift.id)}">${escapeHtml(lift.name)} (${escapeHtml(equipmentForLift(lift).badge)})</option>`)
       .join('')
       : '<option value="">No matching lifts</option>';
     els.logLift.value = nextSelection;
     els.logLiftSearchStatus.textContent = state.logLiftQuery && !filteredLifts.length
       ? 'No matching lifts.'
       : '';
+    updateLogEquipmentInterface();
   }
 
   function renderRepGrid(theoreticalOneRep) {
@@ -217,6 +295,7 @@
 
     els.renameLiftId.value = lift.id;
     els.renameLiftName.value = lift.name;
+    els.renameLiftEquipmentType.value = equipmentTypeForLift(lift);
     els.renameLiftModal.showModal();
     els.renameLiftName.focus();
     els.renameLiftName.select();
@@ -225,12 +304,15 @@
   function openLogSetModal(liftId = '') {
     state.logLiftQuery = '';
     els.logLiftSearch.value = '';
+    resetPlateCalculator();
     renderLiftOptions();
 
     const hasLift = liftId && state.lifts.some((lift) => lift.id === liftId);
     if (hasLift) {
       els.logLift.value = liftId;
     }
+
+    updateLogEquipmentInterface();
 
     els.logSetModal.showModal();
     (hasLift ? document.getElementById('log-weight') : els.logLiftSearch).focus();
@@ -253,7 +335,10 @@
         <div class="lifting-card-summary">
           <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
             <div class="lifting-card-title">
-              <h3>${escapeHtml(item.lift.name)}</h3>
+              <h3>
+                ${escapeHtml(item.lift.name)}
+                ${equipmentTypeForLift(item.lift) === 'other' ? '' : `<span class="lifting-equipment-badge" title="${escapeHtml(equipmentForLift(item.lift).label)} lift" aria-label="${escapeHtml(equipmentForLift(item.lift).label)} lift">${escapeHtml(equipmentForLift(item.lift).badge)}</span>`}
+              </h3>
               <div class="lifting-card-meta">${item.logs.length} log${item.logs.length === 1 ? '' : 's'}</div>
             </div>
             <div class="lifting-row-metric">
@@ -272,7 +357,7 @@
             ${renderRepGrid(item.theoreticalOneRep)}
             <div class="lifting-detail-actions">
               <button class="lifting-action" type="button" data-open-logs="${escapeHtml(item.lift.id)}">View logs</button>
-              <button class="lifting-action" type="button" data-rename-lift="${escapeHtml(item.lift.id)}">Rename</button>
+              <button class="lifting-action" type="button" data-rename-lift="${escapeHtml(item.lift.id)}">Edit</button>
             </div>
           </section>
         </div>
@@ -303,6 +388,7 @@
   });
 
   els.addLiftOpen.addEventListener('click', () => {
+    els.addLiftError.textContent = '';
     els.addLiftModal.showModal();
     els.liftName.focus();
   });
@@ -349,12 +435,17 @@
     const submitButton = els.addLiftForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Creating...');
     setStatus('');
+    els.addLiftError.textContent = '';
     try {
-      await api('addLift', { name: form.get('name') });
+      await api('addLift', {
+        name: form.get('name'),
+        equipment_type: form.get('equipment_type')
+      });
       els.addLiftForm.reset();
       els.addLiftModal.close();
       await loadLifts();
     } catch (error) {
+      els.addLiftError.textContent = error.message;
       setStatus(error.message, true);
     } finally {
       setButtonLoading(submitButton, false);
@@ -400,7 +491,8 @@
     try {
       await api('renameLift', {
         id,
-        name: form.get('name')
+        name: form.get('name'),
+        equipment_type: form.get('equipment_type')
       });
       els.renameLiftModal.close();
       await loadLifts();
@@ -420,6 +512,9 @@
     state.logLiftQuery = els.logLiftSearch.value.trim();
     renderLiftOptions();
   });
+
+  els.logLift.addEventListener('change', updateLogEquipmentInterface);
+  els.plateInputs.forEach((input) => input.addEventListener('input', updatePlateCalculator));
 
   document.addEventListener('click', async (event) => {
     const toggleButton = event.target.closest('[data-toggle-lift]');

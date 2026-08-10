@@ -431,6 +431,19 @@
 }
 
 @media (max-width: 760px) {
+  #log-dialog {
+    width: min(88vw, 440px);
+    max-width: calc(100vw - 2rem);
+    padding: 1rem;
+  }
+
+  #log-dialog .portfolio-form input,
+  #log-dialog .portfolio-form select,
+  #log-dialog .portfolio-form button {
+    width: 100%;
+    min-width: 0;
+  }
+
   .portfolio-summary {
     grid-template-columns: 1fr;
   }
