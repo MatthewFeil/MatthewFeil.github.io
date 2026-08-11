@@ -3,7 +3,7 @@ layout: page
 title: Lifting Tracker
 permalink: /lifting/
 extra_css:
-  - /assets/css/lifting.css
+  - /assets/css/lifting.css?v=20260810-4
 ---
 
 <section
@@ -50,7 +50,7 @@ extra_css:
         <option value="other" selected>Other</option>
       </select>
       <p class="lifting-form-error" id="add-lift-error" role="alert"></p>
-      <button type="submit">Create lift</button>
+      <button type="submit" disabled>Create lift</button>
     </form>
   </dialog>
 
@@ -60,41 +60,68 @@ extra_css:
         <h3>Log a set</h3>
         <button id="log-set-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
-      <label for="log-lift-search">Find lift</label>
-      <input id="log-lift-search" type="search" placeholder="Bench, squat, deadlift..." autocomplete="off">
-      <label for="log-lift">Lift</label>
-      <select id="log-lift" name="lift_id" required></select>
-      <p class="lifting-equipment-note" id="log-equipment-note" hidden>
-        <span class="lifting-equipment-badge" id="log-equipment-badge" aria-hidden="true"></span>
-        <span id="log-equipment-instruction"></span>
-      </p>
-      <p class="lifting-select-status" id="log-lift-search-status" role="status"></p>
-      <div class="lifting-barbell-calculator" id="barbell-calculator" hidden>
-        <div class="lifting-barbell-head">
-          <div>
-            <span class="lifting-barbell-title">Plate calculator</span>
-            <small>45 lb bar · plates per side</small>
-          </div>
-          <strong id="barbell-total">45 lb total</strong>
-        </div>
-        <div class="lifting-plate-grid">
-          <label><span>45 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="45"></label>
-          <label><span>25 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="25"></label>
-          <label><span>15 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="15"></label>
-          <label><span>10 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="10"></label>
-          <label><span>5 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="5"></label>
-          <label><span>2.5 lb</span><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="2.5"></label>
-        </div>
-      </div>
-      <label for="log-weight">Weight</label>
-      <input id="log-weight" name="weight" type="number" min="0" step="0.5" placeholder="225" required>
-      <label for="log-reps">Reps</label>
-      <input id="log-reps" name="reps" type="number" min="1" max="10" step="1" placeholder="5" required>
       <label for="log-date">Date</label>
       <input id="log-date" name="lifted_at" type="date" required>
-      <label for="log-notes">Notes</label>
-      <input id="log-notes" name="notes" type="text" placeholder="Optional">
-      <button type="submit">Add log</button>
+      <label for="log-lift-search">Lift</label>
+      <div class="lifting-lift-picker" id="log-lift-picker">
+        <div class="lifting-combobox-control">
+          <input id="log-lift-search" type="search" placeholder="Search or choose a lift" autocomplete="off" role="combobox" aria-controls="log-lift-options" aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list" required>
+          <button class="lifting-combobox-toggle" id="log-lift-toggle" type="button" aria-label="Show lifts" aria-controls="log-lift-menu" aria-expanded="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4"/></svg>
+          </button>
+        </div>
+        <div class="lifting-combobox-menu" id="log-lift-menu" hidden>
+          <div class="lifting-equipment-filters" aria-label="Filter lifts by equipment">
+            <span>Equipment</span>
+            <button type="button" data-log-equipment-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-log-equipment-filter="dumbbell" aria-pressed="false">Dumbbell</button>
+            <button type="button" data-log-equipment-filter="machine" aria-pressed="false">Machine</button>
+            <button type="button" data-log-equipment-filter="barbell" aria-pressed="false">Barbell</button>
+            <button type="button" data-log-equipment-filter="other" aria-pressed="false">Other</button>
+          </div>
+          <div class="lifting-combobox-results" id="log-lift-options" role="listbox" aria-label="Lifts"></div>
+        </div>
+      </div>
+      <input id="log-lift" name="lift_id" type="hidden" data-required-value>
+      <p class="lifting-select-status" id="log-lift-search-status" role="status"></p>
+      <div class="lifting-log-measurements">
+        <div class="lifting-log-field">
+          <label for="log-weight">Weight</label>
+          <p class="lifting-equipment-note" id="log-equipment-note" hidden>
+            <span class="lifting-equipment-badge" id="log-equipment-badge" aria-hidden="true"></span>
+            <span id="log-equipment-instruction"></span>
+          </p>
+          <input id="log-weight" name="weight" type="number" min="0.5" step="0.5" placeholder="225" required>
+        </div>
+        <div class="lifting-log-field">
+          <label for="log-reps">Reps</label>
+          <input id="log-reps" name="reps" type="number" min="1" max="10" step="1" placeholder="5" required>
+        </div>
+      </div>
+      <div class="lifting-barbell-calculator" id="barbell-calculator" hidden>
+        <button class="lifting-plate-toggle" id="plate-calculator-toggle" type="button" aria-expanded="false" aria-controls="plate-calculator-panel">
+          <span>Plate calculator</span>
+          <span class="lifting-plate-toggle-meta"><svg class="lifting-plate-chevron" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4"/></svg></span>
+        </button>
+        <div class="lifting-plate-panel" id="plate-calculator-panel" aria-hidden="true" inert>
+          <div class="lifting-barbell-head">
+            <div>
+              <span class="lifting-barbell-title">Plate calculator</span>
+              <small>45 lb bar · plates per side</small>
+            </div>
+            <strong data-barbell-total>45 lb total</strong>
+          </div>
+          <div class="lifting-plate-grid">
+            <div class="lifting-plate-option"><span>45 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 45 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="45" aria-label="45 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 45 pound plate per side">+</button></span></div>
+            <div class="lifting-plate-option"><span>25 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 25 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="25" aria-label="25 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 25 pound plate per side">+</button></span></div>
+            <div class="lifting-plate-option"><span>15 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 15 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="15" aria-label="15 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 15 pound plate per side">+</button></span></div>
+            <div class="lifting-plate-option"><span>10 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 10 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="10" aria-label="10 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 10 pound plate per side">+</button></span></div>
+            <div class="lifting-plate-option"><span>5 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 5 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="5" aria-label="5 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 5 pound plate per side">+</button></span></div>
+            <div class="lifting-plate-option"><span>2.5 lb</span><span class="lifting-plate-stepper"><button type="button" data-plate-adjust="-1" aria-label="Remove one 2.5 pound plate per side">−</button><input type="number" min="0" step="1" value="0" inputmode="numeric" data-plate-weight="2.5" aria-label="2.5 pound plates per side"><button type="button" data-plate-adjust="1" aria-label="Add one 2.5 pound plate per side">+</button></span></div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" disabled>Add log</button>
     </form>
   </dialog>
 
@@ -114,7 +141,7 @@ extra_css:
         <option value="barbell">Barbell</option>
         <option value="other">Other</option>
       </select>
-      <button type="submit">Save lift</button>
+      <button type="submit" disabled>Save lift</button>
     </form>
   </dialog>
 
@@ -132,4 +159,4 @@ extra_css:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.3/dist/umd/supabase.js" defer></script>
 <script src="{{ "/assets/js/personal-auth.js" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/lifting.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/lifting.js" | relative_url }}?v=20260810-4" defer></script>

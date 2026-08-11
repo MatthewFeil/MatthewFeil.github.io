@@ -99,10 +99,28 @@
     if (!button.dataset.defaultText) {
       button.dataset.defaultText = button.textContent;
     }
-    button.disabled = isLoading;
     button.classList.toggle('is-loading', isLoading);
     button.setAttribute('aria-busy', String(isLoading));
     button.textContent = isLoading ? loadingText : button.dataset.defaultText;
+    button.disabled = isLoading || (button.form ? !formIsComplete(button.form) : false);
+  }
+
+  function formIsComplete(form) {
+    const requiredTextFields = form.querySelectorAll('input[required][type="text"], input[required][type="search"], textarea[required]');
+    return form.checkValidity() && [...requiredTextFields].every((field) => field.value.trim());
+  }
+
+  function syncSubmitButton(form) {
+    const button = form.querySelector('button[type="submit"]');
+    if (!button || button.classList.contains('is-loading')) return;
+    button.disabled = !formIsComplete(form);
+  }
+
+  function watchFormCompletion(form) {
+    form.addEventListener('input', () => syncSubmitButton(form));
+    form.addEventListener('change', () => syncSubmitButton(form));
+    form.addEventListener('reset', () => setTimeout(() => syncSubmitButton(form), 0));
+    syncSubmitButton(form);
   }
 
   function escapeHtml(value) {
@@ -310,6 +328,7 @@
     els.logStock.innerHTML = state.stocks
       .map((stock) => `<option value="${escapeHtml(stock.id)}">${escapeHtml(stock.symbol)}</option>`)
       .join('');
+    syncSubmitButton(els.logForm);
   }
 
   function renderTable() {
@@ -383,6 +402,7 @@
 
   els.logDate.valueAsDate = new Date();
   els.performancePeriod.value = state.performancePeriod;
+  [els.stockForm, els.logForm].forEach(watchFormCompletion);
 
   els.performancePeriod.addEventListener('change', () => {
     state.performancePeriod = periods[els.performancePeriod.value] ? els.performancePeriod.value : 'all';
@@ -398,6 +418,7 @@
   });
 
   els.openStockDialog.addEventListener('click', () => {
+    syncSubmitButton(els.stockForm);
     openDialog(els.stockDialog);
     document.getElementById('stock-symbol').focus();
   });
@@ -409,6 +430,7 @@
       document.getElementById('stock-symbol').focus();
       return;
     }
+    syncSubmitButton(els.logForm);
     openDialog(els.logDialog);
     els.logStock.focus();
   });
@@ -429,6 +451,10 @@
 
   els.stockForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!formIsComplete(els.stockForm)) {
+      syncSubmitButton(els.stockForm);
+      return;
+    }
     const form = new FormData(els.stockForm);
     const submitButton = els.stockForm.querySelector('button[type="submit"]');
     const symbol = String(form.get('symbol')).trim().toUpperCase();
@@ -449,6 +475,10 @@
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!formIsComplete(els.logForm)) {
+      syncSubmitButton(els.logForm);
+      return;
+    }
     const form = new FormData(els.logForm);
     const submitButton = els.logForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Adding...');

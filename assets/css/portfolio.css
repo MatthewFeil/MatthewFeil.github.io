@@ -226,12 +226,14 @@
 .portfolio-form button:disabled,
 .portfolio-toolbar button:disabled,
 .portfolio-action:disabled {
-  cursor: wait;
-  opacity: 0.82;
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .portfolio-form button.is-loading,
 .portfolio-action.is-loading {
+  cursor: wait;
+  opacity: 0.82;
   overflow: hidden;
 }
 

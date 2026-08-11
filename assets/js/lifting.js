@@ -18,22 +18,22 @@
     dumbbell: {
       label: 'Dumbbell',
       badge: 'Dumbbell',
-      instruction: 'Enter the weight of one dumbbell.'
+      instruction: 'Per-dumbbell weight.'
     },
     machine: {
       label: 'Machine',
       badge: 'Machine',
-      instruction: 'Enter the weight set on the machine.'
+      instruction: 'Machine setting.'
     },
     barbell: {
       label: 'Barbell',
       badge: 'Barbell',
-      instruction: 'Enter the total weight or use the plate calculator.'
+      instruction: 'Total or use plates.'
     },
     other: {
       label: 'Other',
       badge: 'Other',
-      instruction: 'Enter the total weight.'
+      instruction: 'Total weight.'
     }
   };
 
@@ -41,7 +41,9 @@
     lifts: [],
     logs: [],
     query: '',
-    logLiftQuery: ''
+    logLiftQuery: '',
+    logEquipmentFilter: 'all',
+    logActiveOptionIndex: -1
   };
 
   const els = {
@@ -68,14 +70,21 @@
     renameLiftName: document.getElementById('rename-lift-name'),
     renameLiftEquipmentType: document.getElementById('rename-lift-equipment-type'),
     logForm: document.getElementById('log-form'),
+    logLiftPicker: document.getElementById('log-lift-picker'),
     logLiftSearch: document.getElementById('log-lift-search'),
+    logLiftToggle: document.getElementById('log-lift-toggle'),
+    logLiftMenu: document.getElementById('log-lift-menu'),
+    logLiftOptions: document.getElementById('log-lift-options'),
+    logEquipmentFilters: [...document.querySelectorAll('[data-log-equipment-filter]')],
     logLiftSearchStatus: document.getElementById('log-lift-search-status'),
     logLift: document.getElementById('log-lift'),
     logEquipmentNote: document.getElementById('log-equipment-note'),
     logEquipmentBadge: document.getElementById('log-equipment-badge'),
     logEquipmentInstruction: document.getElementById('log-equipment-instruction'),
     barbellCalculator: document.getElementById('barbell-calculator'),
-    barbellTotal: document.getElementById('barbell-total'),
+    plateCalculatorToggle: document.getElementById('plate-calculator-toggle'),
+    plateCalculatorPanel: document.getElementById('plate-calculator-panel'),
+    barbellTotals: [...document.querySelectorAll('[data-barbell-total]')],
     plateInputs: [...document.querySelectorAll('[data-plate-weight]')],
     logWeight: document.getElementById('log-weight'),
     logDate: document.getElementById('log-date'),
@@ -83,7 +92,6 @@
     list: document.getElementById('lifting-list'),
     status: document.getElementById('lifting-status')
   };
-
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.style.color = isError ? 'var(--lifting-warn)' : '';
@@ -96,10 +104,31 @@
     if (!button.dataset.defaultText) {
       button.dataset.defaultText = button.textContent;
     }
-    button.disabled = isLoading;
     button.classList.toggle('is-loading', isLoading);
     button.setAttribute('aria-busy', String(isLoading));
     button.textContent = isLoading ? loadingText : button.dataset.defaultText;
+    button.disabled = isLoading || (button.form ? !formIsComplete(button.form) : false);
+  }
+
+  function formIsComplete(form) {
+    const requiredTextFields = form.querySelectorAll('input[required][type="text"], input[required][type="search"], textarea[required]');
+    const requiredValues = form.querySelectorAll('[data-required-value]');
+    return form.checkValidity()
+      && [...requiredTextFields].every((field) => field.value.trim())
+      && [...requiredValues].every((field) => field.value);
+  }
+
+  function syncSubmitButton(form) {
+    const button = form.querySelector('button[type="submit"]');
+    if (!button || button.classList.contains('is-loading')) return;
+    button.disabled = !formIsComplete(form);
+  }
+
+  function watchFormCompletion(form) {
+    form.addEventListener('input', () => syncSubmitButton(form));
+    form.addEventListener('change', () => syncSubmitButton(form));
+    form.addEventListener('reset', () => setTimeout(() => syncSubmitButton(form), 0));
+    syncSubmitButton(form);
   }
 
   async function hasSession() {
@@ -175,15 +204,29 @@
       return total + (Number(input.dataset.plateWeight) * plateCount);
     }, 0);
     const totalWeight = 45 + (platesPerSide * 2);
-    els.barbellTotal.textContent = `${totalWeight} lb total`;
+    els.barbellTotals.forEach((total) => {
+      total.textContent = `${totalWeight} lb total`;
+    });
     els.logWeight.value = String(totalWeight);
+    syncSubmitButton(els.logForm);
   }
 
   function resetPlateCalculator() {
     els.plateInputs.forEach((input) => {
       input.value = '0';
     });
-    els.barbellTotal.textContent = '45 lb total';
+    els.barbellTotals.forEach((total) => {
+      total.textContent = '45 lb total';
+    });
+  }
+
+  function setPlateCalculatorOpen(isOpen) {
+    const shouldOpen = Boolean(isOpen);
+    const shouldHide = !shouldOpen;
+    els.plateCalculatorPanel.classList.toggle('is-open', shouldOpen);
+    els.plateCalculatorPanel.toggleAttribute('inert', shouldHide);
+    els.plateCalculatorPanel.setAttribute('aria-hidden', String(shouldHide));
+    els.plateCalculatorToggle.setAttribute('aria-expanded', String(shouldOpen));
   }
 
   function updateLogEquipmentInterface() {
@@ -191,6 +234,7 @@
     if (!selectedLift) {
       els.logEquipmentNote.hidden = true;
       els.barbellCalculator.hidden = true;
+      setPlateCalculatorOpen(false);
       return;
     }
 
@@ -200,16 +244,23 @@
     els.logEquipmentNote.hidden = false;
     const equipmentType = equipmentTypeForLift(selectedLift);
     els.barbellCalculator.hidden = equipmentType !== 'barbell';
-    if (equipmentType === 'barbell') updatePlateCalculator();
+    if (equipmentType === 'barbell') {
+      updatePlateCalculator();
+      setPlateCalculatorOpen(false);
+    } else {
+      setPlateCalculatorOpen(false);
+    }
   }
 
   function renderLiftOptions() {
     const submitButton = els.logForm.querySelector('button[type="submit"]');
 
     if (!state.lifts.length) {
-      els.logLift.innerHTML = '<option value="">Add a lift first</option>';
       els.logLiftSearch.value = '';
       els.logLiftSearch.disabled = true;
+      els.logLiftToggle.disabled = true;
+      els.logLift.value = '';
+      els.logLiftOptions.innerHTML = '<div class="lifting-combobox-empty" role="option" aria-disabled="true">Add a lift first.</div>';
       els.logLiftSearchStatus.textContent = '';
       els.logEquipmentNote.hidden = true;
       els.barbellCalculator.hidden = true;
@@ -218,26 +269,85 @@
       return;
     }
 
-    const query = state.logLiftQuery.toLowerCase();
-    const filteredLifts = state.lifts.filter((lift) => lift.name.toLowerCase().includes(query));
-    const currentSelection = els.logLift.value;
-    const nextSelection = filteredLifts.some((lift) => lift.id === currentSelection)
-      ? currentSelection
-      : filteredLifts[0]?.id || '';
-
     els.logLiftSearch.disabled = false;
+    els.logLiftToggle.disabled = false;
     els.logSetOpen.disabled = false;
-    submitButton.disabled = !filteredLifts.length;
-    els.logLift.innerHTML = filteredLifts.length
-      ? filteredLifts
-      .map((lift) => `<option value="${escapeHtml(lift.id)}">${escapeHtml(lift.name)} (${escapeHtml(equipmentForLift(lift).badge)})</option>`)
-      .join('')
-      : '<option value="">No matching lifts</option>';
-    els.logLift.value = nextSelection;
-    els.logLiftSearchStatus.textContent = state.logLiftQuery && !filteredLifts.length
-      ? 'No matching lifts.'
-      : '';
+    renderLogLiftResults();
+    const selectedLift = state.lifts.find((lift) => lift.id === els.logLift.value);
+    if (selectedLift) {
+      els.logLiftSearch.value = selectedLift.name;
+      updateLogEquipmentInterface();
+    } else {
+      els.logLift.value = '';
+      updateLogEquipmentInterface();
+    }
+    syncSubmitButton(els.logForm);
+  }
+
+  function filteredLogLifts() {
+    const query = state.logLiftQuery.toLowerCase();
+    return state.lifts.filter((lift) => (
+      (!query || lift.name.toLowerCase().includes(query))
+      && (state.logEquipmentFilter === 'all' || equipmentTypeForLift(lift) === state.logEquipmentFilter)
+    ));
+  }
+
+  function renderLogLiftResults() {
+    const filteredLifts = filteredLogLifts();
+    state.logActiveOptionIndex = Math.min(state.logActiveOptionIndex, filteredLifts.length - 1);
+    const selectedLiftId = els.logLift.value;
+    els.logEquipmentFilters.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.logEquipmentFilter === state.logEquipmentFilter));
+    });
+    els.logLiftOptions.innerHTML = filteredLifts.length
+      ? filteredLifts.map((lift, index) => `
+        <button
+          class="lifting-combobox-option${index === state.logActiveOptionIndex ? ' is-active' : ''}"
+          id="log-lift-option-${index}"
+          type="button"
+          role="option"
+          aria-selected="${String(lift.id === selectedLiftId)}"
+          data-log-lift-option="${escapeHtml(lift.id)}"
+        >
+          <span>${escapeHtml(lift.name)}</span>
+          <span class="lifting-equipment-badge">${escapeHtml(equipmentForLift(lift).badge)}</span>
+        </button>
+      `).join('')
+      : '<div class="lifting-combobox-empty" role="option" aria-disabled="true">No matching lifts.</div>';
+    if (state.logActiveOptionIndex >= 0) {
+      els.logLiftSearch.setAttribute('aria-activedescendant', `log-lift-option-${state.logActiveOptionIndex}`);
+    } else {
+      els.logLiftSearch.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  function setLogLiftMenuOpen(isOpen) {
+    els.logLiftMenu.hidden = !isOpen;
+    els.logLiftSearch.setAttribute('aria-expanded', String(isOpen));
+    els.logLiftToggle.setAttribute('aria-expanded', String(isOpen));
+    els.logLiftPicker.classList.toggle('is-open', isOpen);
+    els.logSetModal.classList.toggle('is-lift-menu-open', isOpen);
+    if (isOpen) {
+      els.logSetModal.scrollTop = 0;
+      renderLogLiftResults();
+    }
+    if (!isOpen) {
+      state.logActiveOptionIndex = -1;
+      els.logLiftSearch.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  function selectLogLift(liftId) {
+    const selectedLift = state.lifts.find((lift) => lift.id === liftId);
+    if (!selectedLift) return;
+    els.logLift.value = selectedLift.id;
+    els.logLiftSearch.value = selectedLift.name;
+    els.logLiftSearchStatus.textContent = '';
+    state.logLiftQuery = '';
+    state.logActiveOptionIndex = -1;
     updateLogEquipmentInterface();
+    syncSubmitButton(els.logForm);
+    setLogLiftMenuOpen(false);
   }
 
   function renderRepGrid(theoreticalOneRep) {
@@ -296,6 +406,7 @@
     els.renameLiftId.value = lift.id;
     els.renameLiftName.value = lift.name;
     els.renameLiftEquipmentType.value = equipmentTypeForLift(lift);
+    syncSubmitButton(els.renameLiftForm);
     els.renameLiftModal.showModal();
     els.renameLiftName.focus();
     els.renameLiftName.select();
@@ -303,16 +414,22 @@
 
   function openLogSetModal(liftId = '') {
     state.logLiftQuery = '';
+    state.logEquipmentFilter = 'all';
+    state.logActiveOptionIndex = -1;
     els.logLiftSearch.value = '';
+    els.logLift.value = '';
+    els.logLiftSearchStatus.textContent = '';
+    setLogLiftMenuOpen(false);
     resetPlateCalculator();
     renderLiftOptions();
 
     const hasLift = liftId && state.lifts.some((lift) => lift.id === liftId);
     if (hasLift) {
-      els.logLift.value = liftId;
+      selectLogLift(liftId);
     }
 
     updateLogEquipmentInterface();
+    syncSubmitButton(els.logForm);
 
     els.logSetModal.showModal();
     (hasLift ? document.getElementById('log-weight') : els.logLiftSearch).focus();
@@ -379,6 +496,7 @@
   }
 
   els.logDate.valueAsDate = new Date();
+  [els.addLiftForm, els.logForm, els.renameLiftForm].forEach(watchFormCompletion);
 
   els.lockButton.addEventListener('click', async () => {
     els.workspace.hidden = true;
@@ -388,6 +506,7 @@
 
   els.addLiftOpen.addEventListener('click', () => {
     els.addLiftError.textContent = '';
+    syncSubmitButton(els.addLiftForm);
     els.addLiftModal.showModal();
     els.liftName.focus();
   });
@@ -430,6 +549,10 @@
 
   els.addLiftForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!formIsComplete(els.addLiftForm)) {
+      syncSubmitButton(els.addLiftForm);
+      return;
+    }
     const form = new FormData(els.addLiftForm);
     const submitButton = els.addLiftForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Creating...');
@@ -453,6 +576,10 @@
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!formIsComplete(els.logForm)) {
+      syncSubmitButton(els.logForm);
+      return;
+    }
     const form = new FormData(els.logForm);
     const submitButton = els.logForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Adding...');
@@ -462,12 +589,10 @@
         lift_id: form.get('lift_id'),
         lifted_at: form.get('lifted_at'),
         weight: Number(form.get('weight')),
-        reps: Number(form.get('reps')),
-        notes: form.get('notes')
+        reps: Number(form.get('reps'))
       });
       const selectedLift = els.logLift.value;
       els.logForm.reset();
-      state.logLiftQuery = '';
       els.logLiftSearch.value = '';
       els.logDate.valueAsDate = new Date();
       els.logLift.value = selectedLift;
@@ -482,6 +607,10 @@
 
   els.renameLiftForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!formIsComplete(els.renameLiftForm)) {
+      syncSubmitButton(els.renameLiftForm);
+      return;
+    }
     const form = new FormData(els.renameLiftForm);
     const id = String(form.get('id') || '');
     const submitButton = els.renameLiftForm.querySelector('button[type="submit"]');
@@ -507,15 +636,102 @@
     renderList();
   });
 
-  els.logLiftSearch.addEventListener('input', () => {
-    state.logLiftQuery = els.logLiftSearch.value.trim();
-    renderLiftOptions();
+  els.logLiftSearch.addEventListener('click', () => {
+    setLogLiftMenuOpen(true);
   });
 
-  els.logLift.addEventListener('change', updateLogEquipmentInterface);
+  els.logLiftSearch.addEventListener('input', () => {
+    state.logLiftQuery = els.logLiftSearch.value.trim();
+    state.logActiveOptionIndex = -1;
+    els.logLift.value = '';
+    els.logLiftSearchStatus.textContent = '';
+    updateLogEquipmentInterface();
+    syncSubmitButton(els.logForm);
+    setLogLiftMenuOpen(true);
+  });
+
+  els.logLiftSearch.addEventListener('keydown', (event) => {
+    const filteredLifts = filteredLogLifts();
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      setLogLiftMenuOpen(true);
+      if (!filteredLifts.length) return;
+      const direction = event.key === 'ArrowDown' ? 1 : -1;
+      if (state.logActiveOptionIndex < 0) {
+        state.logActiveOptionIndex = direction > 0 ? 0 : filteredLifts.length - 1;
+      } else {
+        state.logActiveOptionIndex = (state.logActiveOptionIndex + direction + filteredLifts.length) % filteredLifts.length;
+      }
+      renderLogLiftResults();
+      document.getElementById(`log-lift-option-${state.logActiveOptionIndex}`)?.scrollIntoView({ block: 'nearest' });
+    }
+    if (event.key === 'Enter' && !els.logLiftMenu.hidden && filteredLifts.length) {
+      event.preventDefault();
+      const index = state.logActiveOptionIndex >= 0 ? state.logActiveOptionIndex : 0;
+      selectLogLift(filteredLifts[index].id);
+    }
+    if (event.key === 'Escape' && !els.logLiftMenu.hidden) {
+      event.preventDefault();
+      event.stopPropagation();
+      setLogLiftMenuOpen(false);
+    }
+  });
+
+  els.logLiftToggle.addEventListener('click', () => {
+    const shouldOpen = els.logLiftMenu.hidden;
+    setLogLiftMenuOpen(shouldOpen);
+    if (shouldOpen) els.logLiftSearch.focus();
+  });
+
+  els.logLiftPicker.addEventListener('click', (event) => {
+    const filterButton = event.target.closest('[data-log-equipment-filter]');
+    const optionButton = event.target.closest('[data-log-lift-option]');
+    if (filterButton) {
+      state.logEquipmentFilter = filterButton.dataset.logEquipmentFilter;
+      state.logActiveOptionIndex = -1;
+      renderLogLiftResults();
+      els.logLiftSearch.focus();
+    }
+    if (optionButton) {
+      selectLogLift(optionButton.dataset.logLiftOption);
+      els.logLiftSearch.focus();
+      setLogLiftMenuOpen(false);
+    }
+  });
+
+  els.logLiftPicker.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (els.logLiftPicker.contains(document.activeElement)) return;
+      setLogLiftMenuOpen(false);
+      els.logLiftSearchStatus.textContent = els.logLiftSearch.value.trim() && !els.logLift.value
+        ? 'Choose a lift from the results.'
+        : '';
+    }, 0);
+  });
+
   els.plateInputs.forEach((input) => input.addEventListener('input', updatePlateCalculator));
+  els.plateCalculatorToggle.addEventListener('click', () => {
+    setPlateCalculatorOpen(!els.plateCalculatorPanel.classList.contains('is-open'));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && els.plateCalculatorPanel.classList.contains('is-open')) {
+      setPlateCalculatorOpen(false);
+    }
+  });
+
+  els.barbellCalculator.addEventListener('click', (event) => {
+    const adjustButton = event.target.closest('[data-plate-adjust]');
+    if (!adjustButton) return;
+    const input = adjustButton.parentElement.querySelector('[data-plate-weight]');
+    const nextValue = Math.max(0, Math.trunc(Number(input.value) || 0) + Number(adjustButton.dataset.plateAdjust));
+    input.value = String(nextValue);
+    updatePlateCalculator();
+  });
 
   document.addEventListener('click', async (event) => {
+    if (!event.target.closest('.lifting-lift-picker')) {
+      setLogLiftMenuOpen(false);
+    }
     const toggleButton = event.target.closest('[data-toggle-lift]');
     const logsButton = event.target.closest('[data-open-logs]');
     const logLiftButton = event.target.closest('[data-log-lift]');

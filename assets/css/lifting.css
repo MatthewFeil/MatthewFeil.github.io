@@ -51,9 +51,12 @@
   display: flex;
   gap: 0.45rem;
   align-items: center;
-  margin: -0.25rem 0 0;
+  min-height: 1.35rem;
+  margin: 0;
   color: var(--lifting-muted);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
 .lifting-equipment-note[hidden],
@@ -98,6 +101,15 @@
   border: 1px solid var(--lifting-border);
 }
 
+.lifting-plate-toggle {
+  display: none;
+}
+
+.lifting-plate-panel {
+  display: grid;
+  gap: 0.65rem;
+}
+
 .lifting-barbell-head {
   display: flex;
   gap: 0.75rem;
@@ -121,27 +133,55 @@
 
 .lifting-plate-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.35rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
 }
 
-.lifting-plate-grid label {
+.lifting-plate-option {
   min-width: 0;
   text-align: center;
 }
 
-.lifting-plate-grid label span {
+.lifting-plate-option > span:first-child {
   display: block;
   margin-bottom: 0.25rem;
+  color: var(--lifting-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.lifting-form .lifting-plate-grid input {
+.lifting-plate-stepper {
+  display: grid;
+  grid-template-columns: minmax(2.35rem, auto) minmax(2.5rem, 1fr) minmax(2.35rem, auto);
+}
+
+.lifting-form .lifting-plate-stepper input {
   width: 100%;
   min-width: 0;
-  padding-right: 0.2rem;
-  padding-left: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.15rem;
+  border-right: 0;
+  border-left: 0;
   text-align: center;
+}
+
+.lifting-form .lifting-plate-stepper button {
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.3rem;
+  color: var(--site-text);
+  background: var(--lifting-surface);
+  border-color: var(--lifting-border);
+  font-size: 1.1rem;
+}
+
+.lifting-form .lifting-plate-stepper button:not(:disabled):hover {
+  color: #fff;
+  background: var(--lifting-accent);
+  border-color: var(--lifting-accent);
 }
 
 .lifting-kicker {
@@ -188,10 +228,196 @@
   gap: var(--tool-gap);
 }
 
+.lifting-log-measurements {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(6rem, 0.55fr);
+  gap: var(--tool-gap);
+  align-items: end;
+}
+
+.lifting-log-field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.lifting-log-field input {
+  width: 100%;
+  min-width: 0;
+}
+
+.lifting-lift-picker {
+  position: relative;
+  min-width: 0;
+}
+
+.lifting-lift-picker.is-open {
+  z-index: 20;
+}
+
+.lifting-combobox-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--tool-control-height);
+}
+
+.lifting-combobox-control:focus-within {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
+}
+
+.lifting-form .lifting-combobox-control input {
+  width: 100%;
+  min-width: 0;
+  border-right: 0;
+}
+
+.lifting-form .lifting-combobox-toggle {
+  width: var(--tool-control-height);
+  min-width: 0;
+  padding: 0;
+  color: var(--site-text);
+  background: var(--lifting-surface);
+  border-color: var(--lifting-border);
+  border-left: 0;
+}
+
+.lifting-form .lifting-combobox-toggle:not(:disabled):hover {
+  color: var(--site-text);
+  background: var(--lifting-surface);
+  border-color: var(--lifting-border);
+  box-shadow: none;
+  transform: none;
+}
+
+.lifting-form .lifting-combobox-control input:focus-visible,
+.lifting-form .lifting-combobox-toggle:focus-visible {
+  border-color: var(--lifting-border);
+  outline: 0;
+}
+
+.lifting-combobox-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-width: 1.75;
+  transition: transform 0.18s ease;
+}
+
+.lifting-combobox-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.lifting-combobox-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 30;
+  overflow: hidden;
+  background: var(--site-surface);
+  border: 1px solid var(--lifting-border);
+  box-shadow: 0.35rem 0.35rem 0 rgb(0 0 0 / 0.14);
+}
+
+.lifting-combobox-menu[hidden] {
+  display: none;
+}
+
+.lifting-equipment-filters {
+  display: flex;
+  gap: 0.32rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.55rem;
+  background: var(--lifting-soft);
+  border-bottom: 1px solid var(--lifting-border);
+}
+
+.lifting-equipment-filters > span {
+  width: 100%;
+  color: var(--lifting-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.lifting-form .lifting-equipment-filters button {
+  min-height: 1.9rem;
+  padding: 0.3rem 0.48rem;
+  color: var(--site-text);
+  background: var(--lifting-surface);
+  border-color: var(--lifting-border);
+  font-size: 0.72rem;
+}
+
+.lifting-form .lifting-equipment-filters button[aria-pressed="true"],
+.lifting-form .lifting-equipment-filters button:not(:disabled):hover {
+  color: #fff;
+  background: var(--lifting-accent);
+  border-color: var(--lifting-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+.lifting-combobox-results {
+  display: grid;
+  max-height: min(13rem, 34vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.lifting-form .lifting-combobox-option {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.45rem 0.6rem;
+  color: var(--site-text);
+  background: var(--site-surface);
+  border: 0;
+  border-bottom: 1px solid var(--lifting-border);
+  text-align: left;
+}
+
+.lifting-form .lifting-combobox-option:last-child {
+  border-bottom: 0;
+}
+
+.lifting-form .lifting-combobox-option[aria-selected="true"] {
+  box-shadow: inset 0.22rem 0 0 var(--lifting-accent);
+}
+
+.lifting-form .lifting-combobox-option.is-active,
+.lifting-form .lifting-combobox-option:not(:disabled):hover {
+  color: var(--site-text);
+  background: var(--lifting-soft);
+  border-color: var(--lifting-border);
+  box-shadow: inset 0.22rem 0 0 var(--lifting-accent);
+  transform: none;
+}
+
+.lifting-combobox-empty {
+  margin: 0;
+  padding: 0.8rem;
+  color: var(--lifting-muted);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
 .lifting-select-status {
-  min-height: 1.2rem;
-  margin: -0.35rem 0 0;
+  margin: 0;
   font-size: 0.88rem;
+}
+
+.lifting-select-status:empty {
+  display: none;
 }
 
 .lifting-log-form {
@@ -330,13 +556,15 @@
 .lifting-action:disabled,
 .lifting-form button:disabled,
 .lifting-log-form button:disabled {
-  cursor: wait;
-  opacity: 0.82;
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .lifting-form button.is-loading,
 .lifting-log-form button.is-loading,
 .lifting-action.is-loading {
+  cursor: wait;
+  opacity: 0.82;
   overflow: hidden;
 }
 
@@ -602,6 +830,10 @@
   width: min(92vw, 560px);
 }
 
+.lifting-log-modal.is-lift-menu-open {
+  overflow: visible;
+}
+
 .lifting-logs-modal {
   width: min(92vw, 560px);
 }
@@ -644,6 +876,113 @@
   }
 }
 
+  .lifting-barbell-calculator {
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+  }
+
+  .lifting-form .lifting-plate-toggle {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 2.5rem;
+    max-height: 2.5rem;
+    min-height: 2.5rem;
+    overflow: hidden;
+    padding: 0.55rem 0.7rem;
+    color: var(--site-text);
+    background: var(--lifting-surface);
+    border: 1px solid var(--lifting-border);
+    font-size: 0.8rem;
+    text-align: left;
+  }
+
+  .lifting-form .lifting-plate-toggle::before,
+  .lifting-form .lifting-plate-toggle::after {
+    display: none;
+    content: none;
+  }
+
+  .lifting-form .lifting-plate-toggle[aria-expanded="true"] {
+    background: var(--lifting-soft);
+  }
+
+  .lifting-form .lifting-plate-toggle:not(:disabled):hover {
+    color: var(--site-text);
+    background: var(--lifting-surface);
+    border-color: var(--lifting-border);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .lifting-plate-toggle-meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.9rem;
+    height: 0.9rem;
+    flex: 0 0 0.9rem;
+  }
+
+  .lifting-plate-chevron {
+    display: block;
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+    max-width: 0.9rem;
+    max-height: 0.9rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-width: 1.75;
+    transition: transform 0.2s ease;
+  }
+
+  .lifting-plate-toggle[aria-expanded="true"] .lifting-plate-chevron {
+    transform: rotate(180deg);
+  }
+
+  .lifting-plate-panel {
+    display: grid;
+    gap: 0.5rem;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-0.25rem);
+    transform-origin: top;
+    transition: max-height 0.24s ease, padding 0.24s ease, opacity 0.18s ease, transform 0.24s ease;
+  }
+
+  .lifting-plate-panel.is-open {
+    max-height: 24rem;
+    padding: 0.65rem;
+    background: var(--lifting-soft);
+    border: 1px solid var(--lifting-border);
+    border-top: 0;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .lifting-barbell-head .lifting-barbell-title {
+    display: none;
+  }
+
+  .lifting-barbell-head small {
+    margin: 0;
+  }
+
 @media (max-width: 720px) {
   .lifting-log-modal {
     width: min(88vw, 460px);
@@ -659,7 +998,7 @@
   }
 
   .lifting-plate-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .lifting-rep-grid {
@@ -754,6 +1093,12 @@
   .lifting-panel-head {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 360px) {
+  .lifting-log-measurements {
+    grid-template-columns: 1fr;
   }
 }
 
