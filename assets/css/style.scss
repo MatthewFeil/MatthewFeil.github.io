@@ -314,18 +314,21 @@ table {
 }
 
 @media (min-width: 1041px) {
-  .site-header:has(.nav-dropdown-tools:hover),
-  .site-header:has(.nav-dropdown-tools:focus-within) {
+  html:not(.has-touch-input) .site-header:has(.nav-dropdown-tools:hover),
+  html:not(.has-touch-input) .site-header:has(.nav-dropdown-tools:focus-within),
+  .site-header:has(.nav-dropdown-tools.is-open) {
     padding-bottom: 6.25rem;
   }
 
-  .site-header:has(.nav-dropdown-personal:hover),
-  .site-header:has(.nav-dropdown-personal:focus-within) {
+  html:not(.has-touch-input) .site-header:has(.nav-dropdown-personal:hover),
+  html:not(.has-touch-input) .site-header:has(.nav-dropdown-personal:focus-within),
+  .site-header:has(.nav-dropdown-personal.is-open) {
     padding-bottom: 4.25rem;
   }
 
-  .nav-dropdown:hover .nav-dropdown-menu,
-  .nav-dropdown:focus-within .nav-dropdown-menu {
+  html:not(.has-touch-input) .nav-dropdown:hover .nav-dropdown-menu,
+  html:not(.has-touch-input) .nav-dropdown:focus-within .nav-dropdown-menu,
+  .nav-dropdown.is-open .nav-dropdown-menu {
     max-height: 7rem;
     border-right-color: var(--site-accent);
     opacity: 1;

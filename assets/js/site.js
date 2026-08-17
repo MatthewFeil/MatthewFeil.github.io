@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.querySelectorAll(".site-nav a.page-link");
   const navDropdowns = document.querySelectorAll(".site-nav .nav-dropdown");
   const mobileNavQuery = window.matchMedia("(max-width: 1040px)");
+  const hasTouchInput = navigator.maxTouchPoints > 0;
+
+  if (hasTouchInput) {
+    document.documentElement.classList.add("has-touch-input");
+  }
 
   if (!navTrigger || navLinks.length === 0) {
     return;
@@ -89,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     button.setAttribute("aria-expanded", "false");
 
     button.addEventListener("click", (event) => {
-      if (!mobileNavQuery.matches) {
+      if (!mobileNavQuery.matches && !hasTouchInput) {
         return;
       }
 

@@ -830,6 +830,15 @@
   width: min(92vw, 560px);
 }
 
+.lifting-log-modal #log-date {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
 .lifting-log-modal.is-lift-menu-open {
   overflow: visible;
 }
