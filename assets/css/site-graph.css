@@ -1,0 +1,288 @@
+.site-graph {
+  --site-graph-border: var(--tool-border, color-mix(in srgb, currentColor 18%, transparent));
+  --site-graph-subtle-border: var(--tool-border-subtle, color-mix(in srgb, currentColor 12%, transparent));
+  --site-graph-surface: var(--tool-soft, color-mix(in srgb, var(--site-bg) 96%, var(--site-text)));
+  --site-graph-panel: var(--tool-surface, color-mix(in srgb, var(--site-bg) 92%, var(--site-text)));
+  --site-graph-muted: var(--tool-muted, color-mix(in srgb, currentColor 62%, transparent));
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--site-graph-border);
+  border-radius: 0;
+  background: var(--site-graph-surface);
+  color: var(--site-text);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.site-graph-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tool-section-gap, 0.75rem);
+  padding: 0.85rem 0.9rem 0;
+}
+
+.site-graph[data-legend-position="bottom"] .site-graph-header {
+  flex-direction: column;
+}
+
+.site-graph-heading {
+  min-width: 0;
+}
+
+.site-graph-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.site-graph-description {
+  max-width: 54rem;
+  margin: 0.32rem 0 0;
+  color: var(--site-graph-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.site-graph-legend,
+.site-graph-readout-values {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-graph-legend {
+  justify-content: flex-end;
+  color: var(--site-graph-muted);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.site-graph-legend-item,
+.site-graph-readout-value {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.4rem;
+}
+
+.site-graph-legend-key {
+  width: 1.35rem;
+  height: 0;
+  flex: 0 0 auto;
+  border-top: 3px solid var(--site-graph-series-color);
+}
+
+.site-graph-legend-key.is-dashed {
+  border-top-style: dashed;
+}
+
+.site-graph-legend-key.is-dotted {
+  border-top-style: dotted;
+}
+
+.site-graph-plot {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 0.1rem 0.35rem 0;
+}
+
+.site-graph-svg {
+  display: block;
+  width: 100%;
+  max-width: none;
+  overflow: visible;
+  color: var(--site-text);
+}
+
+.site-graph-axis-line {
+  stroke: var(--site-graph-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-grid-line {
+  stroke: var(--site-graph-subtle-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-tick-label,
+.site-graph-axis-title,
+.site-graph-point-label,
+.site-graph-end-label {
+  fill: var(--site-graph-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-graph-axis-title,
+.site-graph-point-label,
+.site-graph-end-label {
+  fill: var(--site-text);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-graph-point-label,
+.site-graph-end-label {
+  paint-order: stroke;
+  stroke: var(--site-graph-surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.site-graph-line {
+  fill: none;
+  stroke: var(--site-graph-series-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-area {
+  fill: var(--site-graph-series-color);
+  fill-opacity: var(--site-graph-area-opacity, 0.1);
+  stroke: none;
+}
+
+.site-graph-point {
+  fill: var(--site-graph-surface);
+  stroke: var(--site-graph-series-color);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-hover-guide {
+  stroke: var(--site-text);
+  stroke-dasharray: 3 4;
+  stroke-opacity: 0.48;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-hover-point {
+  fill: var(--site-graph-series-color);
+  stroke: var(--site-graph-surface);
+  stroke-width: 2.5;
+}
+
+.site-graph-hit-area {
+  fill: transparent;
+  cursor: crosshair;
+  touch-action: pan-y;
+}
+
+.site-graph-hit-area:focus {
+  outline: none;
+}
+
+.site-graph-hit-area:focus-visible {
+  stroke: var(--site-accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.site-graph-readout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3rem;
+  border-top: 1px solid var(--site-graph-border);
+  background: var(--site-graph-panel);
+  padding: 0.58rem 0.9rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-graph-readout-x {
+  flex: 0 0 auto;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.site-graph-readout-values {
+  justify-content: flex-end;
+}
+
+.site-graph-readout-key {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--site-graph-series-color) 70%, var(--site-text));
+  background: var(--site-graph-series-color);
+}
+
+.site-graph-readout-label {
+  color: var(--site-graph-muted);
+}
+
+.site-graph-readout-number {
+  color: var(--site-text);
+  font-family: var(--font-ui);
+  font-weight: 800;
+}
+
+.site-graph-empty {
+  margin: 0;
+  padding: 2.5rem 1rem;
+  color: var(--site-graph-muted);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .site-graph-header,
+  .site-graph-readout {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-graph-header {
+    padding: 0.75rem 0.75rem 0;
+  }
+
+  .site-graph-legend,
+  .site-graph-readout-values {
+    justify-content: flex-start;
+  }
+
+  .site-graph-readout {
+    gap: 0.4rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .site-graph-plot {
+    padding-right: 0.1rem;
+    padding-left: 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-graph * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,132 @@
+<h1 id="design-system-matthew-feil">Design System: Matthew Feil</h1>
+
+<h2 id="overview">Overview</h2>
+
+<p><strong>Creative North Star: “Signalboard Studio”</strong></p>
+
+<p>The system treats a personal portfolio as a public signalboard: direct, high-contrast, and built around real projects rather than promotional decoration. Large display type establishes authorship; the page then gives visitors concise, practical routes into work, writing, and tools.</p>
+
+<p>The visual language is deliberately crisp and utilitarian. Flat tonal surfaces, square borders, compact uppercase labels, and a restrained red signal preserve clarity across the public site and private trackers. The system supports creative technology without becoming a generic technical dashboard.</p>
+
+<p><strong>Key Characteristics:</strong></p>
+<ul>
+  <li>Oversized, decisive display type paired with practical reading and UI text.</li>
+  <li>Black, white, and gray tonal structure with red reserved for signal moments.</li>
+  <li>Square, bordered components with a calm border-driven interaction response rather than decorative depth.</li>
+  <li>Responsive layouts that become single-column and menu-led on smaller screens.</li>
+</ul>
+
+<h2 id="colors">Colors</h2>
+
+<p>The palette relies on strong neutral contrast and one rare red signal; semantic green, amber, and red appear only for meaningful status.</p>
+
+<h3 id="primary">Primary</h3>
+<ul>
+  <li><strong>Signal Red</strong> (<code class="language-plaintext highlighter-rouge">#e3262e</code>): marks a key initial, active tool state, focus, and high-priority action in light mode.</li>
+  <li><strong>Signal Red Strong</strong> (<code class="language-plaintext highlighter-rouge">#b90f17</code>): deepens red for high-emphasis interaction states.</li>
+</ul>
+
+<h3 id="neutral">Neutral</h3>
+<ul>
+  <li><strong>Paper White</strong> (<code class="language-plaintext highlighter-rouge">#ffffff</code>): light-mode page field.</li>
+  <li><strong>Soft Gray Surface</strong> (<code class="language-plaintext highlighter-rouge">#f2f2f2</code>): cards and low-emphasis surfaces in light mode.</li>
+  <li><strong>Near-Black Ink</strong> (<code class="language-plaintext highlighter-rouge">#0a0a0a</code>): light-mode reading and display text.</li>
+  <li><strong>Night Field</strong> (<code class="language-plaintext highlighter-rouge">#090909</code>): dark-mode page field.</li>
+  <li><strong>Dark Surface</strong> (<code class="language-plaintext highlighter-rouge">#141414</code>): dark-mode cards and tool surfaces.</li>
+  <li><strong>Bright Ink</strong> (<code class="language-plaintext highlighter-rouge">#f6f6f6</code>): dark-mode reading and display text.</li>
+</ul>
+
+<h3 id="named-rules">Named Rules</h3>
+<p><strong>The Rare Signal Rule.</strong> Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.</p>
+
+<h2 id="typography">Typography</h2>
+
+<p><strong>Display Font:</strong> Archivo Black, Impact, sans-serif</p>
+
+<p><strong>Body Font:</strong> Familjen Grotesk, Arial, sans-serif</p>
+
+<p><strong>Character:</strong> Archivo Black supplies unmistakable, compact display authority. Familjen Grotesk carries reading, labels, forms, and tool data with a sharper, more individual texture than a neutral system sans.</p>
+
+<h3 id="hierarchy">Hierarchy</h3>
+<ul>
+  <li><strong>Display</strong> (Archivo Black, <code class="language-plaintext highlighter-rouge">clamp(4.4rem, 10vw, 11rem)</code>, <code class="language-plaintext highlighter-rouge">0.86</code>): hero identity and large section statements.</li>
+  <li><strong>Headline</strong> (Archivo Black, <code class="language-plaintext highlighter-rouge">clamp(2.6rem, 8vw, 8rem)</code>, <code class="language-plaintext highlighter-rouge">0.86</code>): major homepage and page-section headings.</li>
+  <li><strong>Title</strong> (Archivo Black, <code class="language-plaintext highlighter-rouge">clamp(2.15rem, 4.8vw, 4.6rem)</code>, <code class="language-plaintext highlighter-rouge">0.95</code>): page and app headings.</li>
+  <li><strong>Body</strong> (Familjen Grotesk, <code class="language-plaintext highlighter-rouge">1rem</code>, <code class="language-plaintext highlighter-rouge">1.6</code>): ordinary reading copy. Post content is constrained to <code class="language-plaintext highlighter-rouge">74ch</code>.</li>
+  <li><strong>Label</strong> (Familjen Grotesk, <code class="language-plaintext highlighter-rouge">0.72rem</code> to <code class="language-plaintext highlighter-rouge">0.86rem</code>, <code class="language-plaintext highlighter-rouge">700</code>, <code class="language-plaintext highlighter-rouge">0.07em</code> to <code class="language-plaintext highlighter-rouge">0.1em</code>, uppercase): navigation, metadata, controls, and field labels.</li>
+</ul>
+
+<h3 id="named-rules-1">Named Rules</h3>
+<p><strong>The Two-Voice Rule.</strong> Archivo Black is for display moments only. Familjen Grotesk carries all reading and operational UI text; do not introduce a third type family without a distinct role.</p>
+
+<h2 id="layout">Layout</h2>
+
+<p>The main shell is centered at <code class="language-plaintext highlighter-rouge">min(100%, 1680px)</code> with a responsive page gutter of <code class="language-plaintext highlighter-rouge">clamp(1rem, 3.6vw, 3rem)</code>. The home hero uses an asymmetrical two-column layout on desktop, then stacks into a single column at <code class="language-plaintext highlighter-rouge">1040px</code> and below. Public page sections use full-width dividers and open space rather than nested containers.</p>
+
+<p>Tool interfaces favor compact CSS grids, fixed control heights, and panel grouping. At smaller widths, navigation becomes a touch-sized menu and major grids collapse to one column without hiding core content.</p>
+
+<h2 id="elevation--depth">Elevation &amp; Depth</h2>
+
+<p>The system is flat by default. Borders, tonal surface changes, and spacing establish hierarchy. Hover never moves an element, adds a shadow, or adds a second perimeter: interactive cards and controls simply strengthen their existing border and, where useful, their surface tone. Signal Red is not a generic hover color, so it continues to communicate focus, active state, and priority rather than availability.</p>
+
+<h3 id="named-rules-2">Named Rules</h3>
+<p><strong>The Flat-By-Default Rule.</strong> Do not add resting shadows, hover shadows, glass layers, or ornamental blur. Do not translate elements on hover. Depth must explain interaction or content grouping.</p>
+
+<p><strong>The Active Border Rule.</strong> Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Keyboard focus remains a clearly visible Signal Red outline, while destructive actions retain their semantic error color.</p>
+
+<h2 id="shapes">Shapes</h2>
+
+<p>All controls, panels, cards, and tool surfaces use square corners (<code class="language-plaintext highlighter-rouge">border-radius: 0</code>) and thin, high-contrast borders. Borders are structural rules, not decorative frames. Controls use a standard minimum height of <code class="language-plaintext highlighter-rouge">2.5rem</code>, rising to the <code class="language-plaintext highlighter-rouge">2.75rem</code> touch target on narrow screens.</p>
+
+<h2 id="components">Components</h2>
+
+<h3 id="buttons">Buttons</h3>
+<p>Buttons are compact commands, not pill-shaped decoration.</p>
+<ul>
+  <li><strong>Shape:</strong> square corners (<code class="language-plaintext highlighter-rouge">0</code>) with a <code class="language-plaintext highlighter-rouge">1px</code> border.</li>
+  <li><strong>Primary:</strong> Signal Red background with white text, <code class="language-plaintext highlighter-rouge">0.7rem 1rem</code> padding, and the label type role.</li>
+  <li><strong>Hover / Focus:</strong> pointer hover strengthens the existing border; keyboard focus uses the shared red focus outline.</li>
+  <li><strong>Secondary:</strong> neutral surface with a structural border; do not add a fill merely to create variation.</li>
+</ul>
+
+<h3 id="cards--containers">Cards / Containers</h3>
+<p>Cards frame repeated posts and dense tool groups, never whole page sections.</p>
+<ul>
+  <li><strong>Corner Style:</strong> square (<code class="language-plaintext highlighter-rouge">0</code>).</li>
+  <li><strong>Background:</strong> light or dark surface token according to color scheme.</li>
+  <li><strong>Border:</strong> <code class="language-plaintext highlighter-rouge">1px</code> soft border.</li>
+  <li><strong>Hover Strategy:</strong> flat at rest; clickable cards strengthen their existing border without movement or shadow.</li>
+  <li><strong>Internal Padding:</strong> <code class="language-plaintext highlighter-rouge">0.85rem</code> to <code class="language-plaintext highlighter-rouge">1.2rem</code>, scaled by context.</li>
+</ul>
+
+<h3 id="inputs--fields">Inputs / Fields</h3>
+<p>Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus is communicated by the red outline or border shift, never by color alone.</p>
+
+<h3 id="navigation">Navigation</h3>
+<p>The sticky header uses a translucent page-colored surface and a <code class="language-plaintext highlighter-rouge">2px</code> structural bottom border. Desktop links are compact uppercase labels with a red underline reveal. At <code class="language-plaintext highlighter-rouge">1040px</code> and below, a touch-sized Menu control reveals the right-aligned navigation stack; dropdowns open through opacity and transform motion without animating layout properties.</p>
+
+<h3 id="post-cards">Post Cards</h3>
+<p>Post cards pair a compact Article/date metadata row with a display title and Familjen Grotesk summary. They use tonal surface contrast and a strengthened border on hover, while the homepage hero remains reserved for one featured project.</p>
+
+<h3 id="tool-switchers">Tool Switchers</h3>
+<p>Tool switchers are square segmented controls with a thin shared border. The active option uses Signal Red with white text; inactive options remain neutral and legible.</p>
+
+<h2 id="dos-and-donts">Do’s and Don’ts</h2>
+
+<h3 id="do">Do:</h3>
+<ul>
+  <li><strong>Do</strong> reserve Archivo Black for headings, identity, and short high-impact statements.</li>
+  <li><strong>Do</strong> use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.</li>
+  <li><strong>Do</strong> use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.</li>
+  <li><strong>Do</strong> use red sparingly for emphasis, active state, focus, and meaningful status.</li>
+  <li><strong>Do</strong> keep interactive controls square, bordered, and touch-sized on small screens.</li>
+</ul>
+
+<h3 id="dont">Don’t:</h3>
+<ul>
+  <li><strong>Don’t</strong> introduce rounded SaaS cards, pill controls, or decorative gradient fields.</li>
+  <li><strong>Don’t</strong> use red as a generic background or substitute it for hierarchy.</li>
+  <li><strong>Don’t</strong> add a third type family, display face, or technical-looking mono type without a unique content role.</li>
+  <li><strong>Don’t</strong> make a whole page a floating card or nest cards within cards.</li>
+  <li><strong>Don’t</strong> animate height, padding, margin, or other layout-driving properties for navigation reveals.</li>
+</ul>

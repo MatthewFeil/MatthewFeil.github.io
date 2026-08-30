@@ -10,7 +10,7 @@ permalink: /cta-l-live-art/
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chicago 'L' Live Art</title>
     <link rel="preload" href="{{ "/assets/fonts/archivo-black-latin-400-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ "/assets/fonts/inter-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ "/assets/fonts/familjen-grotesk-latin-wght-normal.woff2" | relative_url }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ "/assets/css/fonts.css" | relative_url }}">
     <script>
       window.CTA_LIVE_ART_CONFIG = {
@@ -91,14 +91,18 @@ permalink: /cta-l-live-art/
     <style>
       :root {
         --font-display: "Archivo Black", Impact, sans-serif;
-        --font-ui: "Archivo Black", Impact, sans-serif;
-        --font-body: "Inter", Arial, sans-serif;
+        --font-ui: "Familjen Grotesk", Arial, sans-serif;
+        --font-body: "Familjen Grotesk", Arial, sans-serif;
         font-family: var(--font-body);
       }
 
       html,
       body {
         overscroll-behavior: none;
+      }
+
+      body {
+        font-family: var(--font-body);
       }
 
       .train-canvas {
@@ -108,7 +112,10 @@ permalink: /cta-l-live-art/
       h1,
       h2,
       h3,
-      h4,
+      h4 {
+        font-family: var(--font-display);
+      }
+
       button,
       label,
       .status-pill {

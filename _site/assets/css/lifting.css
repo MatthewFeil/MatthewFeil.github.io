@@ -179,9 +179,9 @@
 }
 
 .lifting-form .lifting-plate-stepper button:not(:disabled):hover {
-  color: #fff;
-  background: var(--lifting-accent);
-  border-color: var(--lifting-accent);
+  color: var(--lifting-accent-hover);
+  background: color-mix(in srgb, var(--lifting-accent) 10%, transparent);
+  border-color: var(--lifting-accent-hover);
 }
 
 .lifting-kicker {
@@ -285,8 +285,6 @@
   color: var(--site-text);
   background: var(--lifting-surface);
   border-color: var(--lifting-border);
-  box-shadow: none;
-  transform: none;
 }
 
 .lifting-form .lifting-combobox-control input:focus-visible,
@@ -357,11 +355,15 @@
 
 .lifting-form .lifting-equipment-filters button[aria-pressed="true"],
 .lifting-form .lifting-equipment-filters button:not(:disabled):hover {
-  color: #fff;
-  background: var(--lifting-accent);
+  color: var(--lifting-accent);
+  background: var(--lifting-surface);
   border-color: var(--lifting-accent);
-  box-shadow: none;
-  transform: none;
+}
+
+.lifting-form .lifting-equipment-filters button:not(:disabled):hover {
+  color: var(--lifting-accent-hover);
+  background: color-mix(in srgb, var(--lifting-accent) 10%, transparent);
+  border-color: var(--lifting-accent-hover);
 }
 
 .lifting-combobox-results {
@@ -399,8 +401,6 @@
   color: var(--site-text);
   background: var(--lifting-soft);
   border-color: var(--lifting-border);
-  box-shadow: inset 0.22rem 0 0 var(--lifting-accent);
-  transform: none;
 }
 
 .lifting-combobox-empty {
@@ -486,11 +486,14 @@
 .lifting-log-form input:focus-visible,
 .lifting-log-form select:focus-visible,
 .lifting-filter input:focus-visible,
+.lifting-form button:focus-visible,
+.lifting-log-form button:focus-visible,
 .lifting-secondary:focus-visible,
 .lifting-action:focus-visible,
 .lifting-icon-button:focus-visible,
 .lifting-row:focus-visible {
   border-color: var(--site-accent);
+  outline-color: var(--site-accent);
 }
 
 .lifting-form button,
@@ -503,16 +506,17 @@
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
-  background: var(--lifting-accent);
-  color: #fff;
+  background: transparent;
+  color: var(--lifting-accent);
   border-color: var(--lifting-accent);
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .lifting-form button:not(:disabled):hover,
 .lifting-log-form button:not(:disabled):hover {
-  background: color-mix(in srgb, var(--lifting-accent) 92%, white);
-  border-color: color-mix(in srgb, var(--lifting-accent) 72%, white);
+  background: color-mix(in srgb, var(--lifting-accent) 10%, transparent);
+  border-color: var(--lifting-accent-hover);
+  color: var(--lifting-accent-hover);
 }
 
 .lifting-secondary,
@@ -526,7 +530,7 @@
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .lifting-secondary:not(:disabled):hover,
@@ -541,8 +545,6 @@
 .lifting-secondary:not(:disabled):hover,
 .lifting-action:not(:disabled):hover,
 .lifting-icon-button:not(:disabled):hover {
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
 }
 
 #lifting-lock-button:not(:disabled):hover,
@@ -624,13 +626,11 @@
   gap: 0;
   padding: 0;
   overflow: hidden;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+  transition: border-color 0.16s ease;
 }
 
 .lifting-card:hover {
   border-color: color-mix(in srgb, var(--site-text) 34%, transparent);
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
 }
 
 .lifting-row {
@@ -802,12 +802,14 @@
   font-family: var(--font-display);
   font-weight: 900;
   letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
 }
 
 .lifting-log p {
   margin: 0.15rem 0 0;
   color: var(--lifting-muted);
   font-size: 0.88rem;
+  overflow-wrap: anywhere;
 }
 
 .lifting-empty {
@@ -993,10 +995,15 @@
   }
 
 @media (max-width: 720px) {
+  .lifting-modal {
+    box-sizing: border-box;
+    max-width: calc(100vw - 2rem);
+    padding: 1rem;
+  }
+
   .lifting-log-modal {
     width: min(88vw, 460px);
     max-width: calc(100vw - 2rem);
-    padding: 1rem;
   }
 
   .lifting-log-modal .lifting-form input,
@@ -1118,23 +1125,17 @@
     background: var(--lifting-surface);
     border-color: var(--lifting-border);
     color: var(--site-text);
-    box-shadow: none;
-    transform: none;
   }
 
   .lifting-form button:hover,
   .lifting-log-form button:hover {
-    background: var(--lifting-accent);
+    background: transparent;
     border-color: var(--lifting-accent);
-    color: #fff;
-    box-shadow: none;
-    transform: none;
+    color: var(--lifting-accent);
   }
 
   .lifting-card:hover {
     border-color: var(--lifting-border);
-    box-shadow: none;
-    transform: none;
   }
 
   .lifting-card-summary:hover {

@@ -139,8 +139,33 @@
   }
 
   function setStatus(message, tone) {
+    status.classList.remove('is-revealing');
     status.textContent = message;
     status.dataset.tone = tone || '';
+
+    if (message) {
+      window.requestAnimationFrame(() => status.classList.add('is-revealing'));
+    }
+  }
+
+  function setFieldInvalid(input, isInvalid) {
+    if (isInvalid) {
+      input.setAttribute('aria-invalid', 'true');
+    } else {
+      input.removeAttribute('aria-invalid');
+    }
+    input.closest('.investment-field')?.classList.toggle('is-invalid', isInvalid);
+  }
+
+  function clearFieldErrors() {
+    [amountInput, dateInput, endDateInput, symbolInput].forEach((input) => {
+      setFieldInvalid(input, false);
+    });
+  }
+
+  function showValidationError(message, inputs) {
+    inputs.forEach((input) => setFieldInvalid(input, true));
+    setStatus(message, 'error');
   }
 
   function setLoading(isLoading) {
@@ -148,6 +173,15 @@
     submitButton.classList.toggle('is-loading', isLoading);
     submitButton.setAttribute('aria-busy', String(isLoading));
     submitButton.textContent = isLoading ? 'Calculating...' : 'Calculate';
+    results.setAttribute('aria-busy', String(isLoading));
+
+    if (isLoading) {
+      setDetailsOpen(false);
+      results.hidden = false;
+      results.dataset.state = 'loading';
+      app.dataset.calculationState = 'loading';
+      setStatus('Getting price and inflation data…', 'loading');
+    }
   }
 
   function normalizeSymbol(value) {
@@ -245,6 +279,7 @@
   function setDetailsOpen(isOpen) {
     detailsPanel.hidden = !isOpen;
     detailsToggle.setAttribute('aria-expanded', String(isOpen));
+    detailsToggle.textContent = isOpen ? 'Hide details' : 'Details';
   }
 
   function renderResults({ amount, symbol, prices, inflation }) {
@@ -259,7 +294,7 @@
     const realPercent = realValue === null ? null : realValue / amount - 1;
     const inflatedAmount = inflationFactor ? amount * inflationFactor : null;
 
-    output.title.textContent = prices.name === symbol ? symbol : `${symbol} · ${prices.name}`;
+    output.title.textContent = `${symbol} return`;
     output.range.textContent = `${formatDate(prices.purchase.date)} to ${formatDate(prices.current.date)}`;
     output.currentValue.textContent = currencyFormatter.format(currentValue);
     setSigned(output.totalGain, totalGain, currencyFormatter);
@@ -288,10 +323,17 @@
     output.inflationSource.textContent = inflation?.source || 'Unavailable';
 
     results.hidden = false;
+    results.dataset.state = 'results';
+    results.classList.remove('is-revealing');
+    void results.offsetWidth;
+    results.classList.add('is-revealing');
+    app.dataset.calculationState = 'results';
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    clearFieldErrors();
 
     const amount = Number(amountInput.value);
     const startDate = parseInputDate(dateInput.value);
@@ -300,22 +342,30 @@
     const symbol = normalizeSymbol(symbolInput.value);
 
     if (!Number.isFinite(amount) || amount <= 0 || !startDate || !endDate || !symbol) {
-      setStatus('Enter an amount, dates, and ticker.', 'error');
+      const invalidInputs = [
+        !Number.isFinite(amount) || amount <= 0 ? amountInput : null,
+        !startDate ? dateInput : null,
+        !endDate ? endDateInput : null,
+        !symbol ? symbolInput : null
+      ].filter(Boolean);
+      showValidationError('Enter an amount, dates, and ticker.', invalidInputs);
       return;
     }
 
     if (startDate > today || endDate > today) {
-      setStatus('Choose dates that have already happened.', 'error');
+      showValidationError('Choose dates that have already happened.', [
+        ...(startDate > today ? [dateInput] : []),
+        ...(endDate > today ? [endDateInput] : [])
+      ]);
       return;
     }
 
     if (endDate < startDate) {
-      setStatus('Choose an end date after the start date.', 'error');
+      showValidationError('Choose an end date after the start date.', [endDateInput]);
       return;
     }
 
     symbolInput.value = symbol;
-    setStatus('');
     setLoading(true);
 
     try {
@@ -337,9 +387,11 @@
         inflation: prices.inflation
       });
 
-      setStatus(prices.inflation ? '' : 'Inflation unavailable.');
+      setStatus(prices.inflation ? 'Return calculated.' : 'Return calculated. Inflation data is unavailable.', prices.inflation ? 'success' : 'warning');
     } catch (error) {
       results.hidden = true;
+      delete results.dataset.state;
+      delete app.dataset.calculationState;
       setStatus(error instanceof Error ? error.message : 'Price data is unavailable.', 'error');
     } finally {
       setLoading(false);
@@ -365,11 +417,20 @@
     setDetailsOpen(detailsPanel.hidden);
   });
   [dateInput, endDateInput].forEach((input) => {
-    input.addEventListener('input', () => updateDateDisplay(input));
-    input.addEventListener('change', () => updateDateDisplay(input));
+    input.addEventListener('input', () => {
+      updateDateDisplay(input);
+      setFieldInvalid(input, false);
+    });
+    input.addEventListener('change', () => {
+      updateDateDisplay(input);
+      setFieldInvalid(input, false);
+    });
     input.closest('.investment-date-control')?.addEventListener('click', () => {
       openDatePicker(input);
     });
+  });
+  [amountInput, symbolInput].forEach((input) => {
+    input.addEventListener('input', () => setFieldInvalid(input, false));
   });
   form.addEventListener('submit', handleSubmit);
 })();

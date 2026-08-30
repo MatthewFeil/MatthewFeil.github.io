@@ -4,23 +4,63 @@
     <a class="site-title" rel="author" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
 
     <nav class="site-nav" aria-label="Primary navigation">
-      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-      <label class="nav-toggle" for="nav-trigger">Menu</label>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-panel">
+        <span>Menu</span>
+        <span class="nav-toggle-mark" aria-hidden="true"></span>
+      </button>
 
-      <div class="trigger">
-        <a class="page-link" href="{{ "/#about" | relative_url }}">About</a>
-        <a class="page-link" href="{{ "/#posts" | relative_url }}">Posts</a>
-        <a class="page-link" href="{{ "/playlists.html/" | relative_url }}">Playlists</a>
-        <a class="page-link" href="{{ "/cta-l-live-art/" | relative_url }}">Chicago 'L' Live Art</a>
-        <div class="nav-dropdown nav-dropdown-tools">
-          <button class="page-link nav-dropdown-summary" type="button" aria-expanded="false" aria-haspopup="true">Tools</button>
-          <div class="nav-dropdown-menu">
-            <a class="page-link" href="{{ "/gradecalculatorv2/" | relative_url }}">Finals Grade Calculator</a>
-            <a class="page-link" href="{{ "/investmentcalculator/" | relative_url }}">Stock Return Calculator</a>
-            <a class="page-link" href="{{ "/interestcalculator/" | relative_url }}">Interest Calculator</a>
+      <div class="trigger" id="site-nav-panel">
+        <div class="nav-panel-inner">
+          <div class="nav-direct-links">
+            <a class="page-link" data-nav-section="about" href="{{ "/#about" | relative_url }}"><span class="page-link-label">About</span></a>
+            <a class="page-link" data-nav-section="posts" href="{{ "/#posts" | relative_url }}"><span class="page-link-label">Posts</span></a>
+            <a class="page-link" data-nav-route="playlists" href="{{ "/playlists.html/" | relative_url }}"><span class="page-link-label">Playlists</span></a>
           </div>
+
+          <div class="nav-group nav-group-projects">
+            <button class="page-link nav-group-trigger" id="nav-projects-trigger" type="button" aria-expanded="false" aria-controls="nav-projects-panel" aria-haspopup="true"><span class="page-link-label">Projects</span></button>
+            <div class="nav-group-menu" id="nav-projects-panel" aria-labelledby="nav-projects-trigger" aria-hidden="true" inert>
+              <div class="nav-group-menu-inner">
+                <span class="nav-menu-kicker">Projects</span>
+                <a class="nav-shelf-item nav-shelf-item-featured" href="{{ "/cta-l-live-art/" | relative_url }}">
+                  <span class="nav-shelf-item-title">Chicago 'L' Live Art</span>
+                  <span class="nav-shelf-item-summary">Live train-position artwork.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-group nav-group-tools">
+            <button class="page-link nav-group-trigger" id="nav-tools-trigger" type="button" aria-expanded="false" aria-controls="nav-tools-panel" aria-haspopup="true"><span class="page-link-label">Tools</span></button>
+            <div class="nav-group-menu" id="nav-tools-panel" aria-labelledby="nav-tools-trigger" aria-hidden="true" inert>
+              <div class="nav-group-menu-inner nav-tools-list">
+                <span class="nav-menu-kicker">Tools</span>
+                <a class="nav-shelf-item" href="{{ "/gradecalculatorv2/" | relative_url }}">
+                  <span class="nav-shelf-item-title">Finals Grade Calculator</span>
+                  <span class="nav-shelf-item-summary">Calculate what you need on your final.</span>
+                </a>
+                <a class="nav-shelf-item" href="{{ "/investmentcalculator/" | relative_url }}">
+                  <span class="nav-shelf-item-title">Stock Return Calculator</span>
+                  <span class="nav-shelf-item-summary">Compare an investment across time.</span>
+                </a>
+                <a class="nav-shelf-item" href="{{ "/interestcalculator/" | relative_url }}">
+                  <span class="nav-shelf-item-title">Interest Calculator</span>
+                  <span class="nav-shelf-item-summary">Explore compound interest growth.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." title="Theme: System. Activate to switch to light mode.">
+            <span class="theme-toggle-icon" aria-hidden="true">
+              <svg data-theme-icon="system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3.5" y="4" width="17" height="12" rx="0"/><path d="M8 20h8M12 16v4"/></svg>
+              <svg data-theme-icon="light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
+              <svg data-theme-icon="dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/></svg>
+            </span>
+          </button>
+
+          <a class="page-link page-link-personal" data-nav-route="personal" href="{{ "/personal/" | relative_url }}"><span class="page-link-label">Personal Space</span></a>
         </div>
-        <a class="page-link" href="{{ "/personal/" | relative_url }}">Personal Space</a>
       </div>
     </nav>
   </div>

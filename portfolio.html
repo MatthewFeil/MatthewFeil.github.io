@@ -34,7 +34,7 @@ extra_css:
       </div>
     </div>
 
-    <div class="portfolio-summary" id="portfolio-summary">
+    <div class="portfolio-summary" id="portfolio-summary" aria-label="Portfolio summary">
       <div>
         <span>Total value</span>
         <strong id="summary-value">$0.00</strong>
@@ -53,9 +53,9 @@ extra_css:
       </div>
     </div>
 
-    <dialog class="portfolio-dialog" id="stock-dialog">
+    <dialog class="portfolio-dialog" id="stock-dialog" aria-labelledby="stock-dialog-title">
       <div class="portfolio-dialog-head">
-        <h3>Add stock</h3>
+        <h3 id="stock-dialog-title">Add stock</h3>
         <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add stock dialog">&times;</button>
       </div>
       <form id="stock-form" class="portfolio-form">
@@ -69,9 +69,9 @@ extra_css:
       </form>
     </dialog>
 
-    <dialog class="portfolio-dialog" id="log-dialog">
+    <dialog class="portfolio-dialog" id="log-dialog" aria-labelledby="log-dialog-title">
       <div class="portfolio-dialog-head">
-        <h3>Add investment log</h3>
+        <h3 id="log-dialog-title">Add investment log</h3>
         <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add log dialog">&times;</button>
       </div>
       <form id="log-form" class="portfolio-form">
@@ -88,10 +88,10 @@ extra_css:
         </select>
 
         <label for="log-price">Purchase price per share</label>
-        <input id="log-price" name="purchase_price" type="number" min="0.0001" step="0.0001" placeholder="125.50" required>
+        <input id="log-price" name="purchase_price" type="number" min="0.0001" step="0.0001" inputmode="decimal" placeholder="125.50" required>
 
         <label for="log-amount">Total purchase amount</label>
-        <input id="log-amount" name="total_purchase_amount" type="number" min="0.01" step="0.01" placeholder="250.00" required>
+        <input id="log-amount" name="total_purchase_amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="250.00" required>
 
         <button type="submit" disabled>Add log</button>
       </form>
@@ -101,15 +101,15 @@ extra_css:
       <table class="portfolio-table">
         <thead>
           <tr>
-            <th>Stock</th>
-            <th>Shares</th>
-            <th>Avg purchase</th>
-            <th>Current price</th>
-            <th>Cost basis</th>
-            <th>Total value</th>
-            <th id="table-gain-heading">Gain/loss</th>
-            <th id="table-percent-heading">Gain/loss %</th>
-            <th></th>
+            <th scope="col">Stock</th>
+            <th scope="col">Shares</th>
+            <th scope="col">Avg purchase</th>
+            <th scope="col">Current price</th>
+            <th scope="col">Cost basis</th>
+            <th scope="col">Total value</th>
+            <th id="table-gain-heading" scope="col">Gain/loss</th>
+            <th id="table-percent-heading" scope="col">Gain/loss %</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody id="portfolio-rows"></tbody>

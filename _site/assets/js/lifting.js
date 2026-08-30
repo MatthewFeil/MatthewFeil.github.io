@@ -92,6 +92,7 @@
     list: document.getElementById('lifting-list'),
     status: document.getElementById('lifting-status')
   };
+  const logDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
   function setStatus(message, isError = false) {
     els.status.textContent = message;
     els.status.style.color = isError ? 'var(--lifting-warn)' : '';
@@ -171,6 +172,11 @@
       '"': '&quot;',
       "'": '&#39;'
     })[character]);
+  }
+
+  function formatLogDate(value) {
+    const date = new Date(`${value}T00:00:00Z`);
+    return Number.isNaN(date.getTime()) ? escapeHtml(value) : logDate.format(date);
   }
 
   function estimateOneRepMax(log) {
@@ -378,7 +384,7 @@
           <article class="lifting-log">
             <div>
               <strong>${formatWeight(Number(log.weight))} x ${log.reps}</strong>
-              <p><span class="lifting-log-date">${escapeHtml(log.lifted_at)}</span>${log.notes ? ` - ${escapeHtml(log.notes)}` : ''}</p>
+              <p><span class="lifting-log-date">${formatLogDate(log.lifted_at)}</span>${log.notes ? ` - ${escapeHtml(log.notes)}` : ''}</p>
             </div>
             <button class="lifting-action" type="button" data-delete-log="${escapeHtml(log.id)}">Delete</button>
           </article>
@@ -443,14 +449,14 @@
     ));
 
     if (!filtered.length) {
-      els.list.innerHTML = `<p class="lifting-empty">${state.lifts.length ? 'No lifts match your search.' : 'No lift types yet.'}</p>`;
+      els.list.innerHTML = `<p class="lifting-empty">${state.lifts.length ? 'No lifts match your search.' : 'No lift types yet. Add a lift to start logging sets and tracking progress.'}</p>`;
       return;
     }
 
     els.list.innerHTML = filtered.map((item) => `
       <article class="lifting-card">
         <div class="lifting-card-summary">
-          <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-expanded="false">
+          <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-controls="details-${escapeHtml(item.lift.id)}" aria-expanded="false">
             <div class="lifting-card-title">
               <h3>${escapeHtml(item.lift.name)}</h3>
               <div class="lifting-card-meta">

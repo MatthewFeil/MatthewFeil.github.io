@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-28T00:00:00Z",
+  "title": "Design System: Matthew Feil",
+  "extensions": {
+    "colorMeta": {
+      "background-light": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#ffffff", "#f2f2f2", "#e7e7e7"]
+      },
+      "text-light": {
+        "role": "neutral",
+        "displayName": "Near-Black Ink",
+        "canonical": "#0a0a0a",
+        "tonalRamp": ["#626262", "#151515", "#0a0a0a"]
+      },
+      "background-dark": {
+        "role": "neutral",
+        "displayName": "Night Field",
+        "canonical": "#090909",
+        "tonalRamp": ["#090909", "#141414", "#202020"]
+      },
+      "text-dark": {
+        "role": "neutral",
+        "displayName": "Bright Ink",
+        "canonical": "#f6f6f6",
+        "tonalRamp": ["#a7a7a7", "#f6f6f6"]
+      },
+      "signal-red": {
+        "role": "primary",
+        "displayName": "Signal Red",
+        "canonical": "#e3262e",
+        "tonalRamp": ["#b90f17", "#e3262e", "#ff343d", "#ff5c63"]
+      },
+      "success-green": {
+        "role": "secondary",
+        "displayName": "Status Green",
+        "canonical": "#16703a",
+        "tonalRamp": ["#16703a", "#54c982"]
+      },
+      "warning-amber": {
+        "role": "secondary",
+        "displayName": "Status Amber",
+        "canonical": "#9b6300",
+        "tonalRamp": ["#9b6300", "#e0b35b"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Signal",
+        "purpose": "Hero identity, page titles, and short high-impact statements."
+      },
+      "body": {
+        "displayName": "Working Text",
+        "purpose": "Reading copy, forms, tool values, and ordinary UI text."
+      },
+      "label": {
+        "displayName": "Utility Label",
+        "purpose": "Compact uppercase navigation, metadata, controls, and field labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "interactive-offset",
+        "value": "5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent)",
+        "purpose": "Hover and focus response for clickable cards and command controls."
+      }
+    ],
+    "motion": [
+      {
+        "name": "quick-interaction",
+        "value": "0.15s to 0.32s ease",
+        "purpose": "Underline, color, opacity, and transform changes for direct interaction."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "navigation-stack",
+        "value": "1040px"
+      },
+      {
+        "name": "narrow-mobile",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action for a task or form.",
+      "html": "<button class=\"ds-btn-primary\">SAVE CHANGES</button>",
+      "css": ".ds-btn-primary { min-height: 2.5rem; border: 1px solid #e3262e; border-radius: 0; padding: 0.7rem 1rem; background: #e3262e; color: #fff; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-transform: uppercase; transition: background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease; } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: #b90f17; box-shadow: 5px 5px 0 rgba(10, 10, 10, 0.18); outline: 2px solid #e3262e; outline-offset: 2px; transform: translate(-2px, -2px); }"
+    },
+    {
+      "name": "Tool Field",
+      "kind": "input",
+      "refersTo": "tool-control",
+      "description": "Square input for compact calculator and tracker forms.",
+      "html": "<label class=\"ds-field\">AMOUNT<input value=\"1000\" inputmode=\"decimal\"></label>",
+      "css": ".ds-field { display: grid; gap: 0.35rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.1; text-transform: uppercase; } .ds-field input { min-height: 2.5rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.5rem 0.65rem; background: #f2f2f2; color: #0a0a0a; font: inherit; letter-spacing: 0; text-transform: none; } .ds-field input:focus-visible { outline: 2px solid #e3262e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Navigation Link",
+      "kind": "nav",
+      "refersTo": "navigation-link",
+      "description": "Compact uppercase route link with a signal underline on interaction.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\">PROJECTS</a>",
+      "css": ".ds-nav-link { position: relative; display: inline-block; padding: 0.55rem 0 0.5rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-decoration: none; text-transform: uppercase; } .ds-nav-link::after { position: absolute; right: 0; bottom: 0.15rem; left: 0; height: 2px; background: #e3262e; content: ''; transform: scaleX(0); transform-origin: left center; transition: transform 0.16s ease; } .ds-nav-link:hover, .ds-nav-link:focus-visible { color: #0a0a0a; outline: 2px solid #e3262e; outline-offset: 2px; } .ds-nav-link:hover::after, .ds-nav-link:focus-visible::after { transform: scaleX(1); }"
+    },
+    {
+      "name": "Post Card",
+      "kind": "card",
+      "refersTo": "post-card",
+      "description": "Click-through article summary with metadata, display title, and plain-language description.",
+      "html": "<a class=\"ds-post-card\" href=\"#\"><span class=\"ds-post-meta\">ARTICLE · JUL 6, 2026</span><strong>CHICAGO 'L' LIVE ART</strong><span>A live artwork made from real train positions.</span></a>",
+      "css": ".ds-post-card { display: grid; gap: 1.25rem; min-height: 8rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.85rem; background: #f2f2f2; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; } .ds-post-card strong { font-family: 'Archivo Black', Impact, sans-serif; font-size: 1.15rem; line-height: 1.05; } .ds-post-meta { color: #e3262e; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; } .ds-post-card:hover, .ds-post-card:focus-visible { box-shadow: 5px 5px 0 rgba(10, 10, 10, 0.18); outline: 2px solid #e3262e; outline-offset: 2px; transform: translate(-2px, -2px); }"
+    },
+    {
+      "name": "Tool Switcher",
+      "kind": "chip",
+      "refersTo": "tool-switcher",
+      "description": "Square segmented route switcher for closely related calculator tools.",
+      "html": "<nav class=\"ds-switcher\"><a class=\"ds-switcher-active\" href=\"#\">STOCK</a><a href=\"#\">INTEREST</a></nav>",
+      "css": ".ds-switcher { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(10, 10, 10, 0.18); background: rgba(10, 10, 10, 0.18); } .ds-switcher a { min-width: 7rem; padding: 0.55rem 0.8rem; background: #f2f2f2; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1; text-align: center; text-decoration: none; text-transform: uppercase; } .ds-switcher a + a { border-left: 1px solid rgba(10, 10, 10, 0.18); } .ds-switcher a:hover, .ds-switcher a:focus-visible { outline: 2px solid #e3262e; outline-offset: 2px; } .ds-switcher .ds-switcher-active { background: #e3262e; color: #fff; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Signalboard Studio",
+    "overview": "A high-contrast personal project site that treats real work, tools, and ongoing experiments as public signals. The system is direct, flat, and utilitarian, with visual energy concentrated in display typography, precise red accents, and interaction states.",
+    "keyCharacteristics": [
+      "Oversized Archivo Black display type paired with Familjen Grotesk reading and UI text.",
+      "Black, white, and gray tonal structure with red used as a rare signal.",
+      "Square borders and flat surfaces with depth reserved for interaction.",
+      "Desktop asymmetry that stacks into practical mobile layouts."
+    ],
+    "rules": [
+      {
+        "name": "The Rare Signal Rule",
+        "body": "Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Voice Rule",
+        "body": "Archivo Black is for display moments only. Familjen Grotesk carries all reading and operational UI text; do not introduce a third type family without a distinct role.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Do not add resting shadows, glass layers, or ornamental blur. Depth must explain interaction or content grouping.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Use full-width dividers, alignment, and tonal shifts before adding a panel.",
+      "Keep interactive controls square, bordered, and touch-sized on small screens.",
+      "Use red sparingly for emphasis, active state, focus, and meaningful status."
+    ],
+    "donts": [
+      "Do not introduce rounded SaaS cards, pill controls, or decorative gradient fields.",
+      "Do not use red as a generic background or substitute it for hierarchy.",
+      "Do not animate height, padding, margin, or other layout-driving properties for navigation reveals."
+    ]
+  }
+}

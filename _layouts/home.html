@@ -5,17 +5,25 @@ layout: base
 <div class="home">
   <section class="home-hero" aria-labelledby="home-title">
     <div class="home-title-block">
-      <h1 id="home-title">Matthew Feil</h1>
+      <h1 id="home-title"><span class="home-title-line">Matthew</span><span class="home-title-line">Feil</span></h1>
     </div>
     <div class="home-intro-block">
-      <div class="home-link-list" aria-label="Featured pages">
-        <a href="#about">About</a>
-        <a href="#posts">Posts</a>
-        <a href="{{ "/cta-l-live-art/" | relative_url }}">Chicago 'L' Live Art</a>
-        <a href="{{ "/gradecalculatorv2/" | relative_url }}">Finals Grade Calculator</a>
-        <a href="{{ "/investmentcalculator/" | relative_url }}">Investment Calculator</a>
-        <a href="{{ "/playlists.html/" | relative_url }}">My Playlists</a>
+      <a class="home-featured-project" href="{{ "/cta-l-live-art/" | relative_url }}">
+        <span class="home-project-label">Featured project</span>
+        <span class="home-featured-project-title">Chicago 'L' Live Art</span>
+        <span class="home-featured-project-summary">A live artwork made from real Chicago 'L' train positions.</span>
+      </a>
+
+
+      <div class="home-project-index" aria-label="More projects and tools">
+        <h2 class="home-project-index-heading">More to explore</h2>
+        <ul class="home-link-list">
+          <li><a href="{{ "/gradecalculatorv2/" | relative_url }}"><span class="home-project-name">Finals Grade Calculator</span></a></li>
+          <li><a href="{{ "/investmentcalculator/" | relative_url }}"><span class="home-project-name">Stock Return Calculator</span></a></li>
+          <li><a href="{{ "/playlists.html/" | relative_url }}"><span class="home-project-name">My Playlists</span></a></li>
+        </ul>
       </div>
+
     </div>
   </section>
 
@@ -45,7 +53,9 @@ layout: base
       {%- for post in posts -%}
       <li>
         <a class="post-card" href="{{ post.url | relative_url }}">
-          <span class="post-meta">{{ post.date | date: date_format }}</span>
+          <span class="post-meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
+          </span>
           <span class="post-card-copy">
             <h3>
               {{ post.title | escape }}
@@ -80,3 +90,5 @@ layout: base
   {%- endif -%}
 
 </div>
+
+<script src="{{ "/assets/js/home-title-type.js" | relative_url }}" defer></script>

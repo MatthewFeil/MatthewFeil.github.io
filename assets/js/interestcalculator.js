@@ -133,8 +133,33 @@
   }
 
   function setStatus(message, tone) {
+    status.classList.remove('is-revealing');
     status.textContent = message;
     status.dataset.tone = tone || '';
+
+    if (message) {
+      window.requestAnimationFrame(() => status.classList.add('is-revealing'));
+    }
+  }
+
+  function setFieldInvalid(input, isInvalid) {
+    if (isInvalid) {
+      input.setAttribute('aria-invalid', 'true');
+    } else {
+      input.removeAttribute('aria-invalid');
+    }
+    input.closest('.investment-field')?.classList.toggle('is-invalid', isInvalid);
+  }
+
+  function clearFieldErrors() {
+    [principalInput, dateInput, endDateInput, rateInput, methodInput].forEach((input) => {
+      setFieldInvalid(input, false);
+    });
+  }
+
+  function showValidationError(message, inputs) {
+    inputs.forEach((input) => setFieldInvalid(input, true));
+    setStatus(message, 'error');
   }
 
   function setLoading(isLoading) {
@@ -142,6 +167,15 @@
     submitButton.classList.toggle('is-loading', isLoading);
     submitButton.setAttribute('aria-busy', String(isLoading));
     submitButton.textContent = isLoading ? 'Calculating...' : 'Calculate';
+    results.setAttribute('aria-busy', String(isLoading));
+
+    if (isLoading) {
+      setDetailsOpen(false);
+      results.hidden = false;
+      results.dataset.state = 'loading';
+      app.dataset.calculationState = 'loading';
+      setStatus('Calculating interest and inflation…', 'loading');
+    }
   }
 
   function setSigned(element, value, formatter) {
@@ -159,6 +193,7 @@
   function setDetailsOpen(isOpen) {
     detailsPanel.hidden = !isOpen;
     detailsToggle.setAttribute('aria-expanded', String(isOpen));
+    detailsToggle.textContent = isOpen ? 'Hide details' : 'Details';
   }
 
   async function fetchWithTimeout(url, init = {}, timeout = 20000) {
@@ -238,7 +273,7 @@
     const inflatedAmount = inflationFactor ? principal * inflationFactor : null;
     const methodLabel = method === 'simple' ? 'Simple' : 'Compound';
 
-    output.title.textContent = methodLabel;
+    output.title.textContent = `${methodLabel} interest`;
     output.range.textContent = `${formatDate(startDate)} to ${formatDate(endDate)}`;
     output.currentValue.textContent = currencyFormatter.format(currentValue);
     setSigned(output.totalGain, totalGain, currencyFormatter);
@@ -266,10 +301,17 @@
     output.inflationSource.textContent = inflation?.source || 'Unavailable';
 
     results.hidden = false;
+    results.dataset.state = 'results';
+    results.classList.remove('is-revealing');
+    void results.offsetWidth;
+    results.classList.add('is-revealing');
+    app.dataset.calculationState = 'results';
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    clearFieldErrors();
 
     const principal = Number(principalInput.value);
     const startDate = parseInputDate(dateInput.value);
@@ -279,21 +321,29 @@
     const today = new Date();
 
     if (!Number.isFinite(principal) || principal <= 0 || !startDate || !endDate || !Number.isFinite(annualRate)) {
-      setStatus('Enter an amount, dates, and interest rate.', 'error');
+      const invalidInputs = [
+        !Number.isFinite(principal) || principal <= 0 ? principalInput : null,
+        !startDate ? dateInput : null,
+        !endDate ? endDateInput : null,
+        !Number.isFinite(annualRate) ? rateInput : null
+      ].filter(Boolean);
+      showValidationError('Enter an amount, dates, and interest rate.', invalidInputs);
       return;
     }
 
     if (startDate > today || endDate > today) {
-      setStatus('Choose dates that have already happened.', 'error');
+      showValidationError('Choose dates that have already happened.', [
+        ...(startDate > today ? [dateInput] : []),
+        ...(endDate > today ? [endDateInput] : [])
+      ]);
       return;
     }
 
     if (endDate < startDate) {
-      setStatus('Choose an end date after the investment date.', 'error');
+      showValidationError('Choose an end date after the start date.', [endDateInput]);
       return;
     }
 
-    setStatus('');
     setLoading(true);
 
     try {
@@ -318,9 +368,11 @@
         inflation
       });
 
-      setStatus(inflation ? '' : 'Inflation unavailable.');
+      setStatus(inflation ? 'Interest calculated.' : 'Interest calculated. Inflation data is unavailable.', inflation ? 'success' : 'warning');
     } catch (error) {
       results.hidden = true;
+      delete results.dataset.state;
+      delete app.dataset.calculationState;
       setStatus(error instanceof Error ? error.message : 'Interest calculation failed.', 'error');
     } finally {
       setLoading(false);
@@ -346,11 +398,21 @@
     setDetailsOpen(detailsPanel.hidden);
   });
   [dateInput, endDateInput].forEach((input) => {
-    input.addEventListener('input', () => updateDateDisplay(input));
-    input.addEventListener('change', () => updateDateDisplay(input));
+    input.addEventListener('input', () => {
+      updateDateDisplay(input);
+      setFieldInvalid(input, false);
+    });
+    input.addEventListener('change', () => {
+      updateDateDisplay(input);
+      setFieldInvalid(input, false);
+    });
     input.closest('.investment-date-control')?.addEventListener('click', () => {
       openDatePicker(input);
     });
   });
+  [principalInput, rateInput].forEach((input) => {
+    input.addEventListener('input', () => setFieldInvalid(input, false));
+  });
+  methodInput.addEventListener('change', () => setFieldInvalid(methodInput, false));
   form.addEventListener('submit', handleSubmit);
 })();

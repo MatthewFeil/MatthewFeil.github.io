@@ -1,150 +1,19 @@
 ---
-layout: page
-title: Grade Calculator (Legacy)
+layout: null
 permalink: /gradecalculatorv1/
 ---
-
-<div class="legacy-calculator-banner">
-  This is the old version of my grade calculator.
-  <a href="{{ "/gradecalculatorv2/" | relative_url }}">Try the new one here</a>.
-</div>
-
-<div class="calculator">
-  <div id="controls">
-    <label for="currentGrade">Current Semester Grade (%):</label>
-    <input type="number" id="currentGrade" min="0" max="100" step="0.01" />
-    <button id="calculate">Calculate</button>
-  </div>
-<br>
-  <table id="results" hidden>
-    <thead>
-      <tr>
-        <th>Letter Grade</th>
-        <th>Needed on Final (No Rounding, %)</th>
-        <th>Needed on Final (With Rounding, %)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-
-<style>
-.calculator input,
-.calculator button {
-  font-size: 1em;
-  padding: 0.5em;
-  margin: 0;
-  background-color: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
-  color: var(--site-text);
-  border: 1px solid var(--site-border);
-  border-radius: 0;
-}
-
-.calculator button {
-  background-color: var(--site-accent);
-  color: #fff;
-  cursor: pointer;
-  border-color: var(--site-accent);
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-}
-
-.calculator button:hover {
-  background-color: color-mix(in srgb, var(--site-accent) 92%, white);
-  border-color: color-mix(in srgb, var(--site-accent) 72%, white);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--site-text) 18%, transparent);
-  transform: translate(-2px, -2px);
-}
-
-.legacy-calculator-banner {
-  margin-bottom: 1rem;
-  padding: 0.85rem 1rem;
-  background: color-mix(in srgb, var(--site-bg) 90%, var(--site-text));
-  border: 1px solid var(--site-border);
-  border-radius: 0;
-}
-  #results th,
-  #results td {
-    text-align: center;
-  }
-
-  .impossible {
-    color: #d00;
-  }
-
-  .guaranteed {
-    color: #080;
-  }
-
-  @media (hover: none), (pointer: coarse) {
-    .calculator button:hover {
-      background-color: var(--site-accent);
-      border-color: var(--site-accent);
-      box-shadow: none;
-      transform: none;
-    }
-  }
-</style>
-
-<script>
-  const gradeScale = [
-    { name: 'A+', low: 98 },
-    { name: 'A',  low: 93 },
-    { name: 'A-', low: 90 },
-    { name: 'B+', low: 87 },
-    { name: 'B',  low: 83 },
-    { name: 'B-', low: 80 },
-    { name: 'C+', low: 77 },
-    { name: 'C',  low: 73 },
-    { name: 'C-', low: 70 },
-    { name: 'D+', low: 67 },
-    { name: 'D',  low: 63 },
-    { name: 'D-', low: 60 },
-    { name: 'F',  low: 0  }
-  ];
-
-  function neededFinal(current, target) {
-    return (target - current * 0.8) / 0.2;
-  }
-
-  document.getElementById('calculate').addEventListener('click', () => {
-    const current = parseFloat(document.getElementById('currentGrade').value);
-    if (isNaN(current)) {
-      alert('Please enter a valid current grade.');
-      return;
-    }
-
-    const results = gradeScale.map(r => ({
-      name: r.name,
-      raw: neededFinal(current, r.low),
-      rounded: neededFinal(current, r.low - 0.5)
-    }));
-
-    const guaranteedIndex = results.findIndex(r => r.raw <= 0);
-    const displayResults = guaranteedIndex >= 0 ? results.slice(0, guaranteedIndex + 1) : results;
-
-    const tbody = document.querySelector('#results tbody');
-    tbody.innerHTML = '';
-
-    displayResults.forEach(r => {
-      let rawDisplay = r.raw.toFixed(2);
-      let rawClass = '';
-      if (r.raw > 100) { rawDisplay = 'Not possible'; rawClass = 'impossible'; }
-      else if (r.raw <= 0) { rawDisplay = 'Guaranteed'; rawClass = 'guaranteed'; }
-
-      let roundedDisplay = r.rounded.toFixed(2);
-      let roundedClass = '';
-      if (r.rounded > 100) { roundedDisplay = 'Not possible'; roundedClass = 'impossible'; }
-      else if (r.rounded <= 0) { roundedDisplay = 'Guaranteed'; roundedClass = 'guaranteed'; }
-
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${r.name}</td>
-        <td class="${rawClass}">${rawDisplay}</td>
-        <td class="${roundedClass}">${roundedDisplay}</td>
-      `;
-      tbody.appendChild(row);
-    });
-
-    document.getElementById('results').hidden = false;
-  });
-</script>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ "/gradecalculatorv2/" | relative_url }}">
+    <link rel="canonical" href="{{ "/gradecalculatorv2/" | absolute_url }}">
+    <title>Finals Grade Calculator</title>
+    <script>
+      window.location.replace('{{ "/gradecalculatorv2/" | relative_url }}');
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to the <a href="{{ "/gradecalculatorv2/" | relative_url }}">Finals Grade Calculator</a>…</p>
+  </body>
+</html>

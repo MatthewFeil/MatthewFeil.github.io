@@ -8,7 +8,7 @@ extra_css:
 ---
 
 <section
-  class="investment-app"
+  class="investment-app investment-stock-app"
   data-investment-calculator
   data-api-url="https://ofrbbmkbbtohocgifwly.functions.supabase.co/market-data-api"
 >
@@ -20,7 +20,7 @@ extra_css:
   <form class="investment-form" id="investment-form">
     <div class="investment-input-grid" aria-label="Investment calculator inputs">
       <label class="investment-field" for="investment-amount">
-        <span>Invest</span>
+        <span>Amount invested</span>
         <span class="investment-money-field">
           <span aria-hidden="true">$</span>
           <input id="investment-amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" value="1000" required>
@@ -44,28 +44,39 @@ extra_css:
       </label>
 
       <label class="investment-field" for="investment-symbol">
-        <span>In ticker</span>
+        <span>Ticker</span>
         <input id="investment-symbol" name="symbol" type="text" value="SPY" autocapitalize="characters" autocomplete="off" spellcheck="false" required>
       </label>
 
       <button id="investment-submit" type="submit">Calculate</button>
     </div>
 
-    <p class="investment-status" id="investment-status" role="status"></p>
+    <p class="investment-status" id="investment-status" role="status" aria-live="polite" aria-atomic="true"></p>
   </form>
 
-  <section class="investment-results" id="investment-results" hidden>
-    <div class="investment-results-head">
-      <h2 id="investment-result-title">SPY</h2>
+  <section class="investment-results" id="investment-results" aria-busy="false" hidden>
+    <div class="investment-results-loading" aria-hidden="true">
+      <div>
+        <span class="investment-results-loading-label">Calculating return</span>
+        <strong>Looking up prices and inflation</strong>
+      </div>
+      <div class="investment-results-skeleton" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="investment-results-content">
+      <div class="investment-results-head">
+      <h2 id="investment-result-title">SPY return</h2>
       <div class="investment-results-actions">
         <span id="investment-result-range"></span>
         <button class="investment-details-toggle" id="investment-details-toggle" type="button" aria-expanded="false" aria-controls="investment-details">
           Details
         </button>
       </div>
-    </div>
+      </div>
 
-    <div class="investment-values" aria-label="Investment values">
+      <div class="investment-values" aria-label="Investment values">
       <div class="investment-result-card investment-result-card-large">
         <span>End value</span>
         <strong id="result-current-value">$0.00</strong>
@@ -74,9 +85,9 @@ extra_css:
         <span>Inflation adjusted value</span>
         <strong id="result-real-value">$0.00</strong>
       </div>
-    </div>
+      </div>
 
-    <div class="investment-gains" aria-label="Investment gains">
+      <div class="investment-gains" aria-label="Investment gains">
       <div class="investment-result-card">
         <span>Total gain</span>
         <strong>
@@ -91,9 +102,9 @@ extra_css:
           <small id="result-real-percent">(0.00%)</small>
         </strong>
       </div>
-    </div>
+      </div>
 
-    <div class="investment-table-wrap" id="investment-details" hidden>
+      <div class="investment-table-wrap" id="investment-details" hidden>
       <table class="investment-table">
         <tbody>
           <tr>
@@ -138,6 +149,7 @@ extra_css:
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   </section>
 </section>

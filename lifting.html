@@ -34,10 +34,10 @@ extra_css:
     <p id="lifting-status" class="lifting-status" role="status"></p>
   </div>
 
-  <dialog class="lifting-modal" id="add-lift-modal">
+  <dialog class="lifting-modal" id="add-lift-modal" aria-labelledby="add-lift-title">
     <form id="add-lift-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Add lift type</h3>
+        <h3 id="add-lift-title">Add lift type</h3>
         <button id="add-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <label for="lift-name">Lift name</label>
@@ -54,10 +54,10 @@ extra_css:
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-log-modal" id="log-set-modal">
+  <dialog class="lifting-modal lifting-log-modal" id="log-set-modal" aria-labelledby="log-set-title">
     <form id="log-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Log a set</h3>
+        <h3 id="log-set-title">Log a set</h3>
         <button id="log-set-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <label for="log-date">Date</label>
@@ -91,7 +91,7 @@ extra_css:
             <span class="lifting-equipment-badge" id="log-equipment-badge" aria-hidden="true"></span>
             <span id="log-equipment-instruction"></span>
           </p>
-          <input id="log-weight" name="weight" type="number" min="0.5" step="0.5" placeholder="225" required>
+          <input id="log-weight" name="weight" type="number" min="0.5" step="0.5" inputmode="decimal" placeholder="225" required>
         </div>
         <div class="lifting-log-field">
           <label for="log-reps">Reps</label>
@@ -125,10 +125,10 @@ extra_css:
     </form>
   </dialog>
 
-  <dialog class="lifting-modal" id="rename-lift-modal">
+  <dialog class="lifting-modal" id="rename-lift-modal" aria-labelledby="rename-lift-title">
     <form id="rename-lift-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Edit lift</h3>
+        <h3 id="rename-lift-title">Edit lift</h3>
         <button id="rename-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <input id="rename-lift-id" name="id" type="hidden">
@@ -145,7 +145,7 @@ extra_css:
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal">
+  <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal" aria-labelledby="lift-logs-title">
     <div class="lifting-modal-head">
       <h3 id="lift-logs-title">Logs</h3>
       <div class="lifting-modal-head-actions">

@@ -8,6 +8,8 @@
   --personal-dim: color-mix(in srgb, var(--site-text) 50%, transparent);
   --personal-red: var(--site-bad);
   --personal-line: var(--tool-border);
+  --personal-major-gap: clamp(1.5rem, 3vw, 2.5rem);
+  --personal-ease-out: cubic-bezier(0.25, 1, 0.5, 1);
   position: relative;
   display: block;
   color: var(--personal-ink);
@@ -70,10 +72,6 @@
   text-wrap: balance;
 }
 
-.personal-lock h1::first-letter {
-  color: var(--site-accent);
-}
-
 .personal-form {
   position: relative;
   display: grid;
@@ -90,16 +88,15 @@
   top: -1px;
   bottom: auto;
   left: 0;
-  width: 18%;
+  width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
+  background: var(--personal-red);
   content: "";
   opacity: 0;
 }
 
 .personal-app.is-loading .personal-form::after {
-  animation: personal-password-loading-dash 0.9s ease-in-out infinite;
-  opacity: 1;
+  opacity: 0.72;
 }
 
 .personal-app.is-denied .personal-form {
@@ -180,15 +177,15 @@
   line-height: 1;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
 .personal-form button {
   width: fit-content;
   margin-top: 0.2rem;
   border-color: var(--site-accent);
-  background: var(--site-accent);
-  color: #fff;
+  background: transparent;
+  color: var(--site-accent);
   padding: 0.7rem 1rem;
 }
 
@@ -203,14 +200,22 @@
 }
 
 .personal-form button:hover,
-.personal-form button:focus-visible,
+.personal-form button:focus-visible {
+  border-color: var(--site-accent-strong);
+  background: color-mix(in srgb, var(--site-accent) 10%, transparent);
+  color: var(--site-accent-strong);
+}
+
 .personal-home-link:hover,
 .personal-home-link:focus-visible {
-  border-color: var(--site-accent);
-  background: color-mix(in srgb, var(--site-accent) 90%, white);
-  color: #fff;
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
+  border-color: var(--site-accent-strong);
+  background: color-mix(in srgb, var(--site-accent) 10%, transparent);
+  color: var(--site-accent-strong);
+}
+
+.personal-form button:focus-visible,
+.personal-home-link:focus-visible {
+  outline-color: var(--site-accent);
 }
 
 .personal-form button:disabled {
@@ -244,28 +249,6 @@
   font-weight: 800;
   letter-spacing: 0;
   text-transform: none;
-  text-shadow: 0 0 18px rgba(255, 39, 56, 0.7);
-}
-
-.personal-app.is-denied .personal-lock {
-  animation: personal-denied-shake 0.32s ease both;
-}
-
-@keyframes personal-password-loading-dash {
-  0% {
-    left: 0;
-    width: 18%;
-  }
-
-  50% {
-    left: 29%;
-    width: 42%;
-  }
-
-  100% {
-    left: 82%;
-    width: 18%;
-  }
 }
 
 .personal-workspace {
@@ -284,12 +267,12 @@
   justify-content: space-between;
   gap: 0.6rem;
   align-items: center;
-  margin-bottom: var(--tool-section-gap);
+  margin-bottom: var(--personal-major-gap);
 }
 
 .personal-heading h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 7vw, 5.4rem);
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
   letter-spacing: 0;
   line-height: 0.9;
   margin: 0;
@@ -300,7 +283,7 @@
   margin: 0.35rem 0 0;
   color: var(--personal-muted);
   font-size: 0.82rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: var(--tool-label-spacing);
   line-height: 1.2;
   text-transform: uppercase;
@@ -319,23 +302,51 @@
   line-height: 1.1;
   padding: 0.55rem 0.8rem;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .personal-heading button:hover,
 .personal-heading button:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
-  border-color: var(--site-bad);
-  color: var(--site-bad);
+  border-color: var(--site-text);
+  color: var(--site-text);
+}
+
+.personal-heading button:focus-visible {
+  outline-color: var(--site-accent);
+}
+
+.personal-heading button:active,
+.personal-tracker-link:active,
+.personal-task-feedback button:active {
+  transform: scale(0.98);
 }
 
 .personal-dashboard {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-flow: dense;
   gap: var(--tool-section-gap);
+}
+
+.personal-dashboard-status {
+  min-height: 1.25rem;
+  margin: var(--tool-gap) 0 0;
+  color: var(--personal-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.personal-dashboard-status:empty {
+  display: none;
+}
+
+.personal-dashboard-status.is-error {
+  color: var(--personal-red);
+}
+
+.personal-dashboard-status.is-updating {
+  animation: personal-status-arrive 0.2s var(--personal-ease-out) both;
 }
 
 .personal-tracker-links {
@@ -343,6 +354,8 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--tool-section-gap);
   margin-bottom: var(--tool-section-gap);
+  padding-bottom: var(--tool-section-gap);
+  border-bottom: 1px solid var(--personal-border);
 }
 
 .personal-widget {
@@ -361,15 +374,16 @@
 .personal-widget.is-loading::before {
   position: absolute;
   top: -1px;
-  right: 0;
+  right: auto;
   left: 0;
+  width: 36%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--personal-red), transparent);
+  background: var(--personal-red);
   content: "";
-  opacity: 0.92;
-  transform: translateX(-42%) scaleX(0.16);
-  transform-origin: left center;
-  animation: tool-loading-dash 0.9s ease-in-out infinite;
+  opacity: 0.72;
+  transform: translateX(-110%);
+  will-change: transform;
+  animation: personal-widget-loading 0.9s var(--personal-ease-out) infinite;
 }
 
 .personal-widget.is-empty {
@@ -445,16 +459,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 3.25rem;
+  min-height: 2.75rem;
   border: 1px solid var(--personal-border);
-  background: var(--personal-surface);
+  background: transparent;
   color: var(--site-text);
   font-family: var(--font-ui);
-  font-size: clamp(1rem, 1.65vw, 1.22rem);
+  font-size: clamp(0.95rem, 1.35vw, 1.08rem);
   line-height: 1;
-  padding: 0.85rem 1rem;
+  padding: 0.7rem 0.85rem;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s var(--personal-ease-out);
 }
 
 .personal-tracker-link:visited {
@@ -465,9 +479,11 @@
 .personal-tracker-link:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
-  box-shadow: var(--tool-hover-shadow);
   color: var(--site-accent);
-  transform: translate(-2px, -2px);
+}
+
+.personal-tracker-link:focus-visible {
+  outline-color: var(--site-accent);
 }
 
 .personal-widget-head span {
@@ -504,6 +520,11 @@
   min-width: 0;
   padding: 0.75rem 0;
   border-top: 1px solid var(--tool-border-subtle);
+}
+
+.personal-dashboard-entry {
+  animation: personal-dashboard-entry 0.24s var(--personal-ease-out) both;
+  animation-delay: calc(var(--entry-index, 0) * 35ms);
 }
 
 .personal-agenda-list li:first-child,
@@ -560,6 +581,8 @@
 .personal-task-list .personal-empty-message {
   display: grid;
   grid-template-columns: 1fr;
+  align-content: center;
+  gap: 0.6rem;
   min-height: 6rem;
   place-items: center;
   border-top: 1px solid var(--tool-border-subtle);
@@ -591,8 +614,9 @@
   font: inherit;
   font-family: var(--font-ui);
   line-height: inherit;
-  padding: 0;
+  padding: 0.15rem 0;
   text-align: inherit;
+  transition: color 0.15s ease, transform 0.12s var(--personal-ease-out);
 }
 
 .post-content .personal-empty-message .personal-reload-message:hover,
@@ -602,6 +626,10 @@
   text-decoration: underline;
   text-underline-offset: 0.18em;
   transform: none;
+}
+
+.personal-empty-message .personal-reload-message:active {
+  transform: scale(0.97);
 }
 
 .personal-agenda-list a,
@@ -641,21 +669,26 @@
     padding 0.32s ease;
 }
 
+.personal-task-content {
+  display: grid;
+  min-width: 0;
+}
+
 .personal-task-list .personal-task-check {
   --task-priority-color: var(--personal-muted);
   appearance: none;
   display: inline-grid;
   place-items: center;
   position: relative;
-  width: 1.8rem;
-  min-width: 1.8rem;
-  max-width: 1.8rem;
-  height: 1.8rem;
-  min-height: 1.8rem;
-  max-height: 1.8rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  max-width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  max-height: 2.75rem;
   box-sizing: border-box;
-  flex: 0 0 1.8rem;
-  margin: -0.28rem -0.28rem 0 -0.18rem;
+  flex: 0 0 2.75rem;
+  margin: -0.55rem -0.55rem 0 -0.55rem;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -675,9 +708,9 @@
   height: 1.08rem;
   box-sizing: border-box;
   border: 2px solid var(--task-priority-color);
-  border-radius: 0.2rem;
+  border-radius: 0;
   background: color-mix(in srgb, var(--task-priority-color) 10%, transparent);
-  transition: background 0.16s ease, border-color 0.16s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s var(--personal-ease-out);
 }
 
 .personal-task-list .personal-task-check::after {
@@ -688,8 +721,8 @@
   border-right: 2px solid var(--personal-surface);
   border-bottom: 2px solid var(--personal-surface);
   opacity: 0;
-  transform: translateY(-0.06rem) rotate(42deg);
-  transition: opacity 0.16s ease;
+  transform: translateY(-0.06rem) scale(0.7) rotate(42deg);
+  transition: opacity 0.14s ease, transform 0.2s var(--personal-ease-out);
 }
 
 .personal-task-list li[data-priority="4"],
@@ -740,11 +773,13 @@
 .personal-task-list .personal-task-check[aria-pressed="true"]::before {
   background: var(--task-priority-color);
   border-color: var(--task-priority-color);
+  animation: personal-task-confirm 0.22s var(--personal-ease-out) both;
 }
 
 .personal-task-list li.is-complete .personal-task-check::after,
 .personal-task-list .personal-task-check[aria-pressed="true"]::after {
   opacity: 1;
+  transform: translateY(-0.06rem) scale(1) rotate(42deg);
 }
 
 .personal-task-list li.is-complete a {
@@ -752,6 +787,50 @@
   text-decoration: line-through;
   text-decoration-thickness: 0.08em;
   transition: color 0.16s ease;
+}
+
+.personal-task-feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+  color: var(--personal-muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.personal-task-feedback[hidden] {
+  display: none;
+}
+
+.personal-task-list li.is-pending-complete .personal-task-feedback {
+  animation: personal-feedback-arrive 0.2s var(--personal-ease-out) both;
+}
+
+.personal-task-feedback button {
+  min-height: 2.25rem;
+  border: 1px solid var(--personal-border);
+  border-radius: 0;
+  background: var(--personal-surface);
+  color: var(--site-text);
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: var(--tool-label-spacing);
+  line-height: 1;
+  padding: 0.5rem 0.65rem;
+  text-transform: uppercase;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s var(--personal-ease-out);
+}
+
+.personal-task-feedback button:hover,
+.personal-task-feedback button:focus-visible {
+  border-color: var(--site-accent);
+  color: var(--site-accent);
 }
 
 .personal-task-list li.is-removing {
@@ -762,26 +841,47 @@
   border-color: transparent;
 }
 
-@keyframes personal-denied-shake {
-  0%,
+@keyframes personal-widget-loading {
+  to {
+    transform: translateX(290%);
+  }
+}
+
+@keyframes personal-dashboard-entry {
+  from {
+    opacity: 0;
+    transform: translateY(0.3rem);
+  }
+}
+
+@keyframes personal-task-confirm {
+  0% {
+    transform: scale(0.82);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--task-priority-color) 48%, transparent);
+  }
+
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 0.32rem color-mix(in srgb, var(--task-priority-color) 24%, transparent);
+  }
+
   100% {
-    transform: translateX(0);
+    transform: scale(1);
+    box-shadow: 0 0 0 0.6rem transparent;
   }
+}
 
-  20% {
-    transform: translateX(-0.45rem);
+@keyframes personal-feedback-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-0.2rem);
   }
+}
 
-  40% {
-    transform: translateX(0.35rem);
-  }
-
-  60% {
-    transform: translateX(-0.22rem);
-  }
-
-  80% {
-    transform: translateX(0.12rem);
+@keyframes personal-status-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-0.16rem);
   }
 }
 
@@ -811,6 +911,10 @@
     grid-column: 1 / -1;
   }
 
+  .personal-tracker-links {
+    grid-template-columns: 1fr;
+  }
+
   .personal-widget.is-empty {
     min-height: 8.5rem;
     gap: 0.7rem;
@@ -831,10 +935,6 @@
   .personal-widget-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .personal-tracker-links {
-    grid-template-columns: 1fr;
   }
 
 }
@@ -858,8 +958,6 @@
   .personal-tracker-link:hover,
   .personal-reload-message:hover,
   .personal-task-check:hover {
-    box-shadow: none;
-    transform: none;
   }
 
   .personal-heading button:hover {

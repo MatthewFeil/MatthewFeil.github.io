@@ -86,6 +86,7 @@
 
   const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
   const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
+  const logDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
   function setStatus(message, isError = false) {
     els.status.textContent = message;
@@ -339,7 +340,7 @@
     renderSummary(allMetrics);
 
     if (state.stocks.length === 0) {
-      els.rows.innerHTML = '<tr><td colspan="9">No stocks yet.</td></tr>';
+      els.rows.innerHTML = '<tr class="portfolio-empty-row"><td colspan="9">No stocks yet. Add a stock to begin tracking purchases and performance.</td></tr>';
       return;
     }
 
@@ -378,7 +379,7 @@
             <strong>${escapeHtml(stock?.symbol || 'Deleted stock')} - ${type}</strong>
             <button class="portfolio-action" type="button" data-delete-log="${escapeHtml(log.id)}">Delete</button>
           </div>
-          <p>${escapeHtml(log.logged_at)}: ${money.format(Number(log.total_purchase_amount))} at ${money.format(Number(log.purchase_price))} per share, ${number.format(shares)} shares.</p>
+          <p>${logDate.format(new Date(`${escapeHtml(log.logged_at)}T00:00:00Z`))}: ${money.format(Number(log.total_purchase_amount))} at ${money.format(Number(log.purchase_price))} per share, ${number.format(shares)} shares.</p>
         </article>
       `;
     }).join('');
@@ -407,6 +408,7 @@
   els.performancePeriod.addEventListener('change', () => {
     state.performancePeriod = periods[els.performancePeriod.value] ? els.performancePeriod.value : 'all';
     renderTable();
+    setStatus(`Showing ${periods[state.performancePeriod].label.toLowerCase()} performance.`);
   });
 
   els.lockButton.addEventListener('click', async () => {

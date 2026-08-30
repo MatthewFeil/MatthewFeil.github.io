@@ -49,13 +49,15 @@ extra_css:
       <a class="personal-tracker-link" href="{{ "/lifting/" | relative_url }}">Lifting Tracker</a>
     </nav>
 
+    <p class="personal-dashboard-status" id="personal-dashboard-status" role="status" aria-live="polite"></p>
+
     <div class="personal-dashboard" aria-label="Personal dashboard">
       <section class="personal-widget personal-widget-todoist" id="personal-todoist-widget" aria-labelledby="personal-todoist-title">
         <div class="personal-widget-head">
           <h3 id="personal-todoist-title">
-            <a href="https://todoist.com/app/today" target="_blank" rel="noopener">Todoist</a>
+            <a href="https://todoist.com/app/today" target="_blank" rel="noopener" aria-label="Open Todoist in a new tab">Todoist</a>
           </h3>
-          <span id="personal-todoist-count">0</span>
+          <span id="personal-todoist-count" aria-label="0 tasks today">0</span>
         </div>
         <ol class="personal-task-list" id="personal-todoist-list"></ol>
       </section>
@@ -63,13 +65,14 @@ extra_css:
       <section class="personal-widget personal-widget-calendar" id="personal-calendar-widget" aria-labelledby="personal-calendar-title">
         <div class="personal-widget-head">
           <h3 id="personal-calendar-title">
-            <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" rel="noopener">Calendar</a>
+            <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" rel="noopener" aria-label="Open Calendar in a new tab">Calendar</a>
           </h3>
-          <span id="personal-calendar-count">0</span>
+          <span id="personal-calendar-count" aria-label="0 events today">0</span>
         </div>
         <ol class="personal-agenda-list" id="personal-calendar-list"></ol>
       </section>
     </div>
+
   </div>
 </section>
 

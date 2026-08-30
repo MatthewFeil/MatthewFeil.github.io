@@ -7,12 +7,9 @@
     todoist: 'No tasks left today.'
   };
 
-  const reloadMessages = {
-    calendar: 'Refresh to load events',
-    todoist: 'Refresh to load tasks'
-  };
-
   const pendingTodoistCompletions = new Map();
+  let dashboardLoading = false;
+  let dashboardStatusTimeout;
 
   const els = {
     lock: document.getElementById('personal-lock'),
@@ -25,6 +22,7 @@
     status: document.getElementById('personal-status'),
     lockButton: document.getElementById('personal-lock-button'),
     dashboardDate: document.getElementById('personal-dashboard-date'),
+    dashboardStatus: document.getElementById('personal-dashboard-status'),
     calendarWidget: document.getElementById('personal-calendar-widget'),
     calendarCount: document.getElementById('personal-calendar-count'),
     calendarList: document.getElementById('personal-calendar-list'),
@@ -67,6 +65,20 @@
     els.unlockLabel.textContent = isLoading ? 'Checking' : 'Sign in';
   }
 
+  function setDashboardStatus(message, isError = false, timeout = 0) {
+    window.clearTimeout(dashboardStatusTimeout);
+    els.dashboardStatus.textContent = message;
+    els.dashboardStatus.classList.toggle('is-error', isError);
+    els.dashboardStatus.classList.remove('is-updating');
+    if (message) {
+      void els.dashboardStatus.offsetWidth;
+      els.dashboardStatus.classList.add('is-updating');
+    }
+    if (timeout && message) {
+      dashboardStatusTimeout = window.setTimeout(() => setDashboardStatus(''), timeout);
+    }
+  }
+
   function setWidgetLoading(widget, isLoading) {
     widget?.classList.toggle('is-loading', isLoading);
     widget?.setAttribute('aria-busy', String(isLoading));
@@ -82,7 +94,7 @@
   }
 
   function syncTodoistCompletionLoading(isCompleting = false) {
-    setTodoistLoading(isCompleting || pendingTodoistCompletions.size > 0);
+    setTodoistLoading(isCompleting);
   }
 
   function showWorkspace() {
@@ -111,10 +123,15 @@
   }
 
   async function loadDashboard() {
+    if (dashboardLoading) return;
+    dashboardLoading = true;
     els.dashboardDate.textContent = today.format(new Date());
+    setDashboardStatus('');
 
     if (app.dataset.dashboardMode !== 'live') {
       renderDashboard({});
+      setDashboardStatus('Dashboard preview does not include live data.');
+      dashboardLoading = false;
       return;
     }
 
@@ -133,36 +150,55 @@
       }
       renderDashboard(data);
     } catch (error) {
-      renderDashboard({});
+      renderDashboardError(error);
     } finally {
       setDashboardLoading(false);
+      dashboardLoading = false;
     }
   }
 
   function renderDashboard(data) {
+    let hasUnavailableData = false;
     if (Array.isArray(data.calendar)) {
       renderCalendar(data.calendar);
     } else {
-      renderReloadState(els.calendarWidget, els.calendarCount, els.calendarList, reloadMessages.calendar);
+      hasUnavailableData = true;
+      renderReloadState(els.calendarWidget, els.calendarCount, els.calendarList, 'Calendar', 'Couldn’t load today’s events.');
     }
 
     if (Array.isArray(data.todoist)) {
       renderTodoist(sortTodoistTasks(data.todoist));
     } else {
-      renderReloadState(els.todoistWidget, els.todoistCount, els.todoistList, reloadMessages.todoist);
+      hasUnavailableData = true;
+      renderReloadState(els.todoistWidget, els.todoistCount, els.todoistList, 'Todoist', 'Couldn’t load today’s tasks.');
+    }
+
+    if (hasUnavailableData) {
+      setDashboardStatus('Couldn’t load one or more dashboard sections. Try again.', true);
     }
   }
 
+  function renderDashboardError(error) {
+    const sessionExpired = error?.status === 401 || error?.status === 403;
+    const message = sessionExpired
+      ? 'Your session may have expired. Lock, then sign in again.'
+      : 'Couldn’t load your dashboard. Try again.';
+
+    setDashboardStatus(message, true);
+    renderReloadState(els.calendarWidget, els.calendarCount, els.calendarList, 'Calendar', message);
+    renderReloadState(els.todoistWidget, els.todoistCount, els.todoistList, 'Todoist', message);
+  }
+
   function renderCalendar(calendar) {
-    els.calendarCount.textContent = String(calendar.length);
+    setWidgetCount(els.calendarCount, calendar.length, 'event');
     setWidgetEmpty(els.calendarWidget, calendar.length === 0);
     if (!calendar.length) {
       renderEmptyState(els.calendarList, emptyMessages.calendar);
       return;
     }
 
-    els.calendarList.innerHTML = calendar.map((event) => `
-      <li>
+    els.calendarList.innerHTML = calendar.map((event, index) => `
+      <li class="personal-dashboard-entry" style="--entry-index: ${Math.min(index, 6)}">
         <a href="${escapeHtml(event.url || 'https://calendar.google.com/calendar/u/0/r/day')}" target="_blank" rel="noopener">
           <span>${escapeHtml(event.time)}</span>
           <strong>${escapeHtml(event.title)}</strong>
@@ -173,23 +209,29 @@
   }
 
   function renderTodoist(todoist) {
-    els.todoistCount.textContent = String(todoist.length);
+    setWidgetCount(els.todoistCount, todoist.length, 'task');
     setWidgetEmpty(els.todoistWidget, todoist.length === 0);
     if (!todoist.length) {
       renderEmptyState(els.todoistList, emptyMessages.todoist);
       return;
     }
 
-    els.todoistList.innerHTML = todoist.map((task) => `
-      <li data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}">
+    els.todoistList.innerHTML = todoist.map((task, index) => `
+      <li class="personal-dashboard-entry" style="--entry-index: ${Math.min(index, 6)}" data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" data-task-title="${escapeHtml(task.title)}">
         <button class="personal-task-check" type="button" data-complete-task="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" aria-label="Complete ${escapeHtml(task.title)}"></button>
-        <a href="${escapeHtml(task.url || 'https://todoist.com/app/today')}" target="_blank" rel="noopener">
-          <span class="personal-task-title-line">
-            ${taskTime(task) ? `<span class="personal-task-time">${escapeHtml(taskTime(task))}</span>` : ''}
-            <strong>${escapeHtml(task.title)}</strong>
-          </span>
-          ${taskDetails(task).map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}
-        </a>
+        <div class="personal-task-content">
+          <a href="${escapeHtml(task.url || 'https://todoist.com/app/today')}" target="_blank" rel="noopener" aria-label="Open ${escapeHtml(task.title)} in Todoist (opens in a new tab)">
+            <span class="personal-task-title-line">
+              ${taskTime(task) ? `<span class="personal-task-time">${escapeHtml(taskTime(task))}</span>` : ''}
+              <strong>${escapeHtml(task.title)}</strong>
+            </span>
+            ${taskDetails(task).map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}
+          </a>
+          <div class="personal-task-feedback" hidden>
+            <span>Marked complete.</span>
+            <button type="button" data-undo-task="${escapeHtml(task.id || '')}">Undo</button>
+          </div>
+        </div>
       </li>
     `).join('');
   }
@@ -202,14 +244,21 @@
     `;
   }
 
-  function renderReloadState(widget, count, list, message) {
-    count.textContent = '0';
+  function renderReloadState(widget, count, list, source, message) {
+    setWidgetCount(count, 0, source === 'Calendar' ? 'event' : 'task');
     setWidgetEmpty(widget, true);
     list.innerHTML = `
       <li class="personal-empty-message">
-        <button class="personal-reload-message" type="button">${escapeHtml(message)}</button>
+        <span>${escapeHtml(message)}</span>
+        <button class="personal-reload-message" type="button">Try again</button>
       </li>
     `;
+  }
+
+  function setWidgetCount(count, value, singular) {
+    const total = Number(value) || 0;
+    count.textContent = String(total);
+    count.setAttribute('aria-label', `${total} ${singular}${total === 1 ? '' : 's'} today`);
   }
 
   function setWidgetEmpty(widget, isEmpty) {
@@ -270,7 +319,7 @@
   }
 
   function updateTodoistCount() {
-    els.todoistCount.textContent = String(visibleTodoistTaskCount());
+    setWidgetCount(els.todoistCount, visibleTodoistTaskCount(), 'task');
   }
 
   function visibleTodoistTaskCount() {
@@ -298,6 +347,9 @@
 
     taskRow.classList.add('is-complete', 'is-pending-complete');
     button?.setAttribute('aria-pressed', 'true');
+    const feedback = taskRow.querySelector('.personal-task-feedback');
+    if (feedback) feedback.hidden = false;
+    setDashboardStatus(`Marked “${taskLabel(taskRow)}” complete. Undo is available.`, false);
 
     const timeoutId = window.setTimeout(() => {
       pendingTodoistCompletions.delete(taskId);
@@ -317,7 +369,12 @@
     const taskRow = els.todoistList.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
     const button = els.todoistList.querySelector(`[data-complete-task="${CSS.escape(taskId)}"]`);
     taskRow?.classList.remove('is-complete', 'is-pending-complete');
+    const feedback = taskRow?.querySelector('.personal-task-feedback');
+    if (feedback) feedback.hidden = true;
     button?.setAttribute('aria-pressed', 'false');
+    if (taskRow?.dataset.taskTitle) {
+      setDashboardStatus(`Completion canceled for “${taskLabel(taskRow)}”.`, false);
+    }
     syncTodoistCompletionLoading();
   }
 
@@ -345,6 +402,7 @@
 
       collapseTodoistRow(taskRow);
       taskRow.classList.remove('is-pending-complete');
+      setDashboardStatus(`Completed “${taskLabel(taskRow)}”.`, false, 4000);
       updateTodoistCount();
       window.setTimeout(() => {
         taskRow.remove();
@@ -352,8 +410,11 @@
       }, 360);
     } catch (error) {
       taskRow.classList.remove('is-complete', 'is-pending-complete');
+      const feedback = taskRow.querySelector('.personal-task-feedback');
+      if (feedback) feedback.hidden = true;
       button?.removeAttribute('disabled');
       button?.setAttribute('aria-pressed', 'false');
+      setDashboardStatus(`Couldn’t complete “${taskLabel(taskRow)}”. Try again.`, true);
     } finally {
       button?.setAttribute('aria-busy', 'false');
       syncTodoistCompletionLoading();
@@ -366,6 +427,11 @@
     taskRow.getBoundingClientRect();
     taskRow.classList.add('is-removing');
     taskRow.style.maxHeight = '0px';
+  }
+
+  function taskLabel(taskRow) {
+    const title = String(taskRow?.dataset.taskTitle || 'this task').trim();
+    return title.length > 96 ? `${title.slice(0, 93)}…` : title;
   }
 
   els.form.addEventListener('submit', async (event) => {
@@ -407,13 +473,18 @@
 
   els.todoistList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-complete-task]');
-    if (!button) return;
-    completeTodoistTask(button.dataset.completeTask);
+    if (button) {
+      completeTodoistTask(button.dataset.completeTask);
+      return;
+    }
+
+    const undoButton = event.target.closest('[data-undo-task]');
+    if (undoButton) cancelTodoistCompletion(undoButton.dataset.undoTask);
   });
 
   [els.calendarList, els.todoistList].forEach((list) => list.addEventListener('click', (event) => {
     if (!event.target.closest('.personal-reload-message')) return;
-    window.location.reload();
+    loadDashboard();
   }));
 
   async function boot() {

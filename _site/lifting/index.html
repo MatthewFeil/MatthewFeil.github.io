@@ -2,7 +2,7 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><!-- Begin Jekyll SEO tag v2.8.0 -->
 <title>Lifting Tracker | Matthew Feil</title>
 <meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="Lifting Tracker" />
@@ -20,10 +20,23 @@
 {"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Lifting Tracker","url":"http://localhost:4002/lifting/"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="preload" href="/assets/fonts/archivo-black-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/familjen-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="icon" type="image/png" href="/assets/images/favicon.png">
   <link rel="apple-touch-icon" href="/assets/images/favicon.png">
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("site-theme");
+
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.dataset.theme = savedTheme;
+        }
+      } catch {
+        // Keep the system theme when browser storage is unavailable.
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/assets/css/style.css">
   
     
@@ -32,34 +45,76 @@
   
   <link type="application/atom+xml" rel="alternate" href="http://localhost:4002/feed.xml" title="Matthew Feil" />
 </head>
-<body><header class="site-header">
+<body>
+
+    <a class="skip-link" href="#main-content">Skip to content</a><header class="site-header">
 
   <div class="site-header-inner">
     <a class="site-title" rel="author" href="/">Matthew Feil</a>
 
     <nav class="site-nav" aria-label="Primary navigation">
-      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-      <label class="nav-toggle" for="nav-trigger">Menu</label>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-panel">
+        <span>Menu</span>
+        <span class="nav-toggle-mark" aria-hidden="true"></span>
+      </button>
 
-      <div class="trigger">
-        <a class="page-link" href="/#about">About</a>
-        <a class="page-link" href="/#posts">Posts</a>
-        <a class="page-link" href="/playlists.html/">Playlists</a>
-        <a class="page-link" href="/cta-l-live-art/">Chicago 'L' Live Art</a>
-        <div class="nav-dropdown nav-dropdown-tools">
-          <button class="page-link nav-dropdown-summary" type="button" aria-expanded="false" aria-haspopup="true">Tools</button>
-          <div class="nav-dropdown-menu">
-            <a class="page-link" href="/gradecalculatorv2/">Finals Grade Calculator</a>
-            <a class="page-link" href="/investmentcalculator/">Stock Return Calculator</a>
-            <a class="page-link" href="/interestcalculator/">Interest Calculator</a>
+      <div class="trigger" id="site-nav-panel">
+        <div class="nav-panel-inner">
+          <div class="nav-direct-links">
+            <a class="page-link" data-nav-section="about" href="/#about"><span class="page-link-label">About</span></a>
+            <a class="page-link" data-nav-section="posts" href="/#posts"><span class="page-link-label">Posts</span></a>
+            <a class="page-link" data-nav-route="playlists" href="/playlists.html/"><span class="page-link-label">Playlists</span></a>
           </div>
+
+          <div class="nav-group nav-group-projects">
+            <button class="page-link nav-group-trigger" id="nav-projects-trigger" type="button" aria-expanded="false" aria-controls="nav-projects-panel" aria-haspopup="true"><span class="page-link-label">Projects</span></button>
+            <div class="nav-group-menu" id="nav-projects-panel" aria-labelledby="nav-projects-trigger" aria-hidden="true" inert>
+              <div class="nav-group-menu-inner">
+                <span class="nav-menu-kicker">Projects</span>
+                <a class="nav-shelf-item nav-shelf-item-featured" href="/cta-l-live-art/">
+                  <span class="nav-shelf-item-title">Chicago 'L' Live Art</span>
+                  <span class="nav-shelf-item-summary">Live train-position artwork.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-group nav-group-tools">
+            <button class="page-link nav-group-trigger" id="nav-tools-trigger" type="button" aria-expanded="false" aria-controls="nav-tools-panel" aria-haspopup="true"><span class="page-link-label">Tools</span></button>
+            <div class="nav-group-menu" id="nav-tools-panel" aria-labelledby="nav-tools-trigger" aria-hidden="true" inert>
+              <div class="nav-group-menu-inner nav-tools-list">
+                <span class="nav-menu-kicker">Tools</span>
+                <a class="nav-shelf-item" href="/gradecalculatorv2/">
+                  <span class="nav-shelf-item-title">Finals Grade Calculator</span>
+                  <span class="nav-shelf-item-summary">Calculate what you need on your final.</span>
+                </a>
+                <a class="nav-shelf-item" href="/investmentcalculator/">
+                  <span class="nav-shelf-item-title">Stock Return Calculator</span>
+                  <span class="nav-shelf-item-summary">Compare an investment across time.</span>
+                </a>
+                <a class="nav-shelf-item" href="/interestcalculator/">
+                  <span class="nav-shelf-item-title">Interest Calculator</span>
+                  <span class="nav-shelf-item-summary">Explore compound interest growth.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." title="Theme: System. Activate to switch to light mode.">
+            <span class="theme-toggle-icon" aria-hidden="true">
+              <svg data-theme-icon="system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3.5" y="4" width="17" height="12" rx="0"/><path d="M8 20h8M12 16v4"/></svg>
+              <svg data-theme-icon="light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
+              <svg data-theme-icon="dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/></svg>
+            </span>
+          </button>
+
+          <a class="page-link page-link-personal" data-nav-route="personal" href="/personal/"><span class="page-link-label">Personal Space</span></a>
         </div>
-        <a class="page-link" href="/personal/">Personal Space</a>
       </div>
     </nav>
   </div>
 </header>
-<main class="page-content" aria-label="Content">
+<main class="page-content" id="main-content" aria-label="Content">
       <div class="site-main">
         <article class="post"><div class="post-content">
     <section
@@ -90,10 +145,10 @@
     <p id="lifting-status" class="lifting-status" role="status"></p>
   </div>
 
-  <dialog class="lifting-modal" id="add-lift-modal">
+  <dialog class="lifting-modal" id="add-lift-modal" aria-labelledby="add-lift-title">
     <form id="add-lift-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Add lift type</h3>
+        <h3 id="add-lift-title">Add lift type</h3>
         <button id="add-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <label for="lift-name">Lift name</label>
@@ -110,10 +165,10 @@
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-log-modal" id="log-set-modal">
+  <dialog class="lifting-modal lifting-log-modal" id="log-set-modal" aria-labelledby="log-set-title">
     <form id="log-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Log a set</h3>
+        <h3 id="log-set-title">Log a set</h3>
         <button id="log-set-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <label for="log-date">Date</label>
@@ -147,7 +202,7 @@
             <span class="lifting-equipment-badge" id="log-equipment-badge" aria-hidden="true"></span>
             <span id="log-equipment-instruction"></span>
           </p>
-          <input id="log-weight" name="weight" type="number" min="0.5" step="0.5" placeholder="225" required>
+          <input id="log-weight" name="weight" type="number" min="0.5" step="0.5" inputmode="decimal" placeholder="225" required>
         </div>
         <div class="lifting-log-field">
           <label for="log-reps">Reps</label>
@@ -181,10 +236,10 @@
     </form>
   </dialog>
 
-  <dialog class="lifting-modal" id="rename-lift-modal">
+  <dialog class="lifting-modal" id="rename-lift-modal" aria-labelledby="rename-lift-title">
     <form id="rename-lift-form" class="lifting-form" method="dialog">
       <div class="lifting-modal-head">
-        <h3>Edit lift</h3>
+        <h3 id="rename-lift-title">Edit lift</h3>
         <button id="rename-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
       </div>
       <input id="rename-lift-id" name="id" type="hidden">
@@ -201,7 +256,7 @@
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal">
+  <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal" aria-labelledby="lift-logs-title">
     <div class="lifting-modal-head">
       <h3 id="lift-logs-title">Logs</h3>
       <div class="lifting-modal-head-actions">

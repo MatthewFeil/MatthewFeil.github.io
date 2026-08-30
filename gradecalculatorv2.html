@@ -8,48 +8,49 @@ permalink: /gradecalculatorv2/
 <div class="grade-v2" data-grade-calculator>
   <div class="grade-v2-hero">
     <div class="grade-v2-copy">
-      <label for="current-grade">Current Grade</label>
+      <label for="current-grade">Current grade before the final</label>
       <div class="grade-v2-entry percent-field">
-        <input type="number" id="current-grade" min="0" max="150" step="0.01" inputmode="decimal" placeholder="92.5" required>
+        <input type="number" id="current-grade" min="0" max="150" step="0.01" inputmode="decimal" placeholder="92.5" required aria-describedby="current-grade-message">
         <span>%</span>
       </div>
+      <p class="form-message current-grade-message" id="current-grade-message" role="alert"></p>
       <button type="button" class="mobile-settings-open" id="mobile-settings-open" aria-expanded="false" aria-controls="mobile-settings-panel">
-        <span>Calculator settings</span>
+        <span>Grade settings</span>
         <svg class="mobile-settings-chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <path d="M3.5 6 8 10l4.5-4"></path>
         </svg>
       </button>
     </div>
 
-    <div class="settings-card" id="mobile-settings-panel" aria-label="Calculator settings">
+    <div class="settings-card" id="mobile-settings-panel" aria-label="Grade settings">
       <div class="settings-card-head">
-        <span>Calculator settings</span>
-        <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Rounding on</button>
+        <span>Grade settings</span>
+        <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Round final grade: on</button>
       </div>
 
       <p class="grade-v2-summary" id="settings-summary">
-        Rounding within 0.5%. Final exam: 20%. Semester grade: 80%.
+        Current grade counts for 80%. Final exam counts for 20%. Rounds up within 0.5%.
       </p>
 
       <div class="control-stack" aria-label="Calculator controls">
-        <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Rounding</button>
-        <button type="button" class="secondary-action grade-scale-action" data-open-dialog="scale-dialog" aria-label="Adjust grade scale"><span class="scale-label-full">Grade scale</span><span class="scale-label-compact">Scale</span></button>
-        <button type="button" class="secondary-action" data-open-dialog="weight-dialog" aria-label="Adjust final weight">Weight</button>
+        <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Set rounding</button>
+        <button type="button" class="secondary-action grade-scale-action" data-open-dialog="scale-dialog"><span class="scale-label-full">Edit grade scale</span><span class="scale-label-compact">Scale</span></button>
+        <button type="button" class="secondary-action" data-open-dialog="weight-dialog">Set final weight</button>
       </div>
     </div>
   </div>
 
   <section id="results-panel" class="results-panel" hidden>
     <div class="results-heading">
-      <h2>Needed on the final</h2>
+      <h2>Scores needed on the final</h2>
     </div>
 
     <div class="target-table-wrap">
       <table class="target-table">
         <thead>
           <tr>
-            <th>Letter</th>
-            <th>Lowest score needed</th>
+            <th>Grade</th>
+            <th>Score needed</th>
           </tr>
         </thead>
         <tbody id="target-results"></tbody>
@@ -57,18 +58,15 @@ permalink: /gradecalculatorv2/
     </div>
 
     <div class="example-panel">
-      <label for="example-final-grade">Try a final exam grade</label>
+      <label for="example-final-grade">Try a final exam score</label>
       <div class="example-entry percent-field">
         <input type="number" id="example-final-grade" min="0" max="100" step="0.01" inputmode="decimal" placeholder="86">
         <span>%</span>
       </div>
-      <output id="example-output">Enter a final grade to preview your semester result.</output>
+      <output id="example-output" aria-live="polite">Enter a score to see your projected semester grade.</output>
     </div>
   </section>
 
-  <p class="legacy-calculator-link">
-    <a href="{{ "/gradecalculatorv1/" | relative_url }}">Go to legacy grade calculator</a>
-  </p>
 </div>
 
 <dialog class="grade-dialog" id="rounding-dialog">
@@ -77,15 +75,16 @@ permalink: /gradecalculatorv2/
       <h2>Rounding</h2>
       <button type="button" class="icon-close" data-close-dialog aria-label="Close rounding settings">&times;</button>
     </div>
-    <label for="rounding-window">Round up when within</label>
+    <label for="rounding-window">Round up when your semester grade is within</label>
     <div class="setting-row percent-field">
-      <input type="number" id="rounding-window" min="0" max="10" step="0.01" value="0.5">
+      <input type="number" id="rounding-window" min="0" max="10" step="0.01" value="0.5" aria-describedby="rounding-help rounding-message">
       <span>%</span>
     </div>
-    <p class="dialog-help">Default: 0.5%. If rounding is on, a 92.5 can count as a 93.</p>
+    <p class="dialog-help" id="rounding-help">Example: with a 0.5% window, 92.5% becomes 93%.</p>
+    <p class="form-message" id="rounding-message" role="alert"></p>
     <div class="dialog-actions">
-      <button type="button" class="ghost-action" id="reset-rounding">Reset</button>
-      <button type="button" class="primary-action" id="save-rounding">Save</button>
+      <button type="button" class="ghost-action" id="reset-rounding">Use 0.5%</button>
+      <button type="button" class="primary-action" id="save-rounding">Save rounding</button>
     </div>
   </form>
 </dialog>
@@ -96,12 +95,12 @@ permalink: /gradecalculatorv2/
       <h2>Grade scale</h2>
       <button type="button" class="icon-close" data-close-dialog aria-label="Close grade scale settings">&times;</button>
     </div>
-    <p class="dialog-help">Set the lowest semester grade that earns each letter grade.</p>
+    <p class="dialog-help">Set the lowest semester percentage needed for each letter grade.</p>
     <div class="scale-grid" id="scale-editor"></div>
     <p class="form-message" id="scale-message" role="alert"></p>
     <div class="dialog-actions">
-      <button type="button" class="ghost-action" id="reset-scale">Reset</button>
-      <button type="button" class="primary-action" id="save-scale">Save</button>
+      <button type="button" class="ghost-action" id="reset-scale">Use default scale</button>
+      <button type="button" class="primary-action" id="save-scale">Save grade scale</button>
     </div>
   </form>
 </dialog>
@@ -114,13 +113,14 @@ permalink: /gradecalculatorv2/
     </div>
     <label for="final-weight">Final exam weight</label>
     <div class="setting-row percent-field">
-      <input type="number" id="final-weight" min="0" max="100" step="0.01" value="20">
+      <input type="number" id="final-weight" min="0" max="100" step="0.01" value="20" aria-describedby="weight-help weight-message">
       <span>%</span>
     </div>
-    <p class="dialog-help" id="weight-help">Semester grade weight: 80%.</p>
+    <p class="dialog-help" id="weight-help">Your current grade counts for 80% of the semester grade.</p>
+    <p class="form-message" id="weight-message" role="alert"></p>
     <div class="dialog-actions">
-      <button type="button" class="ghost-action" id="reset-weight">Reset</button>
-      <button type="button" class="primary-action" id="save-weight">Save</button>
+      <button type="button" class="ghost-action" id="reset-weight">Use 20%</button>
+      <button type="button" class="primary-action" id="save-weight">Save final weight</button>
     </div>
   </form>
 </dialog>
@@ -138,6 +138,11 @@ permalink: /gradecalculatorv2/
     --gc-good: var(--site-good);
     --gc-bad: var(--site-bad);
     --gc-warn: var(--site-warn);
+    --gc-accent-wash: color-mix(in srgb, var(--gc-accent) 7%, var(--site-bg));
+    --gc-good-wash: color-mix(in srgb, var(--gc-good) 11%, var(--site-bg));
+    --gc-bad-wash: color-mix(in srgb, var(--gc-bad) 9%, var(--site-bg));
+    --gc-warn-wash: color-mix(in srgb, var(--gc-warn) 10%, var(--site-bg));
+    --gc-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .grade-v2 {
@@ -163,25 +168,23 @@ permalink: /gradecalculatorv2/
 
   .grade-v2-hero {
     display: grid;
-    grid-template-columns: minmax(17rem, 0.9fr) minmax(20rem, 1.1fr);
-    gap: clamp(var(--tool-panel-padding), 2vw, 1.2rem);
+    grid-template-columns: minmax(17rem, 1.2fr) minmax(20rem, 0.8fr);
+    grid-template-rows: auto minmax(5.8rem, 1fr);
+    column-gap: clamp(var(--tool-panel-padding), 2vw, 1.2rem);
+    row-gap: 0.5rem;
     align-items: stretch;
     padding: var(--tool-panel-padding);
   }
 
   .grade-v2-copy {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0.45rem;
-    width: 100%;
-    min-width: 0;
+    display: contents;
   }
 
   .grade-v2-copy label,
   .example-panel label,
   .dialog-panel label {
     display: block;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.5rem;
     color: var(--gc-muted);
     font-size: 0.82rem;
     font-weight: 700;
@@ -191,8 +194,27 @@ permalink: /gradecalculatorv2/
   }
 
   .grade-v2-copy label {
+    grid-column: 1;
+    grid-row: 1;
     margin: 0;
     font-size: 0.82rem;
+  }
+
+  .current-grade-message {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  .current-grade-message:empty {
+    display: none;
+  }
+
+  .current-grade-message:not(:empty) {
+    color: var(--gc-bad);
+    font-weight: 700;
   }
 
   .grade-v2-entry,
@@ -226,7 +248,20 @@ permalink: /gradecalculatorv2/
   .grade-v2-entry:focus-within,
   .example-entry:focus-within,
   .setting-row:focus-within {
+    background: var(--gc-accent-wash);
     border-color: var(--site-accent);
+  }
+
+  .grade-v2-entry:has(input[aria-invalid="true"]),
+  .example-entry:has(input[aria-invalid="true"]),
+  .setting-row:has(input[aria-invalid="true"]) {
+    border-color: var(--gc-bad);
+  }
+
+  .grade-v2-entry:has(input[aria-invalid="true"]):focus-within,
+  .example-entry:has(input[aria-invalid="true"]):focus-within,
+  .setting-row:has(input[aria-invalid="true"]):focus-within {
+    border-color: var(--gc-bad);
   }
 
   .scale-grid input:focus-visible,
@@ -243,9 +278,17 @@ permalink: /gradecalculatorv2/
     padding: 0.7rem 2rem 0.7rem 0.8rem;
   }
 
+  .grade-v2 input::placeholder,
+  .grade-dialog input::placeholder {
+    color: color-mix(in srgb, var(--gc-muted) 88%, var(--site-text));
+    opacity: 1;
+  }
+
   .grade-v2-entry {
+    grid-column: 1;
+    grid-row: 2;
     height: 100%;
-    min-height: 5.2rem;
+    min-height: 5.8rem;
     background: var(--site-bg);
   }
 
@@ -253,8 +296,9 @@ permalink: /gradecalculatorv2/
     height: 100%;
     padding: 0.1rem 3.3rem 0.1rem 0.8rem;
     font-family: var(--font-display);
-    font-size: 4.35rem;
-    font-weight: 900;
+    font-size: 5.2rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0;
     line-height: 0.9;
   }
@@ -275,7 +319,7 @@ permalink: /gradecalculatorv2/
     right: 0.9rem;
     font-family: var(--font-display);
     font-size: 1.65rem;
-    font-weight: 900;
+    font-weight: 400;
   }
 
   .grade-v2 button,
@@ -290,13 +334,12 @@ permalink: /gradecalculatorv2/
     font-weight: 800;
     letter-spacing: 0;
     line-height: 1.1;
-    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: background-color 0.15s var(--gc-ease-out), border-color 0.15s var(--gc-ease-out), color 0.15s var(--gc-ease-out);
   }
 
   .grade-v2 button:hover,
   .grade-dialog button:hover {
-    box-shadow: var(--tool-hover-shadow);
-    transform: translate(-2px, -2px);
+    border-color: color-mix(in srgb, currentColor 52%, transparent);
   }
 
   .mobile-settings-open {
@@ -316,22 +359,27 @@ permalink: /gradecalculatorv2/
 
   .primary-action:hover {
     background: color-mix(in srgb, var(--gc-accent) 88%, white);
-    border-color: color-mix(in srgb, var(--gc-accent) 72%, white);
+    border-color: #fff;
   }
 
   .control-stack {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: var(--tool-gap);
     width: 100%;
   }
 
   .settings-card {
+    grid-column: 2;
+    grid-row: 1 / 3;
     display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.65rem;
-    align-content: start;
+    align-self: stretch;
+    min-height: 0;
     min-width: 0;
-    padding: 0.85rem;
+    margin: 0;
+    padding: var(--tool-panel-padding);
     background: var(--gc-surface-strong);
     border: 1px solid var(--gc-border);
   }
@@ -346,7 +394,7 @@ permalink: /gradecalculatorv2/
   .settings-card-head span {
     color: var(--gc-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: var(--tool-label-spacing);
     line-height: 1.1;
     text-transform: uppercase;
@@ -390,28 +438,29 @@ permalink: /gradecalculatorv2/
   }
 
   .toggle-action[aria-pressed="true"] {
-    background: var(--gc-off);
+    background: var(--gc-good-wash);
     border-color: var(--gc-good);
     color: var(--site-text);
   }
 
   .toggle-action[aria-pressed="true"]:hover {
-    background: color-mix(in srgb, var(--site-bg) 82%, var(--site-text));
+    background: color-mix(in srgb, var(--gc-good) 17%, var(--site-bg));
     border-color: var(--gc-good);
     color: var(--site-text);
   }
 
   .grade-v2-summary {
     margin: 0;
+    align-self: center;
     color: var(--gc-muted);
-    font-size: 0.9rem;
-    line-height: 1.35;
+    font-size: 0.92rem;
+    line-height: 1.45;
     text-align: left;
   }
 
   .results-panel {
     display: grid;
-    gap: 0.85rem;
+    gap: var(--tool-panel-padding);
     padding: 0.85rem;
   }
 
@@ -419,18 +468,9 @@ permalink: /gradecalculatorv2/
     display: none;
   }
 
-  .legacy-calculator-link {
-    margin: -0.35rem 0 0;
-    font-size: 0.88rem;
-  }
-
-  .legacy-calculator-link a {
-    color: var(--gc-muted);
-  }
-
-  .legacy-calculator-link a:hover,
-  .legacy-calculator-link a:focus {
-    color: var(--site-text);
+  .results-panel.is-updating .target-table tbody tr {
+    animation: grade-row-in 0.26s var(--gc-ease-out) both;
+    animation-delay: var(--gc-row-delay, 0ms);
   }
 
   .results-heading {
@@ -445,7 +485,7 @@ permalink: /gradecalculatorv2/
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.55rem;
-    font-weight: 900;
+    font-weight: 400;
     letter-spacing: 0;
     line-height: 0.92;
     text-transform: uppercase;
@@ -454,8 +494,6 @@ permalink: /gradecalculatorv2/
   .target-table-wrap {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid var(--gc-border);
-    background: var(--gc-surface);
   }
 
   .grade-v2 .target-table {
@@ -473,6 +511,7 @@ permalink: /gradecalculatorv2/
     padding: 0.78rem 0.9rem;
     border-bottom: 1px solid var(--gc-border);
     text-align: left;
+    font-variant-numeric: tabular-nums;
   }
 
   .target-table tbody tr {
@@ -481,6 +520,18 @@ permalink: /gradecalculatorv2/
 
   .target-table tbody tr:nth-child(even) {
     background: color-mix(in srgb, var(--gc-surface-strong) 64%, transparent);
+  }
+
+  .target-table tbody tr:has(.score-needed.guaranteed) {
+    background: var(--gc-good-wash);
+  }
+
+  .target-table tbody tr:has(.score-needed.impossible) {
+    background: var(--gc-bad-wash);
+  }
+
+  .target-table tbody tr:has(.score-needed.reachable) {
+    background: var(--gc-warn-wash);
   }
 
   .target-table th {
@@ -501,15 +552,7 @@ permalink: /gradecalculatorv2/
   }
 
   .letter-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 2.75rem;
-    min-height: 2rem;
-    padding: 0.2rem 0.55rem;
-    border-radius: 0;
-    background: var(--gc-surface-strong);
-    border: 1px solid var(--gc-border);
+    display: inline-block;
     font-weight: 800;
   }
 
@@ -526,16 +569,19 @@ permalink: /gradecalculatorv2/
   }
 
   .score-needed.reachable {
-    color: var(--site-text);
+    color: color-mix(in srgb, var(--gc-warn) 82%, var(--site-text));
   }
 
   .example-panel {
     display: grid;
     grid-template-columns: minmax(150px, 0.3fr) minmax(140px, 0.24fr) minmax(240px, 0.46fr);
-    gap: 0.65rem;
+    gap: var(--tool-gap);
     align-items: stretch;
     margin-top: 0;
-    padding: 0.75rem;
+    padding: var(--tool-section-gap) 0 0;
+    border: 0;
+    border-top: 1px solid var(--gc-border);
+    background: transparent;
     box-shadow: none;
   }
 
@@ -545,7 +591,7 @@ permalink: /gradecalculatorv2/
     color: var(--site-text);
     font-family: var(--font-display);
     font-size: 1.2rem;
-    font-weight: 900;
+    font-weight: 400;
     letter-spacing: 0;
     line-height: 0.98;
     text-transform: uppercase;
@@ -555,17 +601,18 @@ permalink: /gradecalculatorv2/
     display: grid;
     align-content: center;
     min-height: 3rem;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-    border-radius: 0;
-    background: var(--gc-field);
+    padding: 0.25rem 0;
     color: var(--gc-muted);
-    font-size: 0.95rem;
-    line-height: 1.35;
+    font-size: 0.92rem;
+    line-height: 1.45;
   }
 
   .example-panel output[data-result="true"] {
     color: var(--site-text);
+  }
+
+  .example-panel output.is-updating {
+    animation: grade-readout-in 0.22s var(--gc-ease-out) both;
   }
 
   .example-result-grid {
@@ -581,8 +628,8 @@ permalink: /gradecalculatorv2/
   .example-result-grid strong {
     display: block;
     color: var(--gc-muted);
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: 0.78rem;
+    font-weight: 700;
     letter-spacing: var(--tool-label-spacing);
     line-height: 1.1;
     text-transform: uppercase;
@@ -593,7 +640,8 @@ permalink: /gradecalculatorv2/
     margin-top: 0.15rem;
     font-family: var(--font-display);
     font-size: 1.08rem;
-    font-weight: 900;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0;
     line-height: 1.05;
   }
@@ -606,6 +654,10 @@ permalink: /gradecalculatorv2/
     color: var(--site-text);
   }
 
+  .grade-dialog[open] {
+    animation: grade-dialog-in 0.24s var(--gc-ease-out) both;
+  }
+
   #scale-dialog {
     width: min(92vw, 640px);
   }
@@ -614,12 +666,22 @@ permalink: /gradecalculatorv2/
     background: color-mix(in srgb, black 45%, transparent);
   }
 
+  .grade-dialog[open]::backdrop {
+    animation: grade-backdrop-in 0.2s linear both;
+  }
+
   .dialog-panel {
     display: grid;
     gap: 0.85rem;
     width: 100%;
     padding: 1.25rem;
     box-sizing: border-box;
+  }
+
+  #scale-dialog .dialog-panel {
+    max-block-size: calc(100dvh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .wide-dialog {
@@ -635,7 +697,10 @@ permalink: /gradecalculatorv2/
 
   .dialog-heading h2 {
     margin: 0;
+    font-family: var(--font-display);
     font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1;
   }
 
   .icon-close {
@@ -684,8 +749,11 @@ permalink: /gradecalculatorv2/
   .scale-field label {
     margin: 0;
     color: var(--gc-muted);
-    font-size: 0.76rem;
+    font-size: 0.78rem;
+    font-weight: 700;
     letter-spacing: var(--tool-label-spacing);
+    line-height: 1.2;
+    text-transform: uppercase;
   }
 
   .scale-field input {
@@ -713,27 +781,38 @@ permalink: /gradecalculatorv2/
 
     .grade-v2-hero {
       grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-auto-rows: min-content;
+      align-content: start;
       gap: 0;
       padding: var(--gc-mobile-pad);
     }
 
     .grade-v2-copy {
+      display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
-      align-items: stretch;
-      gap: 0.4rem;
+      align-self: start;
+      align-items: start;
+      gap: 0;
+      min-height: auto;
     }
 
     .grade-v2-copy label {
+      grid-column: auto;
+      grid-row: auto;
       display: block;
+      margin-bottom: 0.4rem;
       min-width: 0;
       color: var(--gc-muted);
       font-size: 0.78rem;
-      letter-spacing: 0.05em;
+      letter-spacing: var(--tool-label-spacing);
       white-space: nowrap;
     }
 
     .grade-v2-entry {
+      grid-column: auto;
+      grid-row: auto;
       min-height: 4.65rem;
     }
 
@@ -749,7 +828,7 @@ permalink: /gradecalculatorv2/
       justify-content: space-between;
       width: 100%;
       min-height: 2.5rem;
-      margin-top: 0.25rem;
+      margin-top: 0.4rem;
       padding: 0.55rem 0.7rem;
       background: var(--gc-field);
       color: var(--site-text);
@@ -770,7 +849,7 @@ permalink: /gradecalculatorv2/
       stroke-linecap: square;
       stroke-linejoin: miter;
       stroke-width: 1.75;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s var(--gc-ease-out);
     }
 
     .mobile-settings-open[aria-expanded="true"] .mobile-settings-chevron {
@@ -778,30 +857,37 @@ permalink: /gradecalculatorv2/
     }
 
     .settings-card {
-      display: grid;
-      gap: 0.5rem;
-      max-height: 0;
-      overflow: hidden;
+      grid-column: auto;
+      grid-row: auto;
+      display: none;
       padding: 0;
       border: 0;
       margin: 0;
       background: transparent;
-      opacity: 0;
       pointer-events: none;
-      transform: translateY(-0.25rem);
-      transform-origin: top;
-      transition: max-height 0.24s ease, padding 0.24s ease, opacity 0.18s ease, transform 0.24s ease;
+      opacity: 0;
+      transform: translateY(-0.35rem);
+      transition: opacity 0.2s var(--gc-ease-out), transform 0.2s var(--gc-ease-out), display 0.2s allow-discrete;
     }
 
     .settings-card.is-open {
-      max-height: 16rem;
+      display: grid;
+      gap: 0.5rem;
+      margin-top: -1px;
       padding: 0.65rem;
       border: 1px solid var(--gc-border);
       border-top: 0;
       background: var(--gc-surface-strong);
-      opacity: 1;
       pointer-events: auto;
+      opacity: 1;
       transform: translateY(0);
+    }
+
+    @starting-style {
+      .settings-card.is-open {
+        opacity: 0;
+        transform: translateY(-0.35rem);
+      }
     }
 
     .settings-card-head {
@@ -830,6 +916,7 @@ permalink: /gradecalculatorv2/
 
     .example-panel {
       grid-template-columns: 1fr;
+      padding-top: var(--tool-section-gap);
     }
 
     .example-panel output {
@@ -854,16 +941,16 @@ permalink: /gradecalculatorv2/
     }
 
     .control-stack {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: var(--gc-mobile-gap);
     }
 
     .scale-label-full {
-      display: none;
+      display: inline;
     }
 
     .scale-label-compact {
-      display: inline;
+      display: none;
     }
 
     .toggle-action {
@@ -872,7 +959,7 @@ permalink: /gradecalculatorv2/
 
     .control-stack .secondary-action {
       min-height: var(--touch-target);
-      font-size: 0.7rem;
+      font-size: 0.78rem;
     }
 
     .secondary-action {
@@ -905,8 +992,8 @@ permalink: /gradecalculatorv2/
     }
 
     .example-panel {
-      gap: 0.5rem;
-      padding: 0.6rem;
+      gap: var(--tool-gap);
+      padding: var(--tool-section-gap) 0 0;
     }
 
     .example-panel label {
@@ -917,8 +1004,7 @@ permalink: /gradecalculatorv2/
   @media (hover: none), (pointer: coarse) {
     .grade-v2 button:hover,
     .grade-dialog button:hover {
-      box-shadow: none;
-      transform: none;
+      border-color: var(--gc-border);
     }
 
     .primary-action:hover {
@@ -939,13 +1025,50 @@ permalink: /gradecalculatorv2/
     }
 
     .toggle-action[aria-pressed="true"]:hover {
-      background: var(--gc-off);
+      background: var(--gc-good-wash);
       border-color: var(--gc-good);
     }
 
     .icon-close:hover {
       background: transparent;
       color: var(--gc-muted);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grade-v2 *,
+    .grade-dialog * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+
+  @keyframes grade-row-in {
+    from {
+      opacity: 0;
+      transform: translateX(-0.4rem);
+    }
+  }
+
+  @keyframes grade-readout-in {
+    from {
+      opacity: 0.45;
+      transform: translateY(0.25rem);
+    }
+  }
+
+  @keyframes grade-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.55rem);
+    }
+  }
+
+  @keyframes grade-backdrop-in {
+    from {
+      opacity: 0;
     }
   }
 </style>
@@ -990,9 +1113,24 @@ permalink: /gradecalculatorv2/
     const roundingWindowInput = document.getElementById('rounding-window');
     const finalWeightInput = document.getElementById('final-weight');
     const weightHelp = document.getElementById('weight-help');
+    const currentGradeMessage = document.getElementById('current-grade-message');
+    const roundingMessage = document.getElementById('rounding-message');
+    const weightMessage = document.getElementById('weight-message');
     const mobileSettingsButton = document.getElementById('mobile-settings-open');
     const mobileSettingsPanel = document.getElementById('mobile-settings-panel');
     const mobileSettingsMedia = window.matchMedia('(max-width: 860px)');
+    const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const animationTimers = new WeakMap();
+
+    function replayAnimation(element, className, duration) {
+      if (reducedMotionMedia.matches) return;
+
+      window.clearTimeout(animationTimers.get(element));
+      element.classList.remove(className);
+      void element.offsetWidth;
+      element.classList.add(className);
+      animationTimers.set(element, window.setTimeout(() => element.classList.remove(className), duration));
+    }
 
     function formatNumber(value) {
       return Number(value.toFixed(2)).toString();
@@ -1020,10 +1158,10 @@ permalink: /gradecalculatorv2/
 
     function updateSummary() {
       const semesterWeight = 100 - state.finalWeight;
-      settingsSummary.textContent = `${state.roundingEnabled ? `Rounding within ${formatNumber(state.roundingWindow)}%` : 'Rounding off'}. Final exam: ${formatNumber(state.finalWeight)}%. Semester grade: ${formatNumber(semesterWeight)}%.`;
-      roundingToggle.textContent = state.roundingEnabled ? 'Rounding on' : 'Rounding off';
+      settingsSummary.textContent = `Current grade counts for ${formatNumber(semesterWeight)}%. Final exam counts for ${formatNumber(state.finalWeight)}%. ${state.roundingEnabled ? `Rounds up within ${formatNumber(state.roundingWindow)}%.` : 'Rounding is off.'}`;
+      roundingToggle.textContent = state.roundingEnabled ? 'Round final grade: on' : 'Round final grade: off';
       roundingToggle.setAttribute('aria-pressed', String(state.roundingEnabled));
-      weightHelp.textContent = `Semester grade weight: ${formatNumber(semesterWeight)}%.`;
+      weightHelp.textContent = `Your current grade counts for ${formatNumber(semesterWeight)}% of the semester grade.`;
     }
 
     function statusForNeeded(score) {
@@ -1035,8 +1173,8 @@ permalink: /gradecalculatorv2/
     function labelForNeeded(score) {
       const status = statusForNeeded(score);
 
-      if (status === 'guaranteed') return 'Guaranteed';
-      if (status === 'impossible') return 'Impossible';
+      if (status === 'guaranteed') return 'Already met';
+      if (status === 'impossible') return Number.isFinite(score) ? 'Needs >100%' : 'Not reachable';
       return `${formatNumber(Math.max(score, 0))}%`;
     }
 
@@ -1050,7 +1188,7 @@ permalink: /gradecalculatorv2/
       exampleOutput.innerHTML = `
         <span class="example-result-grid">
           <span>
-            <strong>Total grade</strong>
+            <strong>Projected grade</strong>
             <b>${formatNumber(totalGrade)}%</b>
           </span>
           <span>
@@ -1059,6 +1197,7 @@ permalink: /gradecalculatorv2/
           </span>
         </span>
       `;
+      replayAnimation(exampleOutput, 'is-updating', 250);
     }
 
     function renderResults() {
@@ -1072,6 +1211,8 @@ permalink: /gradecalculatorv2/
       targetResults.innerHTML = '';
 
       let lowestImpossibleRow = null;
+
+      let visibleRowIndex = 0;
 
       for (const grade of state.scale) {
         const target = activeTarget(grade.low);
@@ -1090,21 +1231,27 @@ permalink: /gradecalculatorv2/
         }
 
         if (lowestImpossibleRow) {
+          lowestImpossibleRow.style.setProperty('--gc-row-delay', `${Math.min(visibleRowIndex, 6) * 35}ms`);
           targetResults.appendChild(lowestImpossibleRow);
           lowestImpossibleRow = null;
+          visibleRowIndex += 1;
         }
 
+        row.style.setProperty('--gc-row-delay', `${Math.min(visibleRowIndex, 6) * 35}ms`);
         targetResults.appendChild(row);
+        visibleRowIndex += 1;
 
         if (status === 'guaranteed') break;
       }
 
       if (lowestImpossibleRow) {
+        lowestImpossibleRow.style.setProperty('--gc-row-delay', `${Math.min(visibleRowIndex, 6) * 35}ms`);
         targetResults.appendChild(lowestImpossibleRow);
       }
 
       resultsPanel.hidden = false;
       updateExample();
+      replayAnimation(resultsPanel, 'is-updating', 500);
     }
 
     function updateExample() {
@@ -1116,12 +1263,12 @@ permalink: /gradecalculatorv2/
       const finalGrade = Number.parseFloat(exampleInput.value);
 
       if (!Number.isFinite(finalGrade)) {
-        setExampleMessage('Enter a final grade to preview your semester result.');
+        setExampleMessage('Enter a score to see your projected semester grade.');
         return;
       }
 
       if (finalGrade < 0 || finalGrade > maxFinalScore) {
-        setExampleMessage(`Final exam grades must be between 0% and ${maxFinalScore}%.`);
+        setExampleMessage(`Final exam scores must be between 0% and ${maxFinalScore}%.`);
         return;
       }
 
@@ -1133,18 +1280,31 @@ permalink: /gradecalculatorv2/
       setExampleResult(total, letter);
     }
 
+    function setFieldError(input, messageElement, message) {
+      input.setCustomValidity(message);
+      input.setAttribute('aria-invalid', String(Boolean(message)));
+      messageElement.textContent = message;
+    }
+
     function readCurrentGrade() {
-      const currentGrade = Number.parseFloat(currentInput.value);
+      const rawValue = currentInput.value.trim();
+
+      if (!rawValue) return { value: null, error: '' };
+
+      const currentGrade = Number(rawValue);
 
       if (!Number.isFinite(currentGrade) || currentGrade < 0 || currentGrade > maxCurrentGrade) {
-        return null;
+        return { value: null, error: `Enter a current grade from 0% to ${maxCurrentGrade}%.` };
       }
 
-      return currentGrade;
+      return { value: currentGrade, error: '' };
     }
 
     function updateFromCurrentGrade() {
-      state.currentGrade = readCurrentGrade();
+      const result = readCurrentGrade();
+      setFieldError(currentInput, currentGradeMessage, result.error);
+
+      if (!result.error) state.currentGrade = result.value;
       renderResults();
     }
 
@@ -1229,10 +1389,12 @@ permalink: /gradecalculatorv2/
         }
 
         if (dialog.id === 'rounding-dialog') {
+          setFieldError(roundingWindowInput, roundingMessage, '');
           roundingWindowInput.value = state.roundingWindow;
         }
 
         if (dialog.id === 'weight-dialog') {
+          setFieldError(finalWeightInput, weightMessage, '');
           finalWeightInput.value = state.finalWeight;
           updateSummary();
         }
@@ -1261,10 +1423,12 @@ permalink: /gradecalculatorv2/
       const nextWindow = Number.parseFloat(roundingWindowInput.value);
 
       if (!Number.isFinite(nextWindow) || nextWindow < 0 || nextWindow > 10) {
+        setFieldError(roundingWindowInput, roundingMessage, 'Enter a rounding window from 0% to 10%.');
         roundingWindowInput.focus();
         return;
       }
 
+      setFieldError(roundingWindowInput, roundingMessage, '');
       state.roundingWindow = nextWindow;
       updateSummary();
       renderResults();
@@ -1272,6 +1436,7 @@ permalink: /gradecalculatorv2/
     });
 
     document.getElementById('reset-rounding').addEventListener('click', () => {
+      setFieldError(roundingWindowInput, roundingMessage, '');
       state.roundingWindow = 0.5;
       roundingWindowInput.value = state.roundingWindow;
       updateSummary();
@@ -1303,10 +1468,12 @@ permalink: /gradecalculatorv2/
       const nextWeight = Number.parseFloat(finalWeightInput.value);
 
       if (!Number.isFinite(nextWeight) || nextWeight < 0 || nextWeight > 100) {
+        setFieldError(finalWeightInput, weightMessage, 'Enter a final weight from 0% to 100%.');
         finalWeightInput.focus();
         return;
       }
 
+      setFieldError(finalWeightInput, weightMessage, '');
       state.finalWeight = nextWeight;
       updateSummary();
       renderResults();
@@ -1314,6 +1481,7 @@ permalink: /gradecalculatorv2/
     });
 
     document.getElementById('reset-weight').addEventListener('click', () => {
+      setFieldError(finalWeightInput, weightMessage, '');
       state.finalWeight = 20;
       finalWeightInput.value = state.finalWeight;
       updateSummary();
@@ -1323,7 +1491,7 @@ permalink: /gradecalculatorv2/
     finalWeightInput.addEventListener('input', () => {
       const nextWeight = Number.parseFloat(finalWeightInput.value);
       const semesterWeight = Number.isFinite(nextWeight) ? 100 - nextWeight : 80;
-      weightHelp.textContent = `Semester grade weight: ${formatNumber(Math.max(0, Math.min(100, semesterWeight)))}%.`;
+      weightHelp.textContent = `Your current grade counts for ${formatNumber(Math.max(0, Math.min(100, semesterWeight)))}% of the semester grade.`;
     });
 
     currentInput.addEventListener('input', updateFromCurrentGrade);

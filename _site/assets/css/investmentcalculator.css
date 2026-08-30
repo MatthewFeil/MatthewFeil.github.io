@@ -62,8 +62,9 @@
 }
 
 .investment-tool-switcher a.is-active {
-  background: var(--investment-button);
-  color: #fff;
+  background: var(--investment-surface);
+  box-shadow: inset 0 0 0 1px var(--investment-button);
+  color: var(--investment-button);
 }
 
 .investment-results-head {
@@ -80,10 +81,13 @@
 }
 
 .investment-results-head h2 {
+  min-width: 0;
   font-family: var(--font-display);
   font-size: clamp(1.25rem, 2.2vw, 1.85rem);
   letter-spacing: -0.04em;
   line-height: 0.92;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -254,6 +258,8 @@
 .investment-details-toggle:focus-visible,
 .investment-tool-switcher a:focus-visible {
   border-color: var(--site-accent);
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
 }
 
 .investment-money-field:focus-within,
@@ -270,6 +276,18 @@
   color: color-mix(in srgb, var(--site-text) 52%, transparent);
 }
 
+.investment-field.is-invalid > span:first-child {
+  color: var(--investment-bad);
+}
+
+.investment-field.is-invalid > input,
+.investment-field.is-invalid > select,
+.investment-field.is-invalid .investment-money-field,
+.investment-field.is-invalid .investment-percent-field,
+.investment-field.is-invalid .investment-date-control {
+  border-color: var(--investment-bad);
+}
+
 .investment-input-grid button,
 .investment-details-toggle {
   position: relative;
@@ -280,20 +298,19 @@
   cursor: pointer;
   font-weight: 800;
   line-height: 1.1;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .investment-input-grid button {
-  background: var(--investment-button);
+  background: transparent;
   border-color: var(--investment-button);
-  color: #fff;
+  color: var(--investment-button);
 }
 
 .investment-input-grid button:not(:disabled):hover {
-  background: color-mix(in srgb, var(--investment-button) 92%, white);
-  border-color: color-mix(in srgb, var(--investment-button) 72%, white);
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
+  background: color-mix(in srgb, var(--investment-button) 10%, transparent);
+  border-color: var(--site-accent-strong);
+  color: var(--site-accent-strong);
 }
 
 .investment-input-grid button:disabled {
@@ -320,7 +337,7 @@
 }
 
 .investment-details-toggle {
-  min-height: 2.25rem;
+  min-height: var(--tool-control-height);
   padding-right: 0.85rem;
   padding-left: 0.85rem;
   background: var(--investment-surface);
@@ -330,8 +347,6 @@
 .investment-details-toggle:hover {
   background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
   border-color: color-mix(in srgb, currentColor 34%, transparent);
-  box-shadow: var(--tool-hover-shadow);
-  transform: translate(-2px, -2px);
 }
 
 .investment-status {
@@ -355,6 +370,18 @@
   color: var(--investment-muted);
 }
 
+.investment-status.is-revealing {
+  animation: investment-status-arrive 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.investment-status[data-tone="success"] {
+  color: var(--investment-good);
+}
+
+.investment-status[data-tone="warning"] {
+  color: var(--site-warn);
+}
+
 .investment-results {
   display: grid;
   gap: var(--tool-section-gap);
@@ -363,6 +390,91 @@
 
 .investment-results[hidden] {
   display: none;
+}
+
+.investment-results-content {
+  display: grid;
+  gap: var(--tool-section-gap);
+}
+
+.investment-stock-app .investment-results-loading,
+.investment-interest-app .investment-results-loading {
+  display: none;
+}
+
+.investment-stock-app .investment-results[data-state="loading"],
+.investment-interest-app .investment-results[data-state="loading"] {
+  min-height: 12.75rem;
+  align-content: center;
+}
+
+.investment-stock-app .investment-results[data-state="loading"] .investment-results-loading,
+.investment-interest-app .investment-results[data-state="loading"] .investment-results-loading {
+  display: grid;
+  gap: 1rem;
+}
+
+.investment-stock-app .investment-results[data-state="loading"] .investment-results-content,
+.investment-interest-app .investment-results[data-state="loading"] .investment-results-content {
+  display: none;
+}
+
+.investment-results-loading-label,
+.investment-results-loading strong {
+  display: block;
+}
+
+.investment-results-loading-label {
+  color: var(--investment-muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: var(--tool-label-spacing);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.investment-results-loading strong {
+  margin-top: 0.3rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.investment-results-skeleton {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--investment-border);
+  background: var(--investment-border);
+}
+
+.investment-results-skeleton span {
+  display: block;
+  min-height: 3rem;
+  background: linear-gradient(105deg, var(--investment-surface) 36%, var(--investment-soft) 48%, var(--investment-surface) 60%);
+  background-size: 220% 100%;
+  animation: investment-skeleton-sweep 1.1s linear infinite;
+}
+
+.investment-results-skeleton span:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.investment-results-skeleton span:nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.investment-results-skeleton span:nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.investment-stock-app .investment-results.is-revealing[data-state="results"] .investment-results-content,
+.investment-interest-app .investment-results.is-revealing[data-state="results"] .investment-results-content {
+  animation: investment-results-arrive 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .investment-results-head span {
@@ -422,6 +534,7 @@
   letter-spacing: -0.03em;
   line-height: 1;
   overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
 }
 
 .investment-result-card-large {
@@ -430,7 +543,7 @@
 
 .investment-result-card-large strong {
   font-size: clamp(1.85rem, 5.2vw, 4rem);
-  letter-spacing: -0.045em;
+  letter-spacing: -0.035em;
 }
 
 .investment-result-card small {
@@ -504,22 +617,19 @@
 
   .investment-tool-switcher a.is-active:hover,
   .investment-tool-switcher a.is-active:focus-visible {
-    background: var(--investment-button);
-    color: #fff;
+    background: var(--investment-surface);
+    color: var(--investment-button);
   }
 
   .investment-input-grid button:hover {
-    background: var(--investment-button);
+    background: transparent;
     border-color: var(--investment-button);
-    box-shadow: none;
-    transform: none;
+    color: var(--investment-button);
   }
 
   .investment-details-toggle:hover {
     background: var(--investment-surface);
     border-color: var(--investment-border);
-    box-shadow: none;
-    transform: none;
   }
 }
 
@@ -607,5 +717,58 @@
   .investment-app {
     --investment-good: var(--site-good);
     --investment-bad: var(--site-bad);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .investment-input-grid button,
+  .investment-details-toggle {
+    transition: none;
+  }
+
+  .investment-input-grid button.is-loading::after {
+    animation: none;
+    transform: none;
+  }
+
+  .investment-status.is-revealing,
+  .investment-stock-app .investment-results.is-revealing[data-state="results"] .investment-results-content,
+  .investment-interest-app .investment-results.is-revealing[data-state="results"] .investment-results-content,
+  .investment-results-skeleton span {
+    animation: none;
+  }
+}
+
+@keyframes investment-status-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-0.2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes investment-results-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes investment-skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -120% 0;
   }
 }
