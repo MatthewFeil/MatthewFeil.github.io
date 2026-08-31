@@ -315,7 +315,7 @@
   left: 0;
   z-index: 30;
   overflow: hidden;
-  background: var(--site-surface);
+  background: var(--lifting-surface);
   border: 1px solid var(--lifting-border);
   box-shadow: 0.35rem 0.35rem 0 rgb(0 0 0 / 0.14);
 }
@@ -510,6 +510,29 @@
   color: var(--lifting-accent);
   border-color: var(--lifting-accent);
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.lifting-toolbar-actions .lock-control {
+  width: var(--tool-control-height);
+  min-width: var(--tool-control-height);
+  padding: 0;
+}
+
+.lifting-app.is-locking .lifting-workspace {
+  animation: tracker-lock-out 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tracker-lock-out {
+  to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lifting-app.is-locking .lifting-workspace {
+    animation: none;
+  }
 }
 
 .lifting-form button:not(:disabled):hover,
@@ -794,7 +817,7 @@
   padding: 0.65rem;
   border: 1px solid var(--lifting-border);
   border-radius: 0;
-  background: var(--lifting-surface);
+  background: var(--lifting-soft);
 }
 
 .lifting-log strong {
@@ -822,7 +845,7 @@
   width: min(92vw, 420px);
   padding: 1.25rem;
   color: var(--site-text);
-  background: var(--site-surface);
+  background: var(--site-bg);
   border: 1px solid var(--site-border);
   border-radius: 0;
   box-shadow: none;

@@ -23,19 +23,21 @@ permalink: /gradecalculatorv2/
     </div>
 
     <div class="settings-card" id="mobile-settings-panel" aria-label="Grade settings">
-      <div class="settings-card-head">
-        <span>Grade settings</span>
-        <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Round final grade: on</button>
-      </div>
+      <div class="settings-card-content">
+        <div class="settings-card-head">
+          <span>Grade settings</span>
+          <button type="button" id="rounding-toggle" class="toggle-action" aria-pressed="true">Round final grade: on</button>
+        </div>
 
-      <p class="grade-v2-summary" id="settings-summary">
-        Current grade counts for 80%. Final exam counts for 20%. Rounds up within 0.5%.
-      </p>
+        <p class="grade-v2-summary" id="settings-summary">
+          Current grade counts for 80%. Final exam counts for 20%. Rounds up within 0.5%.
+        </p>
 
-      <div class="control-stack" aria-label="Calculator controls">
-        <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Set rounding</button>
-        <button type="button" class="secondary-action grade-scale-action" data-open-dialog="scale-dialog"><span class="scale-label-full">Edit grade scale</span><span class="scale-label-compact">Scale</span></button>
-        <button type="button" class="secondary-action" data-open-dialog="weight-dialog">Set final weight</button>
+        <div class="control-stack" aria-label="Calculator controls">
+          <button type="button" class="secondary-action" data-open-dialog="rounding-dialog">Set rounding</button>
+          <button type="button" class="secondary-action grade-scale-action" data-open-dialog="scale-dialog"><span class="scale-label-full">Edit grade scale</span><span class="scale-label-compact">Scale</span></button>
+          <button type="button" class="secondary-action" data-open-dialog="weight-dialog">Set final weight</button>
+        </div>
       </div>
     </div>
   </div>
@@ -127,8 +129,8 @@ permalink: /gradecalculatorv2/
 
 <style>
   :where(.grade-v2, .grade-dialog) {
-    --gc-surface: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
-    --gc-surface-strong: var(--tool-surface);
+    --gc-surface: var(--site-bg);
+    --gc-surface-strong: var(--site-bg);
     --gc-field: var(--tool-surface);
     --gc-off: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
     --gc-border: var(--tool-border);
@@ -382,6 +384,10 @@ permalink: /gradecalculatorv2/
     padding: var(--tool-panel-padding);
     background: var(--gc-surface-strong);
     border: 1px solid var(--gc-border);
+  }
+
+  .settings-card-content {
+    display: contents;
   }
 
   .settings-card-head {
@@ -859,7 +865,10 @@ permalink: /gradecalculatorv2/
     .settings-card {
       grid-column: auto;
       grid-row: auto;
-      display: none;
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: clip;
+      gap: 0;
       padding: 0;
       border: 0;
       margin: 0;
@@ -867,12 +876,18 @@ permalink: /gradecalculatorv2/
       pointer-events: none;
       opacity: 0;
       transform: translateY(-0.35rem);
-      transition: opacity 0.2s var(--gc-ease-out), transform 0.2s var(--gc-ease-out), display 0.2s allow-discrete;
+      visibility: hidden;
+      transition:
+        grid-template-rows 0.22s cubic-bezier(0.4, 0, 1, 1),
+        padding 0.18s cubic-bezier(0.4, 0, 1, 1),
+        border-width 0.18s cubic-bezier(0.4, 0, 1, 1),
+        opacity 0.14s ease-in,
+        transform 0.18s cubic-bezier(0.4, 0, 1, 1),
+        visibility 0s linear 0.22s;
     }
 
     .settings-card.is-open {
-      display: grid;
-      gap: 0.5rem;
+      grid-template-rows: 1fr;
       margin-top: -1px;
       padding: 0.65rem;
       border: 1px solid var(--gc-border);
@@ -881,13 +896,21 @@ permalink: /gradecalculatorv2/
       pointer-events: auto;
       opacity: 1;
       transform: translateY(0);
+      visibility: visible;
+      transition:
+        grid-template-rows 0.28s var(--gc-ease-out),
+        padding 0.22s var(--gc-ease-out),
+        border-width 0.22s var(--gc-ease-out),
+        opacity 0.2s var(--gc-ease-out),
+        transform 0.22s var(--gc-ease-out),
+        visibility 0s;
     }
 
-    @starting-style {
-      .settings-card.is-open {
-        opacity: 0;
-        transform: translateY(-0.35rem);
-      }
+    .settings-card-content {
+      display: grid;
+      min-height: 0;
+      overflow: hidden;
+      gap: 0.5rem;
     }
 
     .settings-card-head {

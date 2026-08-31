@@ -28,16 +28,18 @@
 
 <h3 id="neutral">Neutral</h3>
 <ul>
-  <li><strong>Paper White</strong> (<code class="language-plaintext highlighter-rouge">#ffffff</code>): light-mode page field.</li>
-  <li><strong>Soft Gray Surface</strong> (<code class="language-plaintext highlighter-rouge">#f2f2f2</code>): cards and low-emphasis surfaces in light mode.</li>
+  <li><strong>Field Gray</strong> (<code class="language-plaintext highlighter-rouge">#f7f7f7</code>): light-mode page field.</li>
+  <li><strong>Soft Gray Surface</strong> (<code class="language-plaintext highlighter-rouge">#f2f2f2</code>): compact, bordered controls and data labels in light mode.</li>
   <li><strong>Near-Black Ink</strong> (<code class="language-plaintext highlighter-rouge">#0a0a0a</code>): light-mode reading and display text.</li>
-  <li><strong>Night Field</strong> (<code class="language-plaintext highlighter-rouge">#090909</code>): dark-mode page field.</li>
-  <li><strong>Dark Surface</strong> (<code class="language-plaintext highlighter-rouge">#141414</code>): dark-mode cards and tool surfaces.</li>
+  <li><strong>Night Field</strong> (<code class="language-plaintext highlighter-rouge">#000000</code>): dark-mode page field.</li>
+  <li><strong>Dark Surface</strong> (<code class="language-plaintext highlighter-rouge">#141414</code>): compact, bordered controls and data labels in dark mode.</li>
   <li><strong>Bright Ink</strong> (<code class="language-plaintext highlighter-rouge">#f6f6f6</code>): dark-mode reading and display text.</li>
 </ul>
 
 <h3 id="named-rules">Named Rules</h3>
 <p><strong>The Rare Signal Rule.</strong> Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.</p>
+
+<p><strong>The Field-First Fill Rule.</strong> A page-scale section, panel, card, table, modal, or repeated-content container uses the page field and its structural border. Reserve the lighter or darker neutral surface for a compact, outlined control or label inside that field: inputs, small buttons, count badges, time tags, stat cells, switcher options, and graph readouts. Never place an equally toned compact control inside an equally toned broad container.</p>
 
 <h2 id="typography">Typography</h2>
 
@@ -93,10 +95,17 @@
 <p>Cards frame repeated posts and dense tool groups, never whole page sections.</p>
 <ul>
   <li><strong>Corner Style:</strong> square (<code class="language-plaintext highlighter-rouge">0</code>).</li>
-  <li><strong>Background:</strong> light or dark surface token according to color scheme.</li>
+  <li><strong>Background:</strong> the page field token according to color scheme; hierarchy comes from a border, spacing, and content grouping.</li>
   <li><strong>Border:</strong> <code class="language-plaintext highlighter-rouge">1px</code> soft border.</li>
   <li><strong>Hover Strategy:</strong> flat at rest; clickable cards strengthen their existing border without movement or shadow.</li>
   <li><strong>Internal Padding:</strong> <code class="language-plaintext highlighter-rouge">0.85rem</code> to <code class="language-plaintext highlighter-rouge">1.2rem</code>, scaled by context.</li>
+</ul>
+
+<h3 id="fill-scale">Fill Scale</h3>
+<ul>
+  <li><strong>Field:</strong> page backgrounds and broad outlined containers. It always uses the main light or dark background.</li>
+  <li><strong>Control:</strong> compact bordered actions, fields, labels, and data cells. It uses the single neighboring neutral surface.</li>
+  <li><strong>State:</strong> a selected, semantic, or primary control may use its established accent or status color. It never creates a new ambient surface tier.</li>
 </ul>
 
 <h3 id="inputs--fields">Inputs / Fields</h3>
@@ -118,6 +127,7 @@
   <li><strong>Do</strong> reserve Archivo Black for headings, identity, and short high-impact statements.</li>
   <li><strong>Do</strong> use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.</li>
   <li><strong>Do</strong> use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.</li>
+  <li><strong>Do</strong> keep broad outlined regions on the page field and use tonal fill only for compact controls or labels inside them.</li>
   <li><strong>Do</strong> use red sparingly for emphasis, active state, focus, and meaningful status.</li>
   <li><strong>Do</strong> keep interactive controls square, bordered, and touch-sized on small screens.</li>
 </ul>
@@ -128,5 +138,6 @@
   <li><strong>Don’t</strong> use red as a generic background or substitute it for hierarchy.</li>
   <li><strong>Don’t</strong> add a third type family, display face, or technical-looking mono type without a unique content role.</li>
   <li><strong>Don’t</strong> make a whole page a floating card or nest cards within cards.</li>
+  <li><strong>Don’t</strong> give an outer card and its smaller bordered children the same tonal fill.</li>
   <li><strong>Don’t</strong> animate height, padding, margin, or other layout-driving properties for navigation reveals.</li>
 </ul>

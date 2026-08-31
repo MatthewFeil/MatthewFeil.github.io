@@ -3,7 +3,7 @@ layout: page
 title: Personal Space
 permalink: /personal/
 extra_css:
-  - /assets/css/personal.css
+  - /assets/css/personal.css?v=20260830-5
 ---
 
 <section
@@ -41,7 +41,13 @@ extra_css:
         <h2>Personal Space</h2>
         <p id="personal-dashboard-date"></p>
       </div>
-      <button id="personal-lock-button" type="button">Lock</button>
+      <button id="personal-lock-button" class="lock-control" type="button" aria-label="Lock Personal Space and return to sign in" title="Lock Personal Space">
+        <svg class="lock-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path class="lock-control-shackle" d="M7 10V6.75a5 5 0 0 1 10 0V10" />
+          <rect class="lock-control-body" x="4.5" y="10" width="15" height="10" />
+          <path d="M12 14v2.5" />
+        </svg>
+      </button>
     </div>
 
     <nav class="personal-tracker-links" aria-label="Personal tracker links">
@@ -78,4 +84,4 @@ extra_css:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.3/dist/umd/supabase.js" defer></script>
 <script src="{{ "/assets/js/personal-auth.js" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/personal.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/personal.js?v=20260830-5" | relative_url }}" defer></script>

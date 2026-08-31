@@ -2,13 +2,13 @@
 name: Matthew Feil
 description: A high-contrast personal project site for creative technology, tools, and ongoing work.
 colors:
-  background-light: "#ffffff"
+  background-light: "#f7f7f7"
   surface-light: "#f2f2f2"
   panel-light: "#e7e7e7"
   text-light: "#0a0a0a"
   muted-light: "#626262"
   border-light: "#151515"
-  background-dark: "#090909"
+  background-dark: "#000000"
   surface-dark: "#141414"
   panel-dark: "#202020"
   text-dark: "#f6f6f6"
@@ -53,11 +53,11 @@ components:
     padding: "0.7rem 1rem"
     height: "2.5rem"
   panel:
-    backgroundColor: "{colors.surface-light}"
+    backgroundColor: "{colors.background-light}"
     rounded: "{rounded.square}"
     padding: "{spacing.panel}"
   post-card:
-    backgroundColor: "{colors.surface-light}"
+    backgroundColor: "{colors.background-light}"
     textColor: "{colors.text-light}"
     rounded: "{rounded.square}"
     padding: "clamp(0.85rem, 2.2vw, 1.2rem)"
@@ -88,15 +88,17 @@ The palette relies on strong neutral contrast and one rare red signal; semantic 
 - **Signal Red Strong** (`#b90f17`): deepens red for high-emphasis interaction states.
 
 ### Neutral
-- **Paper White** (`#ffffff`): light-mode page field.
-- **Soft Gray Surface** (`#f2f2f2`): cards and low-emphasis surfaces in light mode.
+- **Field Gray** (`#f7f7f7`): light-mode page field.
+- **Soft Gray Surface** (`#f2f2f2`): compact, bordered controls and data labels in light mode.
 - **Near-Black Ink** (`#0a0a0a`): light-mode reading and display text.
-- **Night Field** (`#090909`): dark-mode page field.
-- **Dark Surface** (`#141414`): dark-mode cards and tool surfaces.
+- **Night Field** (`#000000`): dark-mode page field.
+- **Dark Surface** (`#141414`): compact, bordered controls and data labels in dark mode.
 - **Bright Ink** (`#f6f6f6`): dark-mode reading and display text.
 
 ### Named Rules
 **The Rare Signal Rule.** Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.
+
+**The Field-First Fill Rule.** A page-scale section, panel, card, table, modal, or repeated-content container uses the page field and its structural border. Reserve the lighter or darker neutral surface for a compact, outlined control or label inside that field: inputs, small buttons, count badges, time tags, stat cells, switcher options, and graph readouts. Never place an equally toned compact control inside an equally toned broad container.
 
 ## Typography
 
@@ -147,10 +149,15 @@ Buttons are compact commands, not pill-shaped decoration.
 ### Cards / Containers
 Cards frame repeated posts and dense tool groups, never whole page sections.
 - **Corner Style:** square (`0`).
-- **Background:** light or dark surface token according to color scheme.
+- **Background:** the page field token according to color scheme; hierarchy comes from a border, spacing, and content grouping.
 - **Border:** `1px` soft border.
 - **Hover Strategy:** flat at rest; clickable cards strengthen their existing border without movement or shadow.
 - **Internal Padding:** `0.85rem` to `1.2rem`, scaled by context.
+
+### Fill Scale
+- **Field:** page backgrounds and broad outlined containers. It always uses the main light or dark background.
+- **Control:** compact bordered actions, fields, labels, and data cells. It uses the single neighboring neutral surface.
+- **State:** a selected, semantic, or primary control may use its established accent or status color. It never creates a new ambient surface tier.
 
 ### Inputs / Fields
 Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus is communicated by the red outline or border shift, never by color alone.
@@ -170,6 +177,7 @@ Tool switchers are square segmented controls with a thin shared border. The acti
 - **Do** reserve Archivo Black for headings, identity, and short high-impact statements.
 - **Do** use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.
 - **Do** use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.
+- **Do** keep broad outlined regions on the page field and use tonal fill only for compact controls or labels inside them.
 - **Do** use red sparingly for emphasis, active state, focus, and meaningful status.
 - **Do** keep interactive controls square, bordered, and touch-sized on small screens.
 
@@ -178,4 +186,5 @@ Tool switchers are square segmented controls with a thin shared border. The acti
 - **Don't** use red as a generic background or substitute it for hierarchy.
 - **Don't** add a third type family, display face, or technical-looking mono type without a unique content role.
 - **Don't** make a whole page a floating card or nest cards within cards.
+- **Don't** give an outer card and its smaller bordered children the same tonal fill.
 - **Don't** animate height, padding, margin, or other layout-driving properties for navigation reveals.

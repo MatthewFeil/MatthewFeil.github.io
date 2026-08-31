@@ -101,15 +101,27 @@
     els.lock.hidden = true;
     els.workspace.hidden = false;
     app.classList.add('is-unlocked');
-    app.classList.remove('is-denied', 'is-loading');
+    app.classList.remove('is-denied', 'is-loading', 'is-locking');
+    els.lock.classList.remove('is-entering');
+    els.lockButton.classList.remove('is-locking');
+    els.lockButton.disabled = false;
+    els.lockButton.setAttribute('aria-busy', 'false');
     loadDashboard();
   }
 
-  function showLock() {
+  function showLock(animate = false) {
     els.workspace.hidden = true;
     els.lock.hidden = false;
-    app.classList.remove('is-unlocked');
+    app.classList.remove('is-unlocked', 'is-locking');
+    if (animate) {
+      els.lock.classList.add('is-entering');
+      window.setTimeout(() => els.lock.classList.remove('is-entering'), 250);
+    }
     (els.email.value ? els.password : els.email).focus();
+  }
+
+  function lockMotionDelay() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
   }
 
   function nextPath() {
@@ -227,10 +239,6 @@
             </span>
             ${taskDetails(task).map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}
           </a>
-          <div class="personal-task-feedback" hidden>
-            <span>Marked complete.</span>
-            <button type="button" data-undo-task="${escapeHtml(task.id || '')}">Undo</button>
-          </div>
         </div>
       </li>
     `).join('');
@@ -347,9 +355,7 @@
 
     taskRow.classList.add('is-complete', 'is-pending-complete');
     button?.setAttribute('aria-pressed', 'true');
-    const feedback = taskRow.querySelector('.personal-task-feedback');
-    if (feedback) feedback.hidden = false;
-    setDashboardStatus(`Marked “${taskLabel(taskRow)}” complete. Undo is available.`, false);
+    button?.setAttribute('aria-label', `Undo completion for ${taskLabel(taskRow)}`);
 
     const timeoutId = window.setTimeout(() => {
       pendingTodoistCompletions.delete(taskId);
@@ -369,12 +375,8 @@
     const taskRow = els.todoistList.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
     const button = els.todoistList.querySelector(`[data-complete-task="${CSS.escape(taskId)}"]`);
     taskRow?.classList.remove('is-complete', 'is-pending-complete');
-    const feedback = taskRow?.querySelector('.personal-task-feedback');
-    if (feedback) feedback.hidden = true;
     button?.setAttribute('aria-pressed', 'false');
-    if (taskRow?.dataset.taskTitle) {
-      setDashboardStatus(`Completion canceled for “${taskLabel(taskRow)}”.`, false);
-    }
+    if (taskRow) button?.setAttribute('aria-label', `Complete ${taskLabel(taskRow)}`);
     syncTodoistCompletionLoading();
   }
 
@@ -402,7 +404,6 @@
 
       collapseTodoistRow(taskRow);
       taskRow.classList.remove('is-pending-complete');
-      setDashboardStatus(`Completed “${taskLabel(taskRow)}”.`, false, 4000);
       updateTodoistCount();
       window.setTimeout(() => {
         taskRow.remove();
@@ -410,10 +411,9 @@
       }, 360);
     } catch (error) {
       taskRow.classList.remove('is-complete', 'is-pending-complete');
-      const feedback = taskRow.querySelector('.personal-task-feedback');
-      if (feedback) feedback.hidden = true;
       button?.removeAttribute('disabled');
       button?.setAttribute('aria-pressed', 'false');
+      button?.setAttribute('aria-label', `Complete ${taskLabel(taskRow)}`);
       setDashboardStatus(`Couldn’t complete “${taskLabel(taskRow)}”. Try again.`, true);
     } finally {
       button?.setAttribute('aria-busy', 'false');
@@ -464,11 +464,19 @@
   }));
 
   els.lockButton.addEventListener('click', async () => {
-    await window.PersonalAuth.signOut().catch(() => {});
+    if (els.lockButton.disabled) return;
+    els.lockButton.disabled = true;
+    els.lockButton.classList.add('is-locking');
+    els.lockButton.setAttribute('aria-busy', 'true');
+    app.classList.add('is-locking');
+    await Promise.all([
+      window.PersonalAuth.signOut().catch(() => {}),
+      new Promise((resolve) => window.setTimeout(resolve, lockMotionDelay()))
+    ]);
     els.email.value = '';
     els.password.value = '';
     setStatus('');
-    showLock();
+    showLock(true);
   });
 
   els.todoistList.addEventListener('click', (event) => {
@@ -478,8 +486,6 @@
       return;
     }
 
-    const undoButton = event.target.closest('[data-undo-task]');
-    if (undoButton) cancelTodoistCompletion(undoButton.dataset.undoTask);
   });
 
   [els.calendarList, els.todoistList].forEach((list) => list.addEventListener('click', (event) => {

@@ -141,6 +141,10 @@
     window.location.href = `${personalUrl}?next=${next}`;
   }
 
+  function lockMotionDelay() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
+  }
+
   async function api(action, payload = {}) {
     const response = await window.PersonalAuth.authorizedFetch(apiUrl, {
       method: 'POST',
@@ -505,8 +509,16 @@
   [els.addLiftForm, els.logForm, els.renameLiftForm].forEach(watchFormCompletion);
 
   els.lockButton.addEventListener('click', async () => {
+    if (els.lockButton.disabled) return;
+    els.lockButton.disabled = true;
+    els.lockButton.classList.add('is-locking');
+    els.lockButton.setAttribute('aria-busy', 'true');
+    app.classList.add('is-locking');
+    await Promise.all([
+      window.PersonalAuth.signOut().catch(() => {}),
+      new Promise((resolve) => window.setTimeout(resolve, lockMotionDelay()))
+    ]);
     els.workspace.hidden = true;
-    await window.PersonalAuth.signOut().catch(() => {});
     redirectToPersonal();
   });
 

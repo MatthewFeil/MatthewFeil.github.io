@@ -270,6 +270,10 @@
   margin-bottom: var(--personal-major-gap);
 }
 
+.personal-heading > div {
+  min-width: 0;
+}
+
 .personal-heading h2 {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 4vw, 3.2rem);
@@ -305,6 +309,35 @@
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
+.personal-heading .lock-control {
+  flex: 0 0 var(--tool-control-height);
+  width: var(--tool-control-height);
+  min-width: var(--tool-control-height);
+  padding: 0;
+}
+
+.personal-app.is-locking .personal-workspace {
+  animation: personal-workspace-lock-out 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.personal-lock.is-entering {
+  animation: personal-lock-return 240ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes personal-workspace-lock-out {
+  to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes personal-lock-return {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
 .personal-heading button:hover,
 .personal-heading button:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
@@ -317,9 +350,15 @@
 }
 
 .personal-heading button:active,
-.personal-tracker-link:active,
-.personal-task-feedback button:active {
+.personal-tracker-link:active {
   transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .personal-app.is-locking .personal-workspace,
+  .personal-lock.is-entering {
+    animation: none;
+  }
 }
 
 .personal-dashboard {
@@ -367,7 +406,7 @@
   overflow: hidden;
   border: 1px solid var(--personal-border);
   border-radius: 0;
-  background: var(--personal-surface);
+  background: var(--personal-bg);
   padding: var(--tool-panel-padding);
 }
 
@@ -387,19 +426,8 @@
 }
 
 .personal-widget.is-empty {
-  align-content: stretch;
-  grid-template-rows: auto minmax(0, 1fr);
-}
-
-.personal-widget.is-empty .personal-agenda-list,
-.personal-widget.is-empty .personal-task-list {
-  align-self: stretch;
-  grid-template-rows: minmax(0, 1fr);
-  min-height: 0;
-}
-
-.personal-widget.is-empty .personal-empty-message {
-  min-height: 0;
+  align-content: start;
+  grid-template-rows: auto;
 }
 
 .personal-widget-calendar {
@@ -461,7 +489,7 @@
   justify-content: space-between;
   min-height: 2.75rem;
   border: 1px solid var(--personal-border);
-  background: transparent;
+  background: var(--personal-bg);
   color: var(--site-text);
   font-family: var(--font-ui);
   font-size: clamp(0.95rem, 1.35vw, 1.08rem);
@@ -477,7 +505,7 @@
 
 .personal-tracker-link:hover,
 .personal-tracker-link:focus-visible {
-  background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
+  background: color-mix(in srgb, var(--personal-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
   color: var(--site-accent);
 }
@@ -582,6 +610,9 @@
   display: grid;
   grid-template-columns: 1fr;
   align-content: center;
+  justify-content: center;
+  justify-items: center;
+  inline-size: 100%;
   gap: 0.6rem;
   min-height: 6rem;
   place-items: center;
@@ -597,6 +628,34 @@
 .personal-task-list .personal-empty-message:first-child {
   border-top: 0;
   padding-top: 0;
+}
+
+.personal-widget.is-empty .personal-widget-head {
+  position: relative;
+  z-index: 1;
+}
+
+.personal-widget.is-empty .personal-agenda-list,
+.personal-widget.is-empty .personal-task-list {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  block-size: auto;
+  min-height: 0;
+  padding: 0;
+}
+
+.personal-widget.is-empty .personal-empty-message {
+  position: static;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  align-self: center;
+  inline-size: 100%;
+  min-height: 0;
+  padding: var(--tool-panel-padding);
+  border-top: 0;
 }
 
 .personal-empty-message span {
@@ -718,8 +777,8 @@
   position: absolute;
   width: 0.28rem;
   height: 0.54rem;
-  border-right: 2px solid var(--personal-surface);
-  border-bottom: 2px solid var(--personal-surface);
+  border-right: 2px solid var(--personal-bg);
+  border-bottom: 2px solid var(--personal-bg);
   opacity: 0;
   transform: translateY(-0.06rem) scale(0.7) rotate(42deg);
   transition: opacity 0.14s ease, transform 0.2s var(--personal-ease-out);
@@ -787,50 +846,6 @@
   text-decoration: line-through;
   text-decoration-thickness: 0.08em;
   transition: color 0.16s ease;
-}
-
-.personal-task-feedback {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.45rem;
-  color: var(--personal-muted);
-  font-size: 0.78rem;
-  font-weight: 750;
-  line-height: 1.2;
-}
-
-.personal-task-feedback[hidden] {
-  display: none;
-}
-
-.personal-task-list li.is-pending-complete .personal-task-feedback {
-  animation: personal-feedback-arrive 0.2s var(--personal-ease-out) both;
-}
-
-.personal-task-feedback button {
-  min-height: 2.25rem;
-  border: 1px solid var(--personal-border);
-  border-radius: 0;
-  background: var(--personal-surface);
-  color: var(--site-text);
-  cursor: pointer;
-  font: inherit;
-  font-family: var(--font-ui);
-  font-size: 0.76rem;
-  font-weight: 850;
-  letter-spacing: var(--tool-label-spacing);
-  line-height: 1;
-  padding: 0.5rem 0.65rem;
-  text-transform: uppercase;
-  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s var(--personal-ease-out);
-}
-
-.personal-task-feedback button:hover,
-.personal-task-feedback button:focus-visible {
-  border-color: var(--site-accent);
-  color: var(--site-accent);
 }
 
 .personal-task-list li.is-removing {
@@ -926,12 +941,6 @@
 }
 
 @media (max-width: 560px) {
-  .personal-heading {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-  }
-
   .personal-widget-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -967,7 +976,7 @@
   }
 
   .personal-tracker-link:hover {
-    background: var(--personal-surface);
+    background: var(--personal-bg);
     border-color: var(--personal-border);
     color: var(--site-text);
   }

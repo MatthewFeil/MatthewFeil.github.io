@@ -149,6 +149,10 @@
       pointShape: ['circle', 'square', 'diamond'].includes(series.pointShape) ? series.pointShape : 'circle',
       pointSize: Number.isFinite(Number(series.pointSize)) ? Number(series.pointSize) : 3.5,
       endLabel: Boolean(series.endLabel),
+      interactive: series.interactive !== false,
+      legendMarker: series.legendMarker === 'point' ? 'point' : 'line',
+      legendFill: series.legendFill || series.color || DEFAULT_PALETTE[index % DEFAULT_PALETTE.length],
+      legendBorder: series.legendBorder || series.color || DEFAULT_PALETTE[index % DEFAULT_PALETTE.length],
       formatValue: typeof series.formatValue === 'function' ? series.formatValue : null,
       className: series.className || '',
       hidden: Boolean(series.hidden),
@@ -455,7 +459,7 @@
       const height = Math.max(180, Number(config.height) || 300);
       const margins = { ...config.margins };
       if (width < 480) {
-        margins.left = Math.min(margins.left, 52);
+        margins.left = Math.min(margins.left, 74);
         margins.right = Math.min(margins.right, 14);
       }
       const plotWidth = Math.max(1, width - margins.left - margins.right);
@@ -491,8 +495,10 @@
       }
       series.forEach((item) => {
         const entry = htmlElement('li', 'site-graph-legend-item');
-        const key = htmlElement('span', `site-graph-legend-key is-${item.lineStyle}`);
+        const key = htmlElement('span', `site-graph-legend-key is-${item.legendMarker} is-${item.lineStyle}`);
         key.style.setProperty('--site-graph-series-color', item.color);
+        key.style.setProperty('--site-graph-legend-fill', item.legendFill);
+        key.style.setProperty('--site-graph-legend-border', item.legendBorder);
         const label = htmlElement('span', '', item.label);
         entry.append(key, label);
         this.legend.append(entry);
@@ -646,7 +652,8 @@
         return;
       }
       const { series, width, margins, plotWidth, plotHeight, xScale } = context;
-      const xValues = [...new Set(series.flatMap((item) => (
+      const interactiveSeries = series.filter((item) => item.interactive);
+      const xValues = [...new Set(interactiveSeries.flatMap((item) => (
         item.data.filter((point) => point.validY).map((point) => point.x)
       )))].sort((left, right) => left - right);
       if (!xValues.length) return;
@@ -682,7 +689,7 @@
         guide.setAttribute('x1', xScale(selectedX));
         guide.setAttribute('x2', xScale(selectedX));
         marks.replaceChildren();
-        const selections = series.map((item) => {
+        const selections = interactiveSeries.map((item) => {
           const points = item.data.filter((point) => point.validY);
           const point = points.reduce((closest, candidate) => (
             !closest || Math.abs(candidate.x - selectedX) < Math.abs(closest.x - selectedX) ? candidate : closest

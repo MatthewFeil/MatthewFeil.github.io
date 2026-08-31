@@ -4,6 +4,7 @@ title: Stock Portfolio
 permalink: /portfolio/
 extra_css:
   - /assets/css/portfolio.css
+  - /assets/css/site-graph.css
 ---
 
 <section
@@ -30,7 +31,13 @@ extra_css:
         </div>
         <button id="open-stock-dialog" type="button">Add stock</button>
         <button id="open-log-dialog" type="button">Add log</button>
-        <button id="portfolio-lock-button" type="button">Lock</button>
+        <button id="portfolio-lock-button" class="lock-control" type="button" aria-label="Lock Portfolio Tracker and return to sign in" title="Lock Portfolio Tracker">
+          <svg class="lock-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="lock-control-shackle" d="M7 10V6.75a5 5 0 0 1 10 0V10" />
+            <rect class="lock-control-body" x="4.5" y="10" width="15" height="10" />
+            <path d="M12 14v2.5" />
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -53,6 +60,10 @@ extra_css:
       </div>
     </div>
 
+    <section class="portfolio-graph-panel" aria-label="Portfolio value over time">
+      <div id="portfolio-graph" class="portfolio-graph" aria-busy="true"></div>
+    </section>
+
     <dialog class="portfolio-dialog" id="stock-dialog" aria-labelledby="stock-dialog-title">
       <div class="portfolio-dialog-head">
         <h3 id="stock-dialog-title">Add stock</h3>
@@ -60,10 +71,10 @@ extra_css:
       </div>
       <form id="stock-form" class="portfolio-form">
         <label for="stock-symbol">Ticker symbol</label>
-        <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" required>
+        <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" maxlength="16" pattern="[A-Za-z0-9.=-]{1,16}" autocapitalize="characters" spellcheck="false" required>
 
         <label for="stock-name">Name</label>
-        <input id="stock-name" name="name" type="text" placeholder="Apple Inc.">
+        <input id="stock-name" name="name" type="text" placeholder="Apple Inc." maxlength="120">
 
         <button type="submit" disabled>Add stock</button>
       </form>
@@ -127,4 +138,5 @@ extra_css:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.3/dist/umd/supabase.js" defer></script>
 <script src="{{ "/assets/js/personal-auth.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/site-graph.js" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/portfolio.js" | relative_url }}" defer></script>

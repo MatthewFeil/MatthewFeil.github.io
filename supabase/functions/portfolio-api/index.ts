@@ -33,6 +33,20 @@ type PortfolioBody = {
   total_purchase_amount?: number;
 };
 
+const tickerPattern = /^[A-Z0-9.=-]{1,16}$/;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const entryTypes = new Set(["additional_investment", "reinvested_dividend"]);
+
+function isDateKey(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function isPositiveFinite(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
 async function supabase(path: string, init: RequestInit = {}) {
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     ...init,
@@ -54,37 +68,43 @@ async function getQuotes(stocks: Stock[]) {
   if (stocks.length === 0) return {};
 
   const entries = await Promise.all(stocks.map(async (stock) => {
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.symbol)}?interval=1d&range=2y`,
-      { headers: { "user-agent": "Mozilla/5.0" } },
-    );
-    if (!response.ok) return null;
+    try {
+      const response = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.symbol)}?interval=1d&range=2y`,
+        { headers: { "user-agent": "Mozilla/5.0" } },
+      );
+      if (!response.ok) return null;
 
-    const data = await response.json();
-    const result = data?.chart?.result?.[0];
-    const meta = result?.meta;
-    if (!meta) return null;
+      const data = await response.json();
+      const result = data?.chart?.result?.[0];
+      const meta = result?.meta;
+      if (!meta) return null;
 
-    const timestamps = result.timestamp || [];
-    const closes = result.indicators?.quote?.[0]?.close || [];
-    const history = timestamps
-      .map((timestamp: number, index: number) => ({
-        date: new Date(timestamp * 1000).toISOString().slice(0, 10),
-        close: closes[index],
-      }))
-      .filter((item: { date: string; close: unknown }): item is PricePoint => (
-        typeof item.close === "number" && Number.isFinite(item.close)
-      ));
-    const lastClose = history.length > 0 ? history[history.length - 1].close : null;
-    const price = typeof meta.regularMarketPrice === "number" ? meta.regularMarketPrice : lastClose;
-    if (!price) return null;
+      const timestamps = result.timestamp || [];
+      const closes = result.indicators?.quote?.[0]?.close || [];
+      const history = timestamps
+        .map((timestamp: number, index: number) => ({
+          date: new Date(timestamp * 1000).toISOString().slice(0, 10),
+          close: closes[index],
+        }))
+        .filter((item: { date: string; close: unknown }): item is PricePoint => (
+          typeof item.close === "number" && Number.isFinite(item.close) && item.close > 0
+        ));
+      const lastClose = history.length > 0 ? history[history.length - 1].close : null;
+      const price = typeof meta.regularMarketPrice === "number" && Number.isFinite(meta.regularMarketPrice) && meta.regularMarketPrice > 0
+        ? meta.regularMarketPrice
+        : lastClose;
+      if (!price) return null;
 
-    return [stock.symbol, {
-      price,
-      marketTime: meta.regularMarketTime,
-      currency: meta.currency,
-      history,
-    }];
+      return [stock.symbol, {
+        price,
+        marketTime: meta.regularMarketTime,
+        currency: meta.currency,
+        history,
+      }];
+    } catch {
+      return null;
+    }
   }));
 
   return Object.fromEntries(entries.filter(Boolean) as [string, unknown][]);
@@ -118,6 +138,10 @@ Deno.serve(async (request) => {
     if (body.action === "addStock") {
       const symbol = body.symbol?.trim().toUpperCase();
       if (!symbol) return json({ error: "Ticker symbol is required." }, 400);
+      if (!tickerPattern.test(symbol)) return json({ error: "Enter a ticker with up to 16 letters, numbers, periods, equals signs, or hyphens." }, 400);
+      if (body.name && body.name.trim().length > 120) return json({ error: "Stock name must be 120 characters or fewer." }, 400);
+      const existing = await supabase(`portfolio_stocks?symbol=eq.${encodeURIComponent(symbol)}&select=id`) as Stock[];
+      if (existing.length > 0) return json({ error: `${symbol} is already being tracked.` }, 409);
       await supabase("portfolio_stocks", {
         method: "POST",
         body: JSON.stringify({ symbol, name: body.name?.trim() || null }),
@@ -126,12 +150,19 @@ Deno.serve(async (request) => {
     }
 
     if (body.action === "addLog") {
-      if (!body.stock_id || !body.logged_at || !body.entry_type || !body.purchase_price || !body.total_purchase_amount) {
+      if (!body.stock_id || !body.logged_at || !body.entry_type || body.purchase_price === undefined || body.total_purchase_amount === undefined) {
         return json({ error: "Every log field is required." }, 400);
       }
-      if (body.purchase_price <= 0 || body.total_purchase_amount <= 0) {
+      if (!uuidPattern.test(body.stock_id)) return json({ error: "Choose a valid stock before saving this log." }, 400);
+      if (!isDateKey(body.logged_at) || body.logged_at > new Date().toISOString().slice(0, 10)) {
+        return json({ error: "Choose a valid date that is not in the future." }, 400);
+      }
+      if (!entryTypes.has(body.entry_type)) return json({ error: "Choose a valid investment type." }, 400);
+      if (!isPositiveFinite(body.purchase_price) || !isPositiveFinite(body.total_purchase_amount)) {
         return json({ error: "Purchase price and amount must be greater than zero." }, 400);
       }
+      const stocks = await supabase(`portfolio_stocks?id=eq.${encodeURIComponent(body.stock_id)}&select=id`) as Stock[];
+      if (stocks.length === 0) return json({ error: "That stock no longer exists. Refresh and try again." }, 400);
       await supabase("portfolio_logs", {
         method: "POST",
         body: JSON.stringify({
@@ -145,18 +176,19 @@ Deno.serve(async (request) => {
       return json(await listPortfolio());
     }
 
-    if (body.action === "deleteStock" && body.id) {
+    if (body.action === "deleteStock" && body.id && uuidPattern.test(body.id)) {
       await supabase(`portfolio_stocks?id=eq.${encodeURIComponent(body.id)}`, { method: "DELETE" });
       return json(await listPortfolio());
     }
 
-    if (body.action === "deleteLog" && body.id) {
+    if (body.action === "deleteLog" && body.id && uuidPattern.test(body.id)) {
       await supabase(`portfolio_logs?id=eq.${encodeURIComponent(body.id)}`, { method: "DELETE" });
       return json(await listPortfolio());
     }
 
     return json({ error: "Unknown portfolio action." }, 400);
   } catch (error) {
-    return json({ error: error instanceof Error ? error.message : "Unexpected portfolio error." }, 500);
+    console.error("Portfolio API error", error);
+    return json({ error: "The portfolio service is unavailable. Please try again." }, 500);
   }
 });

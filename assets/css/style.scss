@@ -21,7 +21,7 @@
   --tool-border: color-mix(in srgb, var(--site-text) 18%, transparent);
   --tool-border-subtle: color-mix(in srgb, var(--site-text) 12%, transparent);
   --tool-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
-  --tool-soft: color-mix(in srgb, var(--site-bg) 96%, var(--site-text));
+  --tool-soft: var(--site-bg);
   --tool-muted: color-mix(in srgb, var(--site-text) 62%, transparent);
   --tool-label-spacing: 0.07em;
   --tool-control-height: 2.5rem;
@@ -411,7 +411,7 @@ table {
 .nav-toggle-mark::before,
 .nav-toggle-mark::after {
   display: block;
-  width: 0.9rem;
+  width: 1.125rem;
   height: 2px;
   background: currentcolor;
   content: "";
@@ -428,12 +428,12 @@ table {
   left: 0;
 }
 
-.nav-toggle-mark::before { top: -0.28rem; }
-.nav-toggle-mark::after { top: 0.28rem; }
+.nav-toggle-mark::before { top: -0.32rem; }
+.nav-toggle-mark::after { top: 0.32rem; }
 
 .site-nav.is-open .nav-toggle-mark { background: transparent; }
-.site-nav.is-open .nav-toggle-mark::before { transform: translateY(0.28rem) rotate(45deg); }
-.site-nav.is-open .nav-toggle-mark::after { transform: translateY(-0.28rem) rotate(-45deg); }
+.site-nav.is-open .nav-toggle-mark::before { transform: translateY(0.32rem) rotate(45deg); }
+.site-nav.is-open .nav-toggle-mark::after { transform: translateY(-0.32rem) rotate(-45deg); }
 
 .trigger {
   gap: clamp(0.7rem, 1.7vw, 1.5rem);
@@ -953,7 +953,7 @@ table {
   height: 100%;
   padding: clamp(0.85rem, 2.2vw, 1.2rem);
   border: 1px solid var(--site-soft-border);
-  background: var(--site-surface);
+  background: var(--site-bg);
   color: var(--site-text);
   text-decoration: none;
   transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -1095,7 +1095,7 @@ table {
 
 .post-content code {
   border: 1px solid var(--site-soft-border);
-  background: var(--site-surface);
+  background: var(--site-bg);
   padding: 0.1rem 0.25rem;
   font-size: 0.92em;
 }
@@ -1103,7 +1103,7 @@ table {
 .post-content pre {
   overflow: auto;
   border: 1px solid var(--site-border);
-  background: var(--site-surface);
+  background: var(--site-bg);
   padding: 1rem;
 }
 
@@ -1111,7 +1111,7 @@ table {
   display: block;
   border: 1px solid var(--site-border) !important;
   border-radius: 0 !important;
-  background: var(--site-surface);
+  background: var(--site-bg);
 }
 
 .playlist-stack,
@@ -1131,7 +1131,7 @@ table {
   min-width: 0;
   padding: clamp(0.85rem, 2.2vw, 1.2rem);
   border: 1px solid var(--site-soft-border);
-  background: var(--site-surface);
+  background: var(--site-bg);
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
@@ -1237,6 +1237,63 @@ table {
   color: var(--site-bad);
 }
 
+.lock-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tool-control-height);
+  min-width: var(--tool-control-height);
+  padding: 0;
+}
+
+.lock-control-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-width: 1.75;
+}
+
+.lock-control-shackle,
+.lock-control-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.lock-control.is-locking {
+  cursor: wait;
+}
+
+.lock-control.is-locking .lock-control-shackle {
+  animation: lock-control-shackle-close 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lock-control.is-locking .lock-control-body {
+  animation: lock-control-body-settle 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lock-control-shackle-close {
+  0% { transform: translateX(0.17rem) rotate(-28deg); }
+  62% { transform: translateX(0) rotate(0); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes lock-control-body-settle {
+  0% { transform: scale(0.9); }
+  62% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lock-control.is-locking .lock-control-shackle,
+  .lock-control.is-locking .lock-control-body {
+    animation: none;
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .nav-toggle:hover {
     background: transparent;
@@ -1267,7 +1324,7 @@ table {
   .post-card:focus-visible,
   .playlist-card:hover,
   .playlist-card:focus-within {
-    background: var(--site-surface);
+    background: var(--site-bg);
     border-color: var(--site-soft-border);
   }
 
@@ -1363,9 +1420,9 @@ table {
     display: inline-flex;
     grid-column: 2;
     justify-self: end;
-    min-height: 3rem;
-    padding: 0.65rem 0.8rem;
-    font-size: 0.875rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
   }
 
   .site-nav {

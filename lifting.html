@@ -20,7 +20,13 @@ extra_css:
       <div class="lifting-toolbar-actions">
         <button id="log-set-open" class="lifting-secondary" type="button">Log set</button>
         <button id="add-lift-open" class="lifting-secondary" type="button">Add lift</button>
-        <button id="lifting-lock-button" class="lifting-secondary" type="button">Lock</button>
+        <button id="lifting-lock-button" class="lifting-secondary lock-control" type="button" aria-label="Lock Lifting Tracker and return to sign in" title="Lock Lifting Tracker">
+          <svg class="lock-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="lock-control-shackle" d="M7 10V6.75a5 5 0 0 1 10 0V10" />
+            <rect class="lock-control-body" x="4.5" y="10" width="15" height="10" />
+            <path d="M12 14v2.5" />
+          </svg>
+        </button>
       </div>
     </div>
 

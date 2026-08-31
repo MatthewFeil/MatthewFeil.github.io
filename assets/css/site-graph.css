@@ -20,7 +20,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--tool-section-gap, 0.75rem);
-  padding: 0.85rem 0.9rem 0;
+  padding: 0.85rem 0.9rem 0.65rem;
 }
 
 .site-graph[data-legend-position="bottom"] .site-graph-header {
@@ -31,11 +31,11 @@
   min-width: 0;
 }
 
-.site-graph-title {
+.site-graph h3.site-graph-title {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 800;
+  font-weight: 400;
   letter-spacing: -0.025em;
   line-height: 1;
   text-transform: uppercase;
@@ -45,8 +45,8 @@
   max-width: 54rem;
   margin: 0.32rem 0 0;
   color: var(--site-graph-muted);
-  font-size: 0.8rem;
-  line-height: 1.35;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .site-graph-legend,
@@ -64,9 +64,9 @@
   justify-content: flex-end;
   color: var(--site-graph-muted);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tool-label-spacing, 0.07em);
   line-height: 1.2;
   text-transform: uppercase;
 }
@@ -92,6 +92,14 @@
 
 .site-graph-legend-key.is-dotted {
   border-top-style: dotted;
+}
+
+.site-graph-legend-key.is-point {
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid var(--site-graph-legend-border, var(--site-graph-series-color));
+  border-radius: 50%;
+  background: var(--site-graph-legend-fill, var(--site-graph-series-color));
 }
 
 .site-graph-plot {
@@ -127,7 +135,7 @@
 .site-graph-end-label {
   fill: var(--site-graph-muted);
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -136,9 +144,9 @@
 .site-graph-end-label {
   fill: var(--site-text);
   font-family: var(--font-ui);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tool-label-spacing, 0.07em);
   text-transform: uppercase;
 }
 
@@ -210,16 +218,16 @@
   border-top: 1px solid var(--site-graph-border);
   background: var(--site-graph-panel);
   padding: 0.58rem 0.9rem;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
 
 .site-graph-readout-x {
   flex: 0 0 auto;
   font-family: var(--font-ui);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  letter-spacing: 0.035em;
+  letter-spacing: var(--tool-label-spacing, 0.07em);
   line-height: 1.2;
   text-transform: uppercase;
 }
@@ -243,6 +251,7 @@
 .site-graph-readout-number {
   color: var(--site-text);
   font-family: var(--font-ui);
+  font-size: 1rem;
   font-weight: 800;
 }
 
@@ -261,7 +270,7 @@
   }
 
   .site-graph-header {
-    padding: 0.75rem 0.75rem 0;
+    padding: 0.75rem 0.75rem 0.6rem;
   }
 
   .site-graph-legend,

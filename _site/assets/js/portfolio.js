@@ -81,12 +81,17 @@
     summaryGain: document.getElementById('summary-gain'),
     summaryPercent: document.getElementById('summary-percent'),
     tableGainHeading: document.getElementById('table-gain-heading'),
-    tablePercentHeading: document.getElementById('table-percent-heading')
+    tablePercentHeading: document.getElementById('table-percent-heading'),
+    graph: document.getElementById('portfolio-graph')
   };
 
   const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
   const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
   const logDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const graphDate = new Intl.DateTimeFormat('en-US', { month: '2-digit', year: '2-digit', timeZone: 'UTC' });
+  const graphReadoutDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const REQUEST_TIMEOUT_MS = 20000;
+  let portfolioGraph = null;
 
   function setStatus(message, isError = false) {
     els.status.textContent = message;
@@ -143,6 +148,10 @@
     window.location.href = `${personalUrl}?next=${next}`;
   }
 
+  function lockMotionDelay() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
+  }
+
   function openDialog(dialog) {
     if (typeof dialog.showModal === 'function') {
       dialog.showModal();
@@ -162,13 +171,25 @@
   }
 
   async function api(action, payload = {}) {
-    const response = await window.PersonalAuth.authorizedFetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({ action, ...payload })
-    });
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let response;
+    try {
+      response = await window.PersonalAuth.authorizedFetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ action, ...payload }),
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (controller.signal.aborted) throw new Error('The request timed out. Check your connection and try again.');
+      if (error instanceof TypeError) throw new Error('Unable to reach the portfolio service. Check your connection and try again.');
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -215,6 +236,198 @@
       }
     }
     return null;
+  }
+
+  function logsThrough(key, stockId = null) {
+    return state.logs.filter((log) => (
+      (!stockId || log.stock_id === stockId) && String(log.logged_at) <= key
+    ));
+  }
+
+  function portfolioMetricsAt(key) {
+    const stocks = state.stocks.map((stock) => {
+      const stockLogs = logsThrough(key, stock.id);
+      const shares = stockLogs.reduce((sum, log) => sum + sharesForLog(log), 0);
+      const costBasis = costBasisForLogs(stockLogs);
+      const price = historicalCloseAtOrBefore(stock.symbol, key);
+      const avgPurchase = shares > 0 ? stockLogs.reduce((sum, log) => sum + Number(log.total_purchase_amount), 0) / shares : 0;
+      const value = price === null ? null : shares * price;
+      return {
+        stock,
+        shares,
+        price,
+        avgPurchase,
+        costBasis,
+        value,
+        gain: value === null ? null : value - costBasis
+      };
+    }).filter((item) => item.shares > 0);
+
+    const available = stocks.length > 0 && stocks.every((item) => item.value !== null);
+    const value = available ? stocks.reduce((sum, item) => sum + item.value, 0) : null;
+    const costBasis = stocks.reduce((sum, item) => sum + item.costBasis, 0);
+    return { key, stocks, value, costBasis, gain: value === null ? null : value - costBasis };
+  }
+
+  function graphDates() {
+    const firstLog = state.logs.reduce((first, log) => (
+      !first || String(log.logged_at) < first ? String(log.logged_at) : first
+    ), null);
+    if (!firstLog) return [];
+    return [...new Set(state.stocks.flatMap((stock) => (
+      (state.quotes[stock.symbol]?.history || []).map((point) => point.date)
+    )))].filter((key) => key >= firstLog).sort();
+  }
+
+  function graphStartDate() {
+    const period = periods[state.performancePeriod] || periods.all;
+    return period.startDate ? dateKey(period.startDate()) : null;
+  }
+
+  function graphData() {
+    const startDate = graphStartDate();
+    const data = graphDates().filter((key) => !startDate || key >= startDate).map((key) => {
+      const metrics = portfolioMetricsAt(key);
+      return {
+        x: key,
+        y: metrics.value,
+        metrics,
+        events: []
+      };
+    }).filter((point) => Number.isFinite(point.y));
+    state.logs.forEach((log) => {
+      const point = data.find((item) => item.x >= String(log.logged_at));
+      if (point) point.events.push(log);
+    });
+    return data;
+  }
+
+  function eventPoints(data, entryType) {
+    const start = data[0]?.x;
+    return state.logs.filter((log) => log.entry_type === entryType && (!start || String(log.logged_at) >= start)).map((log) => {
+      const date = data.find((point) => point.x >= String(log.logged_at));
+      return date ? { ...date, event: log } : null;
+    }).filter(Boolean);
+  }
+
+  function graphEventCopy(event) {
+    return event.entry_type === 'reinvested_dividend' ? 'Reinvested dividend' : 'Additional investment';
+  }
+
+  function renderGraphDetail(point) {
+    const readout = els.graph.querySelector('.site-graph-readout');
+    if (!readout || !point?.metrics) return;
+    const { metrics, events } = point;
+    const detail = document.createElement('div');
+    detail.className = 'portfolio-graph-detail';
+    detail.innerHTML = `
+      <div class="portfolio-graph-detail-summary">
+        <p><span>Total value</span><strong>${money.format(metrics.value)}</strong></p>
+        <p><span>Cost basis</span><strong>${money.format(metrics.costBasis)}</strong></p>
+        <p><span>Total gain/loss</span><strong class="${gainClass(metrics.gain)}">${money.format(metrics.gain)}</strong></p>
+      </div>
+    `;
+
+    if (events.length) {
+      const section = document.createElement('section');
+      section.className = 'portfolio-graph-detail-section';
+      section.innerHTML = '<h4>Activity on this date</h4>';
+      const list = document.createElement('ul');
+      list.className = 'portfolio-graph-event-list';
+      list.innerHTML = events.map((event) => {
+        const stock = state.stocks.find((item) => item.id === event.stock_id);
+        const investment = event.entry_type === 'additional_investment';
+        return `<li><span class="portfolio-graph-event-type ${investment ? 'is-investment' : ''}">${graphEventCopy(event)}</span> <strong>${escapeHtml(stock?.symbol || 'Deleted stock')}</strong> — ${money.format(Number(event.total_purchase_amount))} at ${money.format(Number(event.purchase_price))} on ${graphReadoutDate.format(new Date(`${escapeHtml(event.logged_at)}T00:00:00Z`))}</li>`;
+      }).join('');
+      section.append(list);
+      detail.append(section);
+    }
+
+    if (metrics.stocks.length) {
+      const section = document.createElement('section');
+      section.className = 'portfolio-graph-detail-section';
+      section.innerHTML = '<h4>Holdings at this point</h4>';
+      const list = document.createElement('ul');
+      list.className = 'portfolio-graph-stock-list';
+      list.innerHTML = metrics.stocks.map((item) => `<li><strong>${escapeHtml(item.stock.symbol)}</strong><span>Price ${money.format(item.price)}</span><span>Avg purchase ${money.format(item.avgPurchase)}</span><span class="${gainClass(item.gain)}">Gain/loss ${money.format(item.gain)}</span></li>`).join('');
+      section.append(list);
+      detail.append(section);
+    }
+    readout.append(detail);
+  }
+
+  function renderGraph() {
+    if (!window.SiteGraph || !els.graph) return;
+    const data = graphData();
+    els.graph.setAttribute('aria-busy', 'false');
+    const series = [{
+      id: 'portfolio-value',
+      label: 'Portfolio value',
+      color: 'var(--site-text)',
+      area: true,
+      areaOpacity: 0.08,
+      strokeWidth: 2.5,
+      data,
+      formatValue: (value) => money.format(value)
+    }, {
+      id: 'additional-investment',
+      label: 'Additional investment',
+      color: 'var(--site-accent)',
+      line: false,
+      points: 'all',
+      pointSize: 4.5,
+      className: 'portfolio-graph-investment',
+      interactive: false,
+      legendMarker: 'point',
+      data: eventPoints(data, 'additional_investment'),
+      formatValue: (value) => money.format(value)
+    }, {
+      id: 'reinvested-dividend',
+      label: 'Reinvested dividend',
+      color: 'var(--site-text)',
+      line: false,
+      points: 'all',
+      pointSize: 4.5,
+      className: 'portfolio-graph-dividend',
+      interactive: false,
+      legendMarker: 'point',
+      legendFill: 'var(--site-text)',
+      legendBorder: 'var(--site-text)',
+      data: eventPoints(data, 'reinvested_dividend'),
+      formatValue: (value) => money.format(value)
+    }];
+    const config = {
+      title: 'Portfolio value',
+      description: '',
+      ariaLabel: 'Portfolio value over time. Use left and right arrow keys to inspect dates.',
+      height: 340,
+      className: 'portfolio-value-graph',
+      margins: { top: 10, right: 18, bottom: 45, left: 80 },
+      legend: { show: true, position: 'top' },
+      interaction: { enabled: true, selectLast: true },
+      xAxis: {
+        type: 'time',
+        ticks: 6,
+        formatTick: (value) => graphDate.format(new Date(value)),
+        formatValue: (value) => graphReadoutDate.format(new Date(value))
+      },
+      yAxis: {
+        ticks: 5,
+        formatTick: (value) => money.format(value),
+        formatValue: (value) => money.format(value)
+      },
+      emptyMessage: state.logs.length ? 'Historic prices are unavailable for this portfolio.' : 'Add an investment log to see your portfolio value over time.',
+      series
+    };
+    if (portfolioGraph) portfolioGraph.update(config);
+    else {
+      portfolioGraph = new window.SiteGraph(els.graph, config);
+      els.graph.addEventListener('sitegraphchange', (event) => {
+        const graphPoint = event.detail.points.find((item) => item.series === 'portfolio-value')?.point;
+        renderGraphDetail(graphPoint);
+      });
+      renderGraphDetail(data[data.length - 1]);
+    }
   }
 
   function costBasisForLogs(logs) {
@@ -388,31 +601,42 @@
   function render() {
     renderStockOptions();
     renderTable();
+    renderGraph();
     renderLogs();
   }
 
-  async function loadPortfolio() {
+  async function loadPortfolio(successMessage = '') {
     setStatus('Loading portfolio...');
     const data = await api('list');
     state.stocks = data.stocks || [];
     state.logs = data.logs || [];
     state.quotes = data.quotes || {};
     render();
-    setStatus(`Updated ${new Date().toLocaleTimeString()}.`);
+    setStatus(successMessage || `Updated ${new Date().toLocaleTimeString()}.`);
   }
 
   els.logDate.valueAsDate = new Date();
+  els.logDate.max = dateKey(new Date());
   els.performancePeriod.value = state.performancePeriod;
   [els.stockForm, els.logForm].forEach(watchFormCompletion);
 
   els.performancePeriod.addEventListener('change', () => {
     state.performancePeriod = periods[els.performancePeriod.value] ? els.performancePeriod.value : 'all';
     renderTable();
+    renderGraph();
     setStatus(`Showing ${periods[state.performancePeriod].label.toLowerCase()} performance.`);
   });
 
   els.lockButton.addEventListener('click', async () => {
-    await window.PersonalAuth.signOut().catch(() => {});
+    if (els.lockButton.disabled) return;
+    els.lockButton.disabled = true;
+    els.lockButton.classList.add('is-locking');
+    els.lockButton.setAttribute('aria-busy', 'true');
+    app.classList.add('is-locking');
+    await Promise.all([
+      window.PersonalAuth.signOut().catch(() => {}),
+      new Promise((resolve) => window.setTimeout(resolve, lockMotionDelay()))
+    ]);
     closeDialog(els.stockDialog);
     closeDialog(els.logDialog);
     els.workspace.hidden = true;
@@ -467,7 +691,7 @@
       await api('addStock', { symbol, name });
       els.stockForm.reset();
       closeDialog(els.stockDialog);
-      await loadPortfolio();
+      await loadPortfolio('Stock added.');
     } catch (error) {
       setStatus(error.message, true);
     } finally {
@@ -496,7 +720,7 @@
       els.logForm.reset();
       els.logDate.valueAsDate = new Date();
       closeDialog(els.logDialog);
-      await loadPortfolio();
+      await loadPortfolio('Investment log added.');
     } catch (error) {
       setStatus(error.message, true);
     } finally {
@@ -514,13 +738,13 @@
         setButtonLoading(stockButton, true, 'Deleting...');
         setStatus('');
         await api('deleteStock', { id: stockId });
-        await loadPortfolio();
+        await loadPortfolio('Stock and its logs deleted.');
       }
       if (logId && confirm('Delete this log?')) {
         setButtonLoading(logButton, true, 'Deleting...');
         setStatus('');
         await api('deleteLog', { id: logId });
-        await loadPortfolio();
+        await loadPortfolio('Investment log deleted.');
       }
     } catch (error) {
       setStatus(error.message, true);
