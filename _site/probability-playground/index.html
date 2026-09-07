@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Five visual experiments for the parts of probability that feel wrong.">
+  <title>Probability Playground — Matthew Feil</title>
+  <link rel="preload" href="/assets/fonts/archivo-black-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/familjen-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <style>
+    :root { --ink:#101010; --paper:#f7f5ef; --coral:#ff584d; --blue:#1646d8; --acid:#d9f10a; --orange:#ff7a15; --ease:cubic-bezier(.22,1,.36,1); --display:"Archivo Black", Impact, sans-serif; --body:"Familjen Grotesk", Arial, sans-serif; --rail-space:4.8rem; --page-gutter:clamp(1rem,5vw,5.5rem); --stage-top:max(calc(var(--rail-space) + 1.5rem), 11vh); --stage-bottom:clamp(2.5rem,6vh,5rem); --story-gap:clamp(1.25rem,3vw,2.5rem); --visual-footer:clamp(2rem,5vh,4rem); color-scheme: light; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--body); overflow-x:hidden; }
+    a { color:inherit; }
+    .skip { position:fixed; left:1rem; top:-5rem; z-index:20; background:var(--coral); color:var(--ink); padding:.75rem 1rem; font-weight:800; } .skip:focus { top:1rem; }
+    .rail { --rail-foreground:var(--ink); position:fixed; inset:0 0 auto; z-index:10; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:clamp(1rem,2vw,2rem); padding:1.1rem clamp(1rem,3vw,2.7rem); background:color-mix(in srgb,var(--paper) 14%,transparent); -webkit-backdrop-filter:blur(14px) saturate(115%); backdrop-filter:blur(14px) saturate(115%); color:var(--rail-foreground); pointer-events:none; transition:color .2s var(--ease); }
+    body[data-rail-tone="paper"] .rail { --rail-foreground:var(--paper); }
+    .rail::after { content:""; position:absolute; inset:auto 0 0; height:1px; background:var(--rail-foreground); pointer-events:none; transition:background-color .2s var(--ease); }
+    .wordmark { font-family:var(--display); font-size:clamp(.92rem,1.4vw,1.2rem); line-height:1; letter-spacing:.01em; pointer-events:auto; text-decoration:none; white-space:nowrap; }
+    .chapters { display:flex; align-items:center; justify-content:space-between; gap:clamp(.85rem,1.8vw,1.5rem); min-width:0; pointer-events:auto; }
+    .chapters a { position:relative; display:flex; align-items:center; flex:0 0 auto; min-height:2.75rem; font-size:.67rem; font-weight:800; letter-spacing:.04em; line-height:1.05; scroll-snap-align:center; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .chapters a::after { content:""; position:absolute; right:0; bottom:.28rem; left:0; height:2px; background:currentColor; transform:scaleX(0); transform-origin:left; transition:transform .35s var(--ease); } .chapters a[aria-current="true"]::after { transform:scaleX(1); } .chapters a:focus-visible { outline:2px solid var(--coral); outline-offset:5px; }
+    .hero { min-height:100svh; display:grid; align-items:end; padding:clamp(6.5rem,13vh,10rem) var(--page-gutter) clamp(2.5rem,7vw,6rem); position:relative; overflow:hidden; }
+    .hero-copy { position:relative; z-index:2; max-width:min(52rem,55vw); } .hero h1 { margin:0; max-width:12ch; font-family:var(--display); font-size:clamp(4.3rem,12vw,10rem); line-height:.82; letter-spacing:-.035em; text-wrap:balance; } .hero p { max-width:29ch; margin:2rem 0 0; font-size:clamp(1.1rem,2vw,1.5rem); font-weight:650; line-height:1.13; text-wrap:pretty; }
+    .scroll-cue { display:inline-flex; gap:.6rem; align-items:center; margin-top:3rem; font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; } .scroll-cue::after { content:"↓"; font-size:1.45rem; transition:transform .35s var(--ease); } .hero:hover .scroll-cue::after { transform:translateY(.35rem); }
+    .hero-dice { position:absolute; inset:50% clamp(3rem,7vw,8rem) auto auto; z-index:1; width:min(38vw,32rem); transform:translateY(-50%); } .dice-action { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(.8rem,2vw,1.8rem); width:100%; padding:0; border:0; background:none; color:var(--ink); cursor:pointer; transform:rotate(-7deg); } .die { aspect-ratio:1; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:12%; padding:16%; border:3px solid var(--ink); background:var(--paper); box-shadow:clamp(.55rem,1.25vw,1.15rem) clamp(.55rem,1.25vw,1.15rem) 0 var(--ink); } .die:last-child { background:var(--coral); transform:translateY(clamp(1.3rem,4vw,3.8rem)); } .die i { visibility:hidden; aspect-ratio:1; border-radius:50%; background:var(--ink); } .die[data-value="1"] i:nth-child(5),.die[data-value="3"] i:nth-child(1),.die[data-value="3"] i:nth-child(5),.die[data-value="3"] i:nth-child(9),.die[data-value="5"] i:nth-child(1),.die[data-value="5"] i:nth-child(3),.die[data-value="5"] i:nth-child(5),.die[data-value="5"] i:nth-child(7),.die[data-value="5"] i:nth-child(9),.die[data-value="2"] i:nth-child(1),.die[data-value="2"] i:nth-child(9),.die[data-value="4"] i:nth-child(1),.die[data-value="4"] i:nth-child(3),.die[data-value="4"] i:nth-child(7),.die[data-value="4"] i:nth-child(9),.die[data-value="6"] i:nth-child(1),.die[data-value="6"] i:nth-child(3),.die[data-value="6"] i:nth-child(4),.die[data-value="6"] i:nth-child(6),.die[data-value="6"] i:nth-child(7),.die[data-value="6"] i:nth-child(9) { visibility:visible; } .dice-action:focus-visible { outline:3px solid var(--coral); outline-offset:clamp(.8rem,2vw,1.5rem); } .dice-action:hover .die { border-width:4px; } .dice-action.is-rolling .die { animation:dieRoll .48s var(--ease); } .dice-action.is-rolling .die:last-child { animation-delay:.05s; } @keyframes dieRoll { 0% { transform:translate(0) rotate(0); } 42% { transform:translate(-4%, -8%) rotate(-18deg); } 100% { transform:translate(0) rotate(0); } } .dice-action.is-rolling .die:last-child { animation-name:dieRollOffset; } @keyframes dieRollOffset { 0% { transform:translateY(clamp(1.3rem,4vw,3.8rem)) rotate(0); } 42% { transform:translate(-4%, calc(clamp(1.3rem,4vw,3.8rem) - 8%)) rotate(18deg); } 100% { transform:translateY(clamp(1.3rem,4vw,3.8rem)) rotate(0); } } .dice-instruction { grid-column:1 / -1; margin-top:clamp(.35rem,1vw,.8rem); justify-self:end; font-size:.72rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; } .double-wash { position:absolute; inset:0; z-index:0; background:var(--double-wash-color,var(--acid)); clip-path:circle(0 at 76% 48%); pointer-events:none; } .double-wash::after { content:""; position:absolute; inset:0; background:var(--paper); opacity:0; } .hero.is-wash-dark .hero-copy,.hero.is-wash-dark .dice-instruction { color:var(--paper); } .hero.is-double .double-wash { animation:doubleWash 3s var(--ease) both; } .hero.is-double .double-wash::after { animation:doubleWashReturn 3s cubic-bezier(.22,.61,.36,1) both; } @keyframes doubleWash { 0% { clip-path:circle(0 at 76% 48%); } 20%,100% { clip-path:circle(150% at 76% 48%); } } @keyframes doubleWashReturn { 0%,53.4% { opacity:0; } 100% { opacity:1; } }
+    .experiment { --field:var(--ink); --text:var(--paper); --accent:var(--coral); position:relative; background:var(--field); color:var(--text); } .experiment.light { --field:var(--paper); --text:var(--ink); } .experiment.blue { --field:var(--blue); --text:var(--paper); --accent:var(--acid); } .experiment.acid { --field:var(--acid); --text:var(--ink); --accent:var(--ink); } .experiment.orange { --field:var(--orange); --text:var(--ink); --accent:var(--ink); }
+    .experiment-title { position:sticky; top:calc(var(--rail-space) + .65rem); z-index:7; display:flex; align-items:center; gap:.65rem; width:max-content; max-width:calc(100% - (2 * var(--page-gutter))); height:0; margin:0 auto 0 var(--page-gutter); color:var(--text); font:700 clamp(.68rem,1vw,.8rem)/1 var(--body); letter-spacing:.045em; text-align:left; text-transform:uppercase; pointer-events:none; transform:translateY(.15rem); } .experiment-title span { padding-inline-end:.65rem; border-inline-end:1px solid currentColor; color:var(--accent); font-weight:800; font-variant-numeric:tabular-nums; } .experiment-title:focus{outline:none}.experiment-title:focus-visible{outline:3px solid var(--text);outline-offset:7px}
+    .beat { position:relative; min-height:150svh; background:var(--field); } .beat--visual { min-height:230svh; } .beat--answer { min-height:165svh; }
+    .beat-frame { position:sticky; top:0; min-height:100svh; overflow:hidden; display:grid; place-items:center; padding:calc(var(--rail-space) + clamp(3rem,8vh,6rem)) var(--page-gutter) clamp(3rem,8vh,6rem); background:var(--field); isolation:isolate; }
+    .question { width:min(100%,82rem); margin:auto; } .question-text { max-width:15ch; margin:0; font-family:var(--display); font-size:clamp(3rem,8vw,7.2rem); line-height:.86; letter-spacing:-.035em; text-wrap:balance; } .question-text em { color:var(--accent); font-style:normal; } .statement { max-width:38ch; margin:clamp(1.5rem,4vw,2.5rem) 0 0; font-size:clamp(1.05rem,1.8vw,1.45rem); font-weight:650; line-height:1.2; text-wrap:pretty; }
+    .visual { width:min(100%,82rem); min-height:min(72svh,48rem); position:relative; display:grid; place-items:center; }
+    .answer { width:min(100%,82rem); margin:auto; } /* Always show the full human-readable result; scale it instead of abbreviating it. */ .hero-stat { position:relative; z-index:3; margin:0; color:var(--accent); font-family:var(--display); font-size:clamp(5rem,17vw,13rem); letter-spacing:-.04em; line-height:.75; white-space:nowrap; } .hero-stat--wide { font-size:clamp(2rem,6vw,5.6rem); letter-spacing:-.03em; } .stat-caption { display:block; max-width:42ch; margin-top:1.2rem; font-size:.77rem; font-weight:800; letter-spacing:.065em; text-transform:uppercase; } .answer-copy { max-width:62ch; margin:clamp(2rem,5vw,3.5rem) 0 0; font-size:clamp(1.08rem,1.8vw,1.45rem); font-weight:620; line-height:1.35; text-wrap:pretty; } .answer-formula { width:max-content; max-width:100%; margin:1.5rem 0 0; padding:.7rem .85rem; border:1.5px solid currentColor; font-family:var(--display); font-size:clamp(1rem,2vw,1.5rem); letter-spacing:-.02em; overflow-wrap:anywhere; }
+    .birthday-room { width:min(100%,48rem); display:grid; grid-template-columns:repeat(5,1fr); gap:clamp(.5rem,1.4vw,1rem); transform:rotate(-4deg); } .birthday-room .date { aspect-ratio:.76; display:grid; place-items:center; background:var(--paper); color:var(--ink); border:2px solid var(--ink); font-family:var(--display); font-size:clamp(1rem,2.8vw,2.3rem); box-shadow:.55rem .55rem 0 color-mix(in srgb,var(--text) 75%,transparent); } .birthday-room .date b{display:block;font:800 .58rem var(--body);letter-spacing:.08em}.birthday-room .match { background:var(--coral); }
+    .network { width:min(100%,52rem); aspect-ratio:1.32; position:relative; } .network svg { position:absolute; inset:0; width:100%; height:100%; } .network line { stroke:color-mix(in srgb,var(--text) 38%,transparent); stroke-width:2; } .network .route { stroke:var(--accent); stroke-width:5; stroke-dasharray:500; stroke-dashoffset:0; } .person { position:absolute; width:clamp(1.7rem,5vw,3.2rem); aspect-ratio:.72; background:var(--blue); clip-path:polygon(35% 0,65% 0,80% 25%,75% 39%,100% 100%,0 100%,25% 39%,20% 25%); } .person:nth-of-type(2n){background:var(--orange)}.person:nth-of-type(3n){background:var(--acid)}.person.start,.person.end{width:clamp(3.6rem,8vw,6rem);background:var(--paper)}.person.start{left:4%;top:37%}.person.end{right:4%;top:33%;background:var(--orange)}.person.p1{left:27%;top:22%}.person.p2{left:41%;top:54%}.person.p3{left:60%;top:36%}.person.p4{left:74%;top:63%}.person.p5{left:35%;top:74%}.network-label{position:absolute;font:800 .75rem var(--body);letter-spacing:.08em;text-transform:uppercase}.network-label.a{left:4%;top:62%}.network-label.b{right:4%;top:58%}
+    .password-board { width:min(100%,50rem); display:grid; grid-template-columns:repeat(7,1fr); gap:.45rem; padding:.7rem; border:3px solid var(--ink); background:var(--ink); transform:rotate(2deg); } .password-board span { aspect-ratio:.7; display:grid; place-items:center; background:var(--paper); color:var(--ink); font-family:var(--display); font-size:clamp(1.5rem,4vw,3.3rem); } .password-board span:nth-child(3n){background:var(--acid)}.password-board span:nth-child(4n){background:var(--orange)}.password-board span:nth-child(5n){background:var(--blue);color:var(--paper)}
+    .lights-road { width:min(100%,54rem); display:flex; gap:clamp(.7rem,2vw,2.2rem); align-items:center; } .signal { width:clamp(4.4rem,10vw,7.5rem); aspect-ratio:.57; padding:9%; background:var(--ink); display:grid; gap:7%; border:3px solid var(--text); } .lamp { border-radius:50%; background:color-mix(in srgb,var(--text) 30%,var(--ink)); } .signal:nth-child(-n+3) .lamp:first-child { background:var(--accent); box-shadow:0 0 0 .22rem var(--ink),0 0 0 .42rem var(--accent); } .signal:nth-child(4) .lamp:nth-child(2),.signal:nth-child(5) .lamp:nth-child(3){background:var(--text)} .car { width:clamp(3.5rem,8vw,6rem); height:clamp(1.3rem,3vw,2.5rem); background:var(--blue); position:absolute; bottom:calc(var(--visual-footer) + 2.5rem); left:4%; transform:translateX(71vw); } .car::before,.car::after{content:"";position:absolute;bottom:-.35rem;width:.7rem;height:.7rem;background:var(--ink);border-radius:50%}.car::before{left:.7rem}.car::after{right:.7rem}.road-note{position:absolute;bottom:0;left:0;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+    .doors { width:min(100%,50rem); display:flex; gap:clamp(.7rem,2vw,2rem); align-items:end; justify-content:center; } .door { width:28%; aspect-ratio:.62; background:var(--paper); color:var(--ink); border:3px solid var(--ink); display:grid; align-content:center; justify-items:center; font-family:var(--display); font-size:clamp(2.5rem,6vw,5rem); position:relative; } .door::after{content:"";position:absolute;right:12%;top:51%;width:.6rem;aspect-ratio:1;border-radius:50%;background:var(--coral)}.door.reveal{background:var(--accent);transform:rotate(-10deg);}.door.reveal::before{content:"GOAT";font:800 clamp(.75rem,1.5vw,1rem) var(--body);letter-spacing:.1em}
+    /* Scroll only advances the experiment object. Text beats use natural sticky dwell zones. */
+    .scroll-enhanced .beat--visual{--build-1:0;--build-2:0;--build-3:0;--build-4:0;--build-5:0;--reveal:0;--travel:0}.scroll-enhanced .beat--visual :is(.birthday-room,.birthday-room .match,.network,.network .route,.password-board span,.lights-road,.car,.door){animation:none!important}.scroll-enhanced .beat--visual :is(.date,.person,.network-label,.password-board span,.signal,.car,.door){transition:transform .1s linear,opacity .1s linear,filter .1s linear}
+    .scroll-enhanced .beat--visual .birthday-room{transform:rotate(calc(-7deg + var(--travel) * 3deg)) translateY(calc((1 - var(--travel)) * 3rem))}.scroll-enhanced .beat--visual .birthday-room .date{--piece:var(--build-1);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * 10rem)) rotate(calc((1 - var(--piece)) * -5deg))}.scroll-enhanced .beat--visual .birthday-room .date:nth-child(5n+2){--piece:var(--build-2)}.scroll-enhanced .beat--visual .birthday-room .date:nth-child(5n+3){--piece:var(--build-3)}.scroll-enhanced .beat--visual .birthday-room .date:nth-child(5n+4){--piece:var(--build-4)}.scroll-enhanced .beat--visual .birthday-room .date:nth-child(5n){--piece:var(--build-5)}.scroll-enhanced .beat--visual .birthday-room .date.match{--piece:var(--reveal);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * -12rem)) rotate(calc((1 - var(--piece)) * 8deg))}
+    .scroll-enhanced .beat--visual .network{transform:scale(calc(.76 + var(--build-1) * .24)) rotate(calc((1 - var(--travel)) * -2deg))}.scroll-enhanced .beat--visual .network line:not(.route){opacity:var(--build-2)}.scroll-enhanced .beat--visual .network .route{opacity:var(--reveal);stroke-dashoffset:calc((1 - var(--reveal)) * 500)}.scroll-enhanced .beat--visual .person{--piece:var(--build-1);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * 4rem)) scale(calc(.45 + var(--piece) * .55))}.scroll-enhanced .beat--visual :is(.person.p1,.person.p2){--piece:var(--build-2)}.scroll-enhanced .beat--visual :is(.person.p3,.person.p5){--piece:var(--build-3)}.scroll-enhanced .beat--visual :is(.person.p4,.person.end){--piece:var(--build-4)}.scroll-enhanced .beat--visual .network-label{opacity:var(--reveal);transform:translateY(calc((1 - var(--reveal)) * .8rem))}
+    .scroll-enhanced .beat--visual .password-board{transform:rotate(calc(5deg - var(--travel) * 3deg)) scale(calc(.9 + var(--travel) * .1))}.scroll-enhanced .beat--visual .password-board span{--piece:var(--build-1);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * -12rem)) rotate(calc((1 - var(--piece)) * 7deg))!important}.scroll-enhanced .beat--visual .password-board span:nth-child(n+8):nth-child(-n+14){--piece:var(--build-2)}.scroll-enhanced .beat--visual .password-board span:nth-child(n+15):nth-child(-n+21){--piece:var(--build-3)}.scroll-enhanced .beat--visual .password-board span:nth-child(n+22){--piece:var(--build-4)}
+    .scroll-enhanced .beat--visual .lights-road{transform:translateX(calc((1 - var(--travel)) * 7vw))}.scroll-enhanced .beat--visual .signal{--piece:var(--build-1);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * -7rem))}.scroll-enhanced .beat--visual .signal:nth-child(2){--piece:var(--build-2)}.scroll-enhanced .beat--visual .signal:nth-child(3){--piece:var(--build-3)}.scroll-enhanced .beat--visual .signal:nth-child(4){--piece:var(--build-4)}.scroll-enhanced .beat--visual .signal:nth-child(5){--piece:var(--build-5)}.scroll-enhanced .beat--visual .lamp{opacity:calc(.22 + var(--reveal) * .78)}.scroll-enhanced .beat--visual .car{opacity:var(--travel);transform:translateX(calc(var(--travel) * 71vw))}
+    .scroll-enhanced .beat--visual .door{--piece:var(--build-1);opacity:var(--piece);transform:translateY(calc((1 - var(--piece)) * 8rem)) rotate(calc((1 - var(--piece)) * -5deg))}.scroll-enhanced .beat--visual .door:nth-child(2){--piece:var(--build-3)}.scroll-enhanced .beat--visual .door.reveal{transform:translateY(calc((1 - var(--build-3)) * 8rem)) rotate(calc(var(--reveal) * -12deg))}.scroll-enhanced .beat--visual .door.reveal::before{opacity:var(--reveal);transform:scale(calc(.6 + var(--reveal) * .4))}
+    .outro { min-height:82svh; display:grid; place-items:center; padding:9rem 1rem 3rem; background:var(--ink); color:var(--paper); text-align:center; } .outro h2{max-width:9ch;margin:0;font-family:var(--display);font-size:clamp(4rem,11vw,9rem);line-height:.84;letter-spacing:-.035em;text-wrap:balance}.outro p{max-width:34ch;font-size:1.25rem;font-weight:650;line-height:1.2}.outro a{margin-top:1.6rem;color:var(--acid);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    @media (max-width:920px){:root{--page-gutter:clamp(1rem,4vw,2.5rem)}.hero-copy{max-width:min(35rem,58vw)}.hero-dice{width:min(38vw,22rem);inset:50% clamp(1.75rem,4vw,2.5rem) auto auto}.visual{min-height:min(68svh,40rem)}.statement{max-width:35ch}}
+    @media (max-width:760px){:root{--rail-space:6.8rem;--page-gutter:1rem}.rail{grid-template-columns:1fr;padding:.9rem 1rem;gap:.45rem}.chapters{gap:.7rem;justify-content:flex-start;overflow:auto;overscroll-behavior-inline:contain;scrollbar-width:none}.chapters::-webkit-scrollbar{display:none}.chapters a{min-height:2.75rem;font-size:.72rem}.hero{align-items:end}.hero-copy{max-width:100%}.hero h1{font-size:clamp(3rem,13vw,4.4rem)}.hero-dice{width:min(72vw,20rem);opacity:.65;inset:clamp(8rem,17vh,10rem) auto auto 50%;transform:translateX(-50%)}.dice-instruction{font-size:.62rem}.experiment-title{top:calc(var(--rail-space) + .45rem);font-size:.67rem}.beat{min-height:150svh}.beat--visual{min-height:220svh}.beat--answer{min-height:170svh}.beat-frame{padding-top:calc(var(--rail-space) + 3rem);padding-bottom:2rem}.question-text{font-size:clamp(2.75rem,13vw,4.7rem)}.visual{min-height:60svh}.hero-stat{font-size:clamp(4.2rem,22vw,7rem)}.hero-stat--wide{font-size:clamp(1.75rem,7.5vw,3.1rem)}.answer-copy{font-size:1.05rem;line-height:1.35}.birthday-room{width:88vw}.network{width:100%}.double-wash{clip-path:circle(0 at 68% 28%)}}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.beat--visual{min-height:150svh}.birthday-room,.network,.lights-road{transform:none}.birthday-room .match{transform:none}.password-board span,.door,.door.reveal{transform:none;opacity:1}.network line,.network .route,.person,.network-label,.signal{opacity:1}.car{opacity:1;transform:translateX(63vw)}.hero.is-double .double-wash{clip-path:circle(150% at 76% 48%);animation:none}.hero.is-double .double-wash::after{animation:none}}
+  </style>
+</head>
+<body data-rail-tone="ink">
+  <a class="skip" href="#birthdays">Skip to the experiments</a>
+  <header class="rail"><a class="wordmark" href="/">Matthew Feil</a><nav class="chapters" aria-label="Experiment progress"><a href="#birthdays" aria-current="true">Birthdays</a><a href="#connections">Connections</a><a href="#passwords">Passwords</a><a href="#lights">Green lights</a><a href="#monty">Monty Hall</a></nav></header>
+  <main>
+    <section class="hero" aria-labelledby="playground-title"><span class="double-wash" aria-hidden="true"></span><div class="hero-copy"><h1 id="playground-title">Probability Playground</h1><p>Five familiar situations where your intuition is almost certainly doing the math wrong.</p><span class="scroll-cue">Scroll to start</span></div><div class="hero-dice"><button class="dice-action" type="button" aria-label="Roll two dice"><span class="die" data-value="1" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="die" data-value="1" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="dice-instruction">Tap to roll</span></button><span class="sr-only" id="dice-status" aria-live="polite" aria-atomic="true"></span></div></section>
+    <section class="experiment" id="birthdays" data-section aria-labelledby="birthdays-title">
+      <h2 class="experiment-title" id="birthdays-title" tabindex="-1"><span>01</span>Shared birthdays</h2>
+      <div class="beat beat--question"><div class="beat-frame"><div class="question"><p class="question-text">How many people before a shared birthday is <em>more likely than not?</em></p><p class="statement">You do not need hundreds. You barely need a classroom.</p></div></div></div>
+      <div class="beat beat--visual"><div class="beat-frame"><div class="visual"><div class="birthday-room" aria-hidden="true"><span class="date "><b>MAY</b>01</span><span class="date "><b>MAY</b>06</span><span class="date "><b>MAY</b>12</span><span class="date "><b>MAY</b>19</span><span class="date match"><b>MAY</b>21</span><span class="date "><b>MAY</b>07</span><span class="date "><b>MAY</b>15</span><span class="date match"><b>MAY</b>21</span><span class="date "><b>MAY</b>24</span><span class="date "><b>MAY</b>29</span><span class="date "><b>MAY</b>03</span><span class="date "><b>MAY</b>11</span><span class="date "><b>MAY</b>17</span><span class="date "><b>MAY</b>30</span><span class="date "><b>MAY</b>05</span></div></div></div></div>
+      <div class="beat beat--answer"><div class="beat-frame"><div class="answer"><p class="hero-stat">50.7%</p><span class="stat-caption">Chance two of 23 people share a birthday</span><p class="answer-copy">With 23 people there are 253 possible pairs that could match. The useful shortcut is to calculate the chance that every birthday is different, then subtract that result from one.</p><div class="answer-formula">1 − ∏(365 − k) / 365, k = 0 → 22</div></div></div></div>
+    </section>
+    <section class="experiment light" id="connections" data-section aria-labelledby="connections-title">
+      <h2 class="experiment-title" id="connections-title" tabindex="-1"><span>02</span>Chain of relationships</h2>
+      <div class="beat beat--question"><div class="beat-frame"><div class="question"><p class="question-text">How many introductions separate <em>two strangers?</em></p><p class="statement">A huge network can still feel surprisingly small.</p></div></div></div>
+      <div class="beat beat--visual"><div class="beat-frame"><div class="visual"><div class="network" aria-hidden="true"><svg viewBox="0 0 700 520"><line x1="70" y1="260" x2="220" y2="120"/><line x1="70" y1="260" x2="270" y2="350"/><line x1="220" y1="120" x2="330" y2="285"/><line x1="270" y1="350" x2="440" y2="190"/><line x1="330" y1="285" x2="540" y2="330"/><line x1="440" y1="190" x2="625" y2="250"/><line class="route" x1="70" y1="260" x2="625" y2="250"/></svg><span class="person start"></span><span class="person p1"></span><span class="person p2"></span><span class="person p3"></span><span class="person p4"></span><span class="person p5"></span><span class="person end"></span><span class="network-label a">Alex</span><span class="network-label b">Sam</span></div></div></div></div>
+      <div class="beat beat--answer"><div class="beat-frame"><div class="answer"><p class="hero-stat">≈ 6</p><span class="stat-caption">The famous average path length is small—not magic</span><p class="answer-copy">There is no fixed answer for every network. Researchers compare the shortest paths between pairs of people; a few highly connected people create shortcuts that pull the average down dramatically.</p><div class="answer-formula">Average the shortest path between every pair</div></div></div></div>
+    </section>
+    <section class="experiment blue" id="passwords" data-section aria-labelledby="passwords-title">
+      <h2 class="experiment-title" id="passwords-title" tabindex="-1"><span>03</span>Guessing a password</h2>
+      <div class="beat beat--question"><div class="beat-frame"><div class="question"><p class="question-text">What does one extra character <em>really add?</em></p><p class="statement">Not one more guess. An entire new layer of possibilities.</p></div></div></div>
+      <div class="beat beat--visual"><div class="beat-frame"><div class="visual"><div class="password-board" aria-hidden="true"><span>A</span><span>7</span><span>K</span><span>Q</span><span>0</span><span>Z</span><span>2</span><span>M</span><span>L</span><span>3</span><span>N</span><span>B</span><span>8</span><span>P</span><span>Y</span><span>4</span><span>D</span><span>X</span><span>Q</span><span>1</span><span>R</span><span>6</span><span>T</span><span>9</span><span>C</span></div></div></div></div>
+      <div class="beat beat--answer"><div class="beat-frame"><div class="answer"><p class="hero-stat hero-stat--wide">218,340,105,584,896</p><span class="stat-caption">62 characters across eight positions</span><p class="answer-copy">Each position can contain any of 62 letters or numbers, so every added position multiplies the whole possibility space by 62. This counts combinations; it does not model how real password attacks work.</p><div class="answer-formula">62⁸ = 218,340,105,584,896</div></div></div></div>
+    </section>
+    <section class="experiment acid" id="lights" data-section aria-labelledby="lights-title">
+      <h2 class="experiment-title" id="lights-title" tabindex="-1"><span>04</span>Green lights in a row</h2>
+      <div class="beat beat--question"><div class="beat-frame"><div class="question"><p class="question-text">What are the odds of hitting <em>five greens in a row?</em></p><p class="statement">Even friendly odds become unforgiving when every light has to cooperate.</p></div></div></div>
+      <div class="beat beat--visual"><div class="beat-frame"><div class="visual"><div class="lights-road" aria-hidden="true"><div class="signal"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div><div class="signal"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div><div class="signal"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div><div class="signal"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div><div class="signal"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div></div><i class="car" aria-hidden="true"></i><span class="road-note">Five independent 50% green lights</span></div></div></div>
+      <div class="beat beat--answer"><div class="beat-frame"><div class="answer"><p class="hero-stat">3.125%</p><span class="stat-caption">One perfect run in every 32 attempts</span><p class="answer-copy">If each light were independently green half the time, five greens means multiplying one-half by itself five times. Real traffic signals are coordinated, so this is a deliberately simple model rather than a prediction for a route.</p><div class="answer-formula">(1 / 2)⁵ = 1 / 32 = 3.125%</div></div></div></div>
+    </section>
+    <section class="experiment orange" id="monty" data-section aria-labelledby="monty-title">
+      <h2 class="experiment-title" id="monty-title" tabindex="-1"><span>05</span>Monty Hall</h2>
+      <div class="beat beat--question"><div class="beat-frame"><div class="question"><p class="question-text">A losing door opens. Should you <em>stay or switch?</em></p><p class="statement">The host knows where the prize is, so the reveal changes what the remaining door means.</p></div></div></div>
+      <div class="beat beat--visual"><div class="beat-frame"><div class="visual"><div class="doors" aria-hidden="true"><span class="door">1</span><span class="door reveal">2</span><span class="door">3</span></div></div></div></div>
+      <div class="beat beat--answer"><div class="beat-frame"><div class="answer"><p class="hero-stat">66.7%</p><span class="stat-caption">Chance of winning when you switch</span><p class="answer-copy">Your first choice has a one-in-three chance. The other two doors share the remaining two-in-three chance; after the host knowingly removes a losing door, that probability sits with the one unopened alternative.</p><div class="answer-formula">Stay: 1 / 3 &nbsp;·&nbsp; Switch: 2 / 3</div></div></div></div>
+    </section>
+    <section class="outro"><div><h2>Chance looks different when it moves.</h2><p>Probability is not always intuitive. That is why it is worth making visible.</p><a href="/">Back to Matthew Feil</a></div></section>
+  </main>
+  <script>
+    (() => {
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const diceAction = document.querySelector('.dice-action');
+      const dice = [...document.querySelectorAll('.die')];
+      const rollDice = () => {
+        const values = dice.map(() => Math.floor(Math.random() * 6) + 1);
+        dice.forEach((die, index) => die.dataset.value = values[index]);
+        diceAction.setAttribute('aria-label', `Roll two dice. Current values: ${values[0]} and ${values[1]}.`);
+        if (!reduced) {
+          diceAction.classList.remove('is-rolling');
+          void diceAction.offsetWidth;
+          diceAction.classList.add('is-rolling');
+        }
+      };
+      diceAction?.addEventListener('click', rollDice);
+      rollDice();
+
+      const sections = [...document.querySelectorAll('[data-section]')];
+      const chapters = document.querySelector('.chapters');
+      const links = [...document.querySelectorAll('.chapters a')];
+      let activeSectionId = '';
+      const setActive = (section) => {
+        if (activeSectionId === section.id) return;
+        activeSectionId = section.id;
+        const current = links.find(link => link.getAttribute('href') === '#' + section.id);
+        links.forEach(link => link.setAttribute('aria-current', String(link === current)));
+        if (innerWidth <= 760 && current) {
+          const left = current.offsetLeft - (chapters.clientWidth - current.offsetWidth) / 2;
+          chapters.scrollTo({left, behavior:reduced ? 'auto' : 'smooth'});
+        }
+        document.body.dataset.railTone = section.classList.contains('light') || section.classList.contains('acid') || section.classList.contains('orange') ? 'ink' : 'paper';
+      };
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) setActive(entry.target);
+      }), {rootMargin:'-35% 0px -45% 0px', threshold:0});
+      sections.forEach(section => observer.observe(section));
+      setActive(sections[0]);
+      if (!reduced) document.documentElement.classList.add('scroll-enhanced');
+      links.forEach(link => link.addEventListener('click', () => {
+        const target = document.querySelector(link.getAttribute('href'));
+        target?.querySelector('h2')?.focus({preventScroll:true});
+      }));
+    })();
+    (() => { const rail = document.querySelector('.rail'); const syncRailTone = () => { const railBottom = rail?.getBoundingClientRect().bottom ?? 0; const section = [...document.querySelectorAll('[data-section]')].find(candidate => { const bounds = candidate.getBoundingClientRect(); return bounds.top <= railBottom && bounds.bottom > railBottom; }); const tone = section && !(section.classList.contains('light') || section.classList.contains('acid') || section.classList.contains('orange')) ? 'paper' : 'ink'; if (document.body.dataset.railTone !== tone) document.body.dataset.railTone = tone; }; new MutationObserver(syncRailTone).observe(document.body, {attributes:true, attributeFilter:['data-rail-tone']}); addEventListener('scroll', syncRailTone, {passive:true}); addEventListener('resize', syncRailTone, {passive:true}); syncRailTone(); })();
+    (() => { const action = document.querySelector('.dice-action'); const hero = document.querySelector('.hero'); const dice = [...document.querySelectorAll('.hero-dice .die')]; const status = document.querySelector('#dice-status'); const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches; const washColors = ['coral','blue','acid','orange'].map(name => [name,getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim()]); let clearDouble; const celebrateDouble = () => { const [first, second] = dice.map(die => Number(die.dataset.value)); hero.classList.remove('is-double','is-wash-dark'); clearTimeout(clearDouble); status.textContent = ''; if (first !== second) return; const [name,color] = washColors[Math.floor(Math.random() * washColors.length)]; hero.style.setProperty('--double-wash-color', color); hero.classList.toggle('is-wash-dark', name === 'blue'); status.textContent = `Double ${first}!`; void hero.offsetWidth; hero.classList.add('is-double'); clearDouble = setTimeout(() => hero.classList.remove('is-double','is-wash-dark'), reduced ? 900 : 3000); }; action?.addEventListener('click', () => requestAnimationFrame(celebrateDouble)); celebrateDouble(); })();
+    (() => {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const visualBeats = [...document.querySelectorAll('.beat--visual')];
+      let frame = 0;
+      const clamp = (value) => Math.min(1, Math.max(0, value));
+      const phase = (value, start, end) => {
+        const t = clamp((value - start) / (end - start));
+        return t * t * (3 - 2 * t);
+      };
+      const updateMotion = () => {
+        frame = 0;
+        visualBeats.forEach((beat) => {
+          const rect = beat.getBoundingClientRect();
+          const scrollSpan = Math.max(1, rect.height - innerHeight);
+          const progress = clamp(-rect.top / scrollSpan);
+          beat.style.setProperty('--build-1', phase(progress, .1, .28).toFixed(3));
+          beat.style.setProperty('--build-2', phase(progress, .2, .38).toFixed(3));
+          beat.style.setProperty('--build-3', phase(progress, .3, .48).toFixed(3));
+          beat.style.setProperty('--build-4', phase(progress, .4, .58).toFixed(3));
+          beat.style.setProperty('--build-5', phase(progress, .5, .68).toFixed(3));
+          beat.style.setProperty('--reveal', phase(progress, .62, .82).toFixed(3));
+          beat.style.setProperty('--travel', phase(progress, .1, .82).toFixed(3));
+        });
+      };
+      const requestUpdate = () => {
+        if (!frame) frame = requestAnimationFrame(updateMotion);
+      };
+
+      const snapPoints = {
+        birthdays:[0,.18,.32,.46,.60,.74,.88,1],
+        connections:[0,.22,.40,.58,.78,.92,1],
+        passwords:[0,.24,.44,.64,.84,1],
+        lights:[0,.18,.32,.46,.60,.74,.88,1],
+        monty:[0,.28,.50,.76,.90,1]
+      };
+      let snapTimer = 0;
+      let snapFrame = 0;
+      let isSnapping = false;
+      let previousScrollBehavior = '';
+      let lastScrollY = scrollY;
+      let scrollDirection = 1;
+      const cancelSnap = () => {
+        clearTimeout(snapTimer);
+        if (snapFrame) cancelAnimationFrame(snapFrame);
+        if (isSnapping) document.documentElement.style.scrollBehavior = previousScrollBehavior;
+        snapFrame = 0;
+        isSnapping = false;
+      };
+      const playSnap = (targetY, progressDistance) => {
+        const startY = scrollY;
+        const distance = targetY - startY;
+        const duration = Math.min(540, Math.max(260, Math.abs(progressDistance) * 1050));
+        const startedAt = performance.now();
+        previousScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        isSnapping = true;
+        const step = (now) => {
+          const elapsed = Math.min(1, (now - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - elapsed, 3);
+          scrollTo(0, startY + distance * eased);
+          if (elapsed < 1) {
+            snapFrame = requestAnimationFrame(step);
+          } else {
+            document.documentElement.style.scrollBehavior = previousScrollBehavior;
+            snapFrame = 0;
+            isSnapping = false;
+            updateMotion();
+          }
+        };
+        snapFrame = requestAnimationFrame(step);
+      };
+      const settleGraphic = () => {
+        if (isSnapping) return;
+        const beat = visualBeats.find(candidate => {
+          const bounds = candidate.getBoundingClientRect();
+          return bounds.top <= 1 && bounds.bottom >= innerHeight - 1;
+        });
+        if (!beat) return;
+        const rect = beat.getBoundingClientRect();
+        const scrollSpan = Math.max(1, rect.height - innerHeight);
+        const progress = clamp(-rect.top / scrollSpan);
+        const points = snapPoints[beat.closest('[data-section]').id];
+        const tolerance = 2 / scrollSpan;
+        if (points.some(point => Math.abs(point - progress) <= tolerance)) return;
+        const target = scrollDirection < 0
+          ? [...points].reverse().find(point => point < progress) ?? 0
+          : points.find(point => point > progress) ?? 1;
+        playSnap(scrollY + rect.top + target * scrollSpan, target - progress);
+      };
+
+      addEventListener('scroll', () => {
+        const currentScrollY = scrollY;
+        const delta = currentScrollY - lastScrollY;
+        lastScrollY = currentScrollY;
+        requestUpdate();
+        if (isSnapping) return;
+        if (Math.abs(delta) > 1) scrollDirection = Math.sign(delta);
+        clearTimeout(snapTimer);
+        snapTimer = setTimeout(settleGraphic, 90);
+      }, { passive: true });
+      addEventListener('wheel', cancelSnap, { passive: true });
+      addEventListener('touchstart', cancelSnap, { passive: true });
+      addEventListener('keydown', event => {
+        if (['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)) cancelSnap();
+      });
+      addEventListener('resize', () => {
+        cancelSnap();
+        requestUpdate();
+      }, { passive: true });
+      updateMotion();
+    })();
+  </script>
+</body>
+</html>

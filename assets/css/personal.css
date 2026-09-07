@@ -397,6 +397,13 @@
   border-bottom: 1px solid var(--personal-border);
 }
 
+.personal-project-links {
+  display: grid;
+  margin-top: var(--tool-section-gap);
+  padding-top: var(--tool-section-gap);
+  border-top: 1px solid var(--personal-border);
+}
+
 .personal-widget {
   position: relative;
   display: grid;

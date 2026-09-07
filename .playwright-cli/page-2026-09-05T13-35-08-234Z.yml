@@ -1,0 +1,180 @@
+- generic [active] [ref=e1]:
+  - link "Skip to the experiments" [ref=e2] [cursor=pointer]:
+    - /url: "#birthdays"
+  - banner:
+    - link "Matthew Feil" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - navigation "Experiment progress" [ref=e4]:
+      - link "Birthdays" [ref=e5] [cursor=pointer]:
+        - /url: "#birthdays"
+      - link "Connections" [ref=e6] [cursor=pointer]:
+        - /url: "#connections"
+      - link "Passwords" [ref=e7] [cursor=pointer]:
+        - /url: "#passwords"
+      - link "Green lights" [ref=e8] [cursor=pointer]:
+        - /url: "#lights"
+      - link "Monty Hall" [ref=e9] [cursor=pointer]:
+        - /url: "#monty"
+  - main [ref=e10]:
+    - region [ref=e11]:
+      - generic [ref=e12]:
+        - heading "Probability Playground" [level=1] [ref=e13]
+        - paragraph [ref=e14]: Five familiar situations where your intuition is almost certainly doing the math wrong.
+        - generic [ref=e15]: Scroll to start ↓
+      - 'button "Roll two dice. Current values: 3 and 5." [ref=e17] [cursor=pointer]':
+        - generic [ref=e28]: Tap to roll
+    - region "01 Shared birthdays" [ref=e30]:
+      - heading "01 Shared birthdays" [level=2]:
+        - generic: "01"
+        - text: Shared birthdays
+      - generic [ref=e33]:
+        - paragraph [ref=e34]:
+          - text: How many people before a shared birthday is
+          - emphasis [ref=e35]: more likely than not?
+        - paragraph [ref=e36]: You do not need hundreds. You barely need a classroom.
+      - generic [aria-hidden] [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]: MAY
+          - text: "01"
+        - generic [ref=e43]:
+          - generic [ref=e44]: MAY
+          - text: "06"
+        - generic [ref=e45]:
+          - generic [ref=e46]: MAY
+          - text: "12"
+        - generic [ref=e47]:
+          - generic [ref=e48]: MAY
+          - text: "19"
+        - generic [ref=e49]:
+          - generic [ref=e50]: MAY
+          - text: "21"
+        - generic [ref=e51]:
+          - generic [ref=e52]: MAY
+          - text: "07"
+        - generic [ref=e53]:
+          - generic [ref=e54]: MAY
+          - text: "15"
+        - generic [ref=e55]:
+          - generic [ref=e56]: MAY
+          - text: "21"
+        - generic [ref=e57]:
+          - generic [ref=e58]: MAY
+          - text: "24"
+        - generic [ref=e59]:
+          - generic [ref=e60]: MAY
+          - text: "29"
+        - generic [ref=e61]:
+          - generic [ref=e62]: MAY
+          - text: "03"
+        - generic [ref=e63]:
+          - generic [ref=e64]: MAY
+          - text: "11"
+        - generic [ref=e65]:
+          - generic [ref=e66]: MAY
+          - text: "17"
+        - generic [ref=e67]:
+          - generic [ref=e68]: MAY
+          - text: "30"
+        - generic [ref=e69]:
+          - generic [ref=e70]: MAY
+          - text: "05"
+      - generic [ref=e73]:
+        - paragraph [ref=e74]: 50.7%
+        - generic [ref=e75]: Chance two of 23 people share a birthday
+        - paragraph [ref=e76]: With 23 people there are 253 possible pairs that could match. The useful shortcut is to calculate the chance that every birthday is different, then subtract that result from one.
+        - generic [ref=e77]: 1 − ∏(365 − k) / 365, k = 0 → 22
+    - region "02 Chain of relationships" [ref=e78]:
+      - heading "02 Chain of relationships" [level=2]:
+        - generic: "02"
+        - text: Chain of relationships
+      - generic [ref=e81]:
+        - paragraph [ref=e82]:
+          - text: How many introductions separate
+          - emphasis [ref=e83]: two strangers?
+        - paragraph [ref=e84]: A huge network can still feel surprisingly small.
+      - generic [aria-hidden] [ref=e88]:
+        - generic [ref=e104]: Alex
+        - generic [ref=e105]: Sam
+      - generic [ref=e108]:
+        - paragraph [ref=e109]: ≈ 6
+        - generic [ref=e110]: The famous average path length is small—not magic
+        - paragraph [ref=e111]: There is no fixed answer for every network. Researchers compare the shortest paths between pairs of people; a few highly connected people create shortcuts that pull the average down dramatically.
+        - generic [ref=e112]: Average the shortest path between every pair
+    - region "03 Guessing a password" [ref=e113]:
+      - heading "03 Guessing a password" [level=2]:
+        - generic: "03"
+        - text: Guessing a password
+      - generic [ref=e116]:
+        - paragraph [ref=e117]:
+          - text: What does one extra character
+          - emphasis [ref=e118]: really add?
+        - paragraph [ref=e119]: Not one more guess. An entire new layer of possibilities.
+      - generic [aria-hidden] [ref=e123]:
+        - generic [ref=e124]: A
+        - generic [ref=e125]: "7"
+        - generic [ref=e126]: K
+        - generic [ref=e127]: Q
+        - generic [ref=e128]: "0"
+        - generic [ref=e129]: Z
+        - generic [ref=e130]: "2"
+        - generic [ref=e131]: M
+        - generic [ref=e132]: L
+        - generic [ref=e133]: "3"
+        - generic [ref=e134]: "N"
+        - generic [ref=e135]: B
+        - generic [ref=e136]: "8"
+        - generic [ref=e137]: P
+        - generic [ref=e138]: "Y"
+        - generic [ref=e139]: "4"
+        - generic [ref=e140]: D
+        - generic [ref=e141]: X
+        - generic [ref=e142]: Q
+        - generic [ref=e143]: "1"
+        - generic [ref=e144]: R
+        - generic [ref=e145]: "6"
+        - generic [ref=e146]: T
+        - generic [ref=e147]: "9"
+        - generic [ref=e148]: C
+      - generic [ref=e151]:
+        - paragraph [ref=e152]: 218,340,105,584,896
+        - generic [ref=e153]: 62 characters across eight positions
+        - paragraph [ref=e154]: Each position can contain any of 62 letters or numbers, so every added position multiplies the whole possibility space by 62. This counts combinations; it does not model how real password attacks work.
+        - generic [ref=e155]: 62⁸ = 218,340,105,584,896
+    - region "04 Green lights in a row" [ref=e156]:
+      - heading "04 Green lights in a row" [level=2]:
+        - generic: "04"
+        - text: Green lights in a row
+      - generic [ref=e159]:
+        - paragraph [ref=e160]:
+          - text: What are the odds of hitting
+          - emphasis [ref=e161]: five greens in a row?
+        - paragraph [ref=e162]: Even friendly odds become unforgiving when every light has to cooperate.
+      - generic [ref=e163]: Five independent 50% green lights
+      - generic [ref=e176]:
+        - paragraph [ref=e177]: 3.125%
+        - generic [ref=e178]: One perfect run in every 32 attempts
+        - paragraph [ref=e179]: If each light were independently green half the time, five greens means multiplying one-half by itself five times. Real traffic signals are coordinated, so this is a deliberately simple model rather than a prediction for a route.
+        - generic [ref=e180]: (1 / 2)⁵ = 1 / 32 = 3.125%
+    - region "05 Monty Hall" [ref=e181]:
+      - heading "05 Monty Hall" [level=2]:
+        - generic: "05"
+        - text: Monty Hall
+      - generic [ref=e184]:
+        - paragraph [ref=e185]:
+          - text: A losing door opens. Should you
+          - emphasis [ref=e186]: stay or switch?
+        - paragraph [ref=e187]: The host knows where the prize is, so the reveal changes what the remaining door means.
+      - generic [aria-hidden] [ref=e191]:
+        - generic [ref=e192]: "1"
+        - generic [ref=e193]: GOAT 2
+        - generic [ref=e194]: "3"
+      - generic [ref=e197]:
+        - paragraph [ref=e198]: 66.7%
+        - generic [ref=e199]: Chance of winning when you switch
+        - paragraph [ref=e200]: Your first choice has a one-in-three chance. The other two doors share the remaining two-in-three chance; after the host knowingly removes a losing door, that probability sits with the one unopened alternative.
+        - generic [ref=e201]: "Stay: 1 / 3 · Switch: 2 / 3"
+    - generic [ref=e203]:
+      - heading "Chance looks different when it moves." [level=2] [ref=e204]
+      - paragraph [ref=e205]: Probability is not always intuitive. That is why it is worth making visible.
+      - link "Back to Matthew Feil" [ref=e206] [cursor=pointer]:
+        - /url: /

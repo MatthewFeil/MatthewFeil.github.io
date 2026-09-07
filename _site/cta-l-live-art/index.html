@@ -93,6 +93,7 @@
 
       html,
       body {
+        overflow: hidden;
         overscroll-behavior: none;
       }
 
@@ -309,12 +310,13 @@
           const closeButton = panel?.querySelector(".settings-close");
           if (!panel || !trigger || !closeButton) return;
 
-          const returnFocus = () => window.requestAnimationFrame(() => trigger.focus());
+          const focusWithoutScrolling = (element) => element.focus({ preventScroll: true });
+          const returnFocus = () => window.requestAnimationFrame(() => focusWithoutScrolling(trigger));
           if (!trigger.dataset.focusEnhanced) {
             trigger.dataset.focusEnhanced = "true";
             trigger.addEventListener("click", () => {
               window.requestAnimationFrame(() => {
-                if (trigger.getAttribute("aria-expanded") === "true") closeButton.focus();
+                if (trigger.getAttribute("aria-expanded") === "true") focusWithoutScrolling(closeButton);
               });
             });
           }

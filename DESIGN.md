@@ -165,6 +165,9 @@ Inputs and selects use a square, bordered surface and the Familjen Grotesk UI ro
 ### Navigation
 The sticky header uses a translucent page-colored surface and a `2px` structural bottom border. Desktop links are compact uppercase labels with a red underline reveal. At `1040px` and below, a touch-sized Menu control reveals the right-aligned navigation stack; dropdowns open through opacity and transform motion without animating layout properties.
 
+### Probability Playground
+This standalone scroll exhibit may use a distinct palette and animated, experiment-specific visual language. Its hero statistic always shows the complete human-readable result: do not use exponents, scientific notation, or magnitude abbreviations. If the literal number is wide, reduce the statistic's scale responsively rather than shortening it; the visual impact comes from seeing the full extreme.
+
 ### Post Cards
 Post cards pair a compact Article/date metadata row with a display title and Familjen Grotesk summary. They use tonal surface contrast and a strengthened border on hover, while the homepage hero remains reserved for one featured project.
 

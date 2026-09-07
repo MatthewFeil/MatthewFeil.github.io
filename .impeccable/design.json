@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-30T00:00:00Z",
+  "generatedAt": "2026-09-01T00:00:00Z",
   "title": "Design System: Matthew Feil",
   "extensions": {
     "colorMeta": {
@@ -151,6 +151,11 @@
         "name": "The Flat-By-Default Rule",
         "body": "Do not add resting shadows, glass layers, or ornamental blur. Depth must explain interaction or content grouping.",
         "section": "elevation"
+      },
+      {
+        "name": "Probability Playground Literal Statistic Rule",
+        "body": "Hero statistics in the standalone Probability Playground show the complete human-readable result. Do not use exponents, scientific notation, or magnitude abbreviations; scale a wide literal result responsively instead.",
+        "section": "probability-playground"
       }
     ],
     "dos": [

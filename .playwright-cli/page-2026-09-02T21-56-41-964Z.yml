@@ -1,0 +1,160 @@
+- generic [active] [ref=e1]:
+  - link "Skip to the experiments" [ref=e2] [cursor=pointer]:
+    - /url: "#birthdays"
+  - banner:
+    - link "Matthew Feil" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - navigation "Experiment progress" [ref=e4]:
+      - link "Birthdays" [ref=e5] [cursor=pointer]:
+        - /url: "#birthdays"
+      - link "Connections" [ref=e6] [cursor=pointer]:
+        - /url: "#connections"
+      - link "Passwords" [ref=e7] [cursor=pointer]:
+        - /url: "#passwords"
+      - link "Green lights" [ref=e8] [cursor=pointer]:
+        - /url: "#lights"
+      - link "Monty Hall" [ref=e9] [cursor=pointer]:
+        - /url: "#monty"
+  - main [ref=e10]:
+    - region [ref=e11]:
+      - generic [ref=e12]:
+        - heading "Probability Playground" [level=1] [ref=e13]
+        - paragraph [ref=e14]: Five familiar situations where your intuition is almost certainly doing the math wrong.
+        - generic [ref=e15]: Scroll to start ↓
+      - 'button "Roll two dice. Current values: 3 and 1." [ref=e17] [cursor=pointer]':
+        - generic [ref=e24]: Tap to roll
+    - region [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: 01 / Shared birthdays
+          - heading "The room gets crowded fast." [level=2] [ref=e30]
+          - paragraph [ref=e31]: You do not need hundreds of people for a birthday match. You barely need a classroom.
+          - button "See the birthday math↗" [ref=e32] [cursor=pointer]
+        - generic [ref=e33]:
+          - paragraph [ref=e34]: 50.7%
+          - generic [aria-hidden] [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]: MAY
+              - text: "01"
+            - generic [ref=e38]:
+              - generic [ref=e39]: MAY
+              - text: "06"
+            - generic [ref=e40]:
+              - generic [ref=e41]: MAY
+              - text: "12"
+            - generic [ref=e42]:
+              - generic [ref=e43]: MAY
+              - text: "19"
+            - generic [ref=e44]:
+              - generic [ref=e45]: MAY
+              - text: "21"
+            - generic [ref=e46]:
+              - generic [ref=e47]: MAY
+              - text: "07"
+            - generic [ref=e48]:
+              - generic [ref=e49]: MAY
+              - text: "15"
+            - generic [ref=e50]:
+              - generic [ref=e51]: MAY
+              - text: "21"
+            - generic [ref=e52]:
+              - generic [ref=e53]: MAY
+              - text: "24"
+            - generic [ref=e54]:
+              - generic [ref=e55]: MAY
+              - text: "29"
+            - generic [ref=e56]:
+              - generic [ref=e57]: MAY
+              - text: "03"
+            - generic [ref=e58]:
+              - generic [ref=e59]: MAY
+              - text: "11"
+            - generic [ref=e60]:
+              - generic [ref=e61]: MAY
+              - text: "17"
+            - generic [ref=e62]:
+              - generic [ref=e63]: MAY
+              - text: "30"
+            - generic [ref=e64]:
+              - generic [ref=e65]: MAY
+              - text: "05"
+          - generic [ref=e66]: Chance two of 23 people share a birthday
+    - region [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - paragraph [ref=e70]: 02 / Chain of relationships
+          - heading "Someone knows someone." [level=2] [ref=e71]
+          - paragraph [ref=e72]: A surprising number of strangers are connected by only a few introductions.
+          - button "See the network math↗" [ref=e73] [cursor=pointer]
+        - generic [ref=e74]:
+          - paragraph [ref=e75]: ≈ 6
+          - generic [aria-hidden] [ref=e76]:
+            - generic [ref=e92]: Alex
+            - generic [ref=e93]: Sam
+          - generic [ref=e94]: The famous average path length is small—not magic
+    - region [ref=e95]:
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - paragraph [ref=e98]: 03 / Guessing a password
+          - heading "Possibilities multiply." [level=2] [ref=e99]
+          - paragraph [ref=e100]: Adding one character does not add one more guess. It multiplies the number of possible combinations.
+          - button "See the possibility math↗" [ref=e101] [cursor=pointer]
+        - generic [ref=e102]:
+          - paragraph [ref=e103]: 218,340,105,584,896
+          - generic [aria-hidden] [ref=e104]:
+            - generic [ref=e105]: A
+            - generic [ref=e106]: "7"
+            - generic [ref=e107]: K
+            - generic [ref=e108]: Q
+            - generic [ref=e109]: "0"
+            - generic [ref=e110]: Z
+            - generic [ref=e111]: "2"
+            - generic [ref=e112]: M
+            - generic [ref=e113]: L
+            - generic [ref=e114]: "3"
+            - generic [ref=e115]: "N"
+            - generic [ref=e116]: B
+            - generic [ref=e117]: "8"
+            - generic [ref=e118]: P
+            - generic [ref=e119]: "Y"
+            - generic [ref=e120]: "4"
+            - generic [ref=e121]: D
+            - generic [ref=e122]: X
+            - generic [ref=e123]: Q
+            - generic [ref=e124]: "1"
+            - generic [ref=e125]: R
+            - generic [ref=e126]: "6"
+            - generic [ref=e127]: T
+            - generic [ref=e128]: "9"
+            - generic [ref=e129]: C
+          - generic [ref=e130]: 62 characters across eight positions
+    - region [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - paragraph [ref=e134]: 04 / Green lights in a row
+          - heading "The clean run vanishes." [level=2] [ref=e135]
+          - paragraph [ref=e136]: Even if each light is friendly, a run of perfect timing gets unlikely faster than it feels.
+          - button "See the timing math↗" [ref=e137] [cursor=pointer]
+        - generic [ref=e138]:
+          - paragraph [ref=e139]: 3.125%
+          - generic [ref=e147]: Five independent 50% green lights
+    - region [ref=e148]:
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - paragraph [ref=e151]: 05 / Monty Hall
+          - heading "Switching is not a hunch." [level=2] [ref=e152]
+          - paragraph [ref=e153]: Once the host shows a losing door, the unopened door carries the probability you did not choose.
+          - button "See the door math↗" [ref=e154] [cursor=pointer]
+        - generic [ref=e155]:
+          - paragraph [ref=e156]: 66.7%
+          - generic [aria-hidden] [ref=e157]:
+            - generic [ref=e158]: "1"
+            - generic [ref=e159]: GOAT 2
+            - generic [ref=e160]: "3"
+          - paragraph [ref=e161]: Switching wins about two out of three times.
+          - generic [ref=e162]: Chance of winning when you switch
+    - generic [ref=e164]:
+      - heading "Chance looks different when it moves." [level=2] [ref=e165]
+      - paragraph [ref=e166]: Probability is not always intuitive. That is why it is worth making visible.
+      - link "Back to Matthew Feil" [ref=e167] [cursor=pointer]:
+        - /url: /
