@@ -5,7 +5,7 @@
     return;
   }
 
-  const PREVIEW_PASSWORD_HASH = '8afc5d47bae6f7808e6059455b678ea26e33f463292b1e1d07decf0c7ffa0eb7';
+  const PREVIEW_PASSWORD_HASH = 'f3fa372413103704099be8e3761c02c2380213ba4629989156b022e183a93786';
   const PREVIEW_SESSION_KEY = 'transcribe-preview-unlocked';
   const scriptUrl = document.currentScript?.src || `${window.location.origin}/assets/js/transcribe.js`;
 

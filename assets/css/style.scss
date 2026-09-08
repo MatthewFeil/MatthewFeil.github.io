@@ -564,18 +564,21 @@ table {
   color: var(--site-accent);
 }
 
-.page-link-personal {
-  margin-left: -0.25rem;
-  padding-left: 1rem;
+.page-link-subdued {
   color: var(--site-muted);
   font-weight: 700;
 }
 
-.page-link-personal::before {
+.page-link-transcribe {
+  margin-right: -0.25rem;
+  padding-right: 1rem;
+}
+
+.page-link-transcribe::after {
   position: absolute;
   top: 25%;
+  right: 0;
   bottom: 25%;
-  left: 0;
   width: 1px;
   background: var(--site-soft-border);
   content: "";
@@ -1484,6 +1487,7 @@ table {
   .nav-direct-links .page-link,
   .nav-group-trigger,
   .page-link-personal,
+  .page-link-transcribe,
   .theme-toggle {
     display: flex;
     width: 100%;
@@ -1584,7 +1588,12 @@ table {
     padding-left: 0.25rem;
   }
 
-  .page-link-personal::before {
+  .page-link-transcribe {
+    margin-right: 0;
+    padding-right: 0.25rem;
+  }
+
+  .page-link-transcribe::after {
     display: none;
   }
 

@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const routePaths = {
     personal: "/personal",
     playlists: "/playlists.html",
+    transcribe: "/transcribe",
   };
   let currentNavFrame = null;
   let scrollingStateTimeout = null;
