@@ -569,6 +569,21 @@ table {
   font-weight: 700;
 }
 
+.page-link-personal {
+  margin-left: -0.25rem;
+  padding-left: 1rem;
+}
+
+.page-link-personal::before {
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 0;
+  width: 1px;
+  background: var(--site-soft-border);
+  content: "";
+}
+
 .page-link-transcribe {
   margin-right: -0.25rem;
   padding-right: 1rem;
@@ -1586,6 +1601,10 @@ table {
     border-bottom: 0;
     padding-top: 0;
     padding-left: 0.25rem;
+  }
+
+  .page-link-personal::before {
+    display: none;
   }
 
   .page-link-transcribe {
