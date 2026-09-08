@@ -1,0 +1,194 @@
+---
+layout: transcribe
+title: Transcribe
+description: A local audio playback workbench for transcribing music by ear.
+permalink: /transcribe/
+noindex: true
+extra_css:
+  - /assets/css/transcribe.css?v=20260907-1
+---
+
+<main class="transcribe-app" id="transcribe-main" data-transcribe-app data-gate-enabled="true">
+  <section class="transcribe-gate" id="transcribe-gate" aria-labelledby="transcribe-gate-title">
+    <div class="transcribe-gate-brand">Matthew Feil / Transcribe</div>
+    <form class="transcribe-gate-form" id="transcribe-gate-form">
+      <h1 id="transcribe-gate-title">Private preview</h1>
+      <p>This tool is still in development.</p>
+      <label for="transcribe-password">Password</label>
+      <div class="transcribe-gate-entry">
+        <input id="transcribe-password" type="password" autocomplete="current-password" required>
+        <button type="submit">Enter</button>
+      </div>
+      <p class="transcribe-gate-status" id="transcribe-gate-status" role="status" aria-live="polite"></p>
+      <a href="{{ "/" | relative_url }}">Return to matthewfeil.com</a>
+    </form>
+  </section>
+
+  <section class="transcribe-workspace" id="transcribe-workspace" aria-label="Music transcription playback workspace" hidden>
+    <header class="transcribe-control-bar">
+      <div class="transcribe-identity">
+        <a href="{{ "/" | relative_url }}" aria-label="Return to matthewfeil.com">Matthew Feil</a>
+        <span aria-hidden="true">/</span>
+        <strong>Transcribe</strong>
+      </div>
+
+      <div class="transcribe-file-control">
+        <span class="transcribe-file-name" id="transcribe-file-name">No audio open</span>
+        <span class="transcribe-local-status" id="transcribe-local-status">Local</span>
+        <label class="transcribe-file-button" for="transcribe-file">Open file</label>
+        <input id="transcribe-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg" hidden>
+      </div>
+
+      <div class="transcribe-tool-strip" aria-label="Audio processing controls">
+        <label class="transcribe-tool-field">
+          <span>Speed</span>
+          <select id="transcribe-speed">
+            <option value="0.5">50%</option>
+            <option value="0.6">60%</option>
+            <option value="0.75" selected>75%</option>
+            <option value="0.9">90%</option>
+            <option value="1">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+          </select>
+        </label>
+
+        <button class="transcribe-tool-toggle is-active" id="transcribe-pitch-lock" type="button" aria-pressed="true">
+          <span>Pitch lock</span>
+          <strong>On</strong>
+        </button>
+
+        <button class="transcribe-tool-toggle" id="transcribe-loop-top" type="button" aria-pressed="false">
+          <span>Loop</span>
+          <strong>A–B</strong>
+        </button>
+
+        <label class="transcribe-tool-field">
+          <span>Channel</span>
+          <select id="transcribe-channel">
+            <option value="stereo">Stereo</option>
+            <option value="mono">Mono</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </label>
+
+        <label class="transcribe-tool-field transcribe-filter-field">
+          <span>High pass</span>
+          <select id="transcribe-highpass">
+            <option value="20">20 Hz</option>
+            <option value="80">80 Hz</option>
+            <option value="150">150 Hz</option>
+            <option value="300">300 Hz</option>
+            <option value="600">600 Hz</option>
+          </select>
+        </label>
+
+        <label class="transcribe-tool-field transcribe-filter-field">
+          <span>Low pass</span>
+          <select id="transcribe-lowpass">
+            <option value="20000">20.0 kHz</option>
+            <option value="12000">12.0 kHz</option>
+            <option value="8000">8.0 kHz</option>
+            <option value="4000">4.0 kHz</option>
+            <option value="2000">2.0 kHz</option>
+          </select>
+        </label>
+
+        <button class="transcribe-tool-toggle is-active" id="transcribe-spectrum-toggle" type="button" aria-pressed="true">
+          <span>Spectrum</span>
+          <strong>On</strong>
+        </button>
+
+        <button class="transcribe-tool-command" id="transcribe-mark-measure" type="button" disabled>
+          Mark measure
+        </button>
+      </div>
+    </header>
+
+    <section class="transcribe-timeline" aria-label="Audio timeline">
+      <div class="transcribe-overview-wrap">
+        <canvas id="transcribe-overview" class="transcribe-overview" aria-label="Complete recording overview"></canvas>
+      </div>
+      <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
+        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek and drag to select a loop."></canvas>
+        <div class="transcribe-empty" id="transcribe-empty">
+          <strong>Open an audio file</strong>
+          <span>Playback and analysis stay on this device.</span>
+          <label for="transcribe-file">Choose audio</label>
+        </div>
+      </div>
+      <div class="transcribe-timeline-status" aria-live="polite">
+        <span id="transcribe-selection-status">Drag across the waveform to create a loop.</span>
+        <span id="transcribe-audio-format">No file loaded</span>
+      </div>
+    </section>
+
+    <section class="transcribe-analysis" id="transcribe-analysis" aria-label="Pitch-aligned frequency monitor">
+      <div class="transcribe-analysis-head">
+        <strong>Frequency monitor</strong>
+        <div class="transcribe-view-switcher" aria-label="Mobile workspace emphasis">
+          <button class="is-active" type="button" data-view-mode="timeline" aria-pressed="true">Timeline</button>
+          <button type="button" data-view-mode="analysis" aria-pressed="false">Analysis</button>
+        </div>
+        <div class="transcribe-analysis-meta">
+          <output id="transcribe-frequency-readout">Select a passage to inspect its frequency content</output>
+          <output class="transcribe-pitch-readout" aria-label="Pitch inspection" aria-live="polite">
+            <span id="transcribe-pitch-hz">— Hz</span>
+            <strong id="transcribe-pitch-note">—</strong>
+            <span id="transcribe-pitch-cents">—¢</span>
+          </output>
+        </div>
+      </div>
+      <div class="transcribe-analysis-grid" id="transcribe-analysis-grid">
+        <canvas id="transcribe-keyboard" class="transcribe-keyboard" aria-label="Piano pitch scale from C2 to C8"></canvas>
+        <canvas id="transcribe-spectrogram" class="transcribe-spectrogram" tabindex="0" aria-label="Spectrogram aligned to the piano pitch scale. Use pointer, touch, or arrow keys to inspect pitch."></canvas>
+      </div>
+      <div class="transcribe-analysis-progress" id="transcribe-analysis-progress" hidden>
+        <span>Analyzing selected passage</span>
+      </div>
+    </section>
+
+    <footer class="transcribe-transport" aria-label="Playback controls">
+      <button type="button" id="transcribe-rewind" aria-label="Rewind 5 seconds" disabled>
+        <span aria-hidden="true">−5</span>
+      </button>
+      <button type="button" id="transcribe-previous" aria-label="Go to previous measure marker" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14M19 6l-9 6 9 6z"/></svg>
+      </button>
+      <button class="transcribe-play" type="button" id="transcribe-play" aria-label="Play" disabled>
+        <svg class="transcribe-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>
+        <svg class="transcribe-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+      </button>
+      <button type="button" id="transcribe-next" aria-label="Go to next measure marker" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5v14M5 6l9 6-9 6z"/></svg>
+      </button>
+      <button type="button" id="transcribe-forward" aria-label="Forward 5 seconds" disabled>
+        <span aria-hidden="true">+5</span>
+      </button>
+
+      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" aria-pressed="false" disabled>
+        <span>Loop</span>
+        <strong>A–B</strong>
+      </button>
+
+      <output class="transcribe-timecode" id="transcribe-timecode" aria-label="Playback time">00:00.000 / 00:00.000</output>
+
+      <label class="transcribe-volume">
+        <span>Volume</span>
+        <input id="transcribe-volume" type="range" min="0" max="1" step="0.01" value="0.9" disabled>
+      </label>
+
+      <div class="transcribe-zoom" aria-label="Timeline zoom">
+        <span>Zoom</span>
+        <button type="button" id="transcribe-zoom-out" aria-label="Zoom out" disabled>−</button>
+        <output id="transcribe-zoom-value">100%</output>
+        <button type="button" id="transcribe-zoom-in" aria-label="Zoom in" disabled>+</button>
+      </div>
+    </footer>
+
+    <audio id="transcribe-audio" preload="metadata"></audio>
+  </section>
+</main>
+
+<script src="{{ "/assets/js/transcribe.js?v=20260907-1" | relative_url }}" defer></script>
