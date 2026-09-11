@@ -1,0 +1,116 @@
+- generic [ref=f3e1]:
+  - link "Skip to audio workspace" [ref=f3e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=f3e3]:
+    - region "Music transcription playback workspace" [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - generic [ref=f3e6]:
+          - link "Return to matthewfeil.com" [ref=f3e7] [cursor=pointer]:
+            - /url: /
+            - text: Matthew Feil
+          - generic [aria-hidden] [ref=f3e8]: /
+          - strong [ref=f3e9]: Transcribe
+        - button "transcribe-layout-tone.wav" [ref=f3e11] [cursor=pointer]
+        - generic "Playback settings" [ref=f3e12]:
+          - group "Speed" [ref=f3e13]:
+            - generic "Playback speed" [ref=f3e15]:
+              - button "50%" [ref=f3e16] [cursor=pointer]
+              - button "60%" [ref=f3e17] [cursor=pointer]
+              - button "70%" [ref=f3e18] [cursor=pointer]
+              - button "80%" [ref=f3e19] [cursor=pointer]
+              - button "90%" [ref=f3e20] [cursor=pointer]
+              - button "100%" [pressed] [ref=f3e21] [cursor=pointer]
+              - button "125%" [ref=f3e22] [cursor=pointer]
+              - button "Other" [ref=f3e24] [cursor=pointer]
+          - button "Pitch lock On" [pressed] [ref=f3e25] [cursor=pointer]:
+            - generic [ref=f3e26]: Pitch lock
+            - strong [ref=f3e27]: "On"
+          - group [ref=f3e28]:
+            - generic "Sound" [active] [ref=f3e29] [cursor=pointer]
+            - generic [ref=f3e30]:
+              - generic [ref=f3e31]:
+                - generic [ref=f3e32]: Channel
+                - combobox "Channel" [ref=f3e33] [cursor=pointer]:
+                  - option "Stereo" [selected]
+                  - option "Mono"
+                  - option "Left"
+                  - option "Right"
+              - generic [ref=f3e34]:
+                - generic [ref=f3e35]: High pass
+                - combobox "High pass" [ref=f3e36] [cursor=pointer]:
+                  - option "20 Hz"
+                  - option "80 Hz"
+                  - option "150 Hz" [selected]
+                  - option "300 Hz"
+                  - option "600 Hz"
+              - generic [ref=f3e37]:
+                - generic [ref=f3e38]: Low pass
+                - combobox "Low pass" [ref=f3e39] [cursor=pointer]:
+                  - option "20.0 kHz" [selected]
+                  - option "12.0 kHz"
+                  - option "8.0 kHz"
+                  - option "4.0 kHz"
+                  - option "2.0 kHz"
+      - region "Audio timeline" [ref=f3e40]:
+        - generic [ref=f3e41]:
+          - generic [ref=f3e42]: Drag across the waveform to create a loop.
+          - generic "Mobile workspace emphasis" [ref=f3e43]:
+            - button "Timeline" [pressed] [ref=f3e44] [cursor=pointer]
+            - button "Analysis" [ref=f3e45] [cursor=pointer]
+          - generic [ref=f3e46]:
+            - generic [ref=f3e47]: Timeline zoom
+            - slider "Timeline zoom" [ref=f3e48]: "50"
+          - button "Repeat selected passage" [disabled] [ref=f3e49]:
+            - generic [ref=f3e52]: Loop
+        - scrollbar "Timeline overview and visible range" [ref=f3e53]:
+          - generic "Complete recording overview" [ref=f3e54]
+        - generic "Zoomed audio waveform. Click to seek and drag to select a loop." [ref=f3e56]
+      - region "Pitch-aligned frequency monitor" [ref=f3e57]:
+        - generic "Analysis controls" [ref=f3e58]:
+          - generic [ref=f3e59]:
+            - generic [ref=f3e60]: Spectrum scale
+            - combobox "Spectrum scale" [ref=f3e61] [cursor=pointer]:
+              - option "Linear" [selected]
+              - option "Detailed (dB)"
+          - generic [ref=f3e62]:
+            - generic [ref=f3e63]: Note tolerance
+            - combobox "Note tolerance" [ref=f3e64] [cursor=pointer]:
+              - option "Focused"
+              - option "Balanced" [selected]
+              - option "Sensitive"
+          - status "Pitch inspection" [ref=f3e65]:
+            - generic [ref=f3e66]: 441.6 Hz
+            - strong [ref=f3e67]: A4
+            - generic [ref=f3e68]: +6¢
+        - generic "Pitch spectrum, visible range C1 to B6." [ref=f3e69]:
+          - generic [ref=f3e70]:
+            - generic "EQ-style pitch spectrum. Use pointer, touch, or left and right arrow keys to inspect pitch." [ref=f3e71]
+            - 'generic "Horizontal piano keyboard from C1 to B6. Relative note strengths: A4 100 percent." [ref=f3e72]'
+        - group "Audio pitch" [ref=f3e73]:
+          - strong [ref=f3e74]: Audio pitch
+          - generic "Pitch adjustment controls" [ref=f3e75]:
+            - generic [ref=f3e76]:
+              - generic [ref=f3e77]: Semitones
+              - generic [ref=f3e78]:
+                - slider "Semitones 0" [ref=f3e79]: "0"
+                - spinbutton "Semitone adjustment" [ref=f3e80]: "0"
+            - generic [ref=f3e81]:
+              - generic [ref=f3e82]: Pitch correction
+              - generic [ref=f3e83]:
+                - slider "Pitch correction 0" [ref=f3e84]: "0"
+                - spinbutton "Pitch correction in cents" [ref=f3e85]: "0"
+      - generic "Playback controls" [ref=f3e86]:
+        - button "Return to beginning" [ref=f3e87] [cursor=pointer]
+        - button "Rewind 5 seconds" [ref=f3e90] [cursor=pointer]:
+          - img [aria-hidden] [ref=f3e91]:
+            - generic [ref=f3e93]: "5"
+        - button "Play" [ref=f3e94] [cursor=pointer]
+        - button "Forward 5 seconds" [ref=f3e97] [cursor=pointer]:
+          - img [aria-hidden] [ref=f3e98]:
+            - generic [ref=f3e100]: "5"
+        - generic [ref=f3e101]:
+          - slider "Playback position" [ref=f3e102] [cursor=pointer]: "0"
+          - status "Playback time" [ref=f3e103]: 00:00.00 / 00:04.00
+        - generic [ref=f3e104]:
+          - generic [ref=f3e105]: Volume
+          - slider "Volume" [ref=f3e106]: "0.9"

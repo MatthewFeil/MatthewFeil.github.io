@@ -1,0 +1,108 @@
+- generic [ref=f1e1]:
+  - link "Skip to audio workspace" [ref=f1e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=f1e3]:
+    - region "Music transcription playback workspace" [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - generic [ref=f1e6]:
+          - link "Return to matthewfeil.com" [ref=f1e7] [cursor=pointer]:
+            - /url: /
+            - text: Matthew Feil
+          - generic [aria-hidden] [ref=f1e8]: /
+          - strong [ref=f1e9]: Transcribe
+        - generic [ref=f1e10]:
+          - generic [ref=f1e11]: No audio open
+          - generic [ref=f1e12] [cursor=pointer]: New file
+        - generic "Audio processing controls" [ref=f1e13]:
+          - group "Speed" [ref=f1e14]:
+            - generic "Playback speed" [ref=f1e16]:
+              - button "25%" [ref=f1e17] [cursor=pointer]
+              - button "35%" [ref=f1e18] [cursor=pointer]
+              - button "50%" [ref=f1e19] [cursor=pointer]
+              - button "60%" [active] [pressed] [ref=f1e20] [cursor=pointer]
+              - button "75%" [ref=f1e21] [cursor=pointer]
+              - button "90%" [ref=f1e22] [cursor=pointer]
+              - button "100%" [ref=f1e23] [cursor=pointer]
+              - button "125%" [ref=f1e24] [cursor=pointer]
+              - button "150%" [ref=f1e25] [cursor=pointer]
+              - button "175%" [ref=f1e26] [cursor=pointer]
+              - button "200%" [ref=f1e27] [cursor=pointer]
+          - button "Pitch lock On" [pressed] [ref=f1e28] [cursor=pointer]:
+            - generic [ref=f1e29]: Pitch lock
+            - strong [ref=f1e30]: "On"
+          - generic [ref=f1e31]:
+            - generic [ref=f1e32]: Channel
+            - combobox "Channel" [ref=f1e33] [cursor=pointer]:
+              - option "Stereo" [selected]
+              - option "Mono"
+              - option "Left"
+              - option "Right"
+          - generic [ref=f1e34]:
+            - generic [ref=f1e35]: High pass
+            - combobox "High pass" [ref=f1e36] [cursor=pointer]:
+              - option "20 Hz" [selected]
+              - option "80 Hz"
+              - option "150 Hz"
+              - option "300 Hz"
+              - option "600 Hz"
+          - generic [ref=f1e37]:
+            - generic [ref=f1e38]: Low pass
+            - combobox "Low pass" [ref=f1e39] [cursor=pointer]:
+              - option "20.0 kHz" [selected]
+              - option "12.0 kHz"
+              - option "8.0 kHz"
+              - option "4.0 kHz"
+              - option "2.0 kHz"
+      - region "Audio timeline" [ref=f1e40]:
+        - scrollbar "Timeline overview and visible range" [ref=f1e41]:
+          - generic "Complete recording overview" [ref=f1e42]
+        - generic [ref=f1e43]:
+          - generic "Zoomed audio waveform. Click to seek and drag to select a loop." [ref=f1e44]
+          - generic [ref=f1e45]:
+            - strong [ref=f1e46]: Open an audio file
+            - generic [ref=f1e47]: Playback and analysis stay on this device.
+            - generic [ref=f1e48] [cursor=pointer]: Choose audio
+        - generic [ref=f1e49]:
+          - generic [ref=f1e50]:
+            - generic [ref=f1e51]: Timeline zoom
+            - slider "Timeline zoom" [disabled] [ref=f1e52]: "50"
+          - generic "Pitch adjustment controls" [ref=f1e53]:
+            - generic [ref=f1e54]:
+              - generic [ref=f1e55]: Semitones
+              - generic [ref=f1e56]:
+                - slider "Semitones 0" [ref=f1e57]: "0"
+                - spinbutton "Semitone adjustment" [ref=f1e58]: "0"
+            - generic [ref=f1e59]:
+              - generic [ref=f1e60]: Pitch correction
+              - generic [ref=f1e61]:
+                - slider "Pitch correction 0" [ref=f1e62]: "0"
+                - spinbutton "Pitch correction in cents" [ref=f1e63]: "0"
+          - generic [ref=f1e64]:
+            - generic [ref=f1e65]: Note tolerance
+            - combobox "Note tolerance" [ref=f1e66] [cursor=pointer]:
+              - option "Focused"
+              - option "Balanced" [selected]
+              - option "Sensitive"
+          - status "Pitch inspection" [ref=f1e67]:
+            - generic [ref=f1e68]: — Hz
+            - strong [ref=f1e69]: —
+            - generic [ref=f1e70]: —¢
+      - region "Pitch-aligned frequency monitor" [ref=f1e71]:
+        - generic "Pitch spectrum, visible range C1 to B6." [ref=f1e72]:
+          - generic [ref=f1e73]:
+            - generic "EQ-style pitch spectrum. Use pointer, touch, or left and right arrow keys to inspect pitch." [ref=f1e74]
+            - generic "Horizontal piano keyboard from C1 to B6." [ref=f1e75]
+      - generic "Playback controls" [ref=f1e76]:
+        - button "Return to beginning" [disabled] [ref=f1e77]
+        - button "Rewind 5 seconds" [disabled] [ref=f1e80]:
+          - generic [aria-hidden] [ref=f1e81]: −5
+        - button "Play" [disabled] [ref=f1e82]
+        - button "Forward 5 seconds" [disabled] [ref=f1e85]:
+          - generic [aria-hidden] [ref=f1e86]: "+5"
+        - button "Loop A–B" [disabled] [ref=f1e87]:
+          - generic [ref=f1e88]: Loop
+          - strong [ref=f1e89]: A–B
+        - status "Playback time" [ref=f1e90]: 00:00.00 / 00:00.00
+        - generic [ref=f1e91]:
+          - generic [ref=f1e92]: Volume
+          - slider "Volume" [disabled] [ref=f1e93]: "0.9"

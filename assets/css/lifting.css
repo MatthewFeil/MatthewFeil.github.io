@@ -261,8 +261,8 @@
 }
 
 .lifting-combobox-control:focus-within {
-  outline: 2px solid var(--site-accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--site-accent);
 }
 
 .lifting-form .lifting-combobox-control input {
@@ -289,7 +289,7 @@
 
 .lifting-form .lifting-combobox-control input:focus-visible,
 .lifting-form .lifting-combobox-toggle:focus-visible {
-  border-color: var(--lifting-border);
+  border-color: var(--site-accent);
   outline: 0;
 }
 

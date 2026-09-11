@@ -1,0 +1,90 @@
+- generic [active] [ref=f2e1]:
+  - link "Skip to audio workspace" [ref=f2e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=f2e3]:
+    - region "Music transcription playback workspace" [ref=f2e4]:
+      - status: Transcribe is in beta and probably has a few issues.
+      - generic [ref=f2e6]:
+        - generic [ref=f2e7]:
+          - link "Return to matthewfeil.com" [ref=f2e8] [cursor=pointer]:
+            - /url: /
+            - text: Matthew Feil
+          - generic [aria-hidden] [ref=f2e9]: /
+          - strong [ref=f2e10]: Transcribe
+        - button "Open audio file" [ref=f2e13] [cursor=pointer]
+        - generic "Playback settings" [ref=f2e14]:
+          - group "Speed" [ref=f2e15]:
+            - generic "Playback speed" [ref=f2e17]:
+              - button "50%" [ref=f2e18] [cursor=pointer]
+              - button "60%" [ref=f2e19] [cursor=pointer]
+              - button "70%" [ref=f2e20] [cursor=pointer]
+              - button "80%" [ref=f2e21] [cursor=pointer]
+              - button "90%" [ref=f2e22] [cursor=pointer]
+              - button "100%" [pressed] [ref=f2e23] [cursor=pointer]
+              - button "125%" [ref=f2e24] [cursor=pointer]
+              - button "Other" [ref=f2e26] [cursor=pointer]
+          - button "Pitch lock On" [pressed] [ref=f2e27] [cursor=pointer]:
+            - generic [ref=f2e28]: Pitch lock
+            - strong [ref=f2e29]: "On"
+          - group "Sound controls" [ref=f2e30]:
+            - generic [ref=f2e31]:
+              - generic [ref=f2e32]: Channel
+              - combobox "Channel" [ref=f2e33] [cursor=pointer]:
+                - option "Stereo" [selected]
+                - option "Mono"
+                - option "Left"
+                - option "Right"
+            - generic [ref=f2e34]:
+              - generic [ref=f2e35]: High pass
+              - combobox "High pass" [ref=f2e36] [cursor=pointer]:
+                - option "20 Hz" [selected]
+                - option "80 Hz"
+                - option "150 Hz"
+                - option "300 Hz"
+                - option "600 Hz"
+            - generic [ref=f2e37]:
+              - generic [ref=f2e38]: Low pass
+              - combobox "Low pass" [ref=f2e39] [cursor=pointer]:
+                - option "20.0 kHz" [selected]
+                - option "12.0 kHz"
+                - option "8.0 kHz"
+                - option "4.0 kHz"
+                - option "2.0 kHz"
+        - button "Controls" [ref=f2e40] [cursor=pointer]
+      - region "Audio timeline" [ref=f2e41]:
+        - scrollbar "Timeline overview and visible range" [ref=f2e42]:
+          - generic "Complete recording overview" [ref=f2e43]
+        - generic "Measure and section ruler. Drag marks to move them; use the Marks editor for keyboard editing." [ref=f2e44]
+        - generic [ref=f2e45]:
+          - generic "Zoomed audio waveform. Click to seek and drag to select a loop." [ref=f2e46]
+          - button "Drop an audio file here or click to open Audio stays on this device." [ref=f2e47] [cursor=pointer]:
+            - strong [ref=f2e50]: Drop an audio file here or click to open
+            - generic [ref=f2e51]: Audio stays on this device.
+      - region "Pitch-aligned frequency monitor" [ref=f2e52]:
+        - generic "Pitch spectrum, visible range C1 to B6." [ref=f2e53]:
+          - generic [ref=f2e54]:
+            - generic "EQ-style pitch spectrum. Use pointer, touch, or left and right arrow keys to inspect pitch." [ref=f2e55]
+            - generic "Horizontal piano keyboard from C1 to B6." [ref=f2e56]
+      - generic "Playback controls" [ref=f2e57]:
+        - button "Return to beginning" [disabled] [ref=f2e58]
+        - button "Rewind 5 seconds" [disabled] [ref=f2e61]:
+          - img [aria-hidden] [ref=f2e62]:
+            - generic [ref=f2e64]: "5"
+        - button "Play" [disabled] [ref=f2e65]
+        - button "Forward 5 seconds" [disabled] [ref=f2e68]:
+          - img [aria-hidden] [ref=f2e69]:
+            - generic [ref=f2e71]: "5"
+        - button "Repeat selected passage" [disabled] [ref=f2e72]:
+          - generic [ref=f2e75]: Loop
+        - generic [ref=f2e76]:
+          - slider "Playback position" [disabled] [ref=f2e77]: "0"
+          - generic [ref=f2e78]:
+            - status "Elapsed time" [ref=f2e79]: 00:00
+            - status "Time remaining" [ref=f2e80]: "-00:00"
+        - generic [ref=f2e81]:
+          - generic [ref=f2e82]:
+            - generic [ref=f2e83]: Volume
+            - slider "Volume" [disabled] [ref=f2e84]: "0.9"
+          - generic [ref=f2e85]:
+            - generic [ref=f2e86]: Timeline zoom
+            - slider "Timeline zoom" [disabled] [ref=f2e87]: "50"

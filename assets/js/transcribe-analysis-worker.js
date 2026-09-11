@@ -76,31 +76,36 @@ function fft(real, imaginary) {
   }
 }
 
-function buildSpectrogram(startSeconds, endSeconds, requestedFrames, analysisId) {
+function buildSpectrogram(startSeconds, endSeconds, requestedFrames, analysisId, pitchShiftCents = 0) {
   if (!audioSamples) {
     return null;
   }
 
-  const minimumMidi = 36;
-  const maximumMidi = 108;
-  const rows = maximumMidi - minimumMidi;
-  const fftSize = 2048;
+  const minimumMidi = 24;
+  const maximumMidi = 96;
+  const binsPerSemitone = 16;
+  const rows = (maximumMidi - minimumMidi) * binsPerSemitone;
   const startSample = clamp(Math.floor(startSeconds * audioSampleRate), 0, audioSamples.length - 1);
   const endSample = clamp(Math.ceil(endSeconds * audioSampleRate), startSample + 1, audioSamples.length);
   const available = endSample - startSample;
-  const frames = clamp(requestedFrames, 48, 280);
-  const hop = Math.max(1, Math.floor(Math.max(1, available - fftSize) / Math.max(1, frames - 1)));
+  const frames = clamp(requestedFrames, 1, 280);
   const magnitudes = new Float32Array(frames * rows);
-  let peakDb = -120;
+  const pitchRatio = 2 ** (pitchShiftCents / 1200);
 
   for (let frame = 0; frame < frames; frame += 1) {
     if (analysisId !== activeAnalysisId) {
       return null;
     }
 
+    // Longer bass windows resolve neighboring low notes; shorter treble
+    // windows avoid unnecessarily mixing successive attacks. Both are centered.
+    for (const fftSize of [32768, 8192]) {
+    const hop = Math.max(1, Math.floor(Math.max(1, available - fftSize) / Math.max(1, frames - 1)));
     const real = new Float32Array(fftSize);
     const imaginary = new Float32Array(fftSize);
-    const frameStart = Math.min(startSample + frame * hop, Math.max(startSample, endSample - fftSize));
+    const frameStart = frames === 1
+      ? Math.round((startSample + endSample - fftSize) / 2)
+      : Math.min(startSample + frame * hop, Math.max(startSample, endSample - fftSize));
 
     for (let index = 0; index < fftSize; index += 1) {
       const sourceIndex = frameStart + index;
@@ -111,25 +116,25 @@ function buildSpectrogram(startSeconds, endSeconds, requestedFrames, analysisId)
     fft(real, imaginary);
 
     for (let row = 0; row < rows; row += 1) {
-      const midi = minimumMidi + row;
-      const frequency = 440 * 2 ** ((midi - 69) / 12);
-      const bin = clamp(Math.round((frequency * fftSize) / audioSampleRate), 1, fftSize / 2 - 1);
-      const magnitude = Math.hypot(real[bin], imaginary[bin]) / fftSize;
-      const db = 20 * Math.log10(magnitude + 1e-8);
-      magnitudes[frame * rows + row] = db;
-      peakDb = Math.max(peakDb, db);
+      const midi = minimumMidi + row / binsPerSemitone;
+      const shiftedFrequency = 440 * 2 ** ((midi - 69) / 12);
+      const sourceFrequency = shiftedFrequency / pitchRatio;
+      if (sourceFrequency >= audioSampleRate / 2) continue;
+      const bassWeight = clamp((400 - sourceFrequency) / 200, 0, 1);
+      const weight = fftSize === 32768 ? bassWeight : 1 - bassWeight;
+      if (!weight) continue;
+      const exactBin = clamp((sourceFrequency * fftSize) / audioSampleRate, 1, fftSize / 2 - 2);
+      const lowerBin = Math.floor(exactBin);
+      const fraction = exactBin - lowerBin;
+      const lowerMagnitude = Math.hypot(real[lowerBin], imaginary[lowerBin]);
+      const upperMagnitude = Math.hypot(real[lowerBin + 1], imaginary[lowerBin + 1]);
+      const magnitude = (lowerMagnitude + (upperMagnitude - lowerMagnitude) * fraction) / fftSize;
+      magnitudes[frame * rows + row] += magnitude * weight;
+    }
     }
   }
 
-  const floorDb = peakDb - 62;
-  const pixels = new Uint8Array(magnitudes.length);
-
-  for (let index = 0; index < magnitudes.length; index += 1) {
-    const normalized = clamp((magnitudes[index] - floorDb) / Math.max(1, peakDb - floorDb), 0, 1);
-    pixels[index] = Math.round(255 * normalized ** 1.35);
-  }
-
-  return { data: pixels, frames, rows, minimumMidi, maximumMidi };
+  return { data: magnitudes, frames, rows, binsPerSemitone, minimumMidi, maximumMidi };
 }
 
 self.addEventListener('message', (event) => {
@@ -145,12 +150,13 @@ self.addEventListener('message', (event) => {
 
   if (message.type === 'analyze') {
     activeAnalysisId = message.id;
-    const result = buildSpectrogram(message.start, message.end, message.frames || 220, message.id);
+    const result = buildSpectrogram(message.start, message.end, message.frames || 220, message.id, message.pitchShiftCents);
 
     if (result && message.id === activeAnalysisId) {
       self.postMessage({
         type: 'spectrogram',
         id: message.id,
+        center: message.center,
         start: message.start,
         end: message.end,
         ...result

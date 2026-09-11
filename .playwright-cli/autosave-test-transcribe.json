@@ -1,0 +1,35 @@
+{
+  "format": "transcribe-config",
+  "version": 1,
+  "audio": {
+    "name": "autosave-test.wav",
+    "identity": "78f82cd49af869013e8ec414a15d71f5f4f2ec8d006b6a0c50527c91eaa7a85f"
+  },
+  "annotations": {
+    "version": 1,
+    "identity": "78f82cd49af869013e8ec414a15d71f5f4f2ec8d006b6a0c50527c91eaa7a85f",
+    "markers": [],
+    "numbering": "section"
+  },
+  "settings": {
+    "channel": "stereo",
+    "highpass": "20",
+    "lowpass": "20000",
+    "noteTolerance": "0.45",
+    "spectrumScale": "linear",
+    "semitones": "0",
+    "cents": "0",
+    "volume": "0.9",
+    "speed": 0.7,
+    "pitchLock": true,
+    "position": 0,
+    "zoom": 16,
+    "viewStart": 0,
+    "loopStart": null,
+    "loopEnd": null,
+    "loopEnabled": false,
+    "spectrumScroll": 0,
+    "viewMode": "timeline",
+    "controlsOpen": false
+  }
+}

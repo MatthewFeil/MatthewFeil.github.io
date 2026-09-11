@@ -1,0 +1,16 @@
+- generic [active] [ref=e1]:
+  - link "Skip to audio workspace" [ref=e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=e3]:
+    - region [ref=e4]:
+      - generic [ref=e5]: Matthew Feil / Transcribe
+      - generic [ref=e6]:
+        - heading "Private preview" [level=1] [ref=e7]
+        - paragraph [ref=e8]: This tool is still in development.
+        - generic [ref=e9]: Password
+        - generic [ref=e10]:
+          - textbox "Password" [ref=e11]
+          - button "Enter" [ref=e12] [cursor=pointer]
+        - status [ref=e13]
+        - link "Return to matthewfeil.com" [ref=e14] [cursor=pointer]:
+          - /url: /

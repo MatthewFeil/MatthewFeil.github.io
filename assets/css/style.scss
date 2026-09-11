@@ -207,8 +207,13 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--site-accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--site-accent);
+}
+
+button:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 table {
@@ -327,8 +332,8 @@ table {
 }
 
 .theme-toggle:focus-visible {
-  outline: 2px solid var(--site-accent);
-  outline-offset: 3px;
+  outline: none;
+  background: var(--site-panel);
 }
 
 .theme-toggle-icon {
@@ -380,7 +385,7 @@ table {
   color: var(--site-accent);
 }
 
-.page-link:focus-visible,
+.page-link:not(button):focus-visible,
 .nav-shelf-item:focus-visible {
   outline: 2px solid var(--site-accent);
   outline-offset: 3px;
@@ -587,6 +592,17 @@ table {
 .page-link-transcribe {
   margin-right: -0.25rem;
   padding-right: 1rem;
+}
+
+.transcribe-beta-tag {
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid currentColor;
+  font-size: 0.55rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .page-link-transcribe::after {
@@ -1597,8 +1613,8 @@ table {
   .page-link-personal {
     margin-left: 0;
     margin-top: 0.5rem;
-    border-top: 1px solid var(--site-soft-border);
-    border-bottom: 0;
+    border-top: 0;
+    border-bottom: 1px solid var(--site-soft-border);
     padding-top: 0;
     padding-left: 0.25rem;
   }
@@ -1716,4 +1732,10 @@ table {
     transition-duration: 0.01ms !important;
     transition-delay: 0ms !important;
   }
+}
+
+button.page-link:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
