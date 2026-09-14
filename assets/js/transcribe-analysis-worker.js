@@ -1,6 +1,17 @@
 let audioSamples = null;
 let audioSampleRate = 44100;
 let activeAnalysisId = 0;
+let stemOverlay = null;
+function sampleAt(index) {
+  if (!stemOverlay) return audioSamples[index] || 0;
+  const time = index / audioSampleRate;
+  // Stem mode plays only this range; FFT windows beyond its edges are silence.
+  if (time < stemOverlay.start || time >= stemOverlay.end) return 0;
+  const position = (time - stemOverlay.start) * stemOverlay.sampleRate;
+  const first = Math.floor(position), fraction = position - first;
+  const a = stemOverlay.samples[first] || 0, b = stemOverlay.samples[first + 1] || 0;
+  return a + (b - a) * fraction;
+}
 
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
@@ -110,7 +121,7 @@ function buildSpectrogram(startSeconds, endSeconds, requestedFrames, analysisId,
     for (let index = 0; index < fftSize; index += 1) {
       const sourceIndex = frameStart + index;
       const window = 0.5 - 0.5 * Math.cos((2 * Math.PI * index) / (fftSize - 1));
-      real[index] = (audioSamples[sourceIndex] || 0) * window;
+      real[index] = sampleAt(sourceIndex) * window;
     }
 
     fft(real, imaginary);
@@ -140,7 +151,12 @@ function buildSpectrogram(startSeconds, endSeconds, requestedFrames, analysisId,
 self.addEventListener('message', (event) => {
   const message = event.data || {};
 
+  if (message.type === 'stem-overlay') {
+    stemOverlay = message.samples ? message : null;
+    return;
+  }
   if (message.type === 'set-audio') {
+    stemOverlay = null;
     audioSamples = new Float32Array(message.samples);
     audioSampleRate = message.sampleRate;
     const peaks = buildPeaks(audioSamples, message.bucketCount || 6000);

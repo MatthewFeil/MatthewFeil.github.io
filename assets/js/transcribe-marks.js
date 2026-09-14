@@ -31,11 +31,35 @@
       this.status = this.root.querySelector('[data-status]');
       this.fieldset = this.root.querySelector('fieldset');
       this.numbering = this.root.querySelector('[data-numbering]');
+      this.measurePanel = document.getElementById('transcribe-measure-panel');
+      this.measureButton = document.getElementById('transcribe-measures');
+      this.goInput = document.getElementById('transcribe-go-measure');
+      this.loopStartInput = this.measurePanel.querySelector('[data-loop-start]');
+      this.loopEndInput = this.measurePanel.querySelector('[data-loop-end]');
+      this.measurePanel.addEventListener('toggle', e => {
+        this.measureButton.setAttribute('aria-expanded', String(e.newState === 'open'));
+        if (e.newState === 'open') {
+          this.positionMeasures();
+          if (!this.measurePanel.contains(document.activeElement)) this.loopStartInput.focus();
+        }
+      });
+      window.addEventListener('resize', () => this.positionMeasures());
+      window.addEventListener('scroll', () => this.positionMeasures(), true);
+      for (const input of [this.loopStartInput, this.loopEndInput]) input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); this.loopInputs(); }
+      });
+      document.getElementById('transcribe-go-form').addEventListener('submit', e => {
+        e.preventDefault(); if (this.goTo(this.goInput.value)) this.measurePanel.hidePopover();
+      });
+      document.getElementById('transcribe-range-form').addEventListener('submit', e => {
+        e.preventDefault(); this.loopInputs();
+      });
       this.time = this.root.querySelector('[data-time]');
       this.section = this.root.querySelector('[data-section]');
       this.root.addEventListener('click', e => {
         const button = e.target.closest('button'); if (!button) return;
-        if (button.dataset.id) { this.select(button.dataset.id); return; }
+        if (button.dataset.id) { if (e.shiftKey || this.rangeAnchor) this.rangePoint(this.doc.markers.find(m => m.id === button.dataset.id).time, button.dataset.id); else this.select(button.dataset.id); return; }
+        if (button.dataset.action === 'loop-range') { this.loopInputs(); return; }
         const actions = { measure: () => this.mark(false), section: () => this.mark(true), remove: () => this.remove(), undo: () => this.history(false), redo: () => this.history(true), previous: () => this.navigate(-1, true), next: () => this.navigate(1, true), loop: () => this.loop(false), 'loop-section': () => this.loop(true), export: () => this.export(), import: () => this.root.querySelector('[data-file]').click(), apply: () => this.importPending(), cancel: () => this.clearImport() };
         actions[button.dataset.action]?.();
       });
@@ -60,11 +84,22 @@
         if (e.button !== 0) return;
         const rect = this.ruler.getBoundingClientRect();
         const near = rows(this.doc).filter(m => Math.abs(host.x(m.time, rect.width) - (e.clientX-rect.left)) < 12).sort((a,b) => Math.abs(host.x(a.time,rect.width)-(e.clientX-rect.left))-Math.abs(host.x(b.time,rect.width)-(e.clientX-rect.left)))[0];
+        if ((e.shiftKey || this.rangeAnchor) && this.ready) {
+          e.preventDefault();
+          this.rangePoint(near?.time ?? host.time(e.clientX-rect.left, rect.width), near?.id);
+          return;
+        }
         if (!near) return;
         e.preventDefault(); this.select(near.id); this.ruler.focus(); this.ruler.setPointerCapture(e.pointerId);
         this.drag = { id: near.id, before: structuredClone(this.doc), x: e.clientX };
       });
       this.ruler.addEventListener('pointermove', e => {
+        if (this.rangeAnchor) {
+          const rect = this.ruler.getBoundingClientRect();
+          const near = rows(this.doc).filter(m => Math.abs(host.x(m.time, rect.width) - (e.clientX - rect.left)) < 12).sort((a, b) => Math.abs(host.x(a.time, rect.width) - (e.clientX - rect.left)) - Math.abs(host.x(b.time, rect.width) - (e.clientX - rect.left)))[0];
+          this.previewRange(near?.time ?? host.time(e.clientX - rect.left, rect.width));
+          return;
+        }
         if (!this.drag || Math.abs(e.clientX-this.drag.x) < 3) return;
         const rect = this.ruler.getBoundingClientRect(), time = Math.max(0, Math.min(host.duration(), host.time(e.clientX-rect.left, rect.width)));
         if (!this.doc.markers.some(m => m.id !== this.drag.id && Math.abs(m.time-time) < 0.001)) this.doc.markers.find(m => m.id === this.drag.id).time = time;
@@ -80,7 +115,7 @@
       this.ruler.addEventListener('pointerup', end); this.ruler.addEventListener('pointercancel', end);
       this.refresh();
     }
-    say(text) { this.status.textContent = text; }
+    say(text) { this.status.textContent = text; if (this.measurePanel) { this.measurePanel.querySelector('[data-measure-status]').textContent = text; this.positionMeasures(); } }
     change(fn) { this.undoStack.push(structuredClone(this.doc)); this.redoStack = []; fn(); this.refresh(); this.save(); }
     select(id) { this.selected = id; this.refresh(); }
     mark(section) {
@@ -111,12 +146,87 @@
       if (start == null || end == null || end-start < 0.04) { this.say('A complete marked passage is needed to loop.'); return; }
       this.host.loop(start, end);
     }
+    openMeasures(go) {
+      if (!this.ready) return;
+      this.say('');
+      if (!this.measurePanel.matches(':popover-open')) this.measurePanel.showPopover();
+      this.positionMeasures();
+      const input = go ? this.goInput : this.loopStartInput;
+      input.focus(); input.select();
+    }
+    positionMeasures() {
+      if (!this.measurePanel.matches(':popover-open')) return;
+      const button = this.measureButton.getBoundingClientRect();
+      const panel = this.measurePanel.getBoundingClientRect();
+      this.measurePanel.style.left = `${Math.max(8, Math.min(button.right - panel.width, window.innerWidth - panel.width - 8))}px`;
+      this.measurePanel.style.top = `${Math.max(8, button.top - panel.height - 8)}px`;
+    }
+    measureText(value) {
+      return value.trim().toUpperCase().replace(/^(?:MEASURE|SECTION|MM?\.)\s*/, '')
+        .replace(/[\s.:-]+/g, '').replace(/(^|[A-Z])0+(?=\d)/g, '$1');
+    }
+    resolveMeasure(value, all, context, end = false) {
+      const text = this.measureText(value);
+      if (/^[A-Z]+$/.test(text)) {
+        const section = all.filter(m => m.letter === text);
+        return end ? section.at(-1) : section[0];
+      }
+      const exact = all.find(m => m.label === text);
+      if (exact) return exact;
+      if (!/^\d+$/.test(text)) return;
+      const candidates = all.filter(m => m.label.replace(/^[A-Z]+/, '') === text);
+      return candidates.find(m => m.letter === context?.letter) ||
+        candidates.find(m => m.time >= (context?.time ?? 0)) || candidates.at(-1);
+    }
+    goTo(value) {
+      const all = rows(this.doc), current = all.findLast(m => m.time <= this.host.current()) || all[0];
+      const found = this.resolveMeasure(value, all, current);
+      if (!found) { this.say('Measure not found.'); return false; }
+      this.host.seek(found.time); this.select(found.id); this.say(`At ${found.label}.`); return true;
+    }
+    loopInputs(repeat = true) {
+      if (!this.ready) return;
+      const all = rows(this.doc), current = all.findLast(m => m.time <= this.host.current()) || all[0];
+      let first = this.resolveMeasure(this.loopStartInput.value, all, current);
+      let last = this.resolveMeasure(this.loopEndInput.value.trim() || this.loopStartInput.value, all, first, true);
+      if (!first || !last) { this.say('Measure or section not found.'); return; }
+      if (last.time < first.time) [first, last] = [last, first];
+      const end = all[all.indexOf(last)+1]?.time ?? this.host.duration();
+      if (end-first.time < 0.04) { this.say('Choose a passage at least 0.04 seconds long.'); return; }
+      this.rangeAnchor = null;
+      this.loopStartInput.value = first.label; this.loopEndInput.value = last.label;
+      if (repeat) this.host.loop(first.time, end);
+      else this.host.selectRange(first.time, end);
+      this.say(`${repeat ? 'Repeating' : 'Selected'} ${first.label} through ${last.label}.`);
+      return true;
+    }
+    previewRange(time) {
+      if (!this.rangeAnchor) return;
+      this.host.preview?.(this.rangeAnchor.time, Math.max(0, Math.min(this.host.duration(), time)));
+    }
+    rangePoint(time, id) {
+      if (!this.ready) return;
+      const point = { time: Math.max(0, Math.min(this.host.duration(), time)), id };
+      if (!this.rangeAnchor) {
+        this.rangeAnchor = point;
+        this.host.anchor?.(point.time);
+        this.say('First endpoint set. Move the mouse and click to place the other endpoint.');
+        return;
+      }
+      const ordered = [this.rangeAnchor, point].sort((a,b) => a.time-b.time);
+      const end = ordered[1].time;
+      if (end-ordered[0].time < 0.04) { this.say('Choose a different end point.'); return; }
+      this.rangeAnchor = null;
+      this.host.loop(ordered[0].time, end);
+      this.say('Selected passage is looping. Shift-click to begin a new range.');
+    }
     key(e) {
       if (!this.ready || e.defaultPrevented || e.isComposing) return false;
       const key = e.key.toLowerCase();
       let action;
       if ((e.metaKey || e.ctrlKey) && !e.altKey && key === 'z') action = () => this.history(e.shiftKey);
       else if (!e.metaKey && !e.ctrlKey) {
+        if (!e.altKey && key === 'g') action = () => this.openMeasures(true);
         if (!e.altKey && key === 'm' && !e.shiftKey) action = () => this.mark(false);
         if (!e.altKey && key === 's') action = () => e.shiftKey ? this.navigate(1,true) : this.mark(true);
         if (!e.altKey && key === 'n') action = () => this.navigate(e.shiftKey ? -1 : 1);
@@ -133,6 +243,7 @@
     }
     refresh() {
       if (!this.doc.markers.some(m => m.id === this.selected)) this.selected = null;
+      if (this.measureButton) this.measureButton.disabled = !this.ready;
       this.fieldset.disabled = !this.ready; this.numbering.value = this.doc.numbering;
       if (!this.list) { this.host.render(); return; }
       const focusedId = this.list.contains(document.activeElement) ? document.activeElement.dataset.id : null;
@@ -154,6 +265,10 @@
       const width = this.ruler.clientWidth, height = 32, ratio = window.devicePixelRatio || 1;
       this.ruler.width = Math.round(width*ratio); this.ruler.height = height*ratio;
       const ctx = this.ruler.getContext('2d'); ctx.scale(ratio,ratio); ctx.font = '700 12px "Familjen Grotesk", Arial';
+      if (this.rangeAnchor) {
+        const x = this.host.x(this.rangeAnchor.time, width);
+        ctx.fillStyle = '#ff343d'; ctx.fillRect(x, 0, 2, height);
+      }
       let right = -Infinity;
       for (const m of rows(this.doc)) {
         const x = this.host.x(m.time,width); if (x < 0 || x > width) continue;
@@ -163,11 +278,11 @@
       }
     }
     overview(ctx,width,height,duration) {
-      ctx.save(); ctx.fillStyle = '#f6f6f6'; ctx.font = '700 11px "Familjen Grotesk", Arial'; let right = -Infinity;
-      for (const m of rows(this.doc).filter(m => m.section)) { const x = m.time/duration*width; ctx.fillRect(x,height-12,1,12); if (x>right) {ctx.fillText(m.letter,x+3,height-13); right=x+ctx.measureText(m.letter).width+10;} }
+      ctx.save(); ctx.fillStyle = '#f6f6f6'; ctx.font = '700 11px "Familjen Grotesk", Arial'; ctx.textBaseline = 'alphabetic'; let right = -Infinity;
+      for (const m of rows(this.doc).filter(m => m.section)) { const x = m.time/duration*width; ctx.fillRect(x,height-12,1,12); if (x>right) {ctx.fillText(m.letter,x+3,height-3); right=x+ctx.measureText(m.letter).width+10;} }
       ctx.restore();
     }
-    reset() { this.generation++; this.ready = false; this.identity = null; this.doc = blank(); this.selected = null; this.drag = null; this.undoStack = []; this.redoStack = []; this.clearImport(); this.say(''); this.refresh(); }
+    reset() { this.measurePanel?.hidePopover(); this.rangeAnchor = null; if (this.loopStartInput) this.loopStartInput.value = ''; if (this.loopEndInput) this.loopEndInput.value = ''; this.generation++; this.ready = false; this.identity = null; this.doc = blank(); this.selected = null; this.drag = null; this.undoStack = []; this.redoStack = []; this.clearImport(); this.say(''); this.refresh(); }
     async load(buffer) {
       const generation = this.generation; this.ready = true; this.refresh();
       try {

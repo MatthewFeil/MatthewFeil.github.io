@@ -21,7 +21,11 @@
             <div class="nav-group-menu" id="nav-projects-panel" aria-labelledby="nav-projects-trigger" aria-hidden="true" inert>
               <div class="nav-group-menu-inner">
                 <span class="nav-menu-kicker">Projects</span>
-                <a class="nav-shelf-item nav-shelf-item-featured" href="{{ "/cta-l-live-art/" | relative_url }}">
+                <a class="nav-shelf-item nav-shelf-item-featured" data-nav-route="transcribe" href="{{ "/transcribe/" | relative_url }}">
+                  <span class="nav-shelf-item-title">Transcribe</span>
+                  <span class="nav-shelf-item-summary">Slow down, loop, and explore your audio.</span>
+                </a>
+                <a class="nav-shelf-item" href="{{ "/cta-l-live-art/" | relative_url }}">
                   <span class="nav-shelf-item-title">Chicago 'L' Live Art</span>
                   <span class="nav-shelf-item-summary">Live train-position artwork.</span>
                 </a>
@@ -51,7 +55,6 @@
           </div>
 
           <a class="page-link page-link-subdued page-link-personal" data-nav-route="personal" href="{{ "/personal/" | relative_url }}"><span class="page-link-label">Personal Space</span></a>
-          <a class="page-link page-link-subdued page-link-transcribe" data-nav-route="transcribe" href="{{ "/transcribe/" | relative_url }}"><span class="page-link-label">Transcribe</span><span class="transcribe-beta-tag">Beta</span></a>
 
           <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." title="Theme: System. Activate to switch to light mode.">
             <span class="theme-toggle-icon" aria-hidden="true">

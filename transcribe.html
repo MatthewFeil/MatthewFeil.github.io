@@ -5,7 +5,7 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20260910-37
+  - /assets/css/transcribe.css?v=20260912-stem-menu-progress
 ---
 
 <main class="transcribe-app" id="transcribe-main" data-transcribe-app>
@@ -14,12 +14,17 @@ extra_css:
       <span id="transcribe-config-message" role="status" aria-live="polite" aria-atomic="true"></span>
       <button type="button" id="transcribe-config-dismiss" aria-label="Dismiss notification" title="Dismiss notification">×</button>
     </div>
+    <div id="transcribe-stems-banner" hidden>
+      <span id="transcribe-stems-banner-message" role="status" aria-live="polite" aria-atomic="true"></span>
+      <button type="button" id="transcribe-stems-banner-dismiss" aria-label="Dismiss stem notification">×</button>
+      <progress id="transcribe-stems-banner-progress" max="1" value="0" aria-label="Segment splitting progress"></progress>
+    </div>
     <header class="transcribe-control-bar">
       <div class="transcribe-navbar-row">
       <div class="transcribe-identity">
         <a href="{{ "/" | relative_url }}" aria-label="Return to matthewfeil.com">Matthew Feil</a>
-        <span aria-hidden="true">/</span>
-        <strong>Transcribe</strong>
+        <span class="transcribe-identity-suffix"><span aria-hidden="true">/</span>
+        <strong>Transcribe</strong></span>
       </div>
 
       <div class="transcribe-file-control">
@@ -85,9 +90,31 @@ extra_css:
         </label>
         </div>
       </div>
-      <button type="button" id="transcribe-controls-toggle" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
+      <div class="transcribe-panel-buttons">
+      <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel">Stems <strong>Off</strong><span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden></span></button>
+      <button type="button" id="transcribe-controls-toggle" title="Sections (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
       </div>
       </div>
+      </div>
+      <section id="transcribe-stems-panel" class="transcribe-controls-panel transcribe-stems-panel" aria-label="Stem separation" hidden>
+        <div class="transcribe-stems-heading">
+          <h2>Highlight stems <span>Experimental</span></h2>
+          <button type="button" id="transcribe-stems-enabled" class="transcribe-tool-toggle" aria-pressed="false" disabled><span>Stems</span><strong>Off</strong></button>
+        </div>
+        <p id="transcribe-stems-range"></p>
+        <progress id="transcribe-stems-progress" max="1" aria-label="Stem separation progress" hidden></progress>
+        <p id="transcribe-stems-status" role="status" aria-live="polite"></p>
+        <ul class="transcribe-stem-list" aria-label="Individual stems">
+          <li data-stem="vocals"><span>Vocals<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Vocals stem" aria-pressed="true" disabled>On</button></li>
+          <li data-stem="drums"><span>Drums<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Drums stem" aria-pressed="true" disabled>On</button></li>
+          <li data-stem="bass"><span>Bass<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Bass stem" aria-pressed="true" disabled>On</button></li>
+          <li data-stem="guitar"><span>Guitar<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Guitar stem" aria-pressed="true" disabled>On</button></li>
+          <li data-stem="piano"><span>Piano<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Piano stem" aria-pressed="true" disabled>On</button></li>
+          <li data-stem="other"><span>Other / horns<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Other / horns stem" aria-pressed="true" disabled>On</button></li>
+        </ul>
+        <p class="transcribe-stems-help">Drag on the waveform or use [ and ] to highlight up to 60 seconds. Highlight stems play only that passage and clear when it changes.</p>
+        <p class="transcribe-stems-help">Six-stem Demucs downloads a 136 MB model on first use and caches it when storage allows. Processing stays on your device. Piano separation is experimental; horns usually remain in Other. “Very little audio” describes a quiet output, not proof an instrument is absent.</p>
+      </section>
       <section id="transcribe-controls-panel" class="transcribe-controls-panel" aria-label="Transcription controls" hidden>
       <div class="transcribe-analysis-controls" aria-label="Analysis controls">
         <button class="transcribe-tool-toggle" id="transcribe-chords-toggle" type="button" aria-pressed="false" aria-controls="transcribe-chords">
@@ -130,9 +157,9 @@ extra_css:
         </label>
         <div id="transcribe-marks" class="transcribe-numbering-control">
           <fieldset disabled>
-            <label class="transcribe-tolerance-control"><span>Measure numbering</span><select data-numbering><option value="section">Restart each section</option><option value="continuous">Continuous</option></select></label>
+            <label class="transcribe-tolerance-control"><span>Measure numbering</span><select data-numbering><option value="section">Per section</option><option value="continuous">Continuous</option></select></label>
           </fieldset>
-          <output data-status role="status" aria-live="polite" class="visually-hidden"></output>
+          <output data-status role="status" aria-live="polite"></output>
         </div>
         <output class="transcribe-pitch-readout" aria-label="Pitch inspection" hidden>
           <span id="transcribe-pitch-hz">— Hz</span>
@@ -142,30 +169,33 @@ extra_css:
       </div>
         <section class="transcribe-shortcuts" id="transcribe-shortcuts" aria-labelledby="transcribe-shortcuts-title">
           <h2 id="transcribe-shortcuts-title" tabindex="-1">Keyboard shortcuts <kbd>?</kbd></h2>
-          <p>Set A, set B, then let the phrase repeat.</p>
+          <h3>Playback &amp; selection</h3>
           <dl>
             <div><dt><kbd>Space</kbd></dt><dd>Play / pause</dd></div>
-            <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Back / forward 2 seconds</dd></div>
-            <div><dt><kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd></dt><dd>Back / forward 5 seconds</dd></div>
-            <div><dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Set loop A / B at playhead</dd></div>
-            <div><dt><kbd>L</kbd></dt><dd>Toggle selected loop</dd></div>
-            <div><dt><kbd>Esc</kbd></dt><dd>Close Controls</dd></div>
+            <div><dt><kbd>←</kbd> / <kbd>→</kbd></dt><dd>Seek 2s; hold Shift for 5s</dd></div>
+            <div><dt><kbd>[</kbd> / <kbd>]</kbd></dt><dd>Set selection start / end</dd></div>
+            <div><dt><kbd>B</kbd></dt><dd>Restart track or selection</dd></div>
+            <div><dt><kbd>H</kbd></dt><dd>Selection only on / off</dd></div>
+            <div><dt><kbd>R</kbd> or <kbd>L</kbd></dt><dd>Repeat on / off</dd></div>
+            <div><dt><kbd>,</kbd> / <kbd>.</kbd></dt><dd>Speed down / up</dd></div>
+            <div><dt><kbd>−</kbd> / <kbd>=</kbd></dt><dd>Zoom out / in</dd></div>
+            <div><dt><kbd>C</kbd></dt><dd>Show / hide Settings</dd></div>
+            <div><dt><kbd>?</kbd></dt><dd>Show / hide keyboard guide</dd></div>
+            <div><dt><kbd>T</kbd></dt><dd>Show / hide Stems</dd></div>
+            <div><dt><kbd>F</kbd></dt><dd>Show / hide spectrum &amp; keyboard</dd></div>
           </dl>
-          <h3>Markers</h3>
+          <h3>Measures &amp; sections</h3>
           <dl>
-            <div><dt><kbd>M</kbd></dt><dd>Mark a measure at playhead</dd></div>
-            <div><dt><kbd>S</kbd></dt><dd>Mark a section at playhead</dd></div>
-            <div><dt><kbd>N</kbd></dt><dd>Go to next marker</dd></div>
-            <div><dt><kbd>Shift</kbd> + <kbd>N</kbd></dt><dd>Go to previous marker</dd></div>
-            <div><dt><kbd>Shift</kbd> + <kbd>S</kbd></dt><dd>Go to next section</dd></div>
-            <div><dt><kbd>Shift</kbd> + <kbd>L</kbd></dt><dd>Loop current marked measure</dd></div>
-            <div><dt><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></dt><dd>Loop current marked section</dd></div>
+            <div><dt><kbd>M</kbd> / <kbd>S</kbd></dt><dd>Add measure / section at playhead</dd></div>
+            <div><dt><kbd>N</kbd> / <span class="transcribe-key-combo"><kbd>Shift</kbd><span>+</span><kbd>N</kbd></span></dt><dd>Next / previous marker</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd>Shift</kbd><span>+</span><kbd>S</kbd></span></dt><dd>Next section</dd></div>
+            <div><dt><kbd>G</kbd> then number then <kbd>Enter</kbd></dt><dd>Go to measure (12 or B3)</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd>Shift</kbd><span>+</span><kbd>L</kbd></span></dt><dd>Loop measure</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd data-platform-alt>Alt</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>L</kbd></span></dt><dd>Loop section</dd></div>
             <div><dt><kbd>Delete</kbd> / <kbd>Backspace</kbd></dt><dd>Delete selected marker</dd></div>
-            <div><dt><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Z</kbd></dt><dd>Undo marker change</dd></div>
-            <div><dt><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></dt><dd>Redo marker change</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd data-platform-modifier>Ctrl</kbd><span>+</span><kbd>Z</kbd></span></dt><dd>Undo marker edit</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd data-platform-modifier>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Z</kbd></span></dt><dd>Redo marker edit</dd></div>
           </dl>
-          <p class="transcribe-shortcuts-note">Marker shortcuts are available after audio loads. Alt is Option on Mac. Click a marker or navigate to it to select it.</p>
-          <p class="transcribe-shortcuts-note">Playback shortcuts work outside text fields. Focus the waveform for arrow-key seeking.</p>
         </section>
       </section>
     </header>
@@ -183,9 +213,9 @@ extra_css:
       <div class="transcribe-overview-wrap" id="transcribe-overview-navigator" role="scrollbar" aria-label="Timeline overview and visible range" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" tabindex="0">
         <canvas id="transcribe-overview" class="transcribe-overview" aria-label="Complete recording overview"></canvas>
       </div>
-      <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Drag marks to move them; use the Marks editor for keyboard editing."></canvas>
+      <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Shift-click to anchor a range, then move and click to place its other endpoint. Drag marks to move them."></canvas>
       <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
-        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek and drag to select a loop."></canvas>
+        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag to select, or Shift-click to anchor a loop, then move and click to place its other endpoint."></canvas>
         <button type="button" class="transcribe-empty" id="transcribe-empty">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg>
           <strong>Drop an audio file here or click to open</strong>
@@ -212,7 +242,7 @@ extra_css:
     </section>
 
     <footer class="transcribe-transport" aria-label="Playback controls">
-      <button type="button" id="transcribe-start" title="Return to beginning" aria-label="Return to beginning" disabled>
+      <button type="button" id="transcribe-start" aria-keyshortcuts="B" title="Return to track start (B)" aria-label="Return to track start" disabled>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h2v14H5zM19 6l-10 6 10 6z"/></svg>
       </button>
       <button type="button" id="transcribe-rewind" title="Back 5 seconds" aria-label="Rewind 5 seconds" disabled>
@@ -226,9 +256,24 @@ extra_css:
         <svg class="transcribe-skip-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8a9 9 0 1 0 1 8M20 3v5h-5"/><text x="12" y="16">5</text></svg>
       </button>
 
-      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" title="Repeat selected passage" aria-label="Repeat selected passage" aria-pressed="false" disabled>
-        <svg class="transcribe-repeat-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-3v4a3 3 0 0 1-3 3H3"/></svg><span>Loop</span>
+      <button class="transcribe-loop-control transcribe-selection-control" type="button" id="transcribe-selection-only" aria-keyshortcuts="H" title="Play only the highlighted selection; turn off to play the whole track (H)" aria-label="Selection only" aria-pressed="false" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" fill="currentColor" opacity="0.18"/><path d="M7 4H3v16h4m10-16h4v16h-4" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="m9 8 7 4-7 4z" fill="currentColor"/></svg>
       </button>
+      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" aria-keyshortcuts="R L" title="Loop whole track (R)" aria-label="Loop whole track" aria-pressed="false" disabled>
+        <svg class="transcribe-repeat-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-3v4a3 3 0 0 1-3 3H3"/></svg>
+      </button>
+
+      <button type="button" id="transcribe-measures" popovertarget="transcribe-measure-panel" aria-expanded="false" aria-controls="transcribe-measure-panel" aria-label="Measure navigation and loop (G)" title="Measures (G)" disabled>mm.</button>
+      <div id="transcribe-measure-panel" popover="auto" role="region" aria-label="Measure navigation and loop">
+        <form id="transcribe-go-form">
+          <label>Go to <input id="transcribe-go-measure" type="text" placeholder="12 or B3" autocomplete="off" aria-label="Go to measure or section"></label>
+        </form>
+        <form id="transcribe-range-form">
+          <label>Loop start <input data-loop-start type="text" placeholder="A2 or A" autocomplete="off"></label>
+          <label>Loop end <input data-loop-end type="text" placeholder="B3 or B" autocomplete="off"></label>
+        </form>
+        <output data-measure-status role="status" aria-live="polite"></output>
+      </div>
 
       <div class="transcribe-playback-progress">
         <input id="transcribe-seek" type="range" min="0" max="0" step="0.01" value="0" aria-label="Playback position" aria-valuetext="00:00.00 of 00:00.00" disabled>
@@ -255,6 +300,8 @@ extra_css:
   </section>
 </main>
 
-<script src="{{ "/assets/js/transcribe-marks.js?v=20260910-2" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-marks.js?v=20260911-2" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-chords.js?v=20260910-1" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20260910-31" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-stems-core.js?v=20260912-stem-menu-progress" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-stems.js?v=20260912-stem-menu-progress" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20260912-stem-menu-progress" | relative_url }}" defer></script>

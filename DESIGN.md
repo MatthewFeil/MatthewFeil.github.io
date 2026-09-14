@@ -242,3 +242,7 @@ The workbench is a local-audio task surface whose hierarchy comes from aligned s
 - **Don't** animate height, padding, margin, or other layout-driving properties for navigation reveals.
 - **Don't** turn the transcription workbench into a marketing landing page, notation editor, or chrome-heavy DAW imitation.
 - **Don't** recast the casual preview password as authentication or imply that local audio is uploaded.
+
+### Transcribe mobile workspace
+
+At widths up to 720px (and short touch landscape viewports), Transcribe keeps its navbar, overview, measure ruler, waveform, spectrum, keyboard, seek bar, and playback buttons within the dynamic viewport. The timeline receives more height than the spectrum. Mobile pitch inspection spans F3 through F6; desktop retains C1 through B6. Controls expands a scrolling panel containing the existing speed, sound, configuration, volume, zoom, and analysis controls. The same controls return to their desktop positions when the viewport widens, preserving their values and listeners.

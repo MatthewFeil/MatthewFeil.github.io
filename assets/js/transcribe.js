@@ -43,6 +43,7 @@
     pitchNote: document.getElementById('transcribe-pitch-note'),
     pitchCents: document.getElementById('transcribe-pitch-cents'),
     start: document.getElementById('transcribe-start'),
+    selectionOnly: document.getElementById('transcribe-selection-only'),
     rewind: document.getElementById('transcribe-rewind'),
     play: document.getElementById('transcribe-play'),
     forward: document.getElementById('transcribe-forward'),
@@ -64,8 +65,13 @@
     loopStart: null,
     loopEnd: null,
     loopEnabled: false,
+    selectionOnly: false,
     dragging: null,
     dragOriginX: 0,
+    dragPointerX: 0,
+    dragMoved: false,
+    dragScrollFrame: null,
+    dragScrollTime: null,
     overviewDrag: null,
     analysisId: 0,
     analysisInFlight: false,
@@ -90,17 +96,34 @@
     outputGain: null
   };
 
+  const transport = new TranscribeStems.Transport(elements.audio, () => state.fileUrl, message => stems?.setStatus(message));
+  let stems = null;
   let marks = null;
   marks = new TranscribeMarks.Marks({
     duration: () => state.duration,
-    current: () => elements.audio.currentTime,
+    current: () => transport.currentTime,
     x: (time, width) => timeToX(time, width),
     time: (x, width) => xToTime(x, width),
-    seek: (time) => seekBy(time - elements.audio.currentTime),
+    seek: (time) => seekBy(time - transport.currentTime),
+    anchor: (time) => {
+      state.loopStart = time; state.loopEnd = time; state.loopEnabled = false;
+      updateLoopControls(); renderAll();
+      elements.selectionStatus.textContent = `Endpoint ${formatTime(time)} · Move the mouse and click to place the other endpoint`;
+    },
+    preview: (anchor, time) => {
+      state.loopStart = Math.min(anchor, time);
+      state.loopEnd = Math.max(anchor, time);
+      drawWaveform(); drawOverview();
+    },
+    selectRange: (start, end) => {
+      setSelection(start, end);
+      state.loopEnabled = false;
+      updateLoopControls(); renderAll();
+    },
     loop: (start, end) => {
       setSelection(start, end);
       state.loopEnabled = true;
-      elements.audio.currentTime = start;
+      transport.currentTime = start;
       normalizeViewStart(start);
       updateLoopControls();
       renderAll();
@@ -108,7 +131,7 @@
     render: () => { if (marks) { marks.draw(); drawOverview(); } }
   });
 
-  const worker = new Worker(new URL('transcribe-analysis-worker.js?v=20260908-6', scriptUrl));
+  const worker = new Worker(new URL('transcribe-analysis-worker.js?v=20260912-highlight-only', scriptUrl));
   const colors = {
     background: '#000000',
     text: '#f6f6f6',
@@ -120,9 +143,10 @@
   };
   const noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   const blackPitchClasses = new Set([1, 3, 6, 8, 10]);
-  const minimumSpectrumMidi = 24;
-  const maximumSpectrumMidi = 96;
-  const spectrumWhiteKeyCount = 42;
+  const mobileWorkspace = window.matchMedia('(max-width: 720px), (max-height: 500px) and (pointer: coarse)');
+  let minimumSpectrumMidi = mobileWorkspace.matches ? 53 : 24;
+  let maximumSpectrumMidi = mobileWorkspace.matches ? 90 : 96;
+  let spectrumWhiteKeyCount = mobileWorkspace.matches ? 22 : 42;
   const spectrumWindowSeconds = 0.4;
   const spectrumUpdateIntervalSeconds = 0.1;
 
@@ -193,7 +217,7 @@
       state.spectrumCursor = null;
       state.likelyNotes = [];
       resetPitchReadout();
-      requestSpectrumAt(elements.audio.currentTime, true);
+      requestSpectrumAt(transport.currentTime, true);
     }
   }
 
@@ -299,18 +323,19 @@
       const hundredths = Math.floor((safeSeconds % 1) * 100);
       return `${String(minutes).padStart(2, '0')}:${String(wholeSeconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
     };
-    elements.seek.max = String(state.duration);
-    elements.seek.value = String(elements.audio.currentTime);
-    elements.seek.setAttribute('aria-valuetext', `${formatPlaybackTime(elements.audio.currentTime)} of ${formatPlaybackTime(state.duration)}`);
-    elements.timecode.textContent = formatTime(elements.audio.currentTime, false);
-    elements.timeRemaining.textContent = `-${formatTime(Math.ceil(Math.max(0, state.duration - elements.audio.currentTime)), false)}`;
+    elements.seek.min = String(transport.range?.start || 0);
+    elements.seek.max = String(transport.range?.end ?? state.duration);
+    elements.seek.value = String(transport.currentTime);
+    elements.seek.setAttribute('aria-valuetext', `${formatPlaybackTime(transport.currentTime)} of ${formatPlaybackTime(state.duration)}`);
+    elements.timecode.textContent = formatTime(transport.currentTime, false);
+    elements.timeRemaining.textContent = `-${formatTime(Math.ceil(Math.max(0, state.duration - transport.currentTime)), false)}`;
   }
 
   function viewDuration() {
     return state.duration ? state.duration / state.zoom : 0;
   }
 
-  function normalizeViewStart(centerTime = elements.audio.currentTime || 0) {
+  function normalizeViewStart(centerTime = transport.currentTime || 0) {
     const visibleDuration = viewDuration();
     state.viewStart = clamp(centerTime - visibleDuration / 2, 0, Math.max(0, state.duration - visibleDuration));
   }
@@ -377,6 +402,34 @@
     context.stroke();
   }
 
+  // Empty guides describe the workspace without implying recorded audio.
+  function drawEmptyGuides(context, width, height, spectrum = false) {
+    context.save();
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgba(246,246,246,0.10)';
+    context.beginPath();
+    if (spectrum) {
+      for (let midi = minimumSpectrumMidi; midi < maximumSpectrumMidi; midi += 1) {
+        if (midi % 12 !== 0) continue;
+        const x = midiCenterToKeyboardX(midi, width);
+        context.moveTo(x + 0.5, 0); context.lineTo(x + 0.5, height);
+      }
+    } else {
+      const columns = Math.max(3, Math.floor(width / 100));
+      for (let i = 0; i <= columns; i += 1) {
+        const x = i / columns * width;
+        context.moveTo(x + 0.5, 0); context.lineTo(x + 0.5, height);
+      }
+    }
+    const levels = spectrum ? 4 : 2;
+    for (let i = 1; i <= levels; i += 1) {
+      const y = spectrum ? i / levels * height : (i - 0.5) / levels * height;
+      context.moveTo(0, y + 0.5); context.lineTo(width, y + 0.5);
+    }
+    context.stroke();
+    context.restore();
+  }
+
   function drawOverview() {
     const { context, width, height } = configureCanvas(elements.overview);
     context.clearRect(0, 0, width, height);
@@ -384,6 +437,7 @@
     context.fillRect(0, 0, width, height);
 
     if (!state.peaks || !state.duration) {
+      drawEmptyGuides(context, width, height);
       return;
     }
 
@@ -398,7 +452,7 @@
       context.fillText(formatTime(time, false), clamp(x + 6, 4, width - 38), 5);
     }
 
-    drawPeakRange(context, state.peaks, 0, state.peaks.length / 2, 0, width, height * 0.64, height * 0.23, colors.text);
+    drawPeakRange(context, state.peaks, 0, state.peaks.length / 2, 0, width, 20 + Math.max(0, height - 38) / 2, Math.max(1, height - 38) / 2, colors.text);
 
     marks?.overview(context, width, height, state.duration);
     const visibleDuration = viewDuration();
@@ -411,8 +465,8 @@
     context.strokeRect(viewportX + 0.5, 20.5, Math.max(1, viewportWidth - 1), height - 24);
 
     if (state.loopStart !== null && state.loopEnd !== null) {
-      const startX = (state.loopStart / state.duration) * width;
-      const endX = (state.loopEnd / state.duration) * width;
+      const startX = (Math.min(state.loopStart, state.loopEnd) / state.duration) * width;
+      const endX = (Math.max(state.loopStart, state.loopEnd) / state.duration) * width;
       context.fillStyle = colors.accentSoft;
       context.fillRect(startX, 20, endX - startX, height - 23);
     }
@@ -426,6 +480,7 @@
     context.fillRect(0, 0, width, height);
 
     if (!state.peaks || !state.duration) {
+      drawEmptyGuides(context, width, height);
       return;
     }
 
@@ -455,8 +510,9 @@
     }
 
     if (state.loopStart !== null && state.loopEnd !== null) {
-      const startX = timeToX(state.loopStart, width);
-      const endX = timeToX(state.loopEnd, width);
+      // While dragging, the fixed anchor can be to the right of the pointer.
+      const startX = timeToX(Math.min(state.loopStart, state.loopEnd), width);
+      const endX = timeToX(Math.max(state.loopStart, state.loopEnd), width);
       context.fillStyle = colors.accentSoft;
       context.fillRect(startX, 0, endX - startX, height);
       context.strokeStyle = colors.accent;
@@ -473,7 +529,7 @@
     drawPeakRange(context, state.peaks, bucketStart, bucketEnd, 0, width, centerTop, channelHeight * 0.46, colors.text);
     drawPeakRange(context, state.peaks, bucketStart, bucketEnd, 0, width, centerBottom, channelHeight * 0.46, colors.text);
 
-    const playheadX = timeToX(elements.audio.currentTime, width);
+    const playheadX = timeToX(transport.currentTime, width);
     if (playheadX >= 0 && playheadX <= width) {
       context.strokeStyle = colors.accent;
       context.lineWidth = 1.5;
@@ -493,8 +549,8 @@
       .map((note) => `${midiToName(note.midi)} ${Math.round(note.confidence * 100)} percent`)
       .join(', ');
     elements.keyboard.setAttribute('aria-label', likelyNoteLabel
-      ? `Horizontal piano keyboard from C1 to B6. Relative note strengths: ${likelyNoteLabel}.`
-      : 'Horizontal piano keyboard from C1 to B6.');
+      ? `Horizontal piano keyboard from ${midiToName(minimumSpectrumMidi)} to ${midiToName(maximumSpectrumMidi - 1)}. Relative note strengths: ${likelyNoteLabel}.`
+      : `Horizontal piano keyboard from ${midiToName(minimumSpectrumMidi)} to ${midiToName(maximumSpectrumMidi - 1)}.`);
 
     context.clearRect(0, 0, width, height);
     context.fillStyle = colors.background;
@@ -518,11 +574,11 @@
       context.lineWidth = 1;
       context.strokeRect(x + 0.5, 0.5, Math.max(1, whiteKeyWidth), height - 1);
 
-      if (midi % 12 === 0) {
+      if (midi % 12 === 0 || midi === minimumSpectrumMidi || midi === maximumSpectrumMidi - 1) {
         context.fillStyle = '#171717';
         context.font = '700 11px "Familjen Grotesk", Arial, sans-serif';
         context.textBaseline = 'bottom';
-        context.fillText(`C${Math.floor(midi / 12) - 1}`, x + 5, height - 5);
+        context.fillText(midiToName(midi), x + 2, height - 5);
       }
     }
 
@@ -682,7 +738,8 @@
       context.fillStyle = colors.muted;
       context.font = '700 12px "Familjen Grotesk", Arial, sans-serif';
       context.textBaseline = 'middle';
-      context.fillText(state.audioBuffer ? 'Spectrum follows the playhead' : 'Open audio to inspect its frequency content', 16, height / 2);
+      drawEmptyGuides(context, width, height, true);
+      if (state.audioBuffer) context.fillText('Spectrum follows the playhead', 16, height / 2);
       drawKeyboard();
       return;
     }
@@ -729,6 +786,7 @@
       context.stroke();
     }
     for (let midi = minimumMidi; midi <= maximumMidi; midi += 12) {
+      if (midi < minimumSpectrumMidi || midi >= maximumSpectrumMidi) continue;
       const x = midiCenterToKeyboardX(midi, width);
       context.beginPath();
       context.moveTo(x + 0.5, 0);
@@ -737,15 +795,19 @@
     }
 
     context.beginPath();
+    let spectrumPathStarted = false;
     profile.forEach((value, row) => {
+      const note = minimumMidi + row / binsPerSemitone;
+      if (note < minimumSpectrumMidi || note > maximumSpectrumMidi - 1) return;
       const x = midiCenterToKeyboardX(minimumMidi + row / binsPerSemitone, width);
       const amplitude = Math.min(1, value / reference);
       const level = elements.spectrumScale.value === 'db'
         ? clamp((20 * Math.log10(Math.max(amplitude, 1e-8)) + 62) / 62, 0, 1)
         : amplitude;
       const y = height - level * (height - 10) - 5;
-      if (row === 0) context.moveTo(x, y);
+      if (!spectrumPathStarted) context.moveTo(x, y);
       else context.lineTo(x, y);
+      spectrumPathStarted = true;
     });
     context.strokeStyle = colors.text;
     context.lineWidth = 2;
@@ -812,7 +874,8 @@
     ].forEach((element) => {
       element.disabled = !enabled;
     });
-    elements.loopBottom.disabled = !enabled || state.loopStart === null;
+    elements.loopBottom.disabled = !enabled;
+    elements.selectionOnly.disabled = !enabled || !hasSelection();
   }
 
   async function initializeAudioGraph(shouldResume = false) {
@@ -914,14 +977,51 @@
     }
   }
 
+  function hasSelection() {
+    return !marks?.rangeAnchor && state.loopStart !== null && state.loopEnd !== null && state.loopEnd - state.loopStart >= 0.04;
+  }
+
+  function selectionPlayback() {
+    return Boolean(transport.range) || (state.selectionOnly && hasSelection());
+  }
+
+  function returnToStart() {
+    transport.currentTime = selectionPlayback() ? state.loopStart : 0;
+    normalizeViewStart(transport.currentTime);
+    renderAll();
+    requestSpectrumAt(transport.currentTime, true);
+  }
+
+  function enforcePlaybackRange() {
+    if (transport.pending) return;
+    if (!selectionPlayback() || elements.audio.paused) return;
+    if (transport.currentTime >= state.loopEnd) {
+      if (state.loopEnabled) transport.currentTime = state.loopStart;
+      else { elements.audio.pause(); transport.currentTime = state.loopEnd; }
+    } else if (transport.currentTime < state.loopStart) {
+      transport.currentTime = state.loopStart;
+    }
+  }
+
   function updateLoopControls() {
-    const hasLoop = state.loopStart !== null && state.loopEnd !== null;
-    state.loopEnabled = Boolean(state.loopEnabled && hasLoop);
+    stems?.selectionChanged();
+    state.selectionOnly = Boolean(state.selectionOnly && hasSelection());
+    elements.selectionOnly.disabled = !hasSelection() || Boolean(transport.range);
+    elements.selectionOnly.classList.toggle('is-active', selectionPlayback());
+    elements.selectionOnly.setAttribute('aria-pressed', String(selectionPlayback()));
+    const startLabel = selectionPlayback() ? 'Return to selection start' : 'Return to track start';
+    elements.start.title = `${startLabel} (B)`;
+    elements.start.setAttribute('aria-label', startLabel);
+    const loopLabel = selectionPlayback() ? 'Loop selection' : 'Loop whole track';
+    elements.loopBottom.title = `${loopLabel} (R)`;
+    elements.loopBottom.setAttribute('aria-label', loopLabel);
+    state.loopEnabled = Boolean(state.loopEnabled && state.duration);
+    elements.audio.loop = state.loopEnabled && (Boolean(transport.range) || !selectionPlayback());
     [elements.loopBottom].forEach((button) => {
       button.classList.toggle('is-active', state.loopEnabled);
       button.setAttribute('aria-pressed', String(state.loopEnabled));
     });
-    elements.loopBottom.disabled = !state.duration || !hasLoop;
+    elements.loopBottom.disabled = !state.duration;
   }
 
   function setLoopEnabled(enabled) {
@@ -930,9 +1030,7 @@
   }
 
   function toggleLoop() {
-    if (state.loopStart === null || state.loopEnd === null) {
-      return;
-    }
+    if (!state.duration) return;
     setLoopEnabled(!state.loopEnabled);
   }
 
@@ -942,9 +1040,10 @@
     }
 
     await initializeAudioGraph(true);
+    if (transport.pending) { transport.pending.resume = !transport.pending.resume; return; }
     if (elements.audio.paused) {
-      if (state.loopEnabled && state.loopEnd !== null && elements.audio.currentTime >= state.loopEnd) {
-        elements.audio.currentTime = state.loopStart;
+      if (selectionPlayback() && (transport.currentTime < state.loopStart || transport.currentTime >= state.loopEnd)) {
+        transport.currentTime = state.loopStart;
       }
       await elements.audio.play();
     } else {
@@ -956,8 +1055,8 @@
     if (!state.duration) {
       return;
     }
-    elements.audio.currentTime = clamp(elements.audio.currentTime + seconds, 0, state.duration);
-    if (elements.audio.currentTime < state.viewStart || elements.audio.currentTime > state.viewStart + viewDuration()) {
+    transport.currentTime = clamp(transport.currentTime + seconds, 0, state.duration);
+    if (transport.currentTime < state.viewStart || transport.currentTime > state.viewStart + viewDuration()) {
       normalizeViewStart();
     }
     renderAll();
@@ -967,7 +1066,7 @@
     if (!state.duration) {
       return;
     }
-    state.zoom = clamp(nextZoom, 1, 32);
+    state.zoom = clamp(nextZoom, 1, Math.max(32, state.duration / 24));
     normalizeViewStart();
     elements.zoom.setAttribute('aria-valuetext', `${Math.round(state.zoom * 100)}%`);
     renderAll();
@@ -980,7 +1079,7 @@
       state.spectrumCursor = null;
       state.likelyNotes = [];
       resetPitchReadout();
-      elements.frequencyReadout.textContent = 'Open audio to inspect its frequency content';
+      elements.frequencyReadout.textContent = '';
       drawSpectrogram();
       return;
     }
@@ -1015,10 +1114,12 @@
     });
   }
 
-  function setSelection(start, end, shouldAnalyze = true) {
+  function setSelection(start, end, shouldAnalyze = true, seekToStart = true) {
+    if (marks) marks.rangeAnchor = null;
     state.loopStart = clamp(Math.min(start, end), 0, state.duration);
     state.loopEnd = clamp(Math.max(start, end), 0, state.duration);
     const duration = state.loopEnd - state.loopStart;
+    stems?.selectionChanged();
 
     if (duration < 0.04) {
       state.loopStart = null;
@@ -1026,13 +1127,14 @@
       state.loopEnabled = false;
       elements.selectionStatus.textContent = '';
     } else {
-      elements.selectionStatus.textContent = `A ${formatTime(state.loopStart)} · B ${formatTime(state.loopEnd)} · ${duration.toFixed(3)} seconds`;
+      if (seekToStart) { state.selectionOnly = true; transport.currentTime = state.loopStart; }
+      elements.selectionStatus.textContent = '';
     }
 
     updateLoopControls();
     renderAll();
     if (shouldAnalyze) {
-      requestSpectrumAt(elements.audio.currentTime, true);
+      requestSpectrumAt(transport.currentTime, true);
     }
   }
 
@@ -1121,9 +1223,11 @@
         ...Object.fromEntries(configFields.map(key => [key, elements[key].value])),
         speed: elements.audio.playbackRate, pitchLock: elements.audio.preservesPitch,
         zoom: state.zoom, viewStart: state.viewStart,
-        loopStart: state.loopStart, loopEnd: state.loopEnd, loopEnabled: state.loopEnabled,
+        loopStart: marks.rangeAnchor ? null : state.loopStart, loopEnd: marks.rangeAnchor ? null : state.loopEnd, loopEnabled: marks.rangeAnchor ? false : state.loopEnabled,
+        selectionOnly: marks.rangeAnchor ? false : state.selectionOnly,
         spectrumScroll: state.spectrumScrollProgress, viewMode: app.dataset.viewMode,
-        controlsOpen: !controlsPanel.hidden
+        controlsOpen: !controlsPanel.hidden,
+        stems: stems?.settings()
       }
     };
   }
@@ -1142,19 +1246,26 @@
         if (![...input.options].some(option => option.value === v)) invalid();
       } else if (!Number.isFinite(Number(v)) || Number(v) < Number(input.min) || Number(v) > Number(input.max) || Math.abs((Number(v) - Number(input.min)) / Number(input.step) - Math.round((Number(v) - Number(input.min)) / Number(input.step))) > 0.000001) invalid();
     }
-    for (const [key, min, max] of [['speed', .25, 2], ['zoom', 1, 32], ['viewStart', 0, state.duration], ['spectrumScroll', 0, 1]]) {
+    for (const [key, min, max] of [['speed', .25, 2], ['zoom', 1, Math.max(32, state.duration / 24)], ['viewStart', 0, state.duration], ['spectrumScroll', 0, 1]]) {
       if (!Number.isFinite(settings[key]) || settings[key] < min || settings[key] > max) invalid();
     }
     for (const key of ['pitchLock', 'loopEnabled', 'controlsOpen']) if (typeof settings[key] !== 'boolean') invalid();
+    if (settings.selectionOnly !== undefined && typeof settings.selectionOnly !== 'boolean') invalid();
+    if (settings.stems !== undefined) {
+      if (!settings.stems || typeof settings.stems.enabled !== 'boolean' || !settings.stems.stems) invalid();
+      if (settings.stems.scope !== undefined && !['highlight', 'song'].includes(settings.stems.scope)) invalid();
+      for (const name of TranscribeStemAudio.names) if (typeof settings.stems.stems[name] !== 'boolean') invalid();
+    }
     if (!['timeline', 'analysis'].includes(settings.viewMode)) invalid();
-    if (settings.loopStart === null && settings.loopEnd === null) {
-      if (settings.loopEnabled) invalid();
-    } else if (!Number.isFinite(settings.loopStart) || !Number.isFinite(settings.loopEnd) || settings.loopStart < 0 || settings.loopEnd > state.duration || settings.loopEnd - settings.loopStart < .04) invalid();
+    if (!(settings.loopStart === null && settings.loopEnd === null) && (!Number.isFinite(settings.loopStart) || !Number.isFinite(settings.loopEnd) || settings.loopStart < 0 || settings.loopEnd > state.duration || settings.loopEnd - settings.loopStart < .04)) invalid();
     return { annotations, settings };
   }
 
   function applyConfig({ annotations, settings: saved }) {
     elements.audio.pause();
+    if (transport.pending) transport.pending.resume = false;
+    stems?.reset();
+    marks.rangeAnchor = null;
     marks.clearImport();
     marks.change(() => { marks.doc = annotations; marks.selected = null; });
     for (const key of configFields) elements[key].value = saved[key];
@@ -1169,10 +1280,11 @@
     state.loopStart = saved.loopStart;
     state.loopEnd = saved.loopEnd;
     state.loopEnabled = saved.loopEnabled;
-    if (saved.loopStart !== null) setSelection(saved.loopStart, saved.loopEnd, false);
+    state.selectionOnly = saved.selectionOnly ?? (saved.loopEnabled && saved.loopStart !== null);
+    if (saved.loopStart !== null) setSelection(saved.loopStart, saved.loopEnd, false, false);
     else elements.selectionStatus.textContent = '';
     state.zoom = saved.zoom;
-    elements.zoom.value = String(saved.zoom <= 16 ? (saved.zoom - 1) / 15 * 50 : 50 + (saved.zoom - 16) / 16 * 50);
+    elements.zoom.value = String(saved.zoom <= 16 ? (saved.zoom - 1) / 15 * 50 : 50 + (saved.zoom - 16) / (Math.max(32, state.duration / 24) - 16) * 50);
     elements.zoom.setAttribute('aria-valuetext', `${Math.round(saved.zoom * 100)}%`);
     state.viewStart = saved.viewStart;
     normalizeViewStart();
@@ -1182,8 +1294,9 @@
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
-    controlsPanel.hidden = !saved.controlsOpen;
+    controlsPanel.hidden = true;
     controlsToggle.setAttribute('aria-expanded', String(saved.controlsOpen));
+    stems?.restore(saved.stems);
     reconnectChannels(); updateFilters(); updateVolume(); updatePitchShift();
     updateLoopControls(); updateTimecode(); renderAll();
     requestAnimationFrame(() => {
@@ -1261,6 +1374,13 @@
       return;
     }
 
+    stopSelectionScroll();
+    state.dragging = null;
+    stems?.reset(false);
+    transport.reset();
+    worker.postMessage({ type: 'stem-overlay', samples: null });
+    state.audioBuffer = null;
+    state.duration = 0;
     sessionFile = null;
     sessionRevision++;
     if (state.fileUrl) {
@@ -1275,6 +1395,7 @@
     state.fileUrl = URL.createObjectURL(file);
     elements.audio.src = state.fileUrl;
     elements.fileName.textContent = file.name;
+    elements.fileName.title = `${file.name} — Open a new audio file`;
     elements.localStatus.textContent = 'Decoding';
     elements.empty.hidden = true;
     elements.selectionStatus.textContent = 'Preparing waveform…';
@@ -1288,7 +1409,7 @@
       state.audioBuffer = decoded;
       state.duration = state.audioBuffer.duration;
       const marksReady = marks.load(buffer);
-      state.zoom = 16;
+      state.zoom = Math.max(1, state.duration / (mobileWorkspace.matches ? 15 : 24));
       state.viewStart = 0;
       state.loopStart = null;
       state.loopEnd = null;
@@ -1320,8 +1441,8 @@
       elements.localStatus.textContent = 'Local';
       elements.audioFormat.textContent = `${(state.audioBuffer.sampleRate / 1000).toFixed(1)} kHz · ${state.audioBuffer.numberOfChannels === 1 ? 'Mono' : `${state.audioBuffer.numberOfChannels} channels`} · local`;
       elements.selectionStatus.textContent = '';
-      elements.zoom.value = '50';
-      elements.zoom.setAttribute('aria-valuetext', '1600%');
+      elements.zoom.value = String(state.zoom <= 16 ? (state.zoom - 1) / 15 * 50 : 50 + (state.zoom - 16) / (Math.max(32, state.duration / 24) - 16) * 50);
+      elements.zoom.setAttribute('aria-valuetext', `${Math.round(state.zoom * 100)}%`);
       setPlaybackSpeed(1);
       elements.audio.preservesPitch = true;
       elements.semitones.value = '0';
@@ -1366,6 +1487,31 @@
     return { x: clamp(event.clientX - rect.left, 0, rect.width), width: rect.width };
   }
 
+  function stopSelectionScroll() {
+    cancelAnimationFrame(state.dragScrollFrame);
+    state.dragScrollFrame = null;
+    state.dragScrollTime = null;
+  }
+
+  function scrollSelectionAtEdge(timestamp) {
+    if (!state.dragging) { stopSelectionScroll(); return; }
+    const elapsed = state.dragScrollTime === null ? 0 : Math.min(0.05, (timestamp - state.dragScrollTime) / 1000);
+    state.dragScrollTime = timestamp;
+    if (state.dragMoved && state.dragging !== 'pending') {
+      const rect = elements.waveform.getBoundingClientRect();
+      const x = state.dragPointerX - rect.left;
+      const edge = Math.min(48, rect.width / 5);
+      const direction = x < edge ? -clamp((edge - x) / edge, 0, 1)
+        : x > rect.width - edge ? clamp((x - rect.width + edge) / edge, 0, 1) : 0;
+      const before = state.viewStart;
+      if (direction) {
+        setTimelineViewStart(before + direction * viewDuration() * 0.75 * elapsed);
+        if (state.viewStart !== before) handleWaveformPointerMove({ clientX: state.dragPointerX });
+      }
+    }
+    state.dragScrollFrame = requestAnimationFrame(scrollSelectionAtEdge);
+  }
+
   function handleWaveformPointerDown(event) {
     if (!state.duration || event.button !== 0) {
       return;
@@ -1373,6 +1519,8 @@
 
     const { x, width } = waveformPointerPosition(event);
     const time = xToTime(x, width);
+    if (event.shiftKey || marks.rangeAnchor) { event.preventDefault(); marks.rangePoint(time); return; }
+    marks.rangeAnchor = null;
     const boundaryThreshold = (9 / width) * viewDuration();
 
     if (state.loopStart !== null && Math.abs(time - state.loopStart) < boundaryThreshold) {
@@ -1383,17 +1531,29 @@
       state.dragging = 'pending';
     }
 
+    stems?.selectionChanged();
     state.dragOriginX = x;
+    state.dragPointerX = event.clientX;
+    state.dragMoved = false;
+    stopSelectionScroll();
+    state.dragScrollFrame = requestAnimationFrame(scrollSelectionAtEdge);
     elements.waveform.setPointerCapture(event.pointerId);
     drawWaveform();
   }
 
   function handleWaveformPointerMove(event) {
+    if (marks.rangeAnchor) {
+      const { x, width } = waveformPointerPosition(event);
+      marks.previewRange(xToTime(x, width));
+      return;
+    }
     if (!state.dragging) {
       return;
     }
 
+    state.dragPointerX = event.clientX;
     const { x, width } = waveformPointerPosition(event);
+    if (Math.abs(x - state.dragOriginX) >= 4) state.dragMoved = true;
     const time = xToTime(x, width);
 
     if (state.dragging === 'pending') {
@@ -1414,18 +1574,23 @@
   }
 
   function handleWaveformPointerUp(event) {
+    stopSelectionScroll();
     if (!state.dragging) {
       return;
     }
+
+    // A fast release can arrive before the final pointermove. Commit its
+    // coordinates first, including a drag that is still marked as pending.
+    if (event.type !== 'pointercancel') handleWaveformPointerMove(event);
 
     const { x, width } = waveformPointerPosition(event);
     const moved = Math.abs(x - state.dragOriginX);
     const pending = state.dragging === 'pending';
     state.dragging = null;
 
-    if (pending || moved < 4) {
+    if (pending || (!state.dragMoved && moved < 4)) {
       const time = xToTime(x, width);
-      elements.audio.currentTime = time;
+      transport.currentTime = time;
       state.loopStart = null;
       state.loopEnd = null;
       state.loopEnabled = false;
@@ -1439,6 +1604,11 @@
   }
 
   function updateOverviewDrag(event) {
+    if (marks.rangeAnchor && state.duration) {
+      const rect = elements.overview.getBoundingClientRect();
+      marks.previewRange((event.clientX - rect.left) / rect.width * state.duration);
+      return;
+    }
     if (!state.overviewDrag || !state.duration) return;
     const rect = elements.overview.getBoundingClientRect();
     const x = clamp(event.clientX - rect.left, 0, rect.width);
@@ -1450,6 +1620,7 @@
     if (!state.duration) return;
     const rect = elements.overview.getBoundingClientRect();
     const x = clamp(event.clientX - rect.left, 0, rect.width);
+    if ((event.shiftKey || marks.rangeAnchor) && event.button === 0) { event.preventDefault(); marks.rangePoint(x / rect.width * state.duration); return; }
     const viewportX = (state.viewStart / state.duration) * rect.width;
     const viewportWidth = (viewDuration() / state.duration) * rect.width;
     const insideViewport = x >= viewportX && x <= viewportX + viewportWidth;
@@ -1459,7 +1630,7 @@
     };
     elements.overview.setPointerCapture(event.pointerId);
     if (!insideViewport) {
-      elements.audio.currentTime = clamp((x / rect.width) * state.duration, 0, state.duration);
+      transport.currentTime = clamp((x / rect.width) * state.duration, 0, state.duration);
     }
     updateOverviewDrag(event);
   }
@@ -1506,18 +1677,16 @@
   function updatePlaybackFrame() {
     updateTimecode();
 
-    if (state.loopEnabled && state.loopStart !== null && state.loopEnd !== null && elements.audio.currentTime >= state.loopEnd) {
-      elements.audio.currentTime = state.loopStart;
-    }
+    enforcePlaybackRange();
 
-    if (state.zoom > 1 && elements.audio.currentTime > state.viewStart + viewDuration() * 0.92) {
-      normalizeViewStart(elements.audio.currentTime);
+    if (!state.dragging && state.zoom > 1 && transport.currentTime > state.viewStart + viewDuration() * 0.92) {
+      normalizeViewStart(transport.currentTime);
       syncTimelineScroll();
       drawOverview();
     }
 
     drawWaveform();
-    requestSpectrumAt(elements.audio.currentTime);
+    requestSpectrumAt(transport.currentTime);
     if (!elements.audio.paused) {
       state.animationFrame = requestAnimationFrame(updatePlaybackFrame);
     }
@@ -1596,6 +1765,13 @@
   connectPitchControl(elements.semitones, elements.semitonesNumber);
   connectPitchControl(elements.cents, elements.centsNumber);
   elements.loopBottom.addEventListener('click', toggleLoop);
+  elements.selectionOnly.addEventListener('click', () => {
+    if (!hasSelection()) return;
+    state.selectionOnly = !state.selectionOnly;
+    updateLoopControls();
+    if (state.selectionOnly && (transport.currentTime < state.loopStart || transport.currentTime >= state.loopEnd)) returnToStart();
+  });
+  elements.audio.addEventListener('timeupdate', enforcePlaybackRange);
   elements.channel.addEventListener('change', reconnectChannels);
   elements.highpass.addEventListener('change', updateFilters);
   elements.lowpass.addEventListener('change', updateFilters);
@@ -1609,25 +1785,20 @@
         : `${formatTime(state.spectrogram.center)} · no distinct peaks`;
     }
   });
-  elements.start.addEventListener('click', () => {
-    elements.audio.currentTime = 0;
-    state.viewStart = 0;
-    renderAll();
-    requestSpectrumAt(0, true);
-  });
+  elements.start.addEventListener('click', returnToStart);
   elements.rewind.addEventListener('click', () => seekBy(-5));
   elements.play.addEventListener('click', togglePlayback);
   elements.forward.addEventListener('click', () => seekBy(5));
   elements.seek.addEventListener('input', () => {
-    seekBy(Number(elements.seek.value) - elements.audio.currentTime);
-    requestSpectrumAt(elements.audio.currentTime);
+    seekBy(Number(elements.seek.value) - transport.currentTime);
+    requestSpectrumAt(transport.currentTime);
   });
   elements.volume.addEventListener('input', updateVolume);
   elements.zoom.addEventListener('input', () => {
     const position = Number(elements.zoom.value);
     const zoom = position <= 50
       ? 1 + (position / 50) * 15
-      : 16 + ((position - 50) / 50) * 16;
+      : 16 + ((position - 50) / 50) * (Math.max(32, state.duration / 24) - 16);
     setZoom(zoom);
   });
 
@@ -1645,6 +1816,13 @@
   elements.waveform.addEventListener('pointermove', handleWaveformPointerMove);
   elements.waveform.addEventListener('pointerup', handleWaveformPointerUp);
   elements.waveform.addEventListener('pointercancel', handleWaveformPointerUp);
+  elements.waveform.addEventListener('lostpointercapture', () => {
+    handleWaveformPointerUp({ clientX: state.dragPointerX });
+  });
+  window.addEventListener('blur', () => {
+    stopSelectionScroll();
+    if (state.dragging) { state.dragging = null; setSelection(state.loopStart, state.loopEnd, true, false); }
+  });
   elements.waveform.addEventListener('wheel', (event) => {
     const horizontalDelta = event.deltaX || (event.shiftKey ? event.deltaY : 0);
     if (!horizontalDelta || state.zoom <= 1) {
@@ -1714,9 +1892,14 @@
     elements.play.title = 'Play';
     cancelAnimationFrame(state.animationFrame);
     renderAll();
-    requestSpectrumAt(elements.audio.currentTime, true);
+    requestSpectrumAt(transport.currentTime, true);
   });
   elements.audio.addEventListener('ended', () => {
+    if (selectionPlayback() && state.loopEnabled) {
+      transport.currentTime = state.loopStart;
+      elements.audio.play().catch(() => renderAll());
+      return;
+    }
     elements.play.classList.remove('is-playing');
     elements.play.setAttribute('aria-label', 'Play');
     elements.play.title = 'Play';
@@ -1724,7 +1907,7 @@
   });
   elements.audio.addEventListener('seeked', () => {
     renderAll();
-    requestSpectrumAt(elements.audio.currentTime, true);
+    requestSpectrumAt(transport.currentTime, true);
   });
 
   elements.viewButtons.forEach((button) => {
@@ -1741,21 +1924,16 @@
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.defaultPrevented || event.isComposing || elements.workspace.hidden || document.activeElement?.isContentEditable || ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+    if (event.defaultPrevented || event.isComposing || marks.measurePanel?.contains(document.activeElement) || elements.workspace.hidden || document.activeElement?.isContentEditable || ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
       return;
     }
 
-    // Controls keeps focus after a click, but Space remains a transport command.
-    const controlsSpace = document.activeElement === controlsToggle && event.code === 'Space';
-    if (!controlsSpace && ['BUTTON', 'SUMMARY'].includes(document.activeElement?.tagName) && ['Space', 'Enter'].includes(event.code)) return;
     if (marks.key(event)) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
 
     if (event.key === '?') {
       event.preventDefault();
-      controlsPanel.hidden = false;
-      controlsToggle.setAttribute('aria-expanded', 'true');
-      document.getElementById('transcribe-shortcuts-title').focus();
+      if (!event.repeat) toggleSection('shortcuts');
     } else if (event.code === 'Space') {
       event.preventDefault();
       if (event.repeat) return;
@@ -1766,28 +1944,284 @@
     } else if (event.key === 'ArrowRight') {
       event.preventDefault();
       seekBy(event.shiftKey ? 5 : 2);
-    } else if (event.key.toLowerCase() === 'l') {
-      toggleLoop();
+    } else if (event.key === ',' || event.key === '.') {
+      event.preventDefault();
+      if (event.repeat) return;
+      const speeds = elements.speedButtons.map((button) => Number(button.dataset.speed)).sort((a, b) => a - b);
+      const current = elements.audio.playbackRate;
+      const next = event.key === '.'
+        ? speeds.find((speed) => speed > current)
+        : speeds.reverse().find((speed) => speed < current);
+      if (next !== undefined) setPlaybackSpeed(next);
+    } else if (['-', '=', '+'].includes(event.key)) {
+      event.preventDefault();
+      if (elements.zoom.disabled) return;
+      const direction = event.key === '-' ? -1 : 1;
+      elements.zoom.value = String(clamp(Number(elements.zoom.value) + direction * 5, Number(elements.zoom.min), Number(elements.zoom.max)));
+      elements.zoom.dispatchEvent(new Event('input', { bubbles: true }));
+    } else if (event.key.toLowerCase() === 'c') {
+      event.preventDefault();
+      if (!event.repeat) toggleSection('settings');
+    } else if (event.key.toLowerCase() === 'f') {
+      event.preventDefault();
+      if (!event.repeat) spectrumCheckbox.click();
+    } else if (event.key.toLowerCase() === 't') {
+      event.preventDefault();
+      if (!event.repeat) toggleSection('stems');
+    } else if (event.key.toLowerCase() === 'b') {
+      event.preventDefault();
+      if (!event.repeat) elements.start.click();
+    } else if (['r', 'l'].includes(event.key.toLowerCase())) {
+      event.preventDefault();
+      if (!event.repeat) elements.loopBottom.click();
+    } else if (event.key.toLowerCase() === 'h') {
+      event.preventDefault();
+      if (!event.repeat) elements.selectionOnly.click();
     } else if (event.key === '[' && state.duration) {
-      setSelection(elements.audio.currentTime, state.loopEnd ?? clamp(elements.audio.currentTime + 2, 0, state.duration));
+      setSelection(transport.currentTime, state.loopEnd ?? clamp(transport.currentTime + 2, 0, state.duration));
     } else if (event.key === ']' && state.duration) {
-      setSelection(state.loopStart ?? clamp(elements.audio.currentTime - 2, 0, state.duration), elements.audio.currentTime);
+      setSelection(state.loopStart ?? clamp(transport.currentTime - 2, 0, state.duration), transport.currentTime);
     }
   });
 
   const controlsToggle = document.getElementById('transcribe-controls-toggle');
   const controlsPanel = document.getElementById('transcribe-controls-panel');
-  controlsToggle.addEventListener('click', () => {
-    controlsPanel.hidden = !controlsPanel.hidden;
-    controlsToggle.setAttribute('aria-expanded', String(!controlsPanel.hidden));
+  // Reparent existing controls so audio state and listeners stay intact.
+  const sidebar = document.createElement('aside');
+  sidebar.className = 'transcribe-sidebar';
+  sidebar.setAttribute('aria-label', 'Optional controls');
+  elements.workspace.append(sidebar);
+  const sectionButtons = document.createElement('div');
+  sectionButtons.className = 'transcribe-section-buttons';
+  sectionButtons.setAttribute('role', 'group');
+  sectionButtons.setAttribute('aria-label', 'Show or hide sections');
+  app.querySelector('.transcribe-panel-buttons').append(sectionButtons);
+  const sectionIcons = {
+    settings: 'M4 5h16M4 12h16M4 19h16M8 3v4M16 10v4M10 17v4',
+    analysis: 'M4 20V4M4 20h16M7 16l4-7 4 4 5-9',
+    markers: 'M6 21V3h13l-3 4 3 4H6',
+    shortcuts: 'M3 5h18v14H3zM6 9h1m3 0h1m3 0h1m3 0h1M6 13h1m3 0h1m3 0h1m3 0h1M8 16h8',
+    stems: 'M12 3v6M5 21v-6h14v6M12 9v12M5 15V9h14v6',
+    spectrum: 'M3 18v-5m4 5V8m5 10V3m5 15V8m4 10v-5'
+  };
+  function sectionButton(id, title, target) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.title = title;
+    button.setAttribute('aria-label', title);
+    button.setAttribute('aria-controls', target);
+    const shortcut = { settings: 'C', shortcuts: 'Shift+/', stems: 'T', spectrum: 'F' }[id];
+    if (shortcut) {
+      button.setAttribute('aria-keyshortcuts', shortcut);
+      button.title = `${title} (${id === 'shortcuts' ? '?' : shortcut})`;
+    }
+    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sectionIcons[id]}"/></svg>`;
+    sectionButtons.append(button);
+    return button;
+  }
+  const definitions = [
+    ['settings', 'Settings', ['#transcribe-pitch-lock', '#transcribe-chords-toggle', '.transcribe-sound-controls', '.transcribe-audio-pitch', '[for="transcribe-spectrum-scale"]', '[for="transcribe-note-tolerance"]', '#transcribe-marks']],
+    ['shortcuts', 'Keyboard shortcuts', ['#transcribe-shortcuts']],
+    ['stems', 'Stems', ['#transcribe-stems-panel']]
+  ];
+  let visibleSections = [];
+  try { const saved = JSON.parse(localStorage.getItem('transcribe-sections')); if (Array.isArray(saved)) visibleSections = saved; } catch {}
+  if (visibleSections.some(id => ['sound', 'analysis', 'markers'].includes(id))) visibleSections.push('settings');
+  if (visibleSections.includes('markers')) visibleSections.push('shortcuts');
+  const sections = definitions.map(([id, title, selectors]) => {
+    const section = document.createElement('section');
+    section.className = 'transcribe-sidebar-section';
+    section.id = `transcribe-section-${id}`;
+    const heading = document.createElement('h2');
+    heading.textContent = title;
+    section.append(heading);
+    selectors.forEach(selector => section.append(app.querySelector(selector)));
+    sidebar.append(section);
+    const checkbox = sectionButton(id, title, section.id);
+    checkbox.checked = visibleSections.includes(id);
+    checkbox.addEventListener('click', () => toggleSection(id));
+    return { id, section, checkbox };
   });
-  controlsPanel.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    event.stopPropagation();
-    controlsPanel.hidden = true;
-    controlsToggle.setAttribute('aria-expanded', 'false');
-    controlsToggle.focus();
+  app.querySelector('.transcribe-sound-controls').append(document.getElementById('transcribe-marks'));
+  const sidebarScroll = document.createElement('div');
+  sidebarScroll.className = 'transcribe-sidebar-scroll';
+  sections.forEach(({ section }) => sidebarScroll.append(section));
+  sidebar.append(sidebarScroll);
+  const stemPanel = document.getElementById('transcribe-stems-panel');
+  const stemInfo = document.createElement('div');
+  stemInfo.id = 'transcribe-stems-info';
+  stemInfo.setAttribute('popover', 'auto');
+  stemInfo.setAttribute('role', 'note');
+  stemInfo.setAttribute('aria-label', 'About stem separation');
+  stemPanel.querySelectorAll('.transcribe-stems-help').forEach(help => stemInfo.append(help));
+  const infoButton = document.createElement('button');
+  infoButton.type = 'button';
+  infoButton.className = 'transcribe-info-button';
+  infoButton.setAttribute('popovertarget', stemInfo.id);
+  infoButton.setAttribute('aria-label', 'About stem separation');
+  infoButton.title = 'About stem separation';
+  infoButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>';
+  const stemActions = document.createElement('div');
+  stemActions.className = 'transcribe-stems-actions';
+  stemActions.append(document.getElementById('transcribe-stems-enabled'), infoButton);
+  stemPanel.prepend(stemActions);
+  stemPanel.append(stemInfo);
+  const shortcuts = document.getElementById('transcribe-shortcuts');
+  shortcuts.querySelector('h2').hidden = true;
+  const platform = navigator.userAgentData?.platform || navigator.platform || navigator.userAgent;
+  const appleKeyboard = /Mac|iPhone|iPad|iPod/i.test(platform);
+  shortcuts.querySelectorAll('[data-platform-modifier]').forEach(key => { key.textContent = appleKeyboard ? 'Cmd' : 'Ctrl'; });
+  shortcuts.querySelectorAll('[data-platform-alt]').forEach(key => { key.textContent = appleKeyboard ? 'Option' : 'Alt'; });
+
+  sections.forEach(item => {
+    const heading = item.section.querySelector('h2');
+    const disclosure = document.createElement('button');
+    disclosure.type = 'button';
+    disclosure.className = 'transcribe-section-disclosure';
+    disclosure.innerHTML = `<span>${item.checkbox.getAttribute('aria-label')}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+    const contents = [...item.section.children].filter(child => child !== heading);
+    contents.forEach((child, index) => { if (!child.id) child.id = `transcribe-${item.id}-content-${index}`; });
+    disclosure.setAttribute('aria-controls', contents.map(child => child.id).join(' '));
+    disclosure.addEventListener('click', () => toggleSection(item.id));
+    heading.addEventListener('click', event => {
+      if (!event.target.closest('button')) toggleSection(item.id);
+    });
+    heading.firstChild.replaceWith(disclosure);
+    item.disclosure = disclosure;
   });
+  const spectrumCheckbox = sectionButton('spectrum', 'Spectrum & keyboard', 'transcribe-analysis');
+  spectrumCheckbox.id = 'transcribe-spectrum-visible';
+  spectrumCheckbox.checked = true;
+  spectrumCheckbox.setAttribute('aria-controls', 'transcribe-analysis');
+  try { spectrumCheckbox.checked = localStorage.getItem('transcribe-spectrum-visible') !== 'false'; } catch {}
+
+  function updateSpectrumVisibility() {
+    spectrumCheckbox.setAttribute('aria-pressed', String(spectrumCheckbox.checked));
+    document.getElementById('transcribe-analysis').hidden = !spectrumCheckbox.checked;
+    elements.workspace.classList.toggle('spectrum-hidden', !spectrumCheckbox.checked);
+    try { localStorage.setItem('transcribe-spectrum-visible', String(spectrumCheckbox.checked)); } catch {}
+    requestAnimationFrame(resizeCanvases);
+  }
+  spectrumCheckbox.addEventListener('click', () => { spectrumCheckbox.checked = !spectrumCheckbox.checked; updateSpectrumVisibility(); });
+  updateSpectrumVisibility();
+  controlsPanel.replaceChildren();
+  controlsToggle.hidden = true;
+  controlsPanel.hidden = true;
+  controlsPanel.setAttribute('aria-label', 'Visible sections');
+  controlsToggle.textContent = 'Sections';
+  document.getElementById('transcribe-stems-toggle').hidden = true;
+  const sidebarMotionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+  let sidebarInitialized = false;
+  let sidebarAnimations = [];
+  let sidebarMotionVersion = 0;
+  function updateSections(skipMotion = false) {
+    const version = ++sidebarMotionVersion;
+    const animate = sidebarInitialized && !skipMotion && !sidebarMotionPreference.matches;
+    const wasVisible = !sidebar.hidden;
+    const previous = sections.map(({section}) => ({
+      top: section.getBoundingClientRect().top,
+      expanded: !section.classList.contains('is-collapsed')
+    }));
+    sidebarAnimations.forEach(animation => animation.cancel());
+    sidebarAnimations = [];
+    if (mobileWorkspace.matches) {
+      const active = sections.find(item => item.checkbox.checked);
+      sections.forEach(({section, checkbox, disclosure}) => {
+        checkbox.checked = checkbox === active?.checkbox;
+        checkbox.setAttribute('aria-pressed', String(checkbox.checked));
+        checkbox.setAttribute('aria-expanded', String(checkbox.checked));
+        disclosure.setAttribute('aria-expanded', String(checkbox.checked));
+        section.hidden = !checkbox.checked;
+        section.classList.remove('is-collapsed');
+      });
+      document.getElementById('transcribe-stems-panel').hidden = active?.id !== 'stems';
+      sidebar.hidden = !active;
+      elements.workspace.classList.remove('has-sidebar');
+      if (animate && active) {
+        sidebarAnimations.push(sidebar.animate(
+          [{opacity: 0, transform: 'translateY(-8px)'}, {opacity: 1, transform: 'translateY(0)'}],
+          {duration: 160, easing: 'cubic-bezier(.16, 1, .3, 1)'}
+        ));
+      }
+      sidebarInitialized = true;
+      requestAnimationFrame(resizeCanvases);
+      return;
+    }
+    sections.forEach(({checkbox}) => checkbox.removeAttribute('aria-expanded'));
+    const active = sections.filter(item => item.checkbox.checked);
+    const motion = (element, frames, duration = 200) => {
+      const animation = element.animate(frames, {duration, easing: 'cubic-bezier(.16, 1, .3, 1)'});
+      sidebarAnimations.push(animation);
+      return animation;
+    };
+    // Keep the rail in place for its brief exit; a new toggle cancels this work.
+    if (animate && wasVisible && !active.length) {
+      sections.forEach(({checkbox}) => checkbox.setAttribute('aria-pressed', String(checkbox.checked)));
+      motion(sidebar, [{opacity: 1, transform: 'translateX(0)'}, {opacity: 0, transform: 'translateX(8px)'}], 120)
+        .finished.then(() => { if (version === sidebarMotionVersion) updateSections(true); }).catch(() => {});
+      return;
+    }
+    sections.forEach(({id, section, checkbox, disclosure}) => {
+      checkbox.setAttribute('aria-pressed', String(checkbox.checked));
+      section.hidden = false;
+      section.classList.toggle('is-collapsed', !checkbox.checked);
+      disclosure.setAttribute('aria-expanded', String(checkbox.checked));
+      if (id === 'stems') document.getElementById('transcribe-stems-panel').hidden = !checkbox.checked;
+    });
+    sidebar.hidden = !active.length;
+    elements.workspace.classList.toggle('has-sidebar', !!active.length);
+    if (animate && active.length) {
+      if (!wasVisible) {
+        motion(sidebar, [{opacity: 0, transform: 'translateX(12px)'}, {opacity: 1, transform: 'translateX(0)'}]);
+      } else {
+        sections.forEach(({section, checkbox}, index) => {
+          const offset = previous[index].top - section.getBoundingClientRect().top;
+          if (Math.abs(offset) > 1) motion(section, [{transform: `translateY(${offset}px)`}, {transform: 'translateY(0)'}]);
+          if (checkbox.checked && !previous[index].expanded) {
+            [...section.children].filter(child => child.tagName !== 'H2' && !child.hidden).forEach(child => {
+              motion(child, [{opacity: 0}, {opacity: 1}], 160);
+            });
+          }
+        });
+      }
+    }
+    sidebarInitialized = true;
+    try { localStorage.setItem('transcribe-sections', JSON.stringify(active.map(item => item.id))); } catch {}
+    requestAnimationFrame(resizeCanvases);
+  }
+  sidebarMotionPreference.addEventListener('change', () => updateSections(true));
+  function toggleSection(id) {
+    const button = sections.find(item => item.id === id).checkbox;
+    const opening = !button.checked;
+    if (mobileWorkspace.matches) sections.forEach(({checkbox}) => { checkbox.checked = false; });
+    button.checked = opening;
+    updateSections();
+  }
+  document.addEventListener('pointerdown', event => {
+    if (!mobileWorkspace.matches || sidebar.hidden || sidebar.contains(event.target) || sectionButtons.contains(event.target)) return;
+    sections.forEach(({checkbox}) => { checkbox.checked = false; });
+    updateSections(true);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !mobileWorkspace.matches || sidebar.hidden) return;
+    const active = sections.find(({checkbox}) => checkbox.checked);
+    const restoreFocus = sidebar.contains(document.activeElement);
+    sections.forEach(({checkbox}) => { checkbox.checked = false; });
+    updateSections(true);
+    if (restoreFocus) active?.checkbox.focus();
+  });
+  function adaptWorkspace() {
+    const mobile = mobileWorkspace.matches;
+    updateSections(true);
+    minimumSpectrumMidi = mobile ? 53 : 24;
+    maximumSpectrumMidi = mobile ? 90 : 96;
+    spectrumWhiteKeyCount = mobile ? 22 : 42;
+    state.spectrumCursor = null;
+    requestAnimationFrame(resizeCanvases);
+  }
+  mobileWorkspace.addEventListener('change', adaptWorkspace);
+  adaptWorkspace();
+  updateSections();
 
   const resizeObserver = new ResizeObserver(() => resizeCanvases());
   [elements.overview, elements.waveform, elements.analysisGrid].forEach((element) => resizeObserver.observe(element));
@@ -1795,10 +2229,22 @@
   app.dataset.viewMode = 'timeline';
   requestAnimationFrame(() => {
     resizeCanvases();
-    showConfigStatus('Transcribe is in beta and probably has a few issues.');
   });
   updateLoopControls();
   updateTimecode();
+  stems = new TranscribeStems.Panel({
+    buffer: () => state.audioBuffer,
+    selection: () => hasSelection() && !state.dragging ? { start: state.loopStart, end: state.loopEnd } : null,
+    apply: (blob, range, samples) => {
+      transport.switchSource(blob, range);
+      worker.postMessage({ type: 'stem-overlay', samples, start: range?.start, end: range?.end, sampleRate: 44100 }, samples ? [samples.buffer] : []);
+      state.analysisId++; state.analysisInFlight = false; state.pendingSpectrumTime = null; state.lastSpectrumTime = null;
+      updateLoopControls(); updateTimecode(); renderAll();
+      requestSpectrumAt(transport.currentTime, true);
+    },
+    changed: () => saveSession()
+  });
+
   // Save after handlers finish, including keyboard edits and pointer interactions.
   for (const event of ['input', 'change', 'click', 'keyup', 'pointerup', 'pointermove', 'wheel']) {
     app.addEventListener(event, () => queueMicrotask(saveSession));

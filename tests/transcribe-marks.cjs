@@ -28,3 +28,52 @@ assert.throws(()=>validate({version:1,identity:'file',...doc,markers:[{id:'x',ti
 assert.throws(()=>validate({version:1,identity:'file',...doc,markers:[{id:'x',time:1,section:false},{id:'y',time:1,section:false}]},'file',20));
 assert.deepEqual(labels(validate({version:1,identity:'file',...doc},'file',20)),['A1','A2','B1','B2']);
 console.log('Marker numbering, capture, history, navigation, loops, and validation passed.');
+model.doc = structuredClone(doc);
+model.loopStartInput = {value:'a2'}; model.loopEndInput = {value:'B1'};
+model.loopInputs(); assert.deepEqual(loop,[4,12]);
+model.loopStartInput.value='b'; model.loopEndInput.value=''; model.loopInputs(); assert.deepEqual(loop,[8,20]);
+assert.equal(model.loopEndInput.value,'B2');
+model.loopStartInput.value='2'; model.loopEndInput.value='2';
+model.loopInputs(); assert.deepEqual(loop,[12,20], 'Bare numbers use the current section');
+let preview; model.host.preview = (a,b) => preview = [a,b];
+model.rangePoint(2); model.previewRange(8); assert.deepEqual(preview,[2,8]);
+assert.equal(model.rangeAnchor.time,2);
+model.rangePoint(8,'c'); assert.deepEqual(loop,[2,8]);
+model.previewRange(10); assert.deepEqual(preview,[2,8], 'Completed range must stop following the pointer');
+model.rangePoint(15); model.previewRange(4); assert.deepEqual(preview,[15,4]); model.rangePoint(4,'b'); assert.deepEqual(loop,[4,15]);
+model.rangePoint(4,'b'); model.rangePoint(12,'d'); assert.deepEqual(loop,[4,12]);
+model.doc.numbering='continuous'; model.loopStartInput.value='2'; model.loopEndInput.value='3';
+model.loopInputs(); assert.deepEqual(loop,[4,12]);
+console.log('Inclusive measure inputs, whole sections, ambiguous numbers, mixed and reverse Shift ranges passed.');
+model.doc = structuredClone(doc); now = 9;
+assert.equal(model.goTo('2'), true); assert.equal(now, 12, 'Bare numbers use current section');
+assert.equal(model.goTo('A2'), true); assert.equal(now, 4);
+assert.equal(model.goTo('B'), true); assert.equal(now, 8);
+assert.equal(model.goTo('99'), false); assert.equal(now, 8);
+model.doc.numbering = 'continuous';
+assert.equal(model.goTo('2'), true); assert.equal(now, 4);
+let selectedRange;
+model.host.selectRange = (a,b) => selectedRange = [a,b];
+model.loopStartInput.value = 'A2'; model.loopEndInput.value = 'B3';
+model.loopInputs(false); assert.deepEqual(selectedRange, [4,12]);
+let opened = false; model.openMeasures = go => opened = go;
+model.key({key:'g', preventDefault(){}}); assert.equal(opened, true);
+console.log('Go shortcut, section-aware navigation, invalid destinations, and selection without repeat passed.');
+
+model.doc = structuredClone(doc); now = 9;
+for (const value of ['b2', ' B 02 ', 'section b', 'm. 2', 'measure 02', 'b:2']) {
+  assert.equal(model.goTo(value), true, value);
+  assert.equal(now, value === 'section b' ? 8 : 12, value);
+}
+for (const [start, end, expected] of [
+  ['a', 'b', [0,20]], ['a2', 'b', [4,20]], ['b', '', [8,20]],
+  ['1', '2', [8,20]], ['a1', '2', [0,8]], ['B 02', '', [12,20]],
+  ['b2', 'a1', [0,20]]
+]) {
+  model.loopStartInput.value = start; model.loopEndInput.value = end;
+  assert.equal(model.loopInputs(), true); assert.deepEqual(loop, expected);
+}
+const previousLoop = loop;
+model.loopStartInput.value = 'z99'; assert.equal(model.loopInputs(), undefined);
+assert.equal(loop, previousLoop);
+console.log('Flexible lowercase, spaced, prefixed, numeric, section, mixed, blank-end, and reversed range inputs passed.');
