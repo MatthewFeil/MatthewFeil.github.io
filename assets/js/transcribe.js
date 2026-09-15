@@ -143,9 +143,9 @@
   const noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   const blackPitchClasses = new Set([1, 3, 6, 8, 10]);
   const mobileWorkspace = window.matchMedia('(max-width: 720px), (max-height: 500px) and (pointer: coarse)');
-  let minimumSpectrumMidi = mobileWorkspace.matches ? 53 : 24;
-  let maximumSpectrumMidi = mobileWorkspace.matches ? 90 : 96;
-  let spectrumWhiteKeyCount = mobileWorkspace.matches ? 22 : 42;
+  const minimumSpectrumMidi = 24;
+  const maximumSpectrumMidi = 96;
+  const spectrumWhiteKeyCount = 42;
   const spectrumWindowSeconds = 0.4;
   const spectrumUpdateIntervalSeconds = 0.1;
 
@@ -1585,8 +1585,60 @@
     state.dragScrollFrame = requestAnimationFrame(scrollSelectionAtEdge);
   }
 
+  let timelineTouchPan = null;
+  let timelineTouchSelection = null;
+  let timelineTouchBlocked = false;
+
+  function timelineTouchCenter(touches) {
+    return (touches[0].clientX + touches[1].clientX) / 2;
+  }
+
+  function startTimelineTouchPan(touches) {
+    timelineTouchBlocked = true;
+    stopSelectionScroll();
+    if (state.dragging) {
+      state.dragging = null;
+      if (timelineTouchSelection) {
+        state.loopStart = timelineTouchSelection.start;
+        state.loopEnd = timelineTouchSelection.end;
+        stems?.selectionChanged();
+        updateLoopControls();
+        renderAll();
+      }
+    }
+    timelineTouchPan = { x: timelineTouchCenter(touches), viewStart: state.viewStart };
+  }
+
+  function handleWaveformTouchStart(event) {
+    if (event.touches.length === 1 && !timelineTouchBlocked) {
+      timelineTouchSelection = { start: state.loopStart, end: state.loopEnd };
+    } else if (event.touches.length >= 2 && !timelineTouchPan) {
+      startTimelineTouchPan(event.touches);
+    }
+  }
+
+  function handleWaveformTouchMove(event) {
+    if (event.touches.length < 2) {
+      timelineTouchPan = null;
+      return;
+    }
+    if (!timelineTouchPan) startTimelineTouchPan(event.touches);
+    if (!state.duration || state.zoom <= 1) return;
+    if (event.cancelable) event.preventDefault();
+    const delta = timelineTouchCenter(event.touches) - timelineTouchPan.x;
+    setTimelineViewStart(timelineTouchPan.viewStart - (delta / Math.max(1, elements.waveform.clientWidth)) * viewDuration());
+  }
+
+  function handleWaveformTouchEnd(event) {
+    if (event.touches.length < 2) timelineTouchPan = null;
+    if (!event.touches.length) {
+      timelineTouchBlocked = false;
+      timelineTouchSelection = null;
+    }
+  }
+
   function handleWaveformPointerDown(event) {
-    if (!state.duration || event.button !== 0) {
+    if (!state.duration || event.button !== 0 || timelineTouchBlocked || (event.pointerType === 'touch' && !event.isPrimary)) {
       return;
     }
 
@@ -1615,6 +1667,7 @@
   }
 
   function handleWaveformPointerMove(event) {
+    if (timelineTouchBlocked) return;
     if (marks.rangeAnchor) {
       const { x, width } = waveformPointerPosition(event);
       marks.previewRange(xToTime(x, width));
@@ -1648,6 +1701,7 @@
 
   function handleWaveformPointerUp(event) {
     stopSelectionScroll();
+    if (timelineTouchBlocked) return;
     if (!state.dragging) {
       return;
     }
@@ -1901,6 +1955,10 @@
   elements.waveform.addEventListener('pointermove', handleWaveformPointerMove);
   elements.waveform.addEventListener('pointerup', handleWaveformPointerUp);
   elements.waveform.addEventListener('pointercancel', handleWaveformPointerUp);
+  elements.waveform.addEventListener('touchstart', handleWaveformTouchStart, { passive: true });
+  elements.waveform.addEventListener('touchmove', handleWaveformTouchMove, { passive: false });
+  elements.waveform.addEventListener('touchend', handleWaveformTouchEnd, { passive: true });
+  elements.waveform.addEventListener('touchcancel', handleWaveformTouchEnd, { passive: true });
   elements.waveform.addEventListener('lostpointercapture', () => {
     handleWaveformPointerUp({ clientX: state.dragPointerX });
   });
@@ -1951,9 +2009,38 @@
   window.addEventListener('blur', stopKeyboardNotes);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopKeyboardNotes(); });
 
-  elements.spectrogram.addEventListener('pointerdown', handleSpectrogramPointer);
+  let spectrumTouchPan = null;
+  elements.spectrogram.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1) { spectrumTouchPan = null; return; }
+    spectrumTouchPan = {
+      x: event.touches[0].clientX,
+      scrollLeft: elements.analysisGrid.scrollLeft,
+      moved: false
+    };
+  }, { passive: true });
+  elements.spectrogram.addEventListener('touchmove', (event) => {
+    if (!spectrumTouchPan || event.touches.length !== 1) return;
+    const delta = event.touches[0].clientX - spectrumTouchPan.x;
+    if (Math.abs(delta) >= 8) spectrumTouchPan.moved = true;
+    if (!spectrumTouchPan.moved) return;
+    if (event.cancelable) event.preventDefault();
+    const maximumScroll = Math.max(0, elements.analysisGrid.scrollWidth - elements.analysisGrid.clientWidth);
+    elements.analysisGrid.scrollLeft = clamp(spectrumTouchPan.scrollLeft - delta, 0, maximumScroll);
+    updateSpectrumScrollState();
+  }, { passive: false });
+  elements.spectrogram.addEventListener('touchend', (event) => {
+    if (!spectrumTouchPan || event.touches.length) return;
+    if (!spectrumTouchPan.moved && event.changedTouches.length) {
+      handleSpectrogramPointer(event.changedTouches[0]);
+    }
+    spectrumTouchPan = null;
+  }, { passive: true });
+  elements.spectrogram.addEventListener('touchcancel', () => { spectrumTouchPan = null; }, { passive: true });
+  elements.spectrogram.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch') handleSpectrogramPointer(event);
+  });
   elements.spectrogram.addEventListener('pointermove', (event) => {
-    if (event.pointerType === 'mouse' || event.buttons === 1) {
+    if (event.pointerType === 'mouse' || (event.pointerType !== 'touch' && event.buttons === 1)) {
       handleSpectrogramPointer(event);
     }
   });
@@ -2335,11 +2422,18 @@
     if (mobile) settingsSection.querySelector('h2').after(configActions);
     else fileControl.insertBefore(configActions, document.getElementById('transcribe-config-file'));
     updateSections(true);
-    minimumSpectrumMidi = mobile ? 53 : 24;
-    maximumSpectrumMidi = mobile ? 90 : 96;
-    spectrumWhiteKeyCount = mobile ? 22 : 42;
     state.spectrumCursor = null;
-    requestAnimationFrame(resizeCanvases);
+    requestAnimationFrame(() => {
+      const maximumScroll = Math.max(0, elements.analysisGrid.scrollWidth - elements.analysisGrid.clientWidth);
+      const whiteKeyWidth = elements.keyboard.getBoundingClientRect().width / spectrumWhiteKeyCount;
+      elements.analysisGrid.scrollLeft = mobile
+        ? clamp(whiteKeysBefore(53) * whiteKeyWidth, 0, maximumScroll)
+        : 0;
+      state.spectrumScrollProgress = maximumScroll
+        ? elements.analysisGrid.scrollLeft / maximumScroll
+        : 0;
+      resizeCanvases();
+    });
   }
   mobileWorkspace.addEventListener('change', adaptWorkspace);
   adaptWorkspace();

@@ -2959,3 +2959,14 @@ body.transcribe-shell {
 #transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle > strong {
   flex-shrink: 0;
 }
+
+/* Keep the full pitch range swipeable on narrow touch screens. */
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .transcribe-app .transcribe-analysis-grid {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .transcribe-app .transcribe-analysis-grid::-webkit-scrollbar { display: none; }
+  .transcribe-app .transcribe-spectrum-scroll { width: 190.9091%; }
+}

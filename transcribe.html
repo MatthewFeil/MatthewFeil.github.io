@@ -5,7 +5,7 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20260915-spectrum-height
+  - /assets/css/transcribe.css?v=20260915-touch-pan
 ---
 
 <main class="transcribe-app" id="transcribe-main" data-transcribe-app>
@@ -212,7 +212,7 @@ extra_css:
       </div>
       <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Shift-click to anchor a range, then move and click to place its other endpoint. Drag marks to move them."></canvas>
       <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
-        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag to select, or Shift-click to anchor a loop, then move and click to place its other endpoint."></canvas>
+        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag or use one finger to select; swipe with two fingers to pan the timeline. Shift-click anchors a loop range."></canvas>
         <button type="button" class="transcribe-empty" id="transcribe-empty">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg>
           <strong>Drop an audio file here or click to open</strong>
@@ -229,7 +229,7 @@ extra_css:
       <div id="transcribe-chords" role="status" aria-label="Chord guesses" hidden></div>
       <div class="transcribe-analysis-grid" id="transcribe-analysis-grid" tabindex="0" aria-label="Pitch spectrum from C1 to B6.">
         <div class="transcribe-spectrum-scroll">
-          <canvas id="transcribe-spectrogram" class="transcribe-spectrogram" tabindex="0" aria-label="EQ-style pitch spectrum. Use pointer, touch, or left and right arrow keys to inspect pitch."></canvas>
+          <canvas id="transcribe-spectrogram" class="transcribe-spectrogram" tabindex="0" aria-label="EQ-style pitch spectrum. Tap or use left and right arrow keys to inspect pitch; swipe with one finger to pan on mobile."></canvas>
           <canvas id="transcribe-keyboard" class="transcribe-keyboard" aria-label="Horizontal piano keyboard from C1 to B6"></canvas>
         </div>
       </div>
@@ -303,4 +303,4 @@ extra_css:
 <script src="{{ "/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems.js?v=20260914-stem-controls" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-eq.js?v=20260914-table" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20260914-highlight-toggle" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20260915-touch-pan" | relative_url }}" defer></script>
