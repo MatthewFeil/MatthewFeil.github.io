@@ -4,7 +4,7 @@ const vm = require('node:vm');
 const html = fs.readFileSync('transcribe.html', 'utf8');
 const source = fs.readFileSync('assets/js/transcribe.js', 'utf8');
 const fields = ['channel','highpass','lowpass','noteTolerance','spectrumScale','semitones','cents','volume'];
-const elements = {};
+const elements = {analyzeSelection: {checked: false}};
 for (const key of fields) {
   const id = key.replace(/[A-Z]/g, c => '-' + c.toLowerCase());
   const select = html.match(new RegExp(`<select id="transcribe-${id}">([\\s\\S]*?)</select>`));
@@ -20,7 +20,7 @@ for (const key of fields) {
 const annotations = {version:1,identity:'abc',numbering:'continuous',markers:[{id:'a',time:1,section:true},{id:'b',time:3,section:false}]};
 Object.assign(elements,{audio:{playbackRate:.73,preservesPitch:false,currentTime:4},fileName:{textContent:'track.mp3'}});
 const state = {duration:20,zoom:8,viewStart:2,loopStart:1,loopEnd:5,loopEnabled:true,selectionOnly:true,spectrumScrollProgress:.7};
-const ctx = vm.createContext({structuredClone,elements,state,transport:elements.audio,stems:null,configFields:fields,marks:{identity:'abc',document:()=>structuredClone(annotations)},app:{dataset:{viewMode:'analysis'}},controlsPanel:{hidden:false}});
+const ctx = vm.createContext({structuredClone,TranscribeEQ:{settings:()=>[{frequency:100,gain:0,q:1},{frequency:400,gain:0,q:1},{frequency:1600,gain:0,q:1},{frequency:6400,gain:0,q:1}],valid:value=>Array.isArray(value)&&value.length===4},elements,state,transport:elements.audio,stems:null,configFields:fields,marks:{identity:'abc',document:()=>structuredClone(annotations)},app:{dataset:{viewMode:'analysis'}},controlsPanel:{hidden:false}});
 vm.runInContext(fs.readFileSync('assets/js/transcribe-marks.js','utf8'),ctx);
 vm.runInContext(fs.readFileSync('assets/js/transcribe-stems-core.js','utf8'),ctx);
 vm.runInContext(source.slice(source.indexOf('  function captureConfig()'),source.indexOf('  function applyConfig(')),ctx);
@@ -96,3 +96,22 @@ assert.doesNotThrow(() => ctx.validateConfig(stemConfig));
 stemConfig.settings.stems.stems.piano = 'yes';
 assert.throws(() => ctx.validateConfig(stemConfig));
 console.log('Stem preferences validate without adding any audio to configs.');
+
+elements.analyzeSelection.checked = true;
+const selectionSpectrumConfig = ctx.captureConfig();
+assert.equal(selectionSpectrumConfig.settings.analyzeSelection, true);
+assert.equal(ctx.validateConfig(selectionSpectrumConfig).settings.analyzeSelection, true);
+selectionSpectrumConfig.settings.analyzeSelection = 'true';
+assert.throws(() => ctx.validateConfig(selectionSpectrumConfig), /invalid settings/);
+delete selectionSpectrumConfig.settings.analyzeSelection;
+assert.doesNotThrow(() => ctx.validateConfig(selectionSpectrumConfig));
+console.log('Whole-highlight spectrum preference round trip and legacy config compatibility passed.');
+
+const legacyEQ = JSON.parse(JSON.stringify(config));
+delete legacyEQ.settings.eq;
+assert.doesNotThrow(() => ctx.validateConfig(legacyEQ));
+const invalidEQ = JSON.parse(JSON.stringify(config));
+invalidEQ.settings.eq = [];
+assert.throws(() => ctx.validateConfig(invalidEQ));
+assert.equal(config.settings.eq.length, 4);
+console.log('Four EQ bands serialize; legacy configs remain compatible and malformed EQ is rejected.');

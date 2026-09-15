@@ -25,6 +25,7 @@
     channel: document.getElementById('transcribe-channel'),
     highpass: document.getElementById('transcribe-highpass'),
     lowpass: document.getElementById('transcribe-lowpass'),
+    analyzeSelection: document.getElementById('transcribe-analyze-selection'),
     noteTolerance: document.getElementById('transcribe-note-tolerance'),
     spectrumScale: document.getElementById('transcribe-spectrum-scale'),
     overviewNavigator: document.getElementById('transcribe-overview-navigator'),
@@ -87,7 +88,7 @@
     mediaSource: null,
     highpassNode: null,
     lowpassNode: null,
-    midNode: null,
+    eqNodes: [],
     pitchNode: null,
     splitterNode: null,
     leftGain: null,
@@ -131,16 +132,14 @@
     render: () => { if (marks) { marks.draw(); drawOverview(); } }
   });
 
-  const worker = new Worker(new URL('transcribe-analysis-worker.js?v=20260912-highlight-only', scriptUrl));
-  const colors = {
-    background: '#000000',
-    text: '#f6f6f6',
-    muted: '#a7a7a7',
-    border: 'rgba(246,246,246,0.24)',
-    borderStrong: 'rgba(246,246,246,0.55)',
-    accent: '#ff343d',
-    accentSoft: 'rgba(255,52,61,0.13)'
-  };
+  const worker = new Worker(new URL('transcribe-analysis-worker.js?v=20260914-selection-spectrum', scriptUrl));
+  const colors = {};
+  function updateThemeColors() {
+    const style = getComputedStyle(document.documentElement);
+    const tokens = { background: 'bg', text: 'text', muted: 'muted', border: 'canvas-border', borderStrong: 'canvas-border-strong', accent: 'accent', accentSoft: 'accent-soft', grid: 'grid' };
+    for (const [name, token] of Object.entries(tokens)) colors[name] = style.getPropertyValue(`--tr-${token}`).trim();
+  }
+  updateThemeColors();
   const noteNames = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   const blackPitchClasses = new Set([1, 3, 6, 8, 10]);
   const mobileWorkspace = window.matchMedia('(max-width: 720px), (max-height: 500px) and (pointer: coarse)');
@@ -278,6 +277,63 @@
     return maximumSpectrumMidi - 1;
   }
 
+  // Match the painted key shapes, including the white area below black keys.
+  function keyboardNoteAt(x, y, width, height) {
+    const keyWidth = width / spectrumWhiteKeyCount;
+    if (y < height * 0.64) {
+      for (let midi = minimumSpectrumMidi; midi < maximumSpectrumMidi; midi += 1) {
+        if (isBlackKey(midi) && Math.abs(x - whiteKeysBefore(midi) * keyWidth) <= keyWidth * 0.31) return midi;
+      }
+    }
+    const index = Math.floor(x / keyWidth);
+    for (let midi = minimumSpectrumMidi; midi < maximumSpectrumMidi; midi += 1) {
+      if (!isBlackKey(midi) && whiteKeysBefore(midi) === index) return midi;
+    }
+    return null;
+  }
+
+  let keyboardAudioContext = null;
+  const keyboardVoices = new Map();
+  async function playKeyboardNote(midi, pointerId) {
+    stopKeyboardNote(pointerId);
+    const voice = {};
+    keyboardVoices.set(pointerId, voice);
+    // Keep reference notes independent of the track's pitch and filters.
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!keyboardAudioContext || keyboardAudioContext.state === 'closed') keyboardAudioContext = new AudioContextClass();
+    const context = keyboardAudioContext;
+    if (context.state === 'suspended') await context.resume();
+    if (keyboardVoices.get(pointerId) !== voice) return;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const now = context.currentTime;
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(440 * 2 ** ((midi - 69) / 12), now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.16, now + 0.01);
+    Object.assign(voice, { context, oscillator, gain, startedAt: now });
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+    oscillator.start(now);
+  }
+
+  function stopKeyboardNote(pointerId) {
+    const voice = keyboardVoices.get(pointerId);
+    keyboardVoices.delete(pointerId);
+    if (!voice?.oscillator) return;
+    const { context, oscillator, gain, startedAt } = voice;
+    const now = context.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(0.16 * Math.min(1, Math.max(0, (now - startedAt) / 0.01)), now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.06);
+    oscillator.stop(now + 0.07);
+  }
+
+  function stopKeyboardNotes() {
+    for (const pointerId of keyboardVoices.keys()) stopKeyboardNote(pointerId);
+  }
+
   function configureCanvas(canvas) {
     const rect = canvas.getBoundingClientRect();
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -406,7 +462,7 @@
   function drawEmptyGuides(context, width, height, spectrum = false) {
     context.save();
     context.lineWidth = 1;
-    context.strokeStyle = 'rgba(246,246,246,0.10)';
+    context.strokeStyle = colors.grid;
     context.beginPath();
     if (spectrum) {
       for (let midi = minimumSpectrumMidi; midi < maximumSpectrumMidi; midi += 1) {
@@ -458,7 +514,7 @@
     const visibleDuration = viewDuration();
     const viewportX = (state.viewStart / state.duration) * width;
     const viewportWidth = (visibleDuration / state.duration) * width;
-    context.fillStyle = 'rgba(246,246,246,0.09)';
+    context.fillStyle = colors.grid;
     context.fillRect(viewportX, 20, viewportWidth, height - 23);
     context.strokeStyle = colors.accent;
     context.lineWidth = 1;
@@ -561,7 +617,7 @@
       const whiteIndex = whiteKeysBefore(midi);
       const x = whiteIndex * whiteKeyWidth;
       const likelyNote = likelyNotesByMidi.get(midi);
-      context.fillStyle = colors.text;
+      context.fillStyle = '#f6f6f6';
       context.fillRect(x, 0, Math.ceil(whiteKeyWidth) + 1, height);
       if (likelyNote) {
         context.save();
@@ -894,11 +950,9 @@
     state.highpassNode.type = 'highpass';
     state.lowpassNode = state.audioContext.createBiquadFilter();
     state.lowpassNode.type = 'lowpass';
-    state.midNode = state.audioContext.createBiquadFilter();
-    state.midNode.type = 'peaking';
-    state.midNode.frequency.value = 1200;
-    state.midNode.Q.value = 0.8;
-    state.midNode.gain.value = 0;
+    // Low/high-pass Q uses dB in Web Audio: Butterworth avoids resonant gain bumps.
+    state.highpassNode.Q.value = state.lowpassNode.Q.value = 20 * Math.log10(Math.SQRT1_2);
+    state.eqNodes = TranscribeEQ.connect(state.audioContext);
     state.pitchNode = new AudioWorkletNode(state.audioContext, 'transcribe-pitch-processor', {
       parameterData: { pitchFactor: 2 ** (pitchShiftCents() / 1200) }
     });
@@ -910,8 +964,8 @@
 
     state.mediaSource.connect(state.highpassNode);
     state.highpassNode.connect(state.lowpassNode);
-    state.lowpassNode.connect(state.midNode);
-    state.midNode.connect(state.pitchNode);
+    state.lowpassNode.connect(state.eqNodes[0]);
+    state.eqNodes.at(-1).connect(state.pitchNode);
     state.pitchNode.connect(state.splitterNode);
     state.splitterNode.connect(state.leftGain, 0);
     state.splitterNode.connect(state.rightGain, 1);
@@ -965,8 +1019,15 @@
     if (!state.highpassNode || !state.lowpassNode) {
       return;
     }
-    state.highpassNode.frequency.setTargetAtTime(Number(elements.highpass.value), state.audioContext.currentTime, 0.01);
-    state.lowpassNode.frequency.setTargetAtTime(Number(elements.lowpass.value), state.audioContext.currentTime, 0.01);
+    [state.highpassNode, state.lowpassNode].forEach((node, index) => {
+      const frequency = Number(index === 0 ? elements.highpass.value : elements.lowpass.value);
+      const off = frequency === (index === 0 ? 20 : 20000);
+      // A zero-gain peaking filter is unity: bypass completely at the outer edge.
+      node.type = off ? 'peaking' : (index === 0 ? 'highpass' : 'lowpass');
+      node.gain.value = 0;
+      node.Q.value = off ? 1 : 20 * Math.log10(Math.SQRT1_2);
+      node.frequency.setTargetAtTime(frequency, state.audioContext.currentTime, 0.01);
+    });
   }
 
   function updateVolume() {
@@ -1084,8 +1145,11 @@
       return;
     }
 
-    const center = clamp(time, 0, state.duration);
-    if (!force && state.lastSpectrumTime !== null && Math.abs(center - state.lastSpectrumTime) < spectrumUpdateIntervalSeconds) {
+    const aggregate = elements.analyzeSelection.checked && hasSelection();
+    const center = aggregate ? (state.loopStart + state.loopEnd) / 2 : clamp(time, 0, state.duration);
+    const rangeKey = aggregate ? `${state.loopStart}:${state.loopEnd}` : 'moment';
+    if (!force && aggregate && state.lastSpectrumRange === rangeKey) return;
+    if (!force && state.lastSpectrumRange === rangeKey && state.lastSpectrumTime !== null && Math.abs(center - state.lastSpectrumTime) < spectrumUpdateIntervalSeconds) {
       return;
     }
     if (state.analysisInFlight) {
@@ -1094,8 +1158,9 @@
     }
 
     const windowDuration = Math.min(spectrumWindowSeconds, state.duration);
-    const start = clamp(center - windowDuration / 2, 0, Math.max(0, state.duration - windowDuration));
-    const end = Math.min(state.duration, start + windowDuration);
+    const start = aggregate ? state.loopStart : clamp(center - windowDuration / 2, 0, Math.max(0, state.duration - windowDuration));
+    const end = aggregate ? state.loopEnd : Math.min(state.duration, start + windowDuration);
+    state.lastSpectrumRange = rangeKey;
     state.analysisId += 1;
     state.analysisInFlight = true;
     state.lastSpectrumTime = center;
@@ -1110,7 +1175,8 @@
       start,
       end,
       pitchShiftCents: pitchShiftCents(),
-      frames: 1
+      frames: 1,
+      aggregate
     });
   }
 
@@ -1221,12 +1287,14 @@
       annotations: marks.document(),
       settings: {
         ...Object.fromEntries(configFields.map(key => [key, elements[key].value])),
+        analyzeSelection: elements.analyzeSelection.checked,
         speed: elements.audio.playbackRate, pitchLock: elements.audio.preservesPitch,
         zoom: state.zoom, viewStart: state.viewStart,
         loopStart: marks.rangeAnchor ? null : state.loopStart, loopEnd: marks.rangeAnchor ? null : state.loopEnd, loopEnabled: marks.rangeAnchor ? false : state.loopEnabled,
         selectionOnly: marks.rangeAnchor ? false : state.selectionOnly,
         spectrumScroll: state.spectrumScrollProgress, viewMode: app.dataset.viewMode,
         controlsOpen: !controlsPanel.hidden,
+        eq: TranscribeEQ.settings(),
         stems: stems?.settings()
       }
     };
@@ -1250,7 +1318,9 @@
       if (!Number.isFinite(settings[key]) || settings[key] < min || settings[key] > max) invalid();
     }
     for (const key of ['pitchLock', 'loopEnabled', 'controlsOpen']) if (typeof settings[key] !== 'boolean') invalid();
+    if (settings.analyzeSelection !== undefined && typeof settings.analyzeSelection !== 'boolean') invalid();
     if (settings.selectionOnly !== undefined && typeof settings.selectionOnly !== 'boolean') invalid();
+    if (settings.eq !== undefined && !TranscribeEQ.valid(settings.eq)) invalid();
     if (settings.stems !== undefined) {
       if (!settings.stems || typeof settings.stems.enabled !== 'boolean' || !settings.stems.stems) invalid();
       if (settings.stems.scope !== undefined && !['highlight', 'song'].includes(settings.stems.scope)) invalid();
@@ -1269,6 +1339,9 @@
     marks.clearImport();
     marks.change(() => { marks.doc = annotations; marks.selected = null; });
     for (const key of configFields) elements[key].value = saved[key];
+    TranscribeEQ.restore(saved.eq);
+    elements.analyzeSelection.checked = saved.analyzeSelection ?? false;
+    updateAnalyzeSelectionToggle();
     elements.semitonesNumber.value = saved.semitones;
     elements.centsNumber.value = saved.cents;
     setPlaybackSpeed(saved.speed);
@@ -1776,6 +1849,18 @@
   elements.highpass.addEventListener('change', updateFilters);
   elements.lowpass.addEventListener('change', updateFilters);
   elements.spectrumScale.addEventListener('change', drawSpectrogram);
+  function updateAnalyzeSelectionToggle() {
+    const enabled = Boolean(elements.analyzeSelection.checked);
+    elements.analyzeSelection.setAttribute('aria-pressed', String(enabled));
+    elements.analyzeSelection.classList.toggle('is-active', enabled);
+    elements.analyzeSelection.querySelector('strong').textContent = enabled ? 'On' : 'Off';
+  }
+  elements.analyzeSelection.checked = false;
+  elements.analyzeSelection.addEventListener('click', () => {
+    elements.analyzeSelection.checked = !elements.analyzeSelection.checked;
+    updateAnalyzeSelectionToggle();
+    requestSpectrumAt(transport.currentTime, true);
+  });
   elements.noteTolerance.addEventListener('change', () => {
     drawSpectrogram();
     if (state.spectrogram) {
@@ -1845,6 +1930,27 @@
     else if (event.key === 'End') setTimelineViewStart(state.duration);
     else setTimelineViewStart(state.viewStart + direction * amount);
   });
+  elements.keyboard.title = 'Hold a key to hear its note';
+  elements.keyboard.style.cursor = 'pointer';
+  elements.keyboard.style.touchAction = 'none';
+  elements.keyboard.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    const rect = elements.keyboard.getBoundingClientRect();
+    const midi = keyboardNoteAt(event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height);
+    if (midi === null) return;
+    event.preventDefault();
+    elements.keyboard.setPointerCapture(event.pointerId);
+    playKeyboardNote(midi, event.pointerId).catch((error) => {
+      stopKeyboardNote(event.pointerId);
+      console.error('Could not play keyboard note:', error);
+    });
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    elements.keyboard.addEventListener(type, (event) => stopKeyboardNote(event.pointerId));
+  }
+  window.addEventListener('blur', stopKeyboardNotes);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopKeyboardNotes(); });
+
   elements.spectrogram.addEventListener('pointerdown', handleSpectrogramPointer);
   elements.spectrogram.addEventListener('pointermove', (event) => {
     if (event.pointerType === 'mouse' || event.buttons === 1) {
@@ -2002,6 +2108,7 @@
     markers: 'M6 21V3h13l-3 4 3 4H6',
     shortcuts: 'M3 5h18v14H3zM6 9h1m3 0h1m3 0h1m3 0h1M6 13h1m3 0h1m3 0h1m3 0h1M8 16h8',
     stems: 'M12 3v6M5 21v-6h14v6M12 9v12M5 15V9h14v6',
+    eq: 'M2 12h3l3-7 4 14 4-14 3 7h3',
     spectrum: 'M3 18v-5m4 5V8m5 10V3m5 15V8m4 10v-5'
   };
   function sectionButton(id, title, target) {
@@ -2020,9 +2127,10 @@
     return button;
   }
   const definitions = [
-    ['settings', 'Settings', ['#transcribe-pitch-lock', '#transcribe-chords-toggle', '.transcribe-sound-controls', '.transcribe-audio-pitch', '[for="transcribe-spectrum-scale"]', '[for="transcribe-note-tolerance"]', '#transcribe-marks']],
+    ['settings', 'Settings', ['#transcribe-pitch-lock', '#transcribe-chords-toggle', '.transcribe-sound-controls', '.transcribe-audio-pitch', '[for="transcribe-spectrum-scale"]', '[for="transcribe-note-tolerance"]', '#transcribe-analyze-selection', '#transcribe-marks']],
     ['shortcuts', 'Keyboard shortcuts', ['#transcribe-shortcuts']],
-    ['stems', 'Stems', ['#transcribe-stems-panel']]
+    ['stems', 'Stems', ['#transcribe-stems-panel']],
+    ['eq', 'EQ', ['#transcribe-eq-panel']]
   ];
   let visibleSections = [];
   try { const saved = JSON.parse(localStorage.getItem('transcribe-sections')); if (Array.isArray(saved)) visibleSections = saved; } catch {}
@@ -2036,12 +2144,22 @@
     heading.textContent = title;
     section.append(heading);
     selectors.forEach(selector => section.append(app.querySelector(selector)));
+    if (id === 'settings') {
+      const toggles = document.createElement('div');
+      toggles.className = 'transcribe-settings-toggles';
+      toggles.setAttribute('role', 'group');
+      toggles.setAttribute('aria-label', 'Analysis options');
+      toggles.append(elements.pitchLock, chordToggle, elements.analyzeSelection);
+      heading.after(toggles);
+    }
     sidebar.append(section);
     const checkbox = sectionButton(id, title, section.id);
     checkbox.checked = visibleSections.includes(id);
     checkbox.addEventListener('click', () => toggleSection(id));
     return { id, section, checkbox };
   });
+  const fileControl = app.querySelector('.transcribe-file-control');
+  const settingsSection = sections.find(({ id }) => id === 'settings').section;
   app.querySelector('.transcribe-sound-controls').append(document.getElementById('transcribe-marks'));
   const sidebarScroll = document.createElement('div');
   sidebarScroll.className = 'transcribe-sidebar-scroll';
@@ -2137,6 +2255,7 @@
       document.getElementById('transcribe-stems-panel').hidden = active?.id !== 'stems';
       sidebar.hidden = !active;
       elements.workspace.classList.remove('has-sidebar');
+      elements.workspace.classList.toggle('mobile-section-open', !!active);
       if (animate && active) {
         sidebarAnimations.push(sidebar.animate(
           [{opacity: 0, transform: 'translateY(-8px)'}, {opacity: 1, transform: 'translateY(0)'}],
@@ -2169,6 +2288,7 @@
       if (id === 'stems') document.getElementById('transcribe-stems-panel').hidden = !checkbox.checked;
     });
     sidebar.hidden = !active.length;
+    elements.workspace.classList.remove('mobile-section-open');
     elements.workspace.classList.toggle('has-sidebar', !!active.length);
     if (animate && active.length) {
       if (!wasVisible) {
@@ -2212,6 +2332,8 @@
   });
   function adaptWorkspace() {
     const mobile = mobileWorkspace.matches;
+    if (mobile) settingsSection.querySelector('h2').after(configActions);
+    else fileControl.insertBefore(configActions, document.getElementById('transcribe-config-file'));
     updateSections(true);
     minimumSpectrumMidi = mobile ? 53 : 24;
     maximumSpectrumMidi = mobile ? 90 : 96;
@@ -2222,6 +2344,10 @@
   mobileWorkspace.addEventListener('change', adaptWorkspace);
   adaptWorkspace();
   updateSections();
+
+  const refreshTheme = () => { updateThemeColors(); renderAll(); };
+  new MutationObserver(refreshTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', refreshTheme);
 
   const resizeObserver = new ResizeObserver(() => resizeCanvases());
   [elements.overview, elements.waveform, elements.analysisGrid].forEach((element) => resizeObserver.observe(element));

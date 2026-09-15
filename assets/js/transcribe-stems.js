@@ -62,6 +62,8 @@
       this.panel = document.getElementById('transcribe-stems-panel');
       this.toggle = document.getElementById('transcribe-stems-toggle');
       this.toggleProgress = document.getElementById('transcribe-stems-toggle-progress');
+      this.navToggle = document.querySelector('[aria-controls="transcribe-section-stems"]');
+      if (this.navToggle) this.navToggle.append(this.toggleProgress);
       this.fraction = 0;
       this.master = document.getElementById('transcribe-stems-enabled');
       this.status = document.getElementById('transcribe-stems-status');
@@ -90,6 +92,7 @@
       this.rows.forEach(row => row.querySelector('button').addEventListener('click', () => {
         const i = core.names.indexOf(row.dataset.stem);
         this.flags[i] = !this.flags[i];
+        if (row.dataset.stem === 'guitar') this.flags[core.names.indexOf('piano')] = this.flags[i];
         if (this.enabled) this.applyMix();
         this.refresh(); this.changed();
       }));
@@ -116,7 +119,7 @@
       const range = this.selection(), duration = range ? range.end - range.start : 0;
       this.rangeLabel.textContent = !range ? '' : duration > core.maxSeconds ? 'Choose a highlight of 60 seconds or less.' : '';
       this.rangeLabel.hidden = !this.rangeLabel.textContent;
-      this.master.disabled = !this.job && !this.result && (!this.buffer() || !range || duration > core.maxSeconds);
+      this.master.disabled = !this.job && !this.result && (!this.buffer() || !range || !Number.isFinite(duration) || duration <= 0 || duration > core.maxSeconds);
       if (this.result) this.master.setAttribute('aria-pressed', String(this.enabled));
       else this.master.removeAttribute('aria-pressed');
       this.master.textContent = this.job ? 'Cancel' : this.result ? (this.enabled ? 'On' : 'Off') : 'Separate';
@@ -130,8 +133,9 @@
         button.setAttribute('aria-pressed', String(this.flags[i]));
         button.textContent = this.flags[i] ? 'On' : 'Off';
         button.classList.toggle('is-active', this.flags[i] && Boolean(this.result));
-        row.querySelector('[data-stem-activity]').textContent = !this.result ? 'Not analyzed' : this.result.activity[i].quiet ? 'Very little audio detected' : 'Audio detected';
-        row.classList.toggle('is-quiet', Boolean(this.result?.activity[i].quiet));
+        const quiet = Boolean(this.result?.activity[i].quiet) && (row.dataset.stem !== 'guitar' || Boolean(this.result?.activity[core.names.indexOf('piano')].quiet));
+        row.querySelector('[data-stem-activity]').textContent = !this.result ? 'Not analyzed' : quiet ? 'Low audio' : 'Audio detected';
+        row.classList.toggle('is-quiet', quiet);
       });
     }
     stop() { this.banner.hidden = true; this.generation++; this.job?.terminate(); this.job = null; this.refresh(); }
@@ -151,7 +155,7 @@
     }
     async separate() {
       const buffer = this.buffer(), range = this.selection();
-      if (!buffer || !range || range.end - range.start > core.maxSeconds || this.job) return;
+      if (!buffer || !range || !Number.isFinite(range.end - range.start) || range.end <= range.start || range.end - range.start > core.maxSeconds || this.job) return;
       const flags = this.flags.slice();
       this.reset(); this.flags = flags; this.range = { ...range };
       const generation = ++this.generation;
@@ -210,6 +214,10 @@
       // Configs carry preferences only; never start an expensive job on import.
       this.enabled = false;
       this.flags = core.names.map(name => settings?.stems?.[name] ?? true);
+      // Older configs may have separate guitar/piano choices; retain either enabled part.
+      const combined = (settings?.stems?.guitar ?? true) || (settings?.stems?.piano ?? true);
+      this.flags[core.names.indexOf('guitar')] = combined;
+      this.flags[core.names.indexOf('piano')] = combined;
       this.refresh();
       if (settings?.enabled) this.setStatus('Saved stem choices restored. Separate the highlight to enable them.');
     }

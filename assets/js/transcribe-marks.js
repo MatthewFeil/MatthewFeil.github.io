@@ -129,7 +129,15 @@
       });
       this.say(`${section ? 'Section' : 'Measure'} ${rows(this.doc).find(m => m.id === this.selected).label} marked.`);
     }
-    remove() { if (this.selected) this.change(() => { this.doc.markers = this.doc.markers.filter(m => m.id !== this.selected); this.selected = null; }); }
+    remove() {
+      const index = this.doc.markers.findIndex(m => m.id === this.selected);
+      if (index < 0) return;
+      this.change(() => {
+        // Stored order is addition order, independent of timeline position.
+        this.doc.markers.splice(index, 1);
+        this.selected = (this.doc.markers[index - 1] || this.doc.markers[index])?.id ?? null;
+      });
+    }
     history(redo) {
       const from = redo ? this.redoStack : this.undoStack, to = redo ? this.undoStack : this.redoStack;
       if (!from.length) return; to.push(structuredClone(this.doc)); this.doc = from.pop(); this.refresh(); this.save();
@@ -264,21 +272,24 @@
     draw() {
       const width = this.ruler.clientWidth, height = 32, ratio = window.devicePixelRatio || 1;
       this.ruler.width = Math.round(width*ratio); this.ruler.height = height*ratio;
+      const theme = getComputedStyle(document.documentElement);
+      const ink = theme.getPropertyValue('--tr-text').trim(), accent = theme.getPropertyValue('--tr-accent').trim(), muted = theme.getPropertyValue('--tr-muted').trim();
       const ctx = this.ruler.getContext('2d'); ctx.scale(ratio,ratio); ctx.font = '700 12px "Familjen Grotesk", Arial';
       if (this.rangeAnchor) {
         const x = this.host.x(this.rangeAnchor.time, width);
-        ctx.fillStyle = '#ff343d'; ctx.fillRect(x, 0, 2, height);
+        ctx.fillStyle = accent; ctx.fillRect(x, 0, 2, height);
       }
       let right = -Infinity;
       for (const m of rows(this.doc)) {
         const x = this.host.x(m.time,width); if (x < 0 || x > width) continue;
-        ctx.strokeStyle = m.id === this.selected ? '#ff343d' : m.section ? '#f6f6f6' : '#777';
+        ctx.strokeStyle = m.id === this.selected ? accent : m.section ? ink : muted;
         ctx.beginPath(); ctx.moveTo(x+0.5,m.section ? 0 : 19); ctx.lineTo(x+0.5,32); ctx.stroke();
-        if (x > right) { ctx.fillStyle = m.id === this.selected ? '#ff343d' : '#f6f6f6'; ctx.fillText(m.label,x+4,14); right = x+ctx.measureText(m.label).width+12; }
+        if (x > right) { ctx.fillStyle = m.id === this.selected ? accent : ink; ctx.fillText(m.label,x+4,14); right = x+ctx.measureText(m.label).width+12; }
       }
     }
     overview(ctx,width,height,duration) {
-      ctx.save(); ctx.fillStyle = '#f6f6f6'; ctx.font = '700 11px "Familjen Grotesk", Arial'; ctx.textBaseline = 'alphabetic'; let right = -Infinity;
+      const ink = getComputedStyle(document.documentElement).getPropertyValue('--tr-text').trim();
+      ctx.save(); ctx.fillStyle = ink; ctx.font = '700 11px "Familjen Grotesk", Arial'; ctx.textBaseline = 'alphabetic'; let right = -Infinity;
       for (const m of rows(this.doc).filter(m => m.section)) { const x = m.time/duration*width; ctx.fillRect(x,height-12,1,12); if (x>right) {ctx.fillText(m.letter,x+3,height-3); right=x+ctx.measureText(m.letter).width+10;} }
       ctx.restore();
     }

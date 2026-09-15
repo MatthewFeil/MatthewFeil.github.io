@@ -77,3 +77,20 @@ const previousLoop = loop;
 model.loopStartInput.value = 'z99'; assert.equal(model.loopInputs(), undefined);
 assert.equal(loop, previousLoop);
 console.log('Flexible lowercase, spaced, prefixed, numeric, section, mixed, blank-end, and reversed range inputs passed.');
+
+// Deletion follows addition order even when markers were placed out of time order.
+model.doc = structuredClone(doc);
+model.selected = 'b';
+model.remove();
+assert.equal(model.selected, 'a', 'Select the marker added before the deleted marker');
+model.remove();
+assert.equal(model.selected, 'c');
+model.remove();
+assert.equal(model.selected, 'd', 'Deleting the first-added marker selects the next remaining one');
+model.remove();
+assert.equal(model.selected, null, 'Deleting the final marker clears selection');
+assert.equal(model.doc.markers.length, 0);
+const historyCount = model.undoStack.length;
+model.remove();
+assert.equal(model.undoStack.length, historyCount, 'No selection leaves history unchanged');
+console.log('Deletion selection follows addition order with next-marker and empty-list fallbacks.');
