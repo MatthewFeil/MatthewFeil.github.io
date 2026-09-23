@@ -30,7 +30,7 @@
   svg('text', {x: 30, y: 204}, 'Hz');
   const response = svg('path', {fill: 'none', stroke: 'currentColor', 'stroke-width': 2});
   const points = bands.map((band, index) => {
-    const point = svg('g', {tabindex: 0, role: 'button', 'aria-label': `Band ${index + 1}`, class: 'eq-point'});
+    const point = svg('g', {tabindex: 0, role: 'button', 'aria-label': `Band ${index + 1}`, 'data-tooltip': '', class: 'eq-point'});
     const circle = document.createElementNS(ns, 'circle');
     circle.setAttribute('r', 5); circle.setAttribute('fill', colors[index]); point.append(circle);
     let dragging = false;
@@ -63,7 +63,7 @@
   const cutPoints = cuts.map((input, index) => {
     const name = index === 0 ? 'Low cut' : 'High cut';
     const guide = svg('line', {y1: 14, y2: 170, class: 'eq-cut-guide'});
-    const point = svg('g', {tabindex: 0, role: 'slider', 'aria-label': name,
+    const point = svg('g', {tabindex: 0, role: 'slider', 'aria-label': name, 'data-tooltip': '',
       'aria-valuemin': 20, 'aria-valuemax': 20000, 'aria-orientation': 'horizontal',
       class: 'eq-point eq-cut-point'});
     const box = document.createElementNS(ns, 'rect');
@@ -140,6 +140,8 @@
       point.setAttribute('aria-valuenow', frequency);
       const off = frequency === (index === 0 ? 20 : 20000);
       point.setAttribute('aria-valuetext', off ? 'Off' : `${frequency} Hz`);
+      point.dataset.tooltip = `${index === 0 ? 'Low cut' : 'High cut'} · ${off ? 'Off' : `${frequency} Hz`} · Drag to adjust`;
+      point.dispatchEvent(new Event('transcribe-tooltip-update', {bubbles: true}));
       point.classList.toggle('is-off', off);
       guide.style.visibility = off ? 'hidden' : '';
       guide.setAttribute('x1', x(frequency)); guide.setAttribute('x2', x(frequency));
@@ -148,6 +150,8 @@
       for (const key of Object.keys(ranges)) if (inputs[index][key] !== editing) inputs[index][key].value = b[key];
       points[index].setAttribute('transform', `translate(${x(b.frequency)} ${y(b.gain)})`);
       points[index].setAttribute('aria-label', `Band ${index + 1}: ${b.frequency} Hz, ${b.gain} dB, Q ${b.q}. Arrow keys adjust frequency and gain.`);
+      points[index].dataset.tooltip = `Band ${index + 1} · ${b.frequency} Hz · ${b.gain > 0 ? '+' : ''}${b.gain} dB · Q ${b.q}`;
+      points[index].dispatchEvent(new Event('transcribe-tooltip-update', {bubbles: true}));
       if (nodes[index]) for (const [param, value] of [['frequency', b.frequency], ['gain', b.gain], ['Q', b.q]]) nodes[index][param].setTargetAtTime(value, context.currentTime, .01);
     });
     const total = new Float32Array(277);

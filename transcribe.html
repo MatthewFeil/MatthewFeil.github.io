@@ -5,7 +5,7 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20260915-touch-pan
+  - /assets/css/transcribe.css?v=20260922-timeline-hover-guide
 ---
 
 <main class="transcribe-app" id="transcribe-main" data-transcribe-app>
@@ -25,7 +25,7 @@ extra_css:
         <a href="{{ "/" | relative_url }}" aria-label="Return to matthewfeil.com">Matthew Feil</a>
         <span class="transcribe-identity-suffix"><span aria-hidden="true">/</span>
         <strong>Transcribe</strong></span>
-          <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." title="Theme: System. Activate to switch to light mode.">
+          <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." data-tooltip="Theme: System">
             <span class="theme-toggle-icon" aria-hidden="true">
               <svg data-theme-icon="system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"><rect x="3.5" y="4" width="17" height="12" rx="0"/><path d="M8 20h8M12 16v4"/></svg>
               <svg data-theme-icon="light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
@@ -56,12 +56,12 @@ extra_css:
             <button type="button" class="is-active" data-speed="1" aria-pressed="true">100%</button>
             <button type="button" data-speed="1.25" aria-pressed="false">125%</button>
             <span class="transcribe-custom-speed-slot">
-              <button class="transcribe-custom-speed-toggle" id="transcribe-custom-speed-toggle" type="button" aria-expanded="false" aria-controls="transcribe-custom-speed-input">Other</button>
+              <button class="transcribe-custom-speed-toggle" id="transcribe-custom-speed-toggle" type="button" aria-expanded="false" aria-controls="transcribe-custom-speed-input" data-tooltip="Set a custom playback speed">Other</button>
               <input id="transcribe-custom-speed-input" type="number" min="25" max="200" step="1" value="100" inputmode="numeric" aria-label="Custom playback speed, 25 to 200 percent" hidden>
             </span>
           </div>
         </fieldset>
-        <button class="transcribe-tool-toggle is-active" id="transcribe-pitch-lock" type="button" aria-pressed="true">
+        <button class="transcribe-tool-toggle is-active" id="transcribe-pitch-lock" type="button" aria-pressed="true" data-tooltip="Keep pitch steady when slowing audio">
           <span>Pitch lock</span>
           <strong>On</strong>
         </button>
@@ -78,7 +78,7 @@ extra_css:
         </div>
       </div>
       <div class="transcribe-panel-buttons">
-      <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel">Stems <strong>Off</strong><span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden></span></button>
+      <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel" data-tooltip="Separate instruments in a highlight">Stems <strong>Off</strong><span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden></span></button>
       <button type="button" id="transcribe-controls-toggle" title="Sections (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
       </div>
       </div>
@@ -86,7 +86,7 @@ extra_css:
       <section id="transcribe-stems-panel" class="transcribe-controls-panel transcribe-stems-panel" aria-label="Stem separation" hidden>
         <div class="transcribe-stems-heading">
           <h2>Highlight stems <span>Experimental</span></h2>
-          <button type="button" id="transcribe-stems-enabled" class="transcribe-tool-toggle" aria-pressed="false" disabled><span>Stems</span><strong>Off</strong></button>
+          <button type="button" id="transcribe-stems-enabled" class="transcribe-tool-toggle" aria-pressed="false" data-tooltip="Separate the highlighted passage" disabled><span>Stems</span><strong>Off</strong></button>
         </div>
         <p id="transcribe-stems-range"></p>
         <progress id="transcribe-stems-progress" max="1" aria-label="Stem separation progress" hidden></progress>
@@ -102,7 +102,7 @@ extra_css:
         <p class="transcribe-stems-help">Six-stem Demucs downloads a 136 MB model on first use and caches it when storage allows. Processing stays on your device. Guitar and piano play together; horns usually remain in Other. “Low audio” describes a quiet output, not proof an instrument is absent.</p>
       </section>
       <div id="transcribe-eq-panel">
-        <div class="transcribe-eq-actions"><span>4-band parametric EQ</span><button type="button" id="transcribe-eq-reset">Reset</button></div>
+        <div class="transcribe-eq-actions"><span>4-band parametric EQ</span><button type="button" id="transcribe-eq-reset" data-tooltip="Restore flat EQ">Reset</button></div>
         <svg id="transcribe-eq-graph" viewBox="0 0 320 210" role="group" aria-label="Equalizer. Drag bands to adjust frequency and gain; scroll over a band to adjust Q. Drag or scroll the cut handles to adjust low and high cuts."></svg>
         <p class="transcribe-eq-hint">Drag bands: frequency / gain · Scroll: Q<br>Cut handles: drag or scroll cutoff</p>
         <div class="transcribe-eq-cuts">
@@ -113,7 +113,7 @@ extra_css:
       </div>
       <section id="transcribe-controls-panel" class="transcribe-controls-panel" aria-label="Transcription controls" hidden>
       <div class="transcribe-analysis-controls" aria-label="Analysis controls">
-        <button class="transcribe-tool-toggle" id="transcribe-chords-toggle" type="button" aria-pressed="false" aria-controls="transcribe-chords">
+        <button class="transcribe-tool-toggle" id="transcribe-chords-toggle" type="button" aria-pressed="false" aria-controls="transcribe-chords" data-tooltip="Show likely chords at the playhead">
           <span>Chord guesses</span><strong>Off</strong>
         </button>
 
@@ -138,15 +138,15 @@ extra_css:
       </div>
         <label class="transcribe-tolerance-control" for="transcribe-spectrum-scale">
           <span>Spectrum scale</span>
-          <select id="transcribe-spectrum-scale">
+          <select id="transcribe-spectrum-scale" data-tooltip="Change how quiet frequencies appear">
             <option value="linear" selected>Linear</option>
             <option value="db">Detailed (dB)</option>
           </select>
         </label>
-        <button class="transcribe-tool-toggle" id="transcribe-analyze-selection" type="button" aria-pressed="false" title="Analyze whole highlighted section"><span>Whole highlight</span><strong>Off</strong></button>
+        <button class="transcribe-tool-toggle" id="transcribe-analyze-selection" type="button" aria-pressed="false" data-tooltip="Analyze the whole highlighted passage"><span>Whole highlight</span><strong>Off</strong></button>
         <label class="transcribe-tolerance-control" for="transcribe-note-tolerance">
           <span>Note tolerance</span>
-          <select id="transcribe-note-tolerance">
+          <select id="transcribe-note-tolerance" data-tooltip="Adjust sensitivity of note guesses">
             <option value="0.7">Focused</option>
             <option value="0.45" selected>Balanced</option>
             <option value="0.22">Sensitive</option>
@@ -213,6 +213,7 @@ extra_css:
       <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Shift-click to anchor a range, then move and click to place its other endpoint. Drag marks to move them."></canvas>
       <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
         <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag or use one finger to select; swipe with two fingers to pan the timeline. Shift-click anchors a loop range."></canvas>
+        <div id="transcribe-waveform-hover-guide" aria-hidden="true" hidden></div>
         <button type="button" class="transcribe-empty" id="transcribe-empty">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg>
           <strong>Drop an audio file here or click to open</strong>
@@ -239,28 +240,28 @@ extra_css:
     </section>
 
     <footer class="transcribe-transport" aria-label="Playback controls">
-      <button type="button" id="transcribe-start" aria-keyshortcuts="B" title="Return to track start (B)" aria-label="Return to track start" disabled>
+      <button type="button" id="transcribe-start" aria-keyshortcuts="B" data-tooltip="Return to track start (B)" aria-label="Return to track start" disabled>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h2v14H5zM19 6l-10 6 10 6z"/></svg>
       </button>
-      <button type="button" id="transcribe-rewind" title="Back 5 seconds" aria-label="Rewind 5 seconds" disabled>
+      <button type="button" id="transcribe-rewind" data-tooltip="Back 5 seconds" aria-label="Rewind 5 seconds" disabled>
         <svg class="transcribe-skip-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a9 9 0 1 1-1 8M4 3v5h5"/><text x="12" y="16">5</text></svg>
       </button>
-      <button class="transcribe-play" type="button" id="transcribe-play" title="Play" aria-label="Play" disabled>
+      <button class="transcribe-play" type="button" id="transcribe-play" data-tooltip="Play" aria-label="Play" disabled>
         <svg class="transcribe-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>
         <svg class="transcribe-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
       </button>
-      <button type="button" id="transcribe-forward" title="Forward 5 seconds" aria-label="Forward 5 seconds" disabled>
+      <button type="button" id="transcribe-forward" data-tooltip="Forward 5 seconds" aria-label="Forward 5 seconds" disabled>
         <svg class="transcribe-skip-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8a9 9 0 1 0 1 8M20 3v5h-5"/><text x="12" y="16">5</text></svg>
       </button>
 
-      <button class="transcribe-loop-control transcribe-selection-control" type="button" id="transcribe-selection-only" aria-keyshortcuts="H" title="Play only the highlighted selection; turn off to play the whole track (H)" aria-label="Selection only" aria-pressed="false" disabled>
+      <button class="transcribe-loop-control transcribe-selection-control" type="button" id="transcribe-selection-only" aria-keyshortcuts="H" data-tooltip="Play only the highlight (H)" aria-label="Selection only" aria-pressed="false" disabled>
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" fill="currentColor" opacity="0.18"/><path d="M7 4H3v16h4m10-16h4v16h-4" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="m9 8 7 4-7 4z" fill="currentColor"/></svg>
       </button>
-      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" aria-keyshortcuts="R L" title="Loop whole track (R)" aria-label="Loop whole track" aria-pressed="false" disabled>
+      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" aria-keyshortcuts="R L" data-tooltip="Loop whole track (R)" aria-label="Loop whole track" aria-pressed="false" disabled>
         <svg class="transcribe-repeat-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-3v4a3 3 0 0 1-3 3H3"/></svg>
       </button>
 
-      <button type="button" id="transcribe-measures" popovertarget="transcribe-measure-panel" aria-expanded="false" aria-controls="transcribe-measure-panel" aria-label="Measure navigation and loop (G)" title="Measures (G)" disabled>mm.</button>
+      <button type="button" id="transcribe-measures" popovertarget="transcribe-measure-panel" aria-expanded="false" aria-controls="transcribe-measure-panel" aria-label="Measure navigation and loop (G)" data-tooltip="Measures and sections (G)" disabled>mm.</button>
       <div id="transcribe-measure-panel" popover="auto" role="region" aria-label="Measure navigation and loop">
         <form id="transcribe-go-form">
           <label>Go to <input id="transcribe-go-measure" type="text" placeholder="12 or B3" autocomplete="off" aria-label="Go to measure or section"></label>
@@ -297,10 +298,11 @@ extra_css:
   </section>
 </main>
 
-<script src="{{ "/assets/js/site.js" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-marks.js?v=20260914-themes" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/site.js?v=20260922-tooltips" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-marks.js?v=20260915-mobile-markers" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-chords.js?v=20260910-1" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems.js?v=20260914-stem-controls" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-eq.js?v=20260914-table" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20260915-touch-pan" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-eq.js?v=20260922-tooltips" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20260923-shift-edge-scroll" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-tooltips.js?v=20260922-controls" | relative_url }}" defer></script>

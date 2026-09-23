@@ -7,7 +7,7 @@ const fields = ['channel','highpass','lowpass','noteTolerance','spectrumScale','
 const elements = {analyzeSelection: {checked: false}};
 for (const key of fields) {
   const id = key.replace(/[A-Z]/g, c => '-' + c.toLowerCase());
-  const select = html.match(new RegExp(`<select id="transcribe-${id}">([\\s\\S]*?)</select>`));
+  const select = html.match(new RegExp(`<select id="transcribe-${id}"[^>]*>([\\s\\S]*?)</select>`));
   if (select) {
     const options = [...select[1].matchAll(/value="([^"]+)"/g)].map(m => ({value:m[1]}));
     elements[key] = {tagName:'SELECT',options,value:options.at(-1).value};
@@ -18,9 +18,9 @@ for (const key of fields) {
   }
 }
 const annotations = {version:1,identity:'abc',numbering:'continuous',markers:[{id:'a',time:1,section:true},{id:'b',time:3,section:false}]};
-Object.assign(elements,{audio:{playbackRate:.73,preservesPitch:false,currentTime:4},fileName:{textContent:'track.mp3'}});
+Object.assign(elements,{audio:{playbackRate:.73,preservesPitch:false,currentTime:4},pitchLock:{getAttribute:()=> 'false'},fileName:{textContent:'track.mp3'}});
 const state = {duration:20,zoom:8,viewStart:2,loopStart:1,loopEnd:5,loopEnabled:true,selectionOnly:true,spectrumScrollProgress:.7};
-const ctx = vm.createContext({structuredClone,TranscribeEQ:{settings:()=>[{frequency:100,gain:0,q:1},{frequency:400,gain:0,q:1},{frequency:1600,gain:0,q:1},{frequency:6400,gain:0,q:1}],valid:value=>Array.isArray(value)&&value.length===4},elements,state,transport:elements.audio,stems:null,configFields:fields,marks:{identity:'abc',document:()=>structuredClone(annotations)},app:{dataset:{viewMode:'analysis'}},controlsPanel:{hidden:false}});
+const ctx = vm.createContext({structuredClone,TranscribeEQ:{settings:()=>[{frequency:100,gain:0,q:1},{frequency:400,gain:0,q:1},{frequency:1600,gain:0,q:1},{frequency:6400,gain:0,q:1}],valid:value=>Array.isArray(value)&&value.length===4},elements,state,transport:elements.audio,stems:null,configFields:fields,marks:{identity:'abc',document:()=>structuredClone(annotations)},app:{dataset:{viewMode:'analysis'}},controlsPanel:{hidden:false},syncSmoothPlayback(){}});
 vm.runInContext(fs.readFileSync('assets/js/transcribe-marks.js','utf8'),ctx);
 vm.runInContext(fs.readFileSync('assets/js/transcribe-stems-core.js','utf8'),ctx);
 vm.runInContext(source.slice(source.indexOf('  function captureConfig()'),source.indexOf('  function applyConfig(')),ctx);
@@ -36,6 +36,9 @@ const result = ctx.validateConfig(JSON.parse(JSON.stringify(config)));
 assert.equal(result.annotations.markers.length,2);
 assert.equal(result.settings.speed,.73);
 assert.equal(result.settings.pitchLock,false);
+elements.pitchLock.getAttribute = () => 'true';
+assert.equal(ctx.captureConfig().settings.pitchLock, true, 'Save the selected pitch lock even when the custom slowdown disables native preservation');
+elements.pitchLock.getAttribute = () => 'false';
 assert.equal(result.settings.loopEnd,5);
 assert.deepEqual(Object.keys(config).sort(),['annotations','audio','format','settings','version']);
 assert.deepEqual(Object.keys(config.audio).sort(),['identity','name']);
@@ -50,9 +53,9 @@ wholeAudio.settings.loopStart = null;
 wholeAudio.settings.loopEnd = null;
 wholeAudio.settings.loopEnabled = true;
 assert.doesNotThrow(() => ctx.validateConfig(wholeAudio));
-elements.loopBottom = {classList:{toggle(){}},setAttribute(){}};
+elements.loopBottom = {classList:{toggle(){}},dataset:{},setAttribute(){}};
 elements.selectionOnly = {classList:{toggle(){}},setAttribute(){}};
-elements.start = {setAttribute(){}};
+elements.start = {dataset:{},setAttribute(){}};
 vm.runInContext(source.slice(source.indexOf('  function hasSelection()'),source.indexOf('  async function togglePlayback()')),ctx);
 Object.assign(state,{loopStart:null,loopEnd:null,loopEnabled:false});
 ctx.updateLoopControls();
@@ -67,11 +70,11 @@ console.log('Whole-audio loop toggle, default off, segment loop isolation, and c
 state.selectionOnly = false;
 ctx.updateLoopControls();
 assert.equal(elements.audio.loop,true, 'Whole track repeats even with a highlight');
-assert.equal(elements.start.title,'Return to track start (B)');
+assert.equal(elements.start.dataset.tooltip,'Return to track start (B)');
 state.selectionOnly = true;
 ctx.updateLoopControls();
 assert.equal(elements.audio.loop,false);
-assert.equal(elements.start.title,'Return to selection start (B)');
+assert.equal(elements.start.dataset.tooltip,'Return to selection start (B)');
 elements.audio.paused = false;
 elements.audio.pause = () => { elements.audio.paused = true; };
 elements.audio.currentTime = 5.1;

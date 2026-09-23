@@ -31,6 +31,7 @@
     overviewNavigator: document.getElementById('transcribe-overview-navigator'),
     overview: document.getElementById('transcribe-overview'),
     waveform: document.getElementById('transcribe-waveform'),
+    waveformHoverGuide: document.getElementById('transcribe-waveform-hover-guide'),
     empty: document.getElementById('transcribe-empty'),
     selectionStatus: document.getElementById('transcribe-selection-status'),
     audioFormat: document.getElementById('transcribe-audio-format'),
@@ -73,6 +74,9 @@
     dragMoved: false,
     dragScrollFrame: null,
     dragScrollTime: null,
+    hoverPointerX: null,
+    hoverScrollFrame: null,
+    hoverScrollTime: null,
     overviewDrag: null,
     analysisId: 0,
     analysisInFlight: false,
@@ -86,10 +90,20 @@
     animationFrame: null,
     audioContext: null,
     mediaSource: null,
+    transportSink: null,
     highpassNode: null,
     lowpassNode: null,
     eqNodes: [],
     pitchNode: null,
+    stretchNode: null,
+    stretchProcessorName: null,
+    stretchEnabled: null,
+    smoothNode: null,
+    smoothReady: false,
+    smoothEnabled: false,
+    smoothRevision: 0,
+    smoothLoadPromise: Promise.resolve(),
+    pitchOutput: null,
     splitterNode: null,
     leftGain: null,
     rightGain: null,
@@ -155,6 +169,7 @@
 
   function setPlaybackSpeed(speed) {
     elements.audio.playbackRate = speed;
+    updatePitchPreservation();
     let presetIsActive = false;
     elements.speedButtons.forEach((button) => {
       const active = Number(button.dataset.speed) === speed;
@@ -207,6 +222,11 @@
     if (pitchFactor && state.audioContext) {
       pitchFactor.setValueAtTime(2 ** (pitchShiftCents() / 1200), state.audioContext.currentTime);
     }
+    const stretchPitch = state.stretchNode?.parameters.get('pitch');
+    if (stretchPitch && state.audioContext) {
+      stretchPitch.setValueAtTime(2 ** (pitchShiftCents() / 1200), state.audioContext.currentTime);
+    }
+    if (state.smoothEnabled) state.smoothNode.schedule({ semitones: pitchShiftCents() / 100 });
     if (state.audioBuffer) {
       state.analysisId += 1;
       state.analysisInFlight = false;
@@ -218,6 +238,99 @@
       resetPitchReadout();
       requestSpectrumAt(transport.currentTime, true);
     }
+  }
+
+  function updatePitchPreservation() {
+    const locked = elements.pitchLock.getAttribute('aria-pressed') === 'true';
+    const speed = elements.audio.playbackRate;
+    // Near normal speed, the browser's native pitch preservation avoids the
+    // granular noise the custom stretcher can add to sustained instruments.
+    const useStretch = locked && speed < 0.8;
+    const useSmooth = useStretch && state.smoothReady && !transport.range;
+    // The worklet receives uncorrected audio and reverses the pitch change from
+    // the media element's speed. The media element remains the transport clock.
+    elements.audio.preservesPitch = locked && (!useStretch || (!state.stretchNode && !useSmooth));
+    if (!state.pitchNode) return;
+    if (useSmooth !== state.smoothEnabled) {
+      if (useSmooth) {
+        state.mediaSource.disconnect(state.highpassNode);
+        state.smoothNode.connect(state.highpassNode);
+      } else {
+        state.smoothNode.disconnect(state.highpassNode);
+        state.mediaSource.connect(state.highpassNode);
+        state.smoothNode.schedule({ active: false });
+      }
+      state.smoothEnabled = useSmooth;
+    }
+    if (useStretch && !useSmooth && state.stretchNode && state.stretchEnabled === false) resetStretchProcessor();
+    state.stretchNode?.parameters.get('playbackRate').setValueAtTime(speed, state.audioContext.currentTime);
+    state.eqNodes.at(-1).disconnect();
+    state.pitchNode.disconnect();
+    state.stretchNode?.disconnect();
+    const target = useSmooth ? state.pitchOutput : useStretch && state.stretchNode ? state.stretchNode : state.pitchNode;
+    state.eqNodes.at(-1).connect(target);
+    if (target !== state.pitchOutput) target.connect(state.pitchOutput);
+    state.stretchEnabled = useStretch && !useSmooth && Boolean(state.stretchNode);
+    if (useSmooth) syncSmoothPlayback();
+  }
+
+  function syncSmoothPlayback() {
+    if (!state.smoothEnabled) return;
+    const loopStart = state.loopEnabled
+      ? (selectionPlayback() ? state.loopStart : 0)
+      : 0;
+    const loopEnd = state.loopEnabled
+      ? (selectionPlayback() ? state.loopEnd : state.duration)
+      : 0;
+    state.smoothNode.schedule({
+      active: !elements.audio.paused,
+      input: clamp(transport.currentTime, 0, state.duration),
+      rate: elements.audio.playbackRate,
+      semitones: pitchShiftCents() / 100,
+      loopStart,
+      loopEnd,
+      output: state.audioContext.currentTime
+    });
+  }
+
+  async function prepareSmoothTrack(buffer, revision) {
+    if (!state.smoothNode) return;
+    state.smoothLoadPromise = state.smoothLoadPromise.then(async () => {
+      try {
+        await state.smoothNode.dropBuffers();
+        if (revision !== state.smoothRevision) return;
+        if (buffer.length * 2 * 4 > 120 * 1024 * 1024) return;
+        const left = buffer.getChannelData(0);
+        const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
+        await state.smoothNode.addBuffers([left, right]);
+        if (revision !== state.smoothRevision) return;
+        state.smoothReady = true;
+        updatePitchPreservation();
+      } catch (error) {
+        console.warn('Direct audio stretching unavailable; using pitch-lock worklet.', error);
+      }
+    });
+    return state.smoothLoadPromise;
+  }
+
+  function resetStretchProcessor() {
+    if (!state.stretchNode) return;
+    state.stretchNode.disconnect();
+    if (state.stretchEnabled) state.eqNodes.at(-1).disconnect(state.stretchNode);
+    state.stretchNode = createStretchProcessor();
+    if (state.stretchEnabled) {
+      state.eqNodes.at(-1).connect(state.stretchNode);
+      state.stretchNode.connect(state.pitchOutput);
+    }
+  }
+
+  function createStretchProcessor() {
+    return new AudioWorkletNode(state.audioContext, state.stretchProcessorName, {
+      parameterData: { pitch: 2 ** (pitchShiftCents() / 1200), playbackRate: elements.audio.playbackRate },
+      processorOptions: state.stretchProcessorName === 'phase-vocoder-processor'
+        ? { fftSize: 2048, overlapFactor: 8 } : {},
+      outputChannelCount: [2]
+    });
   }
 
   function connectPitchControl(range, number) {
@@ -945,7 +1058,30 @@
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     state.audioContext = new AudioContextClass();
     await state.audioContext.audioWorklet.addModule(new URL('transcribe-pitch-worklet.js?v=20260908-3', scriptUrl));
+    let stretchProcessorName = null;
+    try {
+      await state.audioContext.audioWorklet.addModule(new URL('vendor/phase-vocoder-processor.js?v=2.1.1', scriptUrl));
+      stretchProcessorName = 'phase-vocoder-processor';
+    } catch (error) {
+      console.warn('Smooth pitch lock unavailable; trying the waveform stretcher.', error);
+      try {
+        await state.audioContext.audioWorklet.addModule(new URL('vendor/soundtouch-processor.js?v=2.1.1', scriptUrl));
+        stretchProcessorName = 'soundtouch-processor';
+      } catch (fallbackError) {
+        console.warn('Enhanced pitch lock unavailable; using browser pitch preservation.', fallbackError);
+      }
+    }
+    state.stretchProcessorName = stretchProcessorName;
+    try {
+      const smoothModule = await import(new URL('vendor/SignalsmithStretch.mjs?v=1.3.2', scriptUrl));
+      state.smoothNode = await smoothModule.default(state.audioContext);
+      state.smoothNode.schedule({ active: false });
+    } catch (error) {
+      console.warn('Direct audio stretching unavailable; using pitch-lock worklet.', error);
+    }
     state.mediaSource = state.audioContext.createMediaElementSource(elements.audio);
+    state.transportSink = state.audioContext.createGain();
+    state.transportSink.gain.value = 0;
     state.highpassNode = state.audioContext.createBiquadFilter();
     state.highpassNode.type = 'highpass';
     state.lowpassNode = state.audioContext.createBiquadFilter();
@@ -956,6 +1092,8 @@
     state.pitchNode = new AudioWorkletNode(state.audioContext, 'transcribe-pitch-processor', {
       parameterData: { pitchFactor: 2 ** (pitchShiftCents() / 1200) }
     });
+    if (stretchProcessorName) state.stretchNode = createStretchProcessor();
+    state.pitchOutput = state.audioContext.createGain();
     state.splitterNode = state.audioContext.createChannelSplitter(2);
     state.leftGain = state.audioContext.createGain();
     state.rightGain = state.audioContext.createGain();
@@ -963,10 +1101,14 @@
     state.outputGain = state.audioContext.createGain();
 
     state.mediaSource.connect(state.highpassNode);
+    // Keep the media element's transport clock rendering while direct PCM audio
+    // replaces its audible output during slowed, pitch-locked playback.
+    state.mediaSource.connect(state.transportSink);
+    state.transportSink.connect(state.audioContext.destination);
     state.highpassNode.connect(state.lowpassNode);
     state.lowpassNode.connect(state.eqNodes[0]);
-    state.eqNodes.at(-1).connect(state.pitchNode);
-    state.pitchNode.connect(state.splitterNode);
+    state.pitchOutput.connect(state.splitterNode);
+    updatePitchPreservation();
     state.splitterNode.connect(state.leftGain, 0);
     state.splitterNode.connect(state.rightGain, 1);
     state.mergerNode.connect(state.outputGain);
@@ -1048,6 +1190,7 @@
 
   function returnToStart() {
     transport.currentTime = selectionPlayback() ? state.loopStart : 0;
+    syncSmoothPlayback();
     normalizeViewStart(transport.currentTime);
     renderAll();
     requestSpectrumAt(transport.currentTime, true);
@@ -1071,10 +1214,10 @@
     elements.selectionOnly.classList.toggle('is-active', selectionPlayback());
     elements.selectionOnly.setAttribute('aria-pressed', String(selectionPlayback()));
     const startLabel = selectionPlayback() ? 'Return to selection start' : 'Return to track start';
-    elements.start.title = `${startLabel} (B)`;
+    elements.start.dataset.tooltip = `${startLabel} (B)`;
     elements.start.setAttribute('aria-label', startLabel);
     const loopLabel = selectionPlayback() ? 'Loop selection' : 'Loop whole track';
-    elements.loopBottom.title = `${loopLabel} (R)`;
+    elements.loopBottom.dataset.tooltip = `${loopLabel} (R)`;
     elements.loopBottom.setAttribute('aria-label', loopLabel);
     state.loopEnabled = Boolean(state.loopEnabled && state.duration);
     elements.audio.loop = state.loopEnabled && (Boolean(transport.range) || !selectionPlayback());
@@ -1083,6 +1226,7 @@
       button.setAttribute('aria-pressed', String(state.loopEnabled));
     });
     elements.loopBottom.disabled = !state.duration;
+    syncSmoothPlayback();
   }
 
   function setLoopEnabled(enabled) {
@@ -1288,7 +1432,7 @@
       settings: {
         ...Object.fromEntries(configFields.map(key => [key, elements[key].value])),
         analyzeSelection: elements.analyzeSelection.checked,
-        speed: elements.audio.playbackRate, pitchLock: elements.audio.preservesPitch,
+        speed: elements.audio.playbackRate, pitchLock: elements.pitchLock.getAttribute('aria-pressed') === 'true',
         zoom: state.zoom, viewStart: state.viewStart,
         loopStart: marks.rangeAnchor ? null : state.loopStart, loopEnd: marks.rangeAnchor ? null : state.loopEnd, loopEnabled: marks.rangeAnchor ? false : state.loopEnabled,
         selectionOnly: marks.rangeAnchor ? false : state.selectionOnly,
@@ -1346,10 +1490,10 @@
     elements.centsNumber.value = saved.cents;
     setPlaybackSpeed(saved.speed);
     closeCustomSpeedControl();
-    elements.audio.preservesPitch = saved.pitchLock;
     elements.pitchLock.setAttribute('aria-pressed', String(saved.pitchLock));
     elements.pitchLock.classList.toggle('is-active', saved.pitchLock);
     elements.pitchLock.querySelector('strong').textContent = saved.pitchLock ? 'On' : 'Off';
+    updatePitchPreservation();
     state.loopStart = saved.loopStart;
     state.loopEnd = saved.loopEnd;
     state.loopEnabled = saved.loopEnabled;
@@ -1448,10 +1592,15 @@
     }
 
     stopSelectionScroll();
+    clearWaveformHoverGuide();
     state.dragging = null;
     stems?.reset(false);
     transport.reset();
     worker.postMessage({ type: 'stem-overlay', samples: null });
+    state.smoothRevision += 1;
+    state.smoothReady = false;
+    if (state.smoothNode) state.smoothNode.schedule({ active: false });
+    if (state.smoothEnabled) updatePitchPreservation();
     state.audioBuffer = null;
     state.duration = 0;
     sessionFile = null;
@@ -1481,6 +1630,7 @@
       if (loadGeneration !== marks.generation) return;
       state.audioBuffer = decoded;
       state.duration = state.audioBuffer.duration;
+      prepareSmoothTrack(decoded, state.smoothRevision);
       const marksReady = marks.load(buffer);
       state.zoom = Math.max(1, state.duration / (mobileWorkspace.matches ? 15 : 24));
       state.viewStart = 0;
@@ -1566,16 +1716,72 @@
     state.dragScrollTime = null;
   }
 
+  function timelineEdgeDirection(clientX) {
+    const rect = elements.waveform.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const edge = Math.min(48, rect.width / 5);
+    return x < edge ? -clamp((edge - x) / edge, 0, 1)
+      : x > rect.width - edge ? clamp((x - rect.width + edge) / edge, 0, 1) : 0;
+  }
+
+  function stopHoverScroll() {
+    cancelAnimationFrame(state.hoverScrollFrame);
+    state.hoverScrollFrame = null;
+    state.hoverScrollTime = null;
+  }
+
+  function clearWaveformHoverGuide() {
+    stopHoverScroll();
+    state.hoverPointerX = null;
+    elements.waveformHoverGuide.hidden = true;
+  }
+
+  function scrollHoverAtEdge(timestamp) {
+    if (state.hoverPointerX === null || state.dragging || marks?.drag || timelineTouchBlocked || !state.duration || state.zoom <= 1) {
+      stopHoverScroll();
+      return;
+    }
+    const direction = timelineEdgeDirection(state.hoverPointerX);
+    if (!direction) { stopHoverScroll(); return; }
+    const elapsed = state.hoverScrollTime === null ? 0 : Math.min(0.05, (timestamp - state.hoverScrollTime) / 1000);
+    state.hoverScrollTime = timestamp;
+    if (elapsed) {
+      const before = state.viewStart;
+      setTimelineViewStart(before + direction * viewDuration() * 0.75 * elapsed);
+      if (state.viewStart === before) { stopHoverScroll(); return; }
+      if (marks?.rangeAnchor) {
+        const { x, width } = waveformPointerPosition({ clientX: state.hoverPointerX });
+        marks.previewRange(xToTime(x, width));
+      }
+    }
+    state.hoverScrollFrame = requestAnimationFrame(scrollHoverAtEdge);
+  }
+
+  function startHoverScroll() {
+    if (state.hoverScrollFrame === null && state.hoverPointerX !== null && !state.dragging && !marks?.drag && state.zoom > 1 && timelineEdgeDirection(state.hoverPointerX)) {
+      state.hoverScrollFrame = requestAnimationFrame(scrollHoverAtEdge);
+    }
+  }
+
+  function updateWaveformHoverGuide(event) {
+    if (event.pointerType === 'touch' || !state.duration || timelineTouchBlocked) {
+      clearWaveformHoverGuide();
+      return;
+    }
+    const rect = elements.waveform.getBoundingClientRect();
+    state.hoverPointerX = event.clientX;
+    elements.waveformHoverGuide.style.left = `${clamp(event.clientX - rect.left, 0, Math.max(0, rect.width - 1))}px`;
+    elements.waveformHoverGuide.hidden = false;
+    if (state.dragging) stopHoverScroll();
+    else startHoverScroll();
+  }
+
   function scrollSelectionAtEdge(timestamp) {
     if (!state.dragging) { stopSelectionScroll(); return; }
     const elapsed = state.dragScrollTime === null ? 0 : Math.min(0.05, (timestamp - state.dragScrollTime) / 1000);
     state.dragScrollTime = timestamp;
     if (state.dragMoved && state.dragging !== 'pending') {
-      const rect = elements.waveform.getBoundingClientRect();
-      const x = state.dragPointerX - rect.left;
-      const edge = Math.min(48, rect.width / 5);
-      const direction = x < edge ? -clamp((edge - x) / edge, 0, 1)
-        : x > rect.width - edge ? clamp((x - rect.width + edge) / edge, 0, 1) : 0;
+      const direction = timelineEdgeDirection(state.dragPointerX);
       const before = state.viewStart;
       if (direction) {
         setTimelineViewStart(before + direction * viewDuration() * 0.75 * elapsed);
@@ -1596,6 +1802,7 @@
   function startTimelineTouchPan(touches) {
     timelineTouchBlocked = true;
     stopSelectionScroll();
+    clearWaveformHoverGuide();
     if (state.dragging) {
       state.dragging = null;
       if (timelineTouchSelection) {
@@ -1610,6 +1817,7 @@
   }
 
   function handleWaveformTouchStart(event) {
+    clearWaveformHoverGuide();
     if (event.touches.length === 1 && !timelineTouchBlocked) {
       timelineTouchSelection = { start: state.loopStart, end: state.loopEnd };
     } else if (event.touches.length >= 2 && !timelineTouchPan) {
@@ -1644,7 +1852,12 @@
 
     const { x, width } = waveformPointerPosition(event);
     const time = xToTime(x, width);
-    if (event.shiftKey || marks.rangeAnchor) { event.preventDefault(); marks.rangePoint(time); return; }
+    if (event.shiftKey || marks.rangeAnchor) {
+      event.preventDefault();
+      marks.rangePoint(time);
+      if (marks.rangeAnchor) updateWaveformHoverGuide(event);
+      return;
+    }
     marks.rangeAnchor = null;
     const boundaryThreshold = (9 / width) * viewDuration();
 
@@ -1661,6 +1874,7 @@
     state.dragPointerX = event.clientX;
     state.dragMoved = false;
     stopSelectionScroll();
+    stopHoverScroll();
     state.dragScrollFrame = requestAnimationFrame(scrollSelectionAtEdge);
     elements.waveform.setPointerCapture(event.pointerId);
     drawWaveform();
@@ -1887,7 +2101,7 @@
     elements.pitchLock.setAttribute('aria-pressed', String(enabled));
     elements.pitchLock.classList.toggle('is-active', enabled);
     elements.pitchLock.querySelector('strong').textContent = enabled ? 'On' : 'Off';
-    elements.audio.preservesPitch = enabled;
+    updatePitchPreservation();
   });
   connectPitchControl(elements.semitones, elements.semitonesNumber);
   connectPitchControl(elements.cents, elements.centsNumber);
@@ -1953,8 +2167,12 @@
   }, { passive: false });
   elements.waveform.addEventListener('pointerdown', handleWaveformPointerDown);
   elements.waveform.addEventListener('pointermove', handleWaveformPointerMove);
+  elements.waveform.addEventListener('pointermove', updateWaveformHoverGuide);
+  elements.waveform.addEventListener('pointerleave', clearWaveformHoverGuide);
   elements.waveform.addEventListener('pointerup', handleWaveformPointerUp);
+  elements.waveform.addEventListener('pointerup', startHoverScroll);
   elements.waveform.addEventListener('pointercancel', handleWaveformPointerUp);
+  elements.waveform.addEventListener('pointercancel', clearWaveformHoverGuide);
   elements.waveform.addEventListener('touchstart', handleWaveformTouchStart, { passive: true });
   elements.waveform.addEventListener('touchmove', handleWaveformTouchMove, { passive: false });
   elements.waveform.addEventListener('touchend', handleWaveformTouchEnd, { passive: true });
@@ -1962,8 +2180,15 @@
   elements.waveform.addEventListener('lostpointercapture', () => {
     handleWaveformPointerUp({ clientX: state.dragPointerX });
   });
+  const markRuler = document.getElementById('transcribe-mark-ruler');
+  markRuler.addEventListener('pointermove', updateWaveformHoverGuide);
+  markRuler.addEventListener('pointerleave', clearWaveformHoverGuide);
+  markRuler.addEventListener('pointerdown', stopHoverScroll);
+  markRuler.addEventListener('pointerup', startHoverScroll);
+  markRuler.addEventListener('pointercancel', clearWaveformHoverGuide);
   window.addEventListener('blur', () => {
     stopSelectionScroll();
+    clearWaveformHoverGuide();
     if (state.dragging) { state.dragging = null; setSelection(state.loopStart, state.loopEnd, true, false); }
   });
   elements.waveform.addEventListener('wheel', (event) => {
@@ -1988,7 +2213,6 @@
     else if (event.key === 'End') setTimelineViewStart(state.duration);
     else setTimelineViewStart(state.viewStart + direction * amount);
   });
-  elements.keyboard.title = 'Hold a key to hear its note';
   elements.keyboard.style.cursor = 'pointer';
   elements.keyboard.style.touchAction = 'none';
   elements.keyboard.addEventListener('pointerdown', (event) => {
@@ -2073,16 +2297,18 @@
   });
 
   elements.audio.addEventListener('play', () => {
+    syncSmoothPlayback();
     elements.play.classList.add('is-playing');
     elements.play.setAttribute('aria-label', 'Pause');
-    elements.play.title = 'Pause';
+    elements.play.dataset.tooltip = 'Pause';
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = requestAnimationFrame(updatePlaybackFrame);
   });
   elements.audio.addEventListener('pause', () => {
+    syncSmoothPlayback();
     elements.play.classList.remove('is-playing');
     elements.play.setAttribute('aria-label', 'Play');
-    elements.play.title = 'Play';
+    elements.play.dataset.tooltip = 'Play';
     cancelAnimationFrame(state.animationFrame);
     renderAll();
     requestSpectrumAt(transport.currentTime, true);
@@ -2095,10 +2321,13 @@
     }
     elements.play.classList.remove('is-playing');
     elements.play.setAttribute('aria-label', 'Play');
-    elements.play.title = 'Play';
+    elements.play.dataset.tooltip = 'Play';
+    syncSmoothPlayback();
     updateTimecode();
   });
   elements.audio.addEventListener('seeked', () => {
+    if (state.stretchEnabled) resetStretchProcessor();
+    syncSmoothPlayback();
     renderAll();
     requestSpectrumAt(transport.currentTime, true);
   });
@@ -2201,13 +2430,13 @@
   function sectionButton(id, title, target) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.title = title;
+    button.dataset.tooltip = title;
     button.setAttribute('aria-label', title);
     button.setAttribute('aria-controls', target);
     const shortcut = { settings: 'C', shortcuts: 'Shift+/', stems: 'T', spectrum: 'F' }[id];
     if (shortcut) {
       button.setAttribute('aria-keyshortcuts', shortcut);
-      button.title = `${title} (${id === 'shortcuts' ? '?' : shortcut})`;
+      button.dataset.tooltip = `${title} (${id === 'shortcuts' ? '?' : shortcut})`;
     }
     button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sectionIcons[id]}"/></svg>`;
     sectionButtons.append(button);
@@ -2264,7 +2493,7 @@
   infoButton.className = 'transcribe-info-button';
   infoButton.setAttribute('popovertarget', stemInfo.id);
   infoButton.setAttribute('aria-label', 'About stem separation');
-  infoButton.title = 'About stem separation';
+  infoButton.dataset.tooltip = 'About stem separation';
   infoButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>';
   const stemActions = document.createElement('div');
   stemActions.className = 'transcribe-stems-actions';
@@ -2457,6 +2686,7 @@
     selection: () => hasSelection() && !state.dragging ? { start: state.loopStart, end: state.loopEnd } : null,
     apply: (blob, range, samples) => {
       transport.switchSource(blob, range);
+      updatePitchPreservation();
       worker.postMessage({ type: 'stem-overlay', samples, start: range?.start, end: range?.end, sampleRate: 44100 }, samples ? [samples.buffer] : []);
       state.analysisId++; state.analysisInFlight = false; state.pendingSpectrumTime = null; state.lastSpectrumTime = null;
       updateLoopControls(); updateTimecode(); renderAll();

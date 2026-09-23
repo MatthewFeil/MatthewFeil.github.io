@@ -793,7 +793,7 @@
 
 .personal-task-list li[data-priority="4"],
 .personal-task-check[data-priority="4"] {
-  --task-priority-color: #de4c4a;
+  --task-priority-color: var(--site-bad);
 }
 
 .personal-task-list li[data-priority="3"],

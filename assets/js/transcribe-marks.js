@@ -251,6 +251,9 @@
     }
     refresh() {
       if (!this.doc.markers.some(m => m.id === this.selected)) this.selected = null;
+      const hasMarkers = this.doc.markers.length > 0;
+      this.ruler.closest('.transcribe-timeline').classList.toggle('has-markers', hasMarkers);
+      this.ruler.closest('.transcribe-workspace').classList.toggle('has-markers', hasMarkers);
       if (this.measureButton) this.measureButton.disabled = !this.ready;
       this.fieldset.disabled = !this.ready; this.numbering.value = this.doc.numbering;
       if (!this.list) { this.host.render(); return; }

@@ -14,7 +14,7 @@ colors:
   text-dark: "#f6f6f6"
   muted-dark: "#a7a7a7"
   border-dark: "#f6f6f6"
-  signal-red: "#e3262e"
+  signal-red: "#b90f17"
   signal-red-strong: "#b90f17"
   signal-red-bright: "#ff343d"
   signal-red-soft: "rgb(255 52 61 / 0.13)"
@@ -111,9 +111,8 @@ The transcription workbench is a scoped **Operate-mode extension** of Signalboar
 The palette relies on strong neutral contrast and one rare red signal; semantic green, amber, and red appear only for meaningful status.
 
 ### Primary
-- **Signal Red** (`#e3262e`): marks a key initial, active tool state, focus, and high-priority action in light mode.
-- **Signal Red Strong** (`#b90f17`): deepens red for high-emphasis interaction states.
-- **Bright Signal Red** (`#ff343d`): the transcription workbench's higher-luminance active state, playhead, A–B selection, analysis crosshair, and keyboard focus signal against pure black.
+- **Signal Red** (`#b90f17`): marks a key initial, active tool state, focus, and high-priority action in light mode. Red hover text uses this same shade.
+- **Bright Signal Red** (`#ff343d`): the shared dark-mode signal and transcription workbench's active state, playhead, A–B selection, analysis crosshair, and keyboard focus signal against pure black.
 
 ### Neutral
 - **Field Gray** (`#f7f7f7`): light-mode page field.
@@ -123,6 +122,8 @@ The palette relies on strong neutral contrast and one rare red signal; semantic 
 - **Dark Surface** (`#141414`): compact, bordered controls and data labels in dark mode.
 - **Bright Ink** (`#f6f6f6`): dark-mode reading and display text.
 - **Workbench Rules** (`rgb(246 246 246 / 0.42)` and `rgb(246 246 246 / 0.2)`): strong and soft one-pixel divisions inside the transcription workspace.
+
+Shared tools and Transcribe reuse the site panel and muted-text colors. Workbench borders are mixed from the current text and field colors; canvas grid and signal rules retain separate strengths for legibility.
 
 ### Named Rules
 **The Rare Signal Rule.** Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.

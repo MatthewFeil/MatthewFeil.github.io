@@ -12,17 +12,18 @@
   --site-border: #151515;
   --site-soft-border: color-mix(in srgb, var(--site-text) 18%, transparent);
   --home-section-divider: color-mix(in srgb, var(--site-text) 40%, transparent);
-  --site-accent: #e3262e;
-  --site-accent-strong: #b90f17;
-  --site-accent-text: #b90f17;
+  --site-accent: #b90f17;
+  --site-accent-strong: var(--site-accent);
+  --site-accent-text: var(--site-accent);
+  --site-accent-ink: #ffffff;
   --site-good: #16703a;
   --site-warn: #9b6300;
   --site-bad: #b91c1c;
-  --tool-border: color-mix(in srgb, var(--site-text) 18%, transparent);
+  --tool-border: var(--site-soft-border);
   --tool-border-subtle: color-mix(in srgb, var(--site-text) 12%, transparent);
-  --tool-surface: color-mix(in srgb, var(--site-bg) 92%, var(--site-text));
+  --tool-surface: var(--site-panel);
   --tool-soft: var(--site-bg);
-  --tool-muted: color-mix(in srgb, var(--site-text) 62%, transparent);
+  --tool-muted: var(--site-muted);
   --tool-label-spacing: 0.07em;
   --tool-control-height: 2.5rem;
   --tool-panel-padding: 0.85rem;
@@ -68,8 +69,9 @@
     --site-border: #f6f6f6;
     --site-soft-border: color-mix(in srgb, var(--site-text) 22%, transparent);
     --site-accent: #ff343d;
-    --site-accent-strong: #ff5c63;
-    --site-accent-text: #ff343d;
+    --site-accent-strong: var(--site-accent);
+    --site-accent-text: var(--site-accent);
+    --site-accent-ink: #000000;
     --site-good: #54c982;
     --site-warn: #e0b35b;
     --site-bad: #ff6767;
@@ -85,9 +87,10 @@
   --site-muted: #626262;
   --site-border: #151515;
   --site-soft-border: color-mix(in srgb, var(--site-text) 18%, transparent);
-  --site-accent: #e3262e;
-  --site-accent-strong: #b90f17;
-  --site-accent-text: #b90f17;
+  --site-accent: #b90f17;
+  --site-accent-strong: var(--site-accent);
+  --site-accent-text: var(--site-accent);
+  --site-accent-ink: #ffffff;
   --site-good: #16703a;
   --site-warn: #9b6300;
   --site-bad: #b91c1c;
@@ -103,8 +106,9 @@
   --site-border: #f6f6f6;
   --site-soft-border: color-mix(in srgb, var(--site-text) 22%, transparent);
   --site-accent: #ff343d;
-  --site-accent-strong: #ff5c63;
-  --site-accent-text: #ff343d;
+  --site-accent-strong: var(--site-accent);
+  --site-accent-text: var(--site-accent);
+  --site-accent-ink: #000000;
   --site-good: #54c982;
   --site-warn: #e0b35b;
   --site-bad: #ff6767;
@@ -152,7 +156,7 @@ h6 {
 
 body::selection {
   background: var(--site-accent);
-  color: #ffffff;
+  color: var(--site-accent-ink);
 }
 
 a {
