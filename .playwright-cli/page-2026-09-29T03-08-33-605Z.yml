@@ -1,0 +1,44 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Matthew Feil" [ref=e5] [cursor=pointer]:
+        - /url: /
+      - navigation "Primary navigation" [ref=e6]:
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - link "About" [ref=e10] [cursor=pointer]:
+              - /url: /#about
+            - link "Posts" [ref=e12] [cursor=pointer]:
+              - /url: /#posts
+            - link "Playlists" [ref=e14] [cursor=pointer]:
+              - /url: /playlists.html/
+            - link "My Work" [ref=e16] [cursor=pointer]:
+              - /url: /work/
+          - link "Personal Space" [ref=e18] [cursor=pointer]:
+            - /url: /personal/
+          - 'button "Theme: System. Activate to switch to light mode." [ref=e20] [cursor=pointer]'
+  - main "Content" [ref=e25]:
+    - article [ref=e27]:
+      - heading "Finals Grade Calculator" [level=1] [ref=e29]
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]: Current grade before the final
+          - generic [ref=e35]:
+            - spinbutton "Current grade before the final" [ref=e36]
+            - generic: "%"
+        - generic "Grade settings" [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - generic [ref=e40]: Grade settings
+              - 'button "Round final grade: on" [pressed] [ref=e41] [cursor=pointer]'
+            - paragraph [ref=e42]: Current grade counts for 80%. Final exam counts for 20%. Rounds up within 0.5%.
+            - generic "Calculator controls" [ref=e43]:
+              - button "Set rounding" [ref=e44] [cursor=pointer]
+              - button "Edit grade scale" [ref=e45] [cursor=pointer]
+              - button "Set final weight" [ref=e46] [cursor=pointer]
+  - contentinfo [ref=e47]:
+    - generic [ref=e48]:
+      - paragraph [ref=e49]: Matthew Feil
+      - paragraph [ref=e50]: The website of a highschooler with a passion for music, technology, and learning.

@@ -52,7 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     themeToggle.dataset.theme = normalizedTheme;
     themeToggle.setAttribute("aria-label", `Theme: ${currentName}. Activate to switch to ${nextName} mode.`);
-    themeToggle.title = `Theme: ${currentName}. Activate to switch to ${nextName} mode.`;
+    if (themeToggle.closest(".transcribe-app")) {
+      themeToggle.dataset.tooltip = `Theme: ${currentName} · Switch to ${nextName}`;
+      themeToggle.removeAttribute("title");
+    } else {
+      themeToggle.title = `Theme: ${currentName}. Activate to switch to ${nextName} mode.`;
+    }
 
   };
 
@@ -84,6 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const routePaths = {
     personal: "/personal",
     playlists: "/playlists.html",
+    transcribe: "/transcribe",
+    work: "/work",
   };
   let currentNavFrame = null;
   let scrollingStateTimeout = null;

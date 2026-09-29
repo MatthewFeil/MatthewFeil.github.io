@@ -5,5 +5,20 @@
       "maxFindings": 5,
       "maxChars": 8000
     }
+  },
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "gradecalculatorv2.html"
+        ],
+        "createdAt": "2026-09-29T03:21:55.001Z",
+        "reason": "Agent: settings card has 0.85rem desktop and 0.65rem open mobile padding; collapsed state has no border; example panel has only a top border and transparent background"
+      }
+    ]
   }
 }

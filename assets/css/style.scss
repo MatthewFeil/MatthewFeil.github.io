@@ -835,6 +835,81 @@ table {
   gap: clamp(0.55rem, 1vw, 0.8rem);
 }
 
+.work-page {
+  padding: clamp(2rem, 5vw, 4.5rem) 0 clamp(3rem, 7vw, 6rem);
+}
+
+.work-intro {
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border-bottom: 2px solid var(--site-border);
+}
+
+.work-intro h1 {
+  margin: 0;
+  color: var(--site-text);
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 9vw, 6rem);
+  font-weight: 400;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.work-intro h1::first-letter {
+  color: var(--site-accent);
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  border-bottom: 1px solid var(--site-soft-border);
+  padding: 0 0 clamp(1rem, 2vw, 1.4rem);
+  color: var(--site-text);
+  text-decoration: none;
+}
+
+.work-card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.25vw, 2.25rem);
+  line-height: 1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.work-card-summary {
+  align-self: start;
+  max-width: 54ch;
+  color: var(--site-muted);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.work-card:hover .work-card-title,
+.work-card:focus-visible .work-card-title {
+  color: var(--site-accent-text);
+}
+
+.work-card:focus-visible {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 720px) {
+  .work-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+}
+
 .home-project-index-heading {
   margin: 0;
   color: var(--site-text);

@@ -10,14 +10,12 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
 <meta property="og:description" content="The website of Matthew Feil, a high school student with a passion for music and technology." />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
 <meta property="og:site_name" content="Matthew Feil" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Matthew Feil" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Matthew Feil","name":"Matthew Feil","url":"http://localhost:4000/"}</script>
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Matthew Feil"},"description":"The website of Matthew Feil, a high school student with a passion for music and technology.","headline":"Matthew Feil","name":"Matthew Feil","url":"/"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="preload" href="/assets/fonts/archivo-black-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/familjen-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -39,7 +37,7 @@
   </script>
   <link rel="stylesheet" href="/assets/css/style.css">
   
-  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Matthew Feil" />
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
 </head>
 <body>
 
@@ -59,41 +57,10 @@
             <a class="page-link" data-nav-section="about" href="/#about"><span class="page-link-label">About</span></a>
             <a class="page-link" data-nav-section="posts" href="/#posts"><span class="page-link-label">Posts</span></a>
             <a class="page-link" data-nav-route="playlists" href="/playlists.html/"><span class="page-link-label">Playlists</span></a>
+            <a class="page-link" data-nav-route="work" href="/work/"><span class="page-link-label">My Work</span></a>
           </div>
 
-          <div class="nav-group nav-group-projects">
-            <button class="page-link nav-group-trigger" id="nav-projects-trigger" type="button" aria-expanded="false" aria-controls="nav-projects-panel" aria-haspopup="true"><span class="page-link-label">Projects</span></button>
-            <div class="nav-group-menu" id="nav-projects-panel" aria-labelledby="nav-projects-trigger" aria-hidden="true" inert>
-              <div class="nav-group-menu-inner">
-                <span class="nav-menu-kicker">Projects</span>
-                <a class="nav-shelf-item nav-shelf-item-featured" href="/cta-l-live-art/">
-                  <span class="nav-shelf-item-title">Chicago 'L' Live Art</span>
-                  <span class="nav-shelf-item-summary">Live train-position artwork.</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="nav-group nav-group-tools">
-            <button class="page-link nav-group-trigger" id="nav-tools-trigger" type="button" aria-expanded="false" aria-controls="nav-tools-panel" aria-haspopup="true"><span class="page-link-label">Tools</span></button>
-            <div class="nav-group-menu" id="nav-tools-panel" aria-labelledby="nav-tools-trigger" aria-hidden="true" inert>
-              <div class="nav-group-menu-inner nav-tools-list">
-                <span class="nav-menu-kicker">Tools</span>
-                <a class="nav-shelf-item" href="/gradecalculatorv2/">
-                  <span class="nav-shelf-item-title">Finals Grade Calculator</span>
-                  <span class="nav-shelf-item-summary">Calculate what you need on your final.</span>
-                </a>
-                <a class="nav-shelf-item" href="/investmentcalculator/">
-                  <span class="nav-shelf-item-title">Stock Return Calculator</span>
-                  <span class="nav-shelf-item-summary">Compare an investment across time.</span>
-                </a>
-                <a class="nav-shelf-item" href="/interestcalculator/">
-                  <span class="nav-shelf-item-title">Interest Calculator</span>
-                  <span class="nav-shelf-item-summary">Explore compound interest growth.</span>
-                </a>
-              </div>
-            </div>
-          </div>
+          <a class="page-link page-link-subdued page-link-personal" data-nav-route="personal" href="/personal/"><span class="page-link-label">Personal Space</span></a>
 
           <button class="theme-toggle" type="button" data-theme-toggle data-theme="system" aria-label="Theme: System. Activate to switch to light mode." title="Theme: System. Activate to switch to light mode.">
             <span class="theme-toggle-icon" aria-hidden="true">
@@ -103,7 +70,6 @@
             </span>
           </button>
 
-          <a class="page-link page-link-personal" data-nav-route="personal" href="/personal/"><span class="page-link-label">Personal Space</span></a>
         </div>
       </div>
     </nav>
@@ -117,19 +83,19 @@
       <h1 id="home-title"><span class="home-title-line">Matthew</span><span class="home-title-line">Feil</span></h1>
     </div>
     <div class="home-intro-block">
-      <a class="home-featured-project" href="/cta-l-live-art/">
+      <div class="home-featured-project">
         <span class="home-project-label">Featured project</span>
-        <span class="home-featured-project-title">Chicago 'L' Live Art</span>
-        <span class="home-featured-project-summary">A live artwork made from real Chicago 'L' train positions.</span>
-      </a>
+        <a class="home-featured-project-title" href="/transcribe/">Transcribe</a>
+        <span class="home-featured-project-summary">Slow down recordings, loop passages, and explore pitches—all with audio that stays on your device.</span>
+      </div>
 
 
-      <div class="home-project-index" aria-label="More projects and tools">
+      <div class="home-project-index" aria-label="More work">
         <h2 class="home-project-index-heading">More to explore</h2>
         <ul class="home-link-list">
+          <li><a href="/cta-l-live-art/"><span class="home-project-name">Chicago 'L' Live Art</span></a></li>
           <li><a href="/gradecalculatorv2/"><span class="home-project-name">Finals Grade Calculator</span></a></li>
-          <li><a href="/investmentcalculator/"><span class="home-project-name">Stock Return Calculator</span></a></li>
-          <li><a href="/playlists.html/"><span class="home-project-name">My Playlists</span></a></li>
+          <li><a href="/work/"><span class="home-project-name">View all work</span></a></li>
         </ul>
       </div>
 

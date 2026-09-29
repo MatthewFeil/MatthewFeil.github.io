@@ -1,0 +1,32 @@
+- generic [active] [ref=f2e1]:
+  - link "Skip to content" [ref=f2e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - link "Matthew Feil" [ref=f2e5] [cursor=pointer]:
+        - /url: /
+      - navigation "Primary navigation" [ref=f2e6]:
+        - button "Toggle navigation" [ref=f2e7] [cursor=pointer]
+  - main "Content" [ref=f2e9]:
+    - article [ref=f2e11]:
+      - heading "Finals Grade Calculator" [level=1] [ref=f2e13]
+      - generic [ref=f2e16]:
+        - generic [ref=f2e17]:
+          - generic [ref=f2e18]: Current grade before the final
+          - generic [ref=f2e19]:
+            - spinbutton "Current grade before the final" [ref=f2e20]
+            - generic: "%"
+        - generic "Grade settings" [ref=f2e21]:
+          - generic [ref=f2e22]:
+            - generic [ref=f2e23]:
+              - generic [ref=f2e24]: Grade settings
+              - 'button "Round final grade: on" [pressed] [ref=f2e25] [cursor=pointer]'
+            - paragraph [ref=f2e26]: Current grade counts for 80%. Final exam counts for 20%. Rounds up within 0.5%.
+            - generic "Calculator controls" [ref=f2e27]:
+              - button "Set rounding" [ref=f2e28] [cursor=pointer]
+              - button "Edit grade scale" [ref=f2e29] [cursor=pointer]
+              - button "Set final weight" [ref=f2e30] [cursor=pointer]
+  - contentinfo [ref=f2e31]:
+    - generic [ref=f2e32]:
+      - paragraph [ref=f2e33]: Matthew Feil
+      - paragraph [ref=f2e34]: The website of a highschooler with a passion for music, technology, and learning.

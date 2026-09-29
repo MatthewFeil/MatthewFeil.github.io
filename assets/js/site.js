@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     personal: "/personal",
     playlists: "/playlists.html",
     transcribe: "/transcribe",
+    work: "/work",
   };
   let currentNavFrame = null;
   let scrollingStateTimeout = null;
