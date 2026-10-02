@@ -43,4 +43,8 @@ Public content and project entry points are present in the root pages and `_post
 
 ## Accessibility & Inclusion
 
-The existing web implementation includes semantic form labels, status announcements, visible keyboard focus styling, responsive minimum widths, and light and dark color-scheme support.
+The existing web implementation includes semantic form labels, status announcements, opt-in keyboard navigation and focus styling, responsive minimum widths, and light and dark color-scheme support.
+
+Keyboard navigation is off by default across matthewfeil.com. Users can enable Tab/Shift+Tab navigation and visible focus indicators with the Keyboard navigation toggle or Alt+Shift+K (Option+Shift+K on Mac). The preference persists across pages. App shortcuts and normal field editing work in both modes.
+
+Transcribe uses percentage-based playback speed. Beat analysis, BPM speed mode, metronome/count-in, and the Timing sidebar group are removed. Measure and section markers remain; numbering and bulk measure deletion live in the measure navigation popover. Legacy configs may retain beat metadata, which is ignored on import.

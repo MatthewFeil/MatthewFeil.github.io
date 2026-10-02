@@ -260,7 +260,7 @@
   grid-template-columns: minmax(0, 1fr) var(--tool-control-height);
 }
 
-.lifting-combobox-control:focus-within {
+:root[data-keyboard-navigation="on"] .lifting-combobox-control:focus-within {
   outline: none;
   border-color: var(--site-accent);
 }
@@ -287,8 +287,8 @@
   border-color: var(--lifting-border);
 }
 
-.lifting-form .lifting-combobox-control input:focus-visible,
-.lifting-form .lifting-combobox-toggle:focus-visible {
+:root[data-keyboard-navigation="on"] .lifting-form .lifting-combobox-control input:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-form .lifting-combobox-toggle:focus-visible {
   border-color: var(--site-accent);
   outline: 0;
 }
@@ -481,17 +481,17 @@
   color: color-mix(in srgb, var(--site-text) 48%, transparent);
 }
 
-.lifting-form input:focus-visible,
-.lifting-form select:focus-visible,
-.lifting-log-form input:focus-visible,
-.lifting-log-form select:focus-visible,
-.lifting-filter input:focus-visible,
-.lifting-form button:focus-visible,
-.lifting-log-form button:focus-visible,
-.lifting-secondary:focus-visible,
-.lifting-action:focus-visible,
-.lifting-icon-button:focus-visible,
-.lifting-row:focus-visible {
+:root[data-keyboard-navigation="on"] .lifting-form input:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-form select:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-log-form input:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-log-form select:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-filter input:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-form button:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-log-form button:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-secondary:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-action:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-icon-button:focus-visible,
+:root[data-keyboard-navigation="on"] .lifting-row:focus-visible {
   border-color: var(--site-accent);
   outline-color: var(--site-accent);
 }
@@ -861,7 +861,7 @@
   background: var(--lifting-surface);
 }
 
-.lifting-date-control:focus-within {
+:root[data-keyboard-navigation="on"] .lifting-date-control:focus-within {
   border-color: var(--site-accent);
   outline: 2px solid var(--site-accent);
   outline-offset: 2px;

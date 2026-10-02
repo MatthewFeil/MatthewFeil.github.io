@@ -127,7 +127,12 @@
   function nextPath() {
     const next = new URLSearchParams(window.location.search).get('next');
     if (!next || !next.startsWith('/') || next.startsWith('//')) return '';
-    return next;
+    try {
+      const url = new URL(next, window.location.origin);
+      return url.origin === window.location.origin ? url.href : '';
+    } catch {
+      return '';
+    }
   }
 
   async function unlock(email, password) {

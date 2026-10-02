@@ -1,4 +1,4 @@
-/* Short, shared hover and keyboard-focus labels for the Transcribe workspace. */
+/* Short, shared hover and opt-in keyboard-focus labels for the Transcribe workspace. */
 (() => {
   const app = document.querySelector('[data-transcribe-app]');
   if (!app) return;
@@ -91,7 +91,7 @@
 
   document.addEventListener('focusin', event => {
     const target = targetFor(event.target);
-    if (target?.matches(':focus-visible')) schedule(target, 'focus', 0);
+    if (document.documentElement.dataset.keyboardNavigation === 'on' && target?.matches(':focus-visible')) schedule(target, 'focus', 0);
   });
   document.addEventListener('focusout', event => {
     if (trigger === 'focus' && active?.contains(event.target)) hide();

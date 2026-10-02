@@ -247,9 +247,9 @@ permalink: /gradecalculatorv2/
     outline: none;
   }
 
-  .grade-v2-entry:focus-within,
-  .example-entry:focus-within,
-  .setting-row:focus-within {
+  :root[data-keyboard-navigation="on"] .grade-v2-entry:focus-within,
+  :root[data-keyboard-navigation="on"] .example-entry:focus-within,
+  :root[data-keyboard-navigation="on"] .setting-row:focus-within {
     background: var(--gc-accent-wash);
     border-color: var(--site-accent);
   }
@@ -260,15 +260,15 @@ permalink: /gradecalculatorv2/
     border-color: var(--gc-bad);
   }
 
-  .grade-v2-entry:has(input[aria-invalid="true"]):focus-within,
-  .example-entry:has(input[aria-invalid="true"]):focus-within,
-  .setting-row:has(input[aria-invalid="true"]):focus-within {
+  :root[data-keyboard-navigation="on"] .grade-v2-entry:has(input[aria-invalid="true"]):focus-within,
+  :root[data-keyboard-navigation="on"] .example-entry:has(input[aria-invalid="true"]):focus-within,
+  :root[data-keyboard-navigation="on"] .setting-row:has(input[aria-invalid="true"]):focus-within {
     border-color: var(--gc-bad);
   }
 
-  .scale-grid input:focus-visible,
-  .grade-v2 button:focus-visible,
-  .grade-dialog button:focus-visible {
+  :root[data-keyboard-navigation="on"] .scale-grid input:focus-visible,
+  :root[data-keyboard-navigation="on"] .grade-v2 button:focus-visible,
+  :root[data-keyboard-navigation="on"] .grade-dialog button:focus-visible {
     border-color: var(--site-accent);
     outline: 2px solid var(--site-accent);
     outline-offset: 2px;

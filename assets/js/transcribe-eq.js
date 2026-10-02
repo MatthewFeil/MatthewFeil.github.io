@@ -4,13 +4,18 @@
   const defaults = () => [100, 400, 1600, 6400].map(frequency => ({frequency, gain: 0, q: 1}));
   let bands = defaults(), nodes = [], context = null;
   const graph = document.getElementById('transcribe-eq-graph');
+  graph.setAttribute('preserveAspectRatio', 'none');
+  const editHandles = [];
   const container = document.getElementById('transcribe-eq-bands');
   const cuts = ['highpass', 'lowpass'].map(id => document.getElementById(`transcribe-${id}`));
   const colors = ['#d97706', '#16a370', '#3988ef', '#b65cda'];
-  const ranges = {frequency: [20, 20000], gain: [-18, 18], q: [0.1, 18]};
+  const ranges = {frequency: [20, 20000], gain: [-30, 30], q: [0.1, 18]};
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  const x = f => 30 + Math.log(f / 20) / Math.log(1000) * 276;
-  const y = g => 92 - g / 18 * 78;
+  const plotLeft = 30;
+  let plotWidth = 284, plotTop = 18, plotBottom = 178;
+  const x = f => plotLeft + Math.log(f / 20) / Math.log(1000) * plotWidth;
+  const displayGain = 30;
+  const y = g => plotTop + (displayGain - g) / (displayGain * 2) * (plotBottom - plotTop);
   const ns = 'http://www.w3.org/2000/svg';
   function svg(tag, attrs, label) {
     const el = document.createElementNS(ns, tag);
@@ -19,25 +24,30 @@
     graph.append(el);
     return el;
   }
-  for (const gain of [-18, -9, 0, 9, 18]) {
-    svg('line', {x1: 30, x2: 306, y1: y(gain), y2: y(gain), class: 'eq-grid'});
-    svg('text', {x: 25, y: y(gain) + 3, 'text-anchor': 'end'}, gain > 0 ? `+${gain}` : gain);
-  }
-  for (const frequency of [20, 100, 1000, 10000, 20000]) {
-    svg('line', {x1: x(frequency), x2: x(frequency), y1: 14, y2: 170, class: 'eq-grid'});
-    svg('text', {x: x(frequency), y: 187, 'text-anchor': 'middle'}, frequency >= 1000 ? `${frequency / 1000}k` : frequency);
-  }
-  svg('text', {x: 30, y: 204}, 'Hz');
+  const gainTicks = [-displayGain, -displayGain / 2, 0, displayGain / 2, displayGain].map(gain => ({
+    gain,
+    line: svg('line', {class: 'eq-grid'}),
+    label: svg('text', {'text-anchor': 'end'}, gain > 0 ? `+${gain}` : gain)
+  }));
+  const frequencyTicks = [20, 100, 1000, 10000, 20000].map(frequency => ({
+    frequency,
+    line: svg('line', {class: 'eq-grid'}),
+    label: svg('text', {'text-anchor': frequency === 20 ? 'start' : frequency === 20000 ? 'end' : 'middle'}, `${frequency >= 1000 ? frequency / 1000 + 'k' : frequency} Hz`)
+  }));
+  svg('text', {x: 2, y: 10}, 'dB');
   const response = svg('path', {fill: 'none', stroke: 'currentColor', 'stroke-width': 2});
   const points = bands.map((band, index) => {
     const point = svg('g', {tabindex: 0, role: 'button', 'aria-label': `Band ${index + 1}`, 'data-tooltip': '', class: 'eq-point'});
-    const circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('r', 5); circle.setAttribute('fill', colors[index]); point.append(circle);
+    const hit = document.createElementNS(ns, 'ellipse');
+    hit.classList.add('eq-hit');
+    const circle = document.createElementNS(ns, 'ellipse');
+    circle.setAttribute('fill', colors[index]); point.append(hit, circle);
+    editHandles.push({hit, circle});
     let dragging = false;
     const move = event => {
       const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(graph.getScreenCTM().inverse());
-      bands[index].frequency = Math.round(20 * 1000 ** clamp((p.x - 30) / 276, 0, 1));
-      bands[index].gain = Math.round(clamp((92 - p.y) * 18 / 78, -18, 18) * 10) / 10;
+      bands[index].frequency = Math.round(20 * 1000 ** clamp((p.x - plotLeft) / plotWidth, 0, 1));
+      bands[index].gain = Math.round(clamp(displayGain - (p.y - plotTop) / (plotBottom - plotTop) * displayGain * 2, ...ranges.gain) * 10) / 10;
       update();
     };
     point.addEventListener('pointerdown', event => {
@@ -54,7 +64,7 @@
     point.addEventListener('keydown', event => {
       const b = bands[index];
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') b.frequency = Math.round(clamp(b.frequency * (event.key === 'ArrowRight' ? 1.05 : 1 / 1.05), 20, 20000));
-      else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') b.gain = clamp(b.gain + (event.key === 'ArrowUp' ? .5 : -.5), -18, 18);
+      else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') b.gain = clamp(b.gain + (event.key === 'ArrowUp' ? .5 : -.5), ...ranges.gain);
       else return;
       event.preventDefault(); update();
     });
@@ -68,7 +78,10 @@
       class: 'eq-point eq-cut-point'});
     const box = document.createElementNS(ns, 'rect');
     for (const [key, value] of Object.entries({x: -5, y: -8, width: 10, height: 16})) box.setAttribute(key, value);
-    point.append(box);
+    const hit = document.createElementNS(ns, 'ellipse');
+    hit.classList.add('eq-hit');
+    point.append(hit, box);
+    editHandles.push({hit, box});
     const setFrequency = frequency => {
       input.value = Math.round(clamp(frequency, 20, 20000));
       // Use the existing filter listener so dragging updates playback and saved settings.
@@ -77,7 +90,7 @@
     let dragging = false;
     const move = event => {
       const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(graph.getScreenCTM().inverse());
-      setFrequency(20 * 1000 ** clamp((p.x - 30) / 276, 0, 1));
+      setFrequency(20 * 1000 ** clamp((p.x - plotLeft) / plotWidth, 0, 1));
     };
     point.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
@@ -98,6 +111,37 @@
     });
     return {point, guide};
   });
+  // Draw in screen pixels so axis labels stay aligned and legible at every aspect ratio.
+  const resizePlot = () => {
+    const {width, height} = graph.getBoundingClientRect();
+    if (!width || !height) return;
+    graph.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    plotWidth = Math.max(1, width - plotLeft - 10);
+    plotTop = 18;
+    plotBottom = Math.max(plotTop + 1, height - 24);
+    gainTicks.forEach(({gain, line, label}) => {
+      const tickY = y(gain);
+      for (const [key, value] of Object.entries({x1: plotLeft, x2: plotLeft + plotWidth, y1: tickY, y2: tickY})) line.setAttribute(key, value);
+      label.setAttribute('x', plotLeft - 6); label.setAttribute('y', tickY + 3);
+      const hidden = Math.abs(gain) === displayGain / 2 && plotBottom - plotTop < 72;
+      line.style.display = label.style.display = hidden ? 'none' : '';
+    });
+    frequencyTicks.forEach(({frequency, line, label}) => {
+      const tickX = x(frequency);
+      for (const [key, value] of Object.entries({x1: tickX, x2: tickX, y1: plotTop, y2: plotBottom})) line.setAttribute(key, value);
+      label.setAttribute('x', tickX); label.setAttribute('y', height - 5);
+      label.style.display = frequency === 10000 && width < 450 ? 'none' : '';
+    });
+    editHandles.forEach(({hit, circle, box}) => {
+      hit.setAttribute('rx', 14); hit.setAttribute('ry', 14);
+      if (circle) { circle.setAttribute('rx', 5); circle.setAttribute('ry', 5); }
+      if (box) {
+        for (const [key, value] of Object.entries({x: -5, y: -8, width: 10, height: 16})) box.setAttribute(key, value);
+      }
+    });
+    update();
+  };
+  new ResizeObserver(resizePlot).observe(graph);
   const table = document.createElement('table');
   table.className = 'transcribe-eq-table';
   table.setAttribute('aria-label', 'EQ bands');
@@ -136,7 +180,7 @@
   function update(editing) {
     cuts.forEach((input, index) => {
       const frequency = Number(input.value), {point, guide} = cutPoints[index];
-      point.setAttribute('transform', `translate(${x(frequency)} 170)`);
+      point.setAttribute('transform', `translate(${x(frequency)} ${plotBottom})`);
       point.setAttribute('aria-valuenow', frequency);
       const off = frequency === (index === 0 ? 20 : 20000);
       point.setAttribute('aria-valuetext', off ? 'Off' : `${frequency} Hz`);
@@ -145,6 +189,7 @@
       point.classList.toggle('is-off', off);
       guide.style.visibility = off ? 'hidden' : '';
       guide.setAttribute('x1', x(frequency)); guide.setAttribute('x2', x(frequency));
+      guide.setAttribute('y1', plotTop); guide.setAttribute('y2', plotBottom);
     });
     bands.forEach((b, index) => {
       for (const key of Object.keys(ranges)) if (inputs[index][key] !== editing) inputs[index][key].value = b[key];
@@ -165,7 +210,7 @@
       node.getFrequencyResponse(frequencies, magnitude, phase);
       magnitude.forEach((value, i) => { total[i] += 20 * Math.log10(Math.max(value, 1e-9)); });
     });
-    response.setAttribute('d', Array.from(total, (gain, i) => `${i ? 'L' : 'M'}${30 + i},${y(clamp(gain, -18, 18))}`).join(' '));
+    response.setAttribute('d', Array.from(total, (gain, i) => `${i ? 'L' : 'M'}${plotLeft + i / 276 * plotWidth},${y(clamp(gain, -displayGain, displayGain))}`).join(' '));
   }
   cuts.forEach(input => input.addEventListener('change', () => {
     input.value = Math.round(clamp(Number(input.value) || Number(input.defaultValue), 20, 20000)); update();

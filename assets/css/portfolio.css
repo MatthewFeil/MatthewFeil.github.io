@@ -340,13 +340,13 @@
   color: color-mix(in srgb, var(--site-text) 52%, transparent);
 }
 
-.portfolio-form input:focus-visible,
-.portfolio-form select:focus-visible,
-.portfolio-select:focus-visible,
-.portfolio-form button:focus-visible,
-.portfolio-toolbar button:focus-visible,
-.portfolio-action:focus-visible,
-.portfolio-dialog-close:focus-visible {
+:root[data-keyboard-navigation="on"] .portfolio-form input:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-form select:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-select:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-form button:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-toolbar button:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-action:focus-visible,
+:root[data-keyboard-navigation="on"] .portfolio-dialog-close:focus-visible {
   border-color: var(--site-accent);
   outline-color: var(--site-accent);
 }

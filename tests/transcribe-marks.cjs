@@ -94,3 +94,36 @@ const historyCount = model.undoStack.length;
 model.remove();
 assert.equal(model.undoStack.length, historyCount, 'No selection leaves history unchanged');
 console.log('Deletion selection follows addition order with next-marker and empty-list fallbacks.');
+
+model.doc = structuredClone(doc);model.undoStack=[];model.redoStack=[];
+const sectionStarts=model.doc.markers.filter(m=>m.section);
+model.deleteMeasures();assert.equal(JSON.stringify(model.doc.markers),JSON.stringify(sectionStarts));
+model.history(false);assert.equal(JSON.stringify(model.doc),JSON.stringify(doc));
+model.history(true);assert.equal(JSON.stringify(model.doc.markers),JSON.stringify(sectionStarts));
+let writes=0;model.identity='test';model.persistenceDisabled=true;model.storage=()=>{writes++;return Promise.resolve()};model.save();assert.equal(writes,0);
+console.log('Bulk measure deletion preserves section IDs/times, supports undo/redo, and cleared-storage mode blocks annotation autosave.');
+
+const legacyTiming = {version:2, identity:'test', ...structuredClone(doc), beatSettings:{speedMode:'bpm',signature:'4/4',countIn:2,metronome:true,standaloneBpm:120,sections:[]},beatMap:{obsolete:true}};
+const restoredWithoutBeats = validate(legacyTiming,'test',20);
+assert.deepEqual(JSON.parse(JSON.stringify(restoredWithoutBeats)),doc, 'Legacy imports retain markers/numbering and discard all beat settings');
+model.doc=restoredWithoutBeats;
+assert(!('beatSettings' in model.document()) && !('beatMap' in model.document()), 'Exports must not reintroduce removed beat metadata');
+console.log('Legacy beat metadata is ignored while markers and numbering remain compatible.');
+
+ctx.document = {documentElement:{}};
+ctx.getComputedStyle = () => ({getPropertyValue:()=> '#000'});
+for (const ratio of [1,2]) {
+  ctx.window = {devicePixelRatio:ratio};
+  for (const height of [31,43]) {
+    const ends=[];
+    const drawing = {scale(){},beginPath(){},moveTo(){},lineTo(x,y){ends.push(y);},stroke(){},fillText(){},measureText(){return {width:16};}};
+    const ruler = {clientWidth:390,clientHeight:height,getContext:()=>drawing};
+    Object.assign(model,{ruler,rangeAnchor:null,host:{x:time=>time*20}});
+    model.draw();
+    assert.equal(ruler.width,390*ratio);
+    assert.equal(ruler.height,height*ratio,'Canvas bitmap matches the rendered ruler height at every pixel density');
+    assert(ends.length && ends.every(y=>y===height),'Marker lines reach the bottom of the actual strip');
+    assert.equal(drawing.font,'700 12px "Familjen Grotesk", Arial');
+  }
+}
+console.log('Desktop/mobile marker rulers render at native dimensions without stretching labels.');

@@ -18,6 +18,15 @@
         ],
         "createdAt": "2026-09-29T03:21:55.001Z",
         "reason": "Agent: settings card has 0.85rem desktop and 0.65rem open mobile padding; collapsed state has no border; example panel has only a top border and transparent background"
+      },
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "files": [
+          "assets/css/transcribe.css"
+        ],
+        "createdAt": "2026-09-29T23:01:00.821Z",
+        "reason": "Agent reviewed: HEAD already uses Arial solely for the compact mm. transport label; preserve the incumbent control typography. DESIGN.md retains Archivo Black and Familjen Grotesk as the main faces."
       }
     ]
   }

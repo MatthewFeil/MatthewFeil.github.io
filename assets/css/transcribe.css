@@ -6,6 +6,8 @@
   --tr-panel: var(--site-panel);
   --tr-border: color-mix(in srgb, var(--site-text) 40%, var(--site-bg));
   --tr-border-soft: var(--site-soft-border);
+  /* Neutral rules frame controls; red communicates state and keyboard focus. */
+  --tr-border-hover: var(--tr-text);
   --tr-accent: var(--site-accent);
   --tr-accent-soft: color-mix(in srgb, var(--tr-accent) 13%, transparent);
   --tr-hover: var(--site-panel);
@@ -74,17 +76,17 @@ body.transcribe-shell {
 }
 
 
-.transcribe-app button:focus-visible,
-.transcribe-app input:focus-visible,
-.transcribe-app select:focus-visible {
-  outline: none;
-  border-color: var(--tr-accent);
+:root[data-keyboard-navigation="on"] .transcribe-app button:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-app input:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-app select:focus-visible {
+  outline: 2px solid var(--tr-accent) !important;
+  outline-offset: -2px;
 }
 
-.transcribe-app canvas:focus-visible,
-.transcribe-app label[for]:focus-visible {
-  outline: 2px solid var(--tr-accent);
-  outline-offset: 2px;
+:root[data-keyboard-navigation="on"] .transcribe-app canvas:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-app label[for]:focus-visible {
+  outline: 2px solid var(--tr-accent) !important;
+  outline-offset: -2px;
 }
 
 .transcribe-gate {
@@ -357,7 +359,7 @@ body.transcribe-shell {
 }
 
 .transcribe-speed-buttons button:hover {
-  border-color: var(--tr-text);
+  border-color: var(--tr-border-hover);
   color: var(--tr-text);
 }
 
@@ -481,9 +483,9 @@ body.transcribe-shell {
   cursor: ew-resize;
 }
 
-.transcribe-overview-wrap:focus-visible,
-.transcribe-app #transcribe-waveform:focus-visible,
-.transcribe-app #transcribe-mark-ruler:focus-visible {
+:root[data-keyboard-navigation="on"] .transcribe-overview-wrap:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-app #transcribe-waveform:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-app #transcribe-mark-ruler:focus-visible {
   outline: none;
 }
 
@@ -712,7 +714,7 @@ body.transcribe-shell {
   overscroll-behavior-inline: contain;
 }
 
-.transcribe-analysis-grid:focus-visible {
+:root[data-keyboard-navigation="on"] .transcribe-analysis-grid:focus-visible {
   outline: 2px solid var(--tr-accent);
   outline-offset: -2px;
 }
@@ -1484,8 +1486,8 @@ body.transcribe-shell {
 .transcribe-speed-buttons > button,
 .transcribe-custom-speed-slot { position: relative; }
 .transcribe-speed-buttons button.is-active,
-.transcribe-speed-buttons > button:focus-visible,
-.transcribe-custom-speed-slot:focus-within { z-index: 1; }
+:root[data-keyboard-navigation="on"] .transcribe-speed-buttons > button:focus-visible,
+:root[data-keyboard-navigation="on"] .transcribe-custom-speed-slot:focus-within { z-index: 1; }
 .transcribe-speed-buttons button.is-active,
 .transcribe-app button[aria-pressed="true"] {
   border-color: var(--tr-accent);
@@ -1515,7 +1517,7 @@ body.transcribe-shell {
 @media (hover: hover) {
   .transcribe-app :is(button, select, input[type="number"], input[type="password"]):hover:not(:disabled),
   .transcribe-empty label:hover {
-    border-color: var(--tr-text);
+    border-color: var(--tr-border-hover);
     background-color: var(--tr-surface);
     color: var(--tr-text);
   }
@@ -1605,7 +1607,7 @@ body.transcribe-shell {
 .transcribe-mark-tools input[type="checkbox"] { accent-color: var(--tr-accent); }
 .transcribe-mark-tools button:disabled { opacity: 0.45; cursor: default; }
 .transcribe-mark-tools button[aria-pressed="true"] { border-color: var(--tr-accent); }
-.transcribe-mark-tools :focus-visible { outline: none; border-color: var(--tr-accent); }
+:root[data-keyboard-navigation="on"] .transcribe-mark-tools :focus-visible { outline: 2px solid var(--tr-accent) !important; outline-offset: -2px; }
 .transcribe-mark-tools ol { display: flex; flex-wrap: wrap; gap: 0.3rem; list-style: none; padding: 0; margin: 0.5rem 0; max-height: 6rem; overflow: auto; }
 .transcribe-mark-tools [data-status]:not(:empty) { display: block; padding: 0.25rem 0.65rem; }
 .transcribe-mark-help { color: var(--tr-muted); }
@@ -1696,7 +1698,7 @@ body.transcribe-shell {
   color: inherit; background: transparent; border: 0;
   font-size: 1.25rem; line-height: 1; cursor: pointer;
 }
-#transcribe-config-dismiss:focus-visible { outline: none; border-color: var(--tr-accent); }
+:root[data-keyboard-navigation="on"] #transcribe-config-dismiss:focus-visible { outline: 2px solid var(--tr-accent) !important; outline-offset: -2px; }
 @media (max-width: 1380px) {
   .transcribe-file-control { align-self: center; }
 }
@@ -1940,7 +1942,7 @@ body.transcribe-shell {
 .transcribe-navbar-row .transcribe-tool-field > span { position: static; font-size: 0.6rem; line-height: 0.75rem; }
 .transcribe-navbar-row .transcribe-tool-field select { width: 4.75rem; }
 .transcribe-navbar-row #transcribe-config-actions button:disabled {
-  color: var(--tr-muted); opacity: 0.45; cursor: not-allowed;
+  color: var(--tr-muted); opacity: 1; cursor: not-allowed;
 }
 
 .transcribe-navbar-row .transcribe-file-name { padding-right: 0.75rem; }
@@ -2013,7 +2015,7 @@ body.transcribe-shell {
 .transcribe-shortcuts h2 { margin: 0; font: inherit; font-size: 0.8rem; font-weight: 700; }
 .transcribe-shortcuts h3 { margin: 1rem 0 0.75rem; font: inherit; font-size: 0.8rem; font-weight: 700; }
 .transcribe-shortcuts h2 > kbd { float: right; }
-.transcribe-shortcuts h2:focus-visible { outline: 2px solid var(--tr-accent); outline-offset: 4px; }
+:root[data-keyboard-navigation="on"] .transcribe-shortcuts h2:focus-visible { outline: 2px solid var(--tr-accent); outline-offset: 4px; }
 .transcribe-shortcuts kbd {
   display: inline-block; min-width: 1.5rem; padding: 0.15rem 0.35rem;
   border: 1px solid var(--tr-border); background: var(--tr-surface);
@@ -2106,18 +2108,21 @@ body.transcribe-shell {
 }
 @media (hover: hover) {
   .transcribe-app .transcribe-transport > button:hover:not(:disabled) {
-    border-color: var(--tr-text);
+    border-color: var(--tr-border-hover);
     background: var(--tr-hover);
   }
   .transcribe-app .transcribe-transport > button:is([aria-pressed="true"], .is-playing):hover:not(:disabled) {
-    border-color: var(--tr-text);
+    border-color: var(--tr-border-hover);
     background: var(--tr-accent);
     color: var(--tr-bg);
   }
 }
-.transcribe-app .transcribe-transport > button:focus-visible {
-  outline: 2px solid var(--tr-text);
-  outline-offset: -4px;
+:root[data-keyboard-navigation="on"] .transcribe-app .transcribe-transport > button:focus-visible {
+  outline: 2px solid var(--tr-accent) !important;
+  outline-offset: -2px;
+}
+:root[data-keyboard-navigation="on"] .transcribe-app .transcribe-transport > button:is([aria-pressed="true"], .is-playing):focus-visible {
+  outline-color: var(--tr-bg) !important;
 }
 .transcribe-app .transcribe-transport > button:disabled {
   border-color: var(--tr-border-soft);
@@ -2144,7 +2149,17 @@ body.transcribe-shell {
 .transcribe-stem-list li > span { min-width: 0; font-size: 0.875rem; }
 .transcribe-stem-list small { display: block; margin-top: 0.15rem; font-size: 0.7rem; color: var(--tr-muted); }
 .transcribe-stem-list button { flex: 0 0 2.75rem; min-height: 2.5rem; }
-.transcribe-stem-list li.is-quiet > span { color: var(--tr-muted); }
+.transcribe-stem-list li.is-quiet > span { color: color-mix(in srgb, var(--tr-text) 65%, var(--tr-muted)); }
+.transcribe-stem-list [data-stem-activity] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .transcribe-stems-help { color: var(--tr-muted); }
 @media (max-width: 600px) {
   #transcribe-stems-toggle { min-height: 2.5rem; padding: 0.3rem 0.45rem; }
@@ -2196,7 +2211,7 @@ body.transcribe-shell {
   background: var(--tr-bg); color: var(--tr-text); box-shadow: none;
   padding: 0.375rem 0.5rem; min-height: 2rem; font: inherit;
 }
-#transcribe-measure-panel input:focus-visible { border-color: var(--tr-accent); outline: none; }
+:root[data-keyboard-navigation="on"] #transcribe-measure-panel input:focus-visible { border-color: var(--tr-accent); outline: none; }
 #transcribe-measure-panel input::placeholder { color: var(--tr-muted); opacity: 1; }
 #transcribe-measure-panel output { display: block; margin-top: 0.4rem; font-size: 0.75rem; }
 #transcribe-measure-panel output:empty { display: none; }
@@ -2248,22 +2263,22 @@ body.transcribe-shell {
 .transcribe-sidebar-section { min-width: 0; padding: 12px; border-bottom: 1px solid var(--tr-border); }
 .transcribe-sidebar-section > h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 0.85rem; line-height: 1.25; }
 .transcribe-sidebar-section :is(label,fieldset,select) { min-width: 0; }
-#transcribe-section-settings:not([hidden]) { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 12px; align-items: end; }
-#transcribe-section-settings > h2 { grid-column: 1 / -1; margin: 0; }
-#transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle { display: flex; flex-direction: row; justify-content: space-between; align-items: center; height: 28px; min-height: 28px; padding: 4px 8px; font-size: 0.7rem; letter-spacing: 0; }
-#transcribe-section-settings .transcribe-sound-controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
-#transcribe-section-settings .transcribe-tool-field, #transcribe-section-settings .transcribe-tolerance-control { grid-column: auto; grid-row: auto; display: flex; flex-direction: column; align-items: stretch; gap: 4px; margin: 0; padding: 0; }
-#transcribe-section-settings :is(.transcribe-tool-field,.transcribe-tolerance-control,.transcribe-pitch-adjustment) > span:first-child { text-align: left; font-size: 0.65rem; line-height: 1.2; letter-spacing: 0; }
-#transcribe-section-settings select, #transcribe-section-settings input[type=number] { width: 100%; height: 28px; min-height: 28px; padding: 2px 6px; font-size: 0.75rem; }
-#transcribe-section-settings .transcribe-audio-pitch { grid-column: 1 / -1; padding: 0; margin: 0; border: 0; }
-#transcribe-section-settings .transcribe-pitch-controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-#transcribe-section-settings .transcribe-pitch-adjustment { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-#transcribe-section-settings .transcribe-pitch-entry { display: grid; grid-template-columns: minmax(0,1fr) 3rem; gap: 6px; width: 100%; height: 28px; }
-#transcribe-section-settings input[type=range] { min-width: 0; width: 100%; height: 28px; margin: 0; }
-#transcribe-section-settings .transcribe-numbering-control { grid-column: auto; min-width: 0; }
-#transcribe-section-settings .transcribe-numbering-control fieldset { border: 0; padding: 0; margin: 0; }
-#transcribe-section-settings .transcribe-numbering-control label { flex-direction: column; align-items: stretch; gap: 4px; }
-#transcribe-section-settings .transcribe-numbering-control select { width: 100%; }
+:is(#transcribe-section-sound, #transcribe-section-analysis):not([hidden]) { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 12px; align-items: end; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) > h2 { grid-column: 1 / -1; margin: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle { display: flex; flex-direction: row; justify-content: space-between; align-items: center; height: 28px; min-height: 28px; padding: 4px 8px; font-size: 0.7rem; letter-spacing: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-tool-field, :is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-tolerance-control { grid-column: auto; grid-row: auto; display: flex; flex-direction: column; align-items: stretch; gap: 4px; margin: 0; padding: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) :is(.transcribe-tool-field,.transcribe-tolerance-control,.transcribe-pitch-adjustment) > span:first-child { text-align: left; font-size: 0.65rem; line-height: 1.2; letter-spacing: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) select, :is(#transcribe-section-sound, #transcribe-section-analysis) input[type=number] { width: 100%; height: 28px; min-height: 28px; padding: 2px 6px; font-size: 0.75rem; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-audio-pitch { grid-column: 1 / -1; padding: 0; margin: 0; border: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-pitch-controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-pitch-adjustment { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-pitch-entry { display: grid; grid-template-columns: minmax(0,1fr) 3rem; gap: 6px; width: 100%; height: 28px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) input[type=range] { min-width: 0; width: 100%; height: 28px; margin: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-numbering-control { grid-column: auto; min-width: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-numbering-control fieldset { border: 0; padding: 0; margin: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-numbering-control label { flex-direction: column; align-items: stretch; gap: 4px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-numbering-control select { width: 100%; }
 /* A single reading path prevents narrow columns of broken shortcut text. */
 .transcribe-sidebar .transcribe-shortcuts { display: block; padding: 0; border: 0; }
 .transcribe-sidebar .transcribe-shortcuts h3 { margin: 12px 0 6px; font-size: 0.75rem; line-height: 1.2; }
@@ -2288,7 +2303,7 @@ body.transcribe-shell {
 .transcribe-sidebar .transcribe-stem-list button { min-width: 28px; min-height: 28px; height: 28px; padding: 2px 4px; }
 .transcribe-info-button { display: grid; place-items: center; width: 28px; height: 28px; min-height: 28px; padding: 4px; }
 .transcribe-info-button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-#transcribe-stems-info { max-width: min(28rem,calc(100vw - 2rem)); padding: 1rem; border: 1px solid var(--tr-border); background: var(--tr-bg); color: var(--tr-text); font-size: 0.85rem; line-height: 1.5; }
+#transcribe-stems-info, #transcribe-eq-info { max-width: min(28rem,calc(100vw - 2rem)); padding: 1rem; border: 1px solid var(--tr-border); background: var(--tr-bg); color: var(--tr-text); font-size: 0.85rem; line-height: 1.5; }
 .transcribe-section-buttons { display: flex; flex-wrap: wrap; gap: 4px; }
 .transcribe-section-buttons button { display: grid; place-items: center; width: 40px; height: 40px; padding: 8px; background: var(--tr-bg); }
 .transcribe-section-buttons svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -2328,7 +2343,7 @@ body.transcribe-shell {
   letter-spacing: -0.01em;
   text-transform: none;
 }
-#transcribe-section-settings :is(.transcribe-tool-field,.transcribe-tolerance-control,.transcribe-pitch-adjustment) > span:first-child {
+:is(#transcribe-section-sound, #transcribe-section-analysis) :is(.transcribe-tool-field,.transcribe-tolerance-control,.transcribe-pitch-adjustment) > span:first-child {
   font-size: var(--tr-type-label);
   font-weight: 500;
   line-height: 1.25;
@@ -2336,14 +2351,14 @@ body.transcribe-shell {
   text-transform: none;
   color: var(--tr-muted);
 }
-#transcribe-section-settings :is(select,input[type=number]) {
+:is(#transcribe-section-sound, #transcribe-section-analysis) :is(select,input[type=number]) {
   font-family: inherit;
   font-size: var(--tr-type-value);
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
 }
-#transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle,
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle,
 #transcribe-section-stems .transcribe-stems-actions #transcribe-stems-enabled {
   font-family: inherit;
   font-size: var(--tr-type-label);
@@ -2400,7 +2415,7 @@ body.transcribe-shell {
 }
 .transcribe-sidebar .transcribe-tool-toggle :is(span,strong) { text-transform: none; letter-spacing: 0; }
 
-#transcribe-section-settings .transcribe-sound-controls { align-items: end; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls { align-items: end; }
 
 /* Keycaps distinguish keys from the instructions between them. */
 .transcribe-sidebar .transcribe-shortcuts kbd {
@@ -2441,19 +2456,19 @@ body.transcribe-shell {
 .transcribe-sidebar .transcribe-shortcuts dd { min-width: 0; }
 
 /* Settings rows occupy the full rail rather than retaining navbar sizing. */
-#transcribe-section-settings { justify-items: stretch; }
-#transcribe-section-settings > * { min-width: 0; width: 100%; justify-self: stretch; }
-#transcribe-section-settings .transcribe-sound-controls {
+:is(#transcribe-section-sound, #transcribe-section-analysis) { justify-items: stretch; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) > * { min-width: 0; width: 100%; justify-self: stretch; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls {
   margin: 0;
   width: 100%;
   grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.35fr);
 }
-#transcribe-section-settings .transcribe-sound-controls > * { grid-column: auto; grid-row: auto; width: 100%; min-width: 0; }
-#transcribe-section-settings .transcribe-audio-pitch { display: block; }
-#transcribe-section-settings .transcribe-pitch-controls { width: 100%; min-width: 0; grid-column: auto; grid-row: auto; }
-#transcribe-section-settings .transcribe-pitch-adjustment { width: 100%; align-items: stretch; }
-#transcribe-section-settings .transcribe-tool-field select,
-#transcribe-section-settings .transcribe-tolerance-control select { width: 100%; max-width: none; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls > * { grid-column: auto; grid-row: auto; width: 100%; min-width: 0; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-audio-pitch { display: block; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-pitch-controls { width: 100%; min-width: 0; grid-column: auto; grid-row: auto; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-pitch-adjustment { width: 100%; align-items: stretch; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-tool-field select,
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-tolerance-control select { width: 100%; max-width: none; }
 
 /* Scroll the utility rail while keeping the recording workspace stationary. */
 .transcribe-sidebar { grid-template-rows: minmax(0,1fr) auto; min-height: 0; overflow: hidden; align-content: stretch; }
@@ -2504,12 +2519,12 @@ body.transcribe-shell {
 
 /* Override the shared site's button chrome only for sidebar disclosures. */
 .transcribe-app .transcribe-sidebar button.transcribe-section-disclosure,
-.transcribe-app .transcribe-sidebar button.transcribe-section-disclosure:is(:hover,:active,:focus) {
+.transcribe-app .transcribe-sidebar button.transcribe-section-disclosure:is(:hover,:active), :root[data-keyboard-navigation="on"] .transcribe-app .transcribe-sidebar button.transcribe-section-disclosure:focus {
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
-.transcribe-app .transcribe-sidebar button.transcribe-section-disclosure:focus-visible { color: var(--tr-accent); }
+:root[data-keyboard-navigation="on"] .transcribe-app .transcribe-sidebar button.transcribe-section-disclosure:focus-visible { color: var(--tr-accent); }
 .transcribe-app .transcribe-sidebar-section > h2 {
   width: calc(100% + 24px);
   max-width: none;
@@ -2523,8 +2538,8 @@ body.transcribe-shell {
   padding: 0 12px;
   border: 0;
 }
-#transcribe-section-settings > h2 { width: calc(100% + 24px); margin: -6px -12px 8px; }
-#transcribe-section-settings.is-collapsed > h2 { margin: 0 -12px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis) > h2 { width: calc(100% + 24px); margin: -6px -12px 8px; }
+:is(#transcribe-section-sound, #transcribe-section-analysis).is-collapsed > h2 { margin: 0 -12px; }
 
 /* Brief directional feedback without animating the audio workspace geometry. */
 .transcribe-section-disclosure svg {
@@ -2577,28 +2592,29 @@ body.transcribe-shell {
 }
 
 @media (max-width: 1100px) {
-  #transcribe-section-settings > * { grid-row: auto; }
-  #transcribe-section-settings > h2 { grid-column: 1 / -1; }
-  #transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle { grid-column: auto; }
-  #transcribe-section-settings .transcribe-sound-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) > * { grid-row: auto; }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) > h2 { grid-column: 1 / -1; }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle { grid-column: auto; }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .transcribe-sidebar .transcribe-shortcuts dl > div { grid-template-columns: subgrid; }
 }
 @media (max-height: 500px) {
-  html, body.transcribe-shell { overflow-y: auto; }
-  .transcribe-app[data-view-mode] .transcribe-workspace { height: auto; min-height: 560px; grid-template-rows: auto minmax(180px, 1.2fr) minmax(120px, 0.8fr) auto; overflow: visible; }
+  html, body.transcribe-shell { overflow: hidden; }
+  .transcribe-app[data-view-mode] .transcribe-workspace { height: 100dvh; min-height: 0; grid-template-rows: auto minmax(0, 1.2fr) minmax(0, 0.8fr) auto; overflow: hidden; }
+  .transcribe-timeline, .transcribe-analysis { min-height: 0; }
 }
 
-/* Keyboard focus remains distinct from selected modes and the red playhead. */
-.transcribe-app :is(button, input, select):focus-visible {
-  outline: 2px solid var(--tr-text);
-  outline-offset: -4px;
+/* One inset red focus rule across controls; filled red actions use field ink. */
+:root[data-keyboard-navigation="on"] .transcribe-app :is(button, input, select):focus-visible {
+  outline: 2px solid var(--tr-accent) !important;
+  outline-offset: -2px;
 }
-.transcribe-app :is(#transcribe-overview-navigator, #transcribe-waveform, #transcribe-mark-ruler, .transcribe-analysis-grid):focus-visible {
+:root[data-keyboard-navigation="on"] .transcribe-app :is(#transcribe-overview-navigator, #transcribe-waveform, #transcribe-mark-ruler, .transcribe-analysis-grid):focus-visible {
   outline: 2px solid var(--tr-accent);
   outline-offset: -2px;
 }
-.transcribe-sidebar .transcribe-section-disclosure:focus-visible {
-  outline: 2px solid var(--tr-text);
+:root[data-keyboard-navigation="on"] .transcribe-sidebar .transcribe-section-disclosure:focus-visible {
+  outline: 2px solid var(--tr-accent) !important;
   outline-offset: -2px;
 }
 .transcribe-app input { caret-color: var(--tr-accent); }
@@ -2635,9 +2651,9 @@ body.transcribe-shell {
 /* Complete per-control borders, including the shared edge of stacked config buttons. */
 .transcribe-navbar-row #transcribe-config-actions button { position: relative; }
 .transcribe-navbar-row #transcribe-config-actions button:hover:not(:disabled),
-.transcribe-navbar-row #transcribe-config-actions button:focus-visible {
+:root[data-keyboard-navigation="on"] .transcribe-navbar-row #transcribe-config-actions button:focus-visible {
   z-index: 1;
-  border-color: var(--tr-text);
+  border-color: var(--tr-border-hover);
 }
 .transcribe-navbar-row .transcribe-section-buttons button {
   height: var(--tr-control-height);
@@ -2702,7 +2718,7 @@ body.transcribe-shell {
 }
 .transcribe-app .transcribe-transport > button:not(:disabled) { z-index: 1; }
 .transcribe-app .transcribe-transport > button:is([aria-pressed="true"], .is-playing):not(:disabled) { z-index: 2; }
-.transcribe-app .transcribe-transport > button:focus-visible { z-index: 3; }
+:root[data-keyboard-navigation="on"] .transcribe-app .transcribe-transport > button:focus-visible { z-index: 3; }
 @media (hover: hover) {
   .transcribe-app .transcribe-transport > button:hover:not(:disabled) { z-index: 3; }
 }
@@ -2785,7 +2801,7 @@ body.transcribe-shell {
 }
 
 .transcribe-navbar-row .transcribe-identity a:hover,
-.transcribe-navbar-row .transcribe-identity a:focus-visible { color: var(--tr-accent); }
+:root[data-keyboard-navigation="on"] .transcribe-navbar-row .transcribe-identity a:focus-visible { color: var(--tr-accent); }
 
 /* Let the empty signal guides remain visible around the upload invitation. */
 .transcribe-app .transcribe-empty,
@@ -2803,10 +2819,6 @@ body.transcribe-shell {
   border: 0 !important;
 }
 
-/* Keep command focus from adding an outline to the signal workspace. */
-.transcribe-app :focus-visible {
-  outline: none !important;
-}
 .transcribe-app .transcribe-analysis {
   border-top: 1px solid var(--tr-border-soft);
 }
@@ -2834,15 +2846,16 @@ body.transcribe-shell {
   background: transparent;
   color: var(--tr-accent);
 }
-.transcribe-navbar-row .transcribe-identity .theme-toggle:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--tr-accent);
+:root[data-keyboard-navigation="on"] .transcribe-navbar-row .transcribe-identity .theme-toggle:focus-visible {
+  outline-offset: -2px;
 }
-.transcribe-navbar-row :is(.transcribe-file-name, .transcribe-speed-buttons button, .transcribe-section-buttons button):not([aria-pressed="true"]):not(.is-active) {
-  border-color: var(--tr-border-soft);
+/* All header controls share the same neutral perimeter, including disabled config. */
+.transcribe-navbar-row :is(.transcribe-file-name, :where(#transcribe-config-actions) button, .transcribe-speed-buttons button, .transcribe-section-buttons button, .transcribe-panel-buttons button):not([aria-pressed="true"]):not(.is-active):where(:not([aria-expanded="true"])) {
+  border-color: var(--tr-border);
 }
 @media (hover: hover) {
   .transcribe-navbar-row :is(.transcribe-file-name, .transcribe-speed-buttons button, .transcribe-section-buttons button):hover:not(:disabled) {
-    border-color: var(--tr-text);
+    border-color: var(--tr-border-hover);
   }
 }
 .transcribe-app ::selection { background: var(--tr-accent); color: var(--tr-bg); }
@@ -2862,7 +2875,8 @@ body.transcribe-shell {
 #transcribe-eq-graph text { fill: var(--tr-muted); font-size: 9px; }
 #transcribe-eq-graph .eq-grid { stroke: var(--tr-border); stroke-width: .6; }
 #transcribe-eq-graph .eq-point { cursor: grab; touch-action: none; outline: none; }
-#transcribe-eq-graph .eq-point:focus circle { stroke: var(--tr-text); stroke-width: 3; }
+:root[data-keyboard-navigation="on"] #transcribe-eq-graph .eq-point:focus-visible { outline-offset: -2px; }
+:root[data-keyboard-navigation="on"] #transcribe-eq-graph .eq-point:focus circle { stroke: var(--tr-accent); stroke-width: 3; }
 #transcribe-eq-graph .eq-point text { fill: #fff; font-size: 11px; font-weight: 700; pointer-events: none; }
 .transcribe-eq-hint { margin: 0 0 12px; color: var(--tr-muted); font-size: .7rem; }
 .transcribe-eq-cuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--tr-border); }
@@ -2871,25 +2885,25 @@ body.transcribe-shell {
 #transcribe-eq-panel label { display: grid; gap: 3px; min-width: 0; font-size: .7rem; }
 #transcribe-eq-panel input { box-sizing: border-box; width: 100%; min-width: 0; height: 30px; padding: 3px 5px; font-size: .8rem; }
 
-#transcribe-section-settings .transcribe-sound-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-sound-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 #transcribe-eq-graph .eq-cut-guide { stroke: var(--tr-muted); stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
 #transcribe-eq-graph .eq-cut-point rect { fill: var(--tr-bg); stroke: var(--tr-text); stroke-width: 1.5; }
-#transcribe-eq-graph .eq-cut-point:focus rect { stroke: var(--tr-accent); stroke-width: 2; }
+:root[data-keyboard-navigation="on"] #transcribe-eq-graph .eq-cut-point:focus rect { stroke: var(--tr-accent); stroke-width: 2; }
 
 /* Keep file loading usable on narrow phones; config remains in Settings. */
 @media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
   .transcribe-navbar-row .transcribe-file-summary { width: 100%; }
   .transcribe-navbar-row .transcribe-file-name { width: 100%; }
-  #transcribe-section-settings > #transcribe-config-actions {
+  :is(#transcribe-section-sound, #transcribe-section-analysis) > #transcribe-config-actions {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin-top: 4px;
   }
-  #transcribe-section-settings > #transcribe-config-actions button { width: 100%; min-height: 36px; }
-  #transcribe-section-settings > #transcribe-config-actions button + button { border-left: 1px solid var(--tr-border); }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) > #transcribe-config-actions button { width: 100%; min-height: 36px; }
+  :is(#transcribe-section-sound, #transcribe-section-analysis) > #transcribe-config-actions button + button { border-left: 1px solid var(--tr-border); }
 }
 @media (max-width: 720px) and (max-height: 650px) {
   .transcribe-app .transcribe-empty { gap: 0.15rem; }
@@ -2934,13 +2948,13 @@ body.transcribe-shell {
 #transcribe-eq-graph .eq-cut-point.is-off rect { stroke: var(--tr-muted); }
 
 /* Keep the three analysis switches together above the settings fields. */
-#transcribe-section-settings > .transcribe-settings-toggles {
+:is(#transcribe-section-sound, #transcribe-section-analysis) > .transcribe-settings-toggles {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
-#transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle {
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle {
   min-width: 0;
   width: 100%;
   justify-self: stretch;
@@ -2948,12 +2962,12 @@ body.transcribe-shell {
   height: auto;
   gap: 4px;
 }
-#transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle > span {
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle > span {
   min-width: 0;
   white-space: normal;
   text-align: left;
 }
-#transcribe-section-settings .transcribe-settings-toggles > .transcribe-tool-toggle > strong {
+:is(#transcribe-section-sound, #transcribe-section-analysis) .transcribe-settings-toggles > .transcribe-tool-toggle > strong {
   flex-shrink: 0;
 }
 
@@ -3011,3 +3025,1062 @@ body.transcribe-shell {
 }
 
 .transcribe-tooltip[hidden] { display: none; }
+
+.transcribe-sidebar-section .transcribe-section-reset { flex: 0 0 auto; min-height: 28px; padding: 3px 6px; font-size: .7rem; font-weight: 400; }
+.transcribe-sidebar-section > h2 .transcribe-section-disclosure { flex: 1; min-width: 0; width: auto; }
+.transcribe-data-actions { display: flex; flex-direction: column; gap: .5rem; border-top: 1px solid var(--tr-border); margin-top: .75rem; padding-top: .75rem; }
+.transcribe-data-actions button { white-space: normal; }
+
+.transcribe-speed-modes { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; min-width: 0; }
+.transcribe-speed-modes > [hidden] { display: none !important; }
+
+/* Flat, fixed controls; keyboard help uses the same exclusive sidebar rail. */
+.transcribe-navbar-row .transcribe-panel-buttons { display: flex; flex-direction: row; gap: 4px; align-items: center; }
+.transcribe-navbar-row .transcribe-panel-buttons :is(#transcribe-controls-toggle,#transcribe-shortcuts-toggle) { display: grid; place-items: center; width: 36px; min-width: 36px; height: var(--tr-control-height); min-height: var(--tr-control-height); padding: 6px; border: 1px solid var(--tr-border); }
+.transcribe-panel-buttons svg, .transcribe-sidebar-header svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; }
+.transcribe-panel-buttons button[aria-expanded=true] { color: var(--tr-accent); border-color: var(--tr-accent); }
+.transcribe-flat-sidebar { grid-template-rows: 28px minmax(0,1fr); grid-template-columns: minmax(0,1fr); overflow: hidden; }
+.transcribe-sidebar-header { grid-row: 1; display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 6px 10px; border-bottom: 1px solid var(--tr-border-soft); }
+.transcribe-sidebar-header h2 { margin: 0; font-size: var(--tr-type-label); }
+.transcribe-app .transcribe-sidebar-header button { display: grid; place-items: center; padding: 4px; min-height: 28px; width: 28px; border: 0; background: transparent; box-shadow: none; }
+.transcribe-flat-sidebar > :is(.transcribe-controls-grid,.transcribe-shortcuts-pane) { grid-row: 2; min-height: 0; }
+.transcribe-controls-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 8px 12px; padding: 8px; overflow: visible; }
+.transcribe-controls-grid[hidden], .transcribe-shortcuts-pane[hidden] { display: none !important; }
+.transcribe-flat-sidebar .transcribe-sidebar-section:not([hidden]) { display: block; min-width: 0; padding: 0; border: 0; }
+.transcribe-flat-sidebar .transcribe-sidebar-section > h3 { display: flex; align-items: center; gap: 4px; margin: 0 0 4px; padding: 0; font-size: var(--tr-type-label); line-height: 1; min-height: 20px; }
+.transcribe-flat-sidebar .transcribe-sidebar-section > h3 > span { margin-right: auto; }
+.transcribe-flat-sidebar .transcribe-section-reset { min-height: 20px; padding: 2px 4px; font-size: var(--tr-type-note); font-weight: 400; }
+.transcribe-flat-sidebar .transcribe-info-button { min-width: 20px; width: 20px; min-height: 20px; height: 20px; padding: 2px; }
+.transcribe-flat-sidebar .transcribe-group-content { display: grid; gap: 4px; min-width: 0; }
+.transcribe-flat-sidebar :is(button, input, select) { font-family: inherit; }
+.transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle { display: flex; flex-direction: row; align-items: center; justify-content: space-between; min-height: 26px; height: 26px; width: 100%; padding: 3px 5px; font-size: var(--tr-type-label); letter-spacing: 0; text-transform: none; }
+.transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) :is(input[type=number],select) { height: 26px; min-height: 26px; padding: 2px 4px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-sound-controls { display: block; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-tool-field { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-controls { display: grid; grid-template-columns: minmax(0,1fr); gap: 4px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry { grid-template-columns: minmax(0,1fr) 34px; gap: 4px; height: 26px; }
+.transcribe-flat-sidebar #transcribe-section-sound input[type=range] { height: 26px; }
+.transcribe-flat-sidebar #transcribe-analysis-contents { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.transcribe-flat-sidebar #transcribe-analysis-contents > button { grid-column: 1 / -1; }
+.transcribe-flat-sidebar #transcribe-analysis-contents label { gap: 2px; }
+.transcribe-flat-sidebar #transcribe-marks { display: grid; grid-template-columns: minmax(0,1fr) 2fr; gap: 4px 8px; }
+.transcribe-flat-sidebar #transcribe-marks > fieldset label { gap: 2px; }
+.transcribe-flat-sidebar #transcribe-marks > output:empty { display: none; }
+.transcribe-flat-sidebar #transcribe-delete-measures { min-height: 26px; font-size: var(--tr-type-note); padding: 3px 5px; }
+.transcribe-flat-sidebar #transcribe-eq-panel { display: grid; gap: 4px; }
+.transcribe-flat-sidebar .transcribe-eq-actions { display: none; }
+.transcribe-flat-sidebar #transcribe-eq-graph { width: 100%; height: 100px; margin: 0; }
+.transcribe-flat-sidebar .transcribe-eq-cuts { gap: 4px; border: 0; padding: 0; }
+.transcribe-flat-sidebar #transcribe-eq-panel label { gap: 2px; font-size: var(--tr-type-note); }
+.transcribe-flat-sidebar #transcribe-eq-panel input { height: 24px; padding: 2px 3px; font-size: var(--tr-type-label); }
+.transcribe-flat-sidebar .transcribe-eq-row { grid-template-columns: 8px minmax(0,1.3fr) repeat(2,minmax(0,1fr)); margin: 4px 0 0; gap: 4px; }
+.transcribe-flat-sidebar .transcribe-eq-row > span { font-size: var(--tr-type-label); }
+.transcribe-flat-sidebar #transcribe-stems-panel { padding: 0; border: 0; margin: 0; display: grid; gap: 4px; max-height: none; overflow: visible; }
+.transcribe-flat-sidebar .transcribe-stems-heading { display: none; }
+.transcribe-flat-sidebar .transcribe-stems-actions { margin: 0; padding: 0; min-height: 26px; }
+.transcribe-flat-sidebar #transcribe-stems-enabled { flex: 1; min-height: 26px; height: 26px; padding: 3px 5px; font-size: var(--tr-type-label); }
+.transcribe-flat-sidebar .transcribe-stem-list { margin: 0; gap: 4px; }
+.transcribe-flat-sidebar .transcribe-stem-list li { display: grid; grid-template-columns: minmax(0,1fr) 32px; gap: 4px; padding: 0; min-height: 26px; }
+.transcribe-flat-sidebar .transcribe-stem-list li > span { font-size: var(--tr-type-label); line-height: 1.1; }
+.transcribe-flat-sidebar .transcribe-stem-list small { font-size: var(--tr-type-note); line-height: 1; }
+.transcribe-flat-sidebar .transcribe-stem-list button { min-height: 26px; height: 26px; padding: 2px; font-size: var(--tr-type-label); }
+.transcribe-flat-sidebar #transcribe-stems-panel > p { margin: 0; line-height: 1.1; }
+.transcribe-flat-sidebar .transcribe-sidebar-footer { grid-column: 1 / -1; padding: 0; border-top: 1px solid var(--tr-border-soft); }
+.transcribe-flat-sidebar .transcribe-data-actions { margin: 0; padding: 4px 0 0; border: 0; }
+.transcribe-flat-sidebar .transcribe-data-actions button { min-height: 24px; padding: 2px 6px; font-size: var(--tr-type-note); }
+.transcribe-shortcuts-pane { overflow-y: auto; padding: 8px; scrollbar-width: thin; }
+.transcribe-shortcuts-pane .transcribe-shortcuts { margin: 0; }
+.transcribe-shortcuts-pane .transcribe-shortcuts h3 { margin-top: 8px; }
+.transcribe-flat-sidebar > [popover] { max-width: min(24rem,calc(100vw - 24px)); padding: 12px; font-size: var(--tr-type-label); }
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .transcribe-workspace.mobile-section-open > .transcribe-flat-sidebar { grid-row: 2 / 4; overflow: hidden; }
+  .transcribe-navbar-row .transcribe-file-control { display: flex; align-items: center; gap: 4px; }
+  .transcribe-navbar-row .transcribe-file-summary { width: auto; flex: 1; min-width: 0; }
+  .transcribe-navbar-row #transcribe-config-actions { display: flex; flex-direction: column; flex: 0 0 auto; }
+  .transcribe-navbar-row #transcribe-config-actions button { font-size: 0.65rem; height: calc((var(--tr-control-height) + 1px) / 2); min-height: 0; padding: 0 4px; }
+  .transcribe-flat-sidebar .transcribe-controls-grid { gap: 6px 8px; padding: 6px; overflow: visible; }
+  .transcribe-flat-sidebar #transcribe-delete-measures { justify-self: end; }
+}
+
+/* Supersede the old section grids rather than inheriting their auto-placement. */
+.transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis):not([hidden]) { display: block; }
+.transcribe-flat-sidebar #transcribe-marks > fieldset { grid-column: 1; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-marks > #transcribe-delete-measures { grid-column: 1; grid-row: 2; justify-self: stretch; }
+.transcribe-flat-sidebar #transcribe-marks > output:not(:empty) { grid-column: 1; grid-row: 3; margin: 0; font-size: var(--tr-type-note); }
+.transcribe-flat-sidebar .transcribe-stem-list { grid-template-columns: minmax(0,1fr); }
+.transcribe-flat-sidebar .transcribe-stem-list li { border: 0; }
+.transcribe-flat-sidebar #transcribe-analysis-contents > label > span { font-size: var(--tr-type-note); white-space: nowrap; }
+.transcribe-flat-sidebar :is(.transcribe-stems-actions,.transcribe-info-button) svg { width: 16px; height: 16px; }
+.transcribe-flat-sidebar #transcribe-stems-progress { width: 100%; height: 4px; }
+
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment { grid-template-rows: 26px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment > span:first-child { grid-column: 1; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry { grid-column: 2; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-section-sound input[type=range] { min-width: 0; }
+.transcribe-flat-sidebar #transcribe-chords-toggle { width: 100%; max-width: none; justify-self: stretch; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table { margin: 0; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table th, .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table td { padding: 2px 1px; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table th:first-child { width: 14px; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table thead th { font-size: var(--tr-type-note); }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-swatch { width: 6px; height: 6px; }
+.transcribe-flat-sidebar .transcribe-stems-actions { gap: 4px; }
+.transcribe-flat-sidebar #transcribe-stems-info + * { margin: 0; }
+
+/* Shared rows make the whole panel fit without a scrolling control surface. */
+.transcribe-flat-sidebar #transcribe-sound-contents { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: end; }
+.transcribe-flat-sidebar #transcribe-sound-contents > .transcribe-audio-pitch { grid-column: 1 / -1; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-tool-field { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
+.transcribe-flat-sidebar #transcribe-analysis-contents > :is(#transcribe-spectrum-visible,#transcribe-chords-toggle) { grid-column: auto; }
+.transcribe-flat-sidebar #transcribe-analysis-contents > button { font-size: var(--tr-type-note); }
+.transcribe-flat-sidebar #transcribe-section-eq { grid-column: 1 / -1; }
+.transcribe-flat-sidebar #transcribe-eq-panel { grid-template-columns: minmax(0,1fr) minmax(0,1.5fr); align-items: start; gap: 4px 8px; }
+.transcribe-flat-sidebar #transcribe-eq-graph { grid-column: 1; grid-row: 1; height: 90px; }
+.transcribe-flat-sidebar .transcribe-eq-cuts { grid-column: 1; grid-row: 2; }
+.transcribe-flat-sidebar #transcribe-eq-bands { grid-column: 2; grid-row: 1 / 3; }
+.transcribe-flat-sidebar #transcribe-eq-panel input { height: 24px; min-height: 24px; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table :is(th,td) { line-height: 1; padding: 2px 1px; }
+.transcribe-flat-sidebar #transcribe-section-stems { grid-column: 1 / -1; }
+.transcribe-flat-sidebar #transcribe-section-stems > h3 { min-height: 26px; }
+.transcribe-flat-sidebar #transcribe-section-stems .transcribe-stems-actions { display: flex; flex-wrap: nowrap; gap: 4px; }
+.transcribe-flat-sidebar #transcribe-stems-enabled { min-width: 80px; }
+.transcribe-flat-sidebar .transcribe-stem-list { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px 8px; }
+.transcribe-flat-sidebar .transcribe-stem-list li > span { font-size: var(--tr-type-note); }
+.transcribe-flat-sidebar .transcribe-stem-list small { font-size: 0.6rem; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts label { font-size: 0.6rem; white-space: nowrap; }
+@media (min-width:1101px) {
+  .transcribe-flat-sidebar .transcribe-stem-list { grid-template-columns: repeat(5,minmax(0,1fr)); }
+  .transcribe-flat-sidebar .transcribe-stem-list li { grid-template-columns: minmax(0,1fr); }
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-sound-controls { grid-column: 2; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-pitch-lock { grid-column: 1; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-eq-graph { height: 70px; }
+.transcribe-flat-sidebar #transcribe-eq-panel input { min-height: 22px; height: 22px; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table :is(th,td) { padding: 1px; }
+.transcribe-flat-sidebar .transcribe-controls-grid { gap: 4px 8px; }
+.transcribe-flat-sidebar .transcribe-sidebar-footer .transcribe-data-actions { padding-top: 2px; }
+.transcribe-flat-sidebar .transcribe-sidebar-footer button { height: 22px; min-height: 22px; }
+@media (max-width: 400px) {
+  .transcribe-flat-sidebar .transcribe-sidebar-section > h3 { min-height: 18px; margin-bottom: 2px; }
+  .transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle { min-height: 24px; height: 24px; }
+  .transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) :is(input,select) { min-height: 24px; height: 24px; }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment { grid-template-rows: 24px; }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry { height: 24px; }
+  .transcribe-flat-sidebar #transcribe-section-sound input[type=range] { height: 24px; }
+  .transcribe-flat-sidebar .transcribe-stem-list li { min-height: 24px; }
+  .transcribe-flat-sidebar #transcribe-section-stems > h3 { min-height: 24px; }
+  .transcribe-flat-sidebar #transcribe-stems-enabled { min-height: 24px; height: 24px; }
+  .transcribe-flat-sidebar .transcribe-stems-actions { min-height: 24px; }
+}
+@media (max-width: 350px) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { gap: 2px 6px; padding: 4px; }
+  .transcribe-flat-sidebar .transcribe-group-content { gap: 2px; }
+  .transcribe-flat-sidebar #transcribe-marks { gap: 2px 4px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel { gap: 2px 4px; }
+  .transcribe-flat-sidebar .transcribe-stem-list { gap: 2px 4px; }
+}
+
+.transcribe-flat-sidebar .transcribe-stems-actions .transcribe-info-button { width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 2px; }
+@media (max-width: 350px) {
+}
+/* The native channel selection shares the first toggle row. */
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-tool-field > span:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-tool-field { display: block; }
+/* Use the available rail height for comfortable controls and a usable EQ plot. */
+.transcribe-flat-sidebar .transcribe-controls-grid {
+  grid-template-rows: auto auto minmax(0,1fr) auto auto;
+  align-content: stretch;
+  gap: 8px 10px;
+  padding: 10px;
+}
+.transcribe-flat-sidebar #transcribe-section-eq { display: flex !important; flex-direction: column; min-height: min-content; }
+.transcribe-flat-sidebar #transcribe-eq-contents { flex: 1; min-height: 0; display: flex; }
+.transcribe-flat-sidebar #transcribe-eq-panel { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2.5fr); grid-template-rows: minmax(70px,1fr) auto; gap: 6px 8px; }
+.transcribe-flat-sidebar #transcribe-eq-graph { grid-column: 1 / -1; grid-row: 1; width: 100%; height: 100%; min-height: 70px; }
+.transcribe-flat-sidebar .transcribe-eq-cuts { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: minmax(0,1fr); align-self: start; gap: 6px; }
+.transcribe-flat-sidebar #transcribe-eq-bands { grid-column: 2; grid-row: 2; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table { display: block; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.transcribe-flat-sidebar .transcribe-eq-table tbody { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px 6px; }
+.transcribe-flat-sidebar .transcribe-eq-table tbody tr { display: grid; grid-template-columns: 8px minmax(0,1.4fr) repeat(2,minmax(0,1fr)); align-items: end; gap: 2px; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table :is(th,td) { padding: 0; min-width: 0; }
+.transcribe-flat-sidebar .transcribe-eq-table td::before { display: block; margin-bottom: 2px; font-size: var(--tr-type-note); line-height: 1; color: var(--tr-muted); }
+.transcribe-flat-sidebar .transcribe-eq-table td:nth-child(2)::before { content: 'Hz'; }
+.transcribe-flat-sidebar .transcribe-eq-table td:nth-child(3)::before { content: 'dB'; }
+.transcribe-flat-sidebar .transcribe-eq-table td:nth-child(4)::before { content: 'Q'; }
+.transcribe-flat-sidebar .transcribe-eq-table tbody th { display: grid; align-items: center; height: 28px; }
+.transcribe-flat-sidebar #transcribe-eq-graph .eq-point { touch-action: none; }
+@media (min-width: 721px) {
+  .transcribe-flat-sidebar { --tr-type-label: 0.8125rem; --tr-type-note: 0.6875rem; }
+  .transcribe-flat-sidebar .transcribe-group-content { gap: 6px; }
+  .transcribe-flat-sidebar .transcribe-sidebar-section > h3 { min-height: 22px; margin-bottom: 6px; }
+  .transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle { height: 32px; min-height: 32px; }
+  .transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) :is(input,select) { height: 32px; min-height: 32px; font-size: var(--tr-type-label); }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment { grid-template-rows: 32px; }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry { height: 32px; grid-template-columns: minmax(0,1fr) 42px; }
+  .transcribe-flat-sidebar #transcribe-section-sound input[type=range] { height: 32px; }
+  .transcribe-flat-sidebar .transcribe-stem-list li { min-height: 32px; }
+  .transcribe-flat-sidebar .transcribe-stem-list li > span { font-size: var(--tr-type-label); }
+  .transcribe-flat-sidebar #transcribe-stems-enabled { height: 32px; min-height: 32px; }
+  .transcribe-flat-sidebar #transcribe-section-stems > h3 { min-height: 32px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel input { height: 28px; min-height: 28px; font-size: var(--tr-type-label); }
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts label { font-size: var(--tr-type-note); }
+  .transcribe-flat-sidebar .transcribe-sidebar-footer button { height: 28px; min-height: 28px; }
+}
+@media (max-width:720px) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { padding: 6px; gap: 4px 8px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel { gap: 4px 6px; }
+  .transcribe-flat-sidebar .transcribe-eq-cuts { gap: 4px; }
+  .transcribe-flat-sidebar .transcribe-eq-table tbody { gap: 4px; }
+}
+@media (max-width:350px) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { padding: 4px; gap: 2px 6px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel { grid-template-columns: minmax(0,1fr) minmax(0,2.8fr); gap: 2px 4px; }
+  .transcribe-flat-sidebar .transcribe-eq-table tbody { gap: 2px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts label { font-size: 0.5625rem; }
+}
+
+#transcribe-eq-graph .eq-hit { fill: transparent; stroke: none !important; pointer-events: all; }
+#transcribe-eq-graph .eq-point ellipse:not(.eq-hit) { vector-effect: non-scaling-stroke; }
+:root[data-keyboard-navigation="on"] #transcribe-eq-graph .eq-point:focus ellipse:not(.eq-hit) { stroke: var(--tr-accent); stroke-width: 2; }
+
+/* Keep cuts at hand and give each numeric band enough room for its value. */
+.transcribe-flat-sidebar #transcribe-section-eq > h3 { align-items: end; }
+.transcribe-flat-sidebar #transcribe-section-eq > h3 > span { align-self: center; }
+.transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 48%; gap: 4px; margin-left: auto; }
+.transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts label { display: grid; gap: 2px; min-width: 0; font-size: var(--tr-type-note); line-height: 1; white-space: nowrap; font-weight: 400; }
+.transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts input { width: 100%; min-width: 0; min-height: 24px; height: 24px; padding: 2px 4px; font-size: var(--tr-type-label); }
+.transcribe-flat-sidebar #transcribe-eq-panel { grid-template-columns: minmax(0,1fr); }
+.transcribe-flat-sidebar #transcribe-eq-bands { grid-column: 1; grid-row: 2; }
+@media (min-width:721px) {
+  .transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts input { height: 28px; min-height: 28px; }
+}
+@media (max-width:720px) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { gap: 2px 8px; }
+  .transcribe-flat-sidebar .transcribe-eq-table tbody tr:nth-child(n+3) td::before { display: none; }
+  .transcribe-flat-sidebar .transcribe-stem-list { gap: 2px 8px; }
+}
+@media (max-width:720px) {
+  .transcribe-flat-sidebar .transcribe-eq-table tbody th { height: 22px; }
+  .transcribe-flat-sidebar .transcribe-eq-table td::before { margin-bottom: 1px; }
+}
+@media (max-width:350px) {
+  .transcribe-flat-sidebar #transcribe-eq-panel { grid-template-rows: minmax(60px,1fr) auto; }
+  .transcribe-flat-sidebar #transcribe-eq-graph { min-height: 60px; }
+}
+
+@media (max-width:350px) {
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row { grid-template-rows: 40px 44px 44px; }
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row .transcribe-identity { min-height: 40px; height: 40px; padding-block: 8px; }
+}
+/* One operational type family, with distinct titles, labels, values, and notes. */
+.transcribe-flat-sidebar {
+  --tr-type-section: 0.875rem;
+  --tr-type-command: 0.72rem;
+  --tr-type-helper: 0.6875rem;
+  --tr-type-value: 0.8125rem;
+  font-family: var(--font-ui);
+}
+.transcribe-flat-sidebar .transcribe-sidebar-header h2,
+.transcribe-flat-sidebar .transcribe-sidebar-section > h3 {
+  font-family: var(--font-ui);
+  font-size: var(--tr-type-section);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+.transcribe-flat-sidebar .transcribe-controls-grid :is(button,input,select,label) {
+  font-family: var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.transcribe-flat-sidebar .transcribe-controls-grid :is(input,select) {
+  font-size: var(--tr-type-value);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle,
+.transcribe-flat-sidebar #transcribe-analysis-contents > button {
+  font-size: var(--tr-type-label);
+  font-weight: 500;
+}
+.transcribe-flat-sidebar .transcribe-tool-toggle > span { color: var(--tr-text); font-weight: 500; }
+.transcribe-flat-sidebar .transcribe-tool-toggle > strong { font-weight: 700; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment > span:first-child,
+.transcribe-flat-sidebar #transcribe-analysis-contents > label > span,
+.transcribe-flat-sidebar #transcribe-marks label,
+.transcribe-flat-sidebar #transcribe-marks legend{
+  font-size: var(--tr-type-label);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--tr-text);
+}
+.transcribe-flat-sidebar #transcribe-stems-enabled { font-weight: 600; }
+.transcribe-flat-sidebar .transcribe-stem-list li > span {
+  font-size: var(--tr-type-label);
+  font-weight: 500;
+  line-height: 1.15;
+}
+.transcribe-flat-sidebar .transcribe-eq-table td::before,
+.transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts label {
+  font-size: var(--tr-type-helper);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--tr-muted);
+}
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar {
+    --tr-type-section: 0.8125rem;
+    --tr-type-label: 0.72rem;
+    --tr-type-command: 0.6875rem;
+    --tr-type-helper: 0.625rem;
+    --tr-type-value: 0.75rem;
+  }
+}
+/* Short rails reserve space for legible fields below the editable graph. */
+@media (max-width: 720px), (max-height: 800px) {
+  .transcribe-flat-sidebar #transcribe-eq-panel { grid-template-rows: minmax(60px,1fr) auto; }
+  .transcribe-flat-sidebar #transcribe-eq-graph { min-height: 60px; }
+}
+@media (max-width: 350px) {
+  .transcribe-flat-sidebar #transcribe-eq-panel { grid-template-rows: minmax(55px,1fr) auto; }
+  .transcribe-flat-sidebar #transcribe-eq-graph { min-height: 55px; }
+}
+
+/* Shared alignment rails keep the flat controls easy to scan. */
+.transcribe-flat-sidebar {
+  --tr-group-gap: 8px;
+  --tr-column-gap: 12px;
+  --tr-field-gap: 4px;
+  --tr-sidebar-row-height: 32px;
+}
+.transcribe-flat-sidebar .transcribe-controls-grid {
+  column-gap: var(--tr-column-gap);
+  row-gap: var(--tr-group-gap);
+}
+.transcribe-flat-sidebar #transcribe-section-sound {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+}
+.transcribe-flat-sidebar #transcribe-sound-contents {
+  flex: 1;
+  grid-template-rows: var(--tr-sidebar-row-height) minmax(0,1fr);
+  align-items: stretch;
+}
+.transcribe-flat-sidebar #transcribe-section-sound #transcribe-channel {
+  height: var(--tr-sidebar-row-height);
+  min-height: var(--tr-sidebar-row-height);
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-controls {
+  height: 100%;
+  grid-template-rows: repeat(2,var(--tr-sidebar-row-height));
+  align-content: space-between;
+  align-items: start;
+}
+.transcribe-flat-sidebar #transcribe-marks {
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: var(--tr-field-gap);
+  align-items: end;
+}
+.transcribe-flat-sidebar #transcribe-marks > fieldset{
+  display: contents;
+}
+.transcribe-flat-sidebar #transcribe-marks > fieldset > label { grid-column: 1; grid-row: 1; }
+.transcribe-flat-sidebar #transcribe-marks > output:not(:empty){ grid-column: 1 / -1; grid-row: auto; }
+.transcribe-flat-sidebar .transcribe-eq-table tbody { column-gap: var(--tr-column-gap); }
+.transcribe-flat-sidebar .transcribe-stem-list { column-gap: var(--tr-column-gap); }
+.transcribe-flat-sidebar #transcribe-section-eq > h3 .transcribe-eq-cuts { gap: var(--tr-field-gap); }
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar { --tr-group-gap: 4px; --tr-column-gap: 8px; --tr-sidebar-row-height: 24px; }
+}
+@media (max-width: 350px), (min-width: 721px) and (max-height: 800px) {
+  .transcribe-flat-sidebar { --tr-group-gap: 2px; }
+}
+
+/* Keep headings for titles and reset actions; all settings live beneath them. */
+.transcribe-flat-sidebar .transcribe-controls-grid {
+  grid-template-rows: repeat(5,auto);
+  align-content: space-between;
+}
+.transcribe-flat-sidebar #transcribe-section-eq { flex: none; }
+.transcribe-flat-sidebar #transcribe-eq-contents { flex: none; }
+.transcribe-flat-sidebar #transcribe-eq-panel {
+  flex: none;
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+}
+.transcribe-flat-sidebar #transcribe-eq-graph {
+  grid-column: 1;
+  grid-row: 1;
+  height: clamp(44px,12vh,110px);
+  min-height: 44px;
+}
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: var(--tr-column-gap);
+  width: 100%;
+  margin: 0;
+}
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts label {
+  font-size: var(--tr-type-helper);
+  font-weight: 500;
+  line-height: 1;
+}
+.transcribe-flat-sidebar #transcribe-eq-bands { grid-column: 1; grid-row: 3; }
+.transcribe-flat-sidebar #transcribe-section-stems > h3 { min-height: 22px; }
+.transcribe-flat-sidebar #transcribe-stems-panel .transcribe-stems-actions { display: block; }
+.transcribe-flat-sidebar #transcribe-stems-enabled { width: 100%; min-width: 0; }
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar #transcribe-eq-panel { gap: 4px; }
+  .transcribe-flat-sidebar #transcribe-eq-graph { height: 48px; }
+  .transcribe-flat-sidebar #transcribe-section-stems > h3 { min-height: 18px; }
+}
+.transcribe-flat-sidebar #transcribe-section-eq { display: block !important; }
+.transcribe-flat-sidebar #transcribe-eq-contents { display: block; }
+.transcribe-flat-sidebar #transcribe-section-eq { min-height: min-content; }
+.transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-graph {
+  height: clamp(36px,7vh,64px);
+  min-height: 36px;
+}
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-graph { height: 36px; }
+}
+
+/* Pitch labels follow the same above-field pattern as analysis settings. */
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-controls {
+  height: auto;
+  grid-template-rows: repeat(2,auto);
+  align-content: start;
+  gap: 4px;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment {
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: auto var(--tr-sidebar-row-height);
+  gap: 2px;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment > span:first-child {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: var(--tr-type-note);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--tr-muted);
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* Band identity stays in the field tint and graph; borders match other fields. */
+.transcribe-flat-sidebar .transcribe-eq-table tbody tr {
+  position: relative;
+  grid-template-columns: minmax(0,1.4fr) repeat(2,minmax(0,1fr));
+  background: transparent;
+}
+.transcribe-flat-sidebar .transcribe-eq-table tbody th {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.transcribe-flat-sidebar .transcribe-eq-swatch { display: none; }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table input {
+  width: 100%;
+  background: color-mix(in srgb, var(--eq-band-color) 9%, var(--tr-bg));
+  border-color: var(--tr-border);
+}
+
+/* Quiet rules separate groups; spare height belongs inside the working controls. */
+.transcribe-flat-sidebar .transcribe-controls-grid {
+  grid-template-rows: auto auto minmax(0,1fr) auto auto;
+  align-content: stretch;
+  row-gap: 8px;
+}
+.transcribe-flat-sidebar #transcribe-section-analysis {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+}
+.transcribe-flat-sidebar #transcribe-section-analysis::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--tr-column-gap) / -2);
+  border-left: 1px solid var(--tr-border-soft);
+}
+.transcribe-flat-sidebar #transcribe-analysis-contents {
+  flex: 1;
+  align-content: space-between;
+}
+.transcribe-flat-sidebar #transcribe-sound-contents > .transcribe-audio-pitch { height: 100%; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-controls {
+  height: 100%;
+  align-content: space-between;
+}
+@media (min-width: 1101px) and (min-height: 850px) {
+  .transcribe-flat-sidebar { --tr-sidebar-row-height: 36px; }
+  .transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle,
+  .transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) :is(input,select),
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry{
+    height: 36px;
+    min-height: 36px;
+  }
+  .transcribe-flat-sidebar #transcribe-eq-panel input { height: 32px; min-height: 32px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel { gap: 10px; }
+}
+@media (max-width: 720px), (max-height: 800px) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { row-gap: 4px; }
+}
+.transcribe-flat-sidebar #transcribe-eq-panel,
+.transcribe-flat-sidebar #transcribe-eq-contents { min-height: min-content; }
+@media (min-width: 721px) and (max-height: 800px) {
+  .transcribe-flat-sidebar #transcribe-eq-graph { height: 60px; }
+}
+@media (min-width: 1101px) and (min-height: 850px) {
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input,
+  .transcribe-flat-sidebar #transcribe-section-analysis select{
+    height: 36px;
+    min-height: 36px;
+  }
+}
+
+@media (min-width: 721px) and (max-height: 800px) {
+  .transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-graph { height: 36px; }
+}
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) .transcribe-controls-grid { row-gap: 2px; }
+}
+@media (max-width: 350px) {
+  .transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-graph { height: 32px; min-height: 32px; }
+}
+
+/* A consistent reading hierarchy for the current flat control surface. */
+.transcribe-flat-sidebar {
+  --tr-type-section: 0.9375rem;
+  --tr-type-value: 0.875rem;
+  --tr-type-command: 0.75rem;
+  --tr-type-field-label: 0.6875rem;
+}
+.transcribe-flat-sidebar .transcribe-sidebar-header h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.transcribe-flat-sidebar #transcribe-analysis-contents > label > span,
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment > span:first-child,
+.transcribe-flat-sidebar #transcribe-marks > fieldset label > span,
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts label {
+  font-size: var(--tr-type-field-label);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--tr-muted);
+}
+.transcribe-flat-sidebar #transcribe-eq-panel input,
+.transcribe-flat-sidebar #transcribe-section-eq .transcribe-eq-cuts input,
+.transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) :is(input[type=number],select) {
+  font-size: var(--tr-type-value);
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.transcribe-flat-sidebar .transcribe-section-reset {
+  font-size: var(--tr-type-field-label);
+  font-weight: 500;
+}
+@media (max-width: 720px) {
+  .transcribe-flat-sidebar {
+    --tr-type-section: 0.875rem;
+    --tr-type-value: 0.75rem;
+    --tr-type-command: 0.6875rem;
+    --tr-type-field-label: 0.6875rem;
+  }
+  .transcribe-flat-sidebar .transcribe-sidebar-header h2 { font-size: 1.0625rem; }
+}
+
+/* Sound and Analysis share three control baselines across their two columns. */
+.transcribe-flat-sidebar {
+  --tr-sidebar-label-height: calc(var(--tr-type-field-label) * 1.15);
+  --tr-sidebar-labeled-height: calc(var(--tr-sidebar-row-height) + var(--tr-sidebar-label-height) + 2px);
+}
+.transcribe-flat-sidebar :is(#transcribe-sound-contents,#transcribe-analysis-contents) {
+  grid-template-rows: var(--tr-sidebar-row-height) repeat(2,var(--tr-sidebar-labeled-height));
+  align-content: start;
+  align-items: end;
+  row-gap: 0;
+}
+.transcribe-flat-sidebar #transcribe-section-sound :is(.transcribe-audio-pitch,.transcribe-pitch-controls) { display: contents; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment {
+  grid-column: 1 / -1;
+  align-self: end;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment:first-child { grid-row: 2; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment:last-child { grid-row: 3; }
+.transcribe-flat-sidebar #transcribe-analysis-contents > #transcribe-analyze-selection { grid-row: 2; align-self: end; }
+.transcribe-flat-sidebar #transcribe-analysis-contents > label { grid-row: 3; align-self: end; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input,
+.transcribe-flat-sidebar #transcribe-analysis-contents select,
+.transcribe-flat-sidebar #transcribe-analysis-contents > button {
+  height: var(--tr-sidebar-row-height);
+  min-height: var(--tr-sidebar-row-height);
+}
+.transcribe-flat-sidebar #transcribe-section-analysis #transcribe-analysis-contents select {
+  height: var(--tr-sidebar-row-height);
+  min-height: var(--tr-sidebar-row-height);
+}
+.transcribe-flat-sidebar #transcribe-section-analysis #transcribe-analysis-contents > label > span {
+  font-size: var(--tr-type-field-label);
+  line-height: 1.15;
+}
+@media (max-width: 350px) {
+  .transcribe-flat-sidebar :is(#transcribe-sound-contents,#transcribe-analysis-contents) { row-gap: 0; }
+}
+
+/* Finishing details stay inside the controls rail. */
+.transcribe-flat-sidebar .transcribe-section-reset {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+}
+.transcribe-flat-sidebar #transcribe-eq-panel input { padding-inline: 4px; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input[type=number] { text-align: center; }
+.transcribe-flat-sidebar .transcribe-controls-grid input::selection {
+  background: var(--tr-accent);
+  color: var(--tr-bg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table input:hover { border-color: var(--tr-border-hover); }
+}
+
+/* Spare rail height belongs to the response graph, not gaps between control rows. */
+.transcribe-flat-sidebar #transcribe-section-eq { display: flex !important; flex-direction: column; min-height: 0; }
+.transcribe-flat-sidebar #transcribe-eq-contents { display: flex; flex: 1; min-height: 0; }
+.transcribe-flat-sidebar #transcribe-eq-panel { flex: 1; min-height: 0; grid-template-rows: minmax(44px,1fr) auto auto; }
+.transcribe-flat-sidebar #transcribe-eq-graph { height: 100%; min-height: 44px; }
+.transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-panel { grid-template-rows: minmax(32px,1fr) auto auto; }
+.transcribe-flat-sidebar:has(.transcribe-stem-list:not([hidden])) #transcribe-eq-graph { height: 100%; min-height: 32px; }
+@media (min-width: 1101px) {
+  .transcribe-flat-sidebar .transcribe-stem-list li {
+    grid-template-rows: minmax(2.3em, 1fr) auto;
+    align-items: start;
+  }
+}
+
+/* The controls rail has no Timing group; marker options live with measure navigation. */
+.transcribe-flat-sidebar .transcribe-controls-grid { grid-template-rows: auto minmax(0,1fr) auto auto; overflow-y: auto; }
+#transcribe-measure-panel #transcribe-marks > fieldset { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; border: 0; }
+#transcribe-measure-panel #transcribe-marks label { display: grid; gap: 4px; }
+#transcribe-measure-panel #transcribe-delete-measures { width: 100%; }
+#transcribe-measure-panel #transcribe-marks > output:empty { display: none; }
+
+/* Distill repeated labels and keep maintenance actions secondary. */
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table tbody tr:nth-child(n+3) td::before { display: none; }
+.transcribe-flat-sidebar .transcribe-sidebar-section > h3 :is(.transcribe-section-reset,.transcribe-info-button) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--tr-muted);
+  font-weight: 500;
+}
+.transcribe-flat-sidebar #transcribe-clear-saved {
+  border-color: transparent;
+  background: transparent;
+  color: var(--tr-muted);
+  text-align: right;
+  font-weight: 500;
+}
+@media (hover: hover) and (pointer: fine) {
+  .transcribe-flat-sidebar .transcribe-sidebar-section > h3 :is(.transcribe-section-reset,.transcribe-info-button):hover {
+    border-color: var(--tr-border-hover);
+    color: var(--tr-text);
+  }
+  .transcribe-flat-sidebar #transcribe-clear-saved:hover { color: var(--tr-text); text-decoration: underline; }
+}
+
+/* One row fits either a plain control or a compact label above its field. */
+.transcribe-flat-sidebar { --tr-sidebar-row-height: max(34px, 2.125rem); --tr-sidebar-labeled-height: var(--tr-sidebar-row-height); }
+.transcribe-flat-sidebar :is(#transcribe-sound-contents,#transcribe-analysis-contents) {
+  grid-template-rows: repeat(3,var(--tr-sidebar-row-height));
+  row-gap: 6px;
+}
+.transcribe-flat-sidebar #transcribe-section-sound #transcribe-channel,
+.transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle,
+.transcribe-flat-sidebar #transcribe-analysis-contents > button {
+  height: var(--tr-sidebar-row-height);
+  min-height: var(--tr-sidebar-row-height);
+}
+.transcribe-flat-sidebar #transcribe-analysis-contents > label {
+  height: var(--tr-sidebar-row-height);
+  display: grid;
+  grid-template-rows: var(--tr-sidebar-label-height) minmax(0,1fr);
+  gap: 2px;
+}
+.transcribe-flat-sidebar #transcribe-section-analysis #transcribe-analysis-contents select {
+  height: calc(var(--tr-sidebar-row-height) - var(--tr-sidebar-label-height) - 2px);
+  min-height: 0;
+  padding-block: 0;
+  line-height: 1;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment {
+  height: var(--tr-sidebar-row-height);
+  grid-template-columns: minmax(0,1fr) 42px;
+  grid-template-rows: var(--tr-sidebar-label-height) minmax(0,1fr);
+  gap: 2px 4px;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry { display: contents; }
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input[type=range] {
+  grid-column: 1;
+  grid-row: 2;
+  height: 100%;
+  min-height: 0;
+  align-self: center;
+  margin: 0;
+}
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input[type=number] {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  height: var(--tr-sidebar-row-height);
+  min-height: 0;
+  padding-block: 0;
+}
+.transcribe-flat-sidebar #transcribe-section-eq .transcribe-eq-cuts input,
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table input {
+  height: max(20px, 1.25rem);
+  min-height: max(20px, 1.25rem);
+  padding-block: 0;
+  line-height: 1;
+}
+
+/* Text growth uses content space; the normal compact control sizes stay intact. */
+.transcribe-navbar-row .transcribe-identity {
+  flex-wrap: nowrap;
+  height: auto;
+  white-space: nowrap;
+}
+.transcribe-navbar-row .transcribe-identity-suffix { white-space: nowrap; }
+.transcribe-navbar-row .transcribe-speed-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+}
+.transcribe-navbar-row .transcribe-speed-buttons > button,
+.transcribe-navbar-row .transcribe-custom-speed-slot {
+  flex: 1 0 auto;
+  min-width: max-content;
+  width: auto;
+}
+@media (min-width: 721px) and (pointer: fine) {
+  .transcribe-navbar-row .transcribe-speed-buttons > button,
+  .transcribe-navbar-row .transcribe-custom-speed-slot,
+  .transcribe-navbar-row .transcribe-custom-speed-slot :is(button, input),
+  .transcribe-navbar-row .transcribe-panel-buttons :is(#transcribe-controls-toggle, #transcribe-shortcuts-toggle) {
+    box-sizing: border-box;
+    flex: 0 0 var(--tr-control-height);
+    width: var(--tr-control-height);
+    min-width: var(--tr-control-height);
+    height: var(--tr-control-height);
+    min-height: var(--tr-control-height);
+    padding-inline: 0;
+  }
+}
+.transcribe-flat-sidebar .transcribe-group-content > .transcribe-tool-toggle {
+  gap: 0;
+  white-space: normal;
+  height: auto;
+  min-height: var(--tr-sidebar-row-height);
+}
+.transcribe-flat-sidebar .transcribe-sidebar-section > h3 { min-height: max(20px, 1.375rem); height: auto; }
+.transcribe-flat-sidebar .transcribe-controls-grid { align-content: start; }
+.transcribe-flat-sidebar :is(#transcribe-sound-contents,#transcribe-analysis-contents) {
+  grid-template-rows: repeat(3, minmax(var(--tr-sidebar-row-height), max-content));
+}
+.transcribe-flat-sidebar { grid-template-rows: auto minmax(0, 1fr); }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table tbody tr { height: auto; min-height: max(20px, 1.25rem); }
+.transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table td::before { line-height: 1.2; height: auto; }
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row { grid-template-rows: auto auto auto; }
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row .transcribe-identity { height: auto; }
+  .transcribe-app .transcribe-transport-sliders > label { grid-template-rows: auto auto; }
+  .transcribe-app .transcribe-transport-sliders span { line-height: 1.2; white-space: normal; }
+  .transcribe-app .transcribe-transport-sliders input { height: max(11px, 0.6875rem); }
+}
+/* Dividers span the section, independent of its flexible content height. */
+.transcribe-flat-sidebar :is(#transcribe-section-eq,#transcribe-section-stems) { position: relative; }
+.transcribe-flat-sidebar :is(#transcribe-section-eq,#transcribe-section-stems)::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  inset-inline: 0;
+  border-top: 1px solid var(--tr-border-soft);
+}
+@media (max-width: 720px), (max-height: 800px) {
+  .transcribe-flat-sidebar :is(#transcribe-section-eq,#transcribe-section-stems)::before { top: -2px; }
+}
+
+/* A little breathing room inside the two aligned control columns. */
+.transcribe-flat-sidebar :is(#transcribe-sound-contents,#transcribe-analysis-contents) > button,
+.transcribe-flat-sidebar #transcribe-section-sound #transcribe-channel,
+.transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input[type=number],
+.transcribe-flat-sidebar #transcribe-section-analysis #transcribe-analysis-contents select { padding: 1px 6px; }
+
+@media (hover: hover) {
+  .transcribe-navbar-row .transcribe-panel-buttons :is(#transcribe-controls-toggle,#transcribe-shortcuts-toggle):hover:not(:disabled) {
+    border-color: var(--tr-border-hover);
+  }
+}
+
+.transcribe-flat-sidebar .transcribe-anchored-info[popover] {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: min(24rem,calc(100vw - 16px));
+  max-width: min(24rem,calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.transcribe-flat-sidebar :is(#transcribe-eq-info,#transcribe-stems-info) p {
+  margin: 0;
+  color: var(--tr-muted);
+  font-size: var(--tr-type-note);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+}
+
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .transcribe-navbar-row .transcribe-panel-buttons #transcribe-shortcuts-toggle {
+    display: none;
+  }
+  .transcribe-navbar-row {
+    padding: 0 16px 8px;
+    gap: 8px 6px;
+  }
+  .transcribe-navbar-row .transcribe-identity {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+  .transcribe-navbar-row .transcribe-file-control { gap: 6px; }
+  .transcribe-navbar-row #transcribe-config-actions { flex: 0 0 96px; }
+  .transcribe-navbar-row #transcribe-config-actions button { padding-inline: 8px; }
+  .transcribe-navbar-row .transcribe-panel-buttons #transcribe-controls-toggle {
+    width: var(--tr-control-height);
+    min-width: var(--tr-control-height);
+    padding: 8px;
+  }
+}
+
+.transcribe-piano-help {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+:root[data-keyboard-navigation="on"] .transcribe-app #transcribe-keyboard:focus-visible {
+  outline: 2px solid var(--tr-accent);
+  outline-offset: -2px;
+}
+
+/* Font-relative container limits reflow enlarged text without changing phone defaults. */
+.transcribe-navbar-row { container: transcribe-navbar / inline-size; }
+.transcribe-flat-sidebar { container: transcribe-controls / inline-size; }
+@container transcribe-navbar (max-width: 12.5rem) {
+  .transcribe-navbar-row .transcribe-identity { flex-wrap: wrap; }
+}
+@container transcribe-controls (max-width: 12.5rem) {
+  .transcribe-flat-sidebar .transcribe-controls-grid { display: block; }
+  .transcribe-flat-sidebar .transcribe-controls-grid > * + * { margin-top: 8px; }
+  .transcribe-flat-sidebar :is(#transcribe-section-sound,#transcribe-section-analysis) { grid-column: 1; grid-row: auto; }
+  .transcribe-flat-sidebar #transcribe-section-analysis::before { display: none; }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment { grid-template-columns: minmax(0, 1fr) max(42px, 2.625rem); }
+  .transcribe-flat-sidebar #transcribe-eq-contents,
+  .transcribe-flat-sidebar #transcribe-eq-panel { flex: none; }
+  .transcribe-flat-sidebar #transcribe-eq-contents { display: block; }
+  .transcribe-flat-sidebar #transcribe-eq-panel { width: 100%; min-width: 0; grid-template-rows: 5rem auto auto; }
+  .transcribe-flat-sidebar #transcribe-eq-graph { height: 5rem; min-height: 5rem; }
+}
+
+/* Touch settings use real, separated hit areas; overflow stays in the controls rail. */
+@media (any-pointer: coarse) {
+  .transcribe-app[data-view-mode] .transcribe-workspace,
+  .transcribe-app[data-view-mode] .transcribe-workspace:not(.has-markers) {
+    --tr-timeline-min-height: calc(6rem + 44px);
+    grid-template-rows: auto minmax(var(--tr-timeline-min-height), 1.2fr) minmax(44px, 0.8fr) auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .transcribe-app[data-view-mode] .transcribe-workspace:not(.has-markers) {
+    --tr-timeline-min-height: calc(3.25rem + 44px);
+  }
+  .transcribe-app .transcribe-timeline { min-height: 0; overflow: visible; }
+  .transcribe-app .transcribe-waveform-wrap { min-height: 44px; }
+  .transcribe-app #transcribe-waveform { min-height: 44px; }
+  .transcribe-app #transcribe-mark-ruler { touch-action: pan-y; }
+  .transcribe-flat-sidebar {
+    --tr-sidebar-row-height: max(60px, 3.75rem);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .transcribe-flat-sidebar .transcribe-controls-grid {
+    grid-template-rows: auto minmax(min-content, 1fr) auto auto;
+  }
+  .transcribe-flat-sidebar #transcribe-section-eq { min-height: min-content; }
+  .transcribe-flat-sidebar .transcribe-sidebar-header button,
+  .transcribe-flat-sidebar .transcribe-section-reset,
+  .transcribe-flat-sidebar .transcribe-info-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    flex: 0 0 44px;
+  }
+  .transcribe-flat-sidebar .transcribe-sidebar-section > h3 { min-height: 44px; }
+  .transcribe-flat-sidebar .transcribe-section-reset {
+    width: auto;
+    flex: 0 0 auto;
+    padding-inline: 6px;
+  }
+  .transcribe-flat-sidebar .transcribe-controls-grid { row-gap: 8px; }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-entry input[type=number] {
+    height: max(44px, 2.75rem);
+    min-height: 44px;
+  }
+  .transcribe-flat-sidebar #transcribe-section-sound .transcribe-pitch-adjustment {
+    grid-template-columns: minmax(0, 1fr) max(44px, 2.75rem);
+  }
+  .transcribe-flat-sidebar #transcribe-section-eq .transcribe-eq-cuts input,
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table input {
+    height: max(44px, 2.75rem);
+    min-height: 44px;
+  }
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table tbody tr {
+    height: auto;
+    min-height: 44px;
+    grid-template-columns: minmax(44px, 1.4fr) repeat(2, minmax(44px, 1fr));
+  }
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-table tbody { gap: 6px; }
+  .transcribe-flat-sidebar #transcribe-eq-panel .transcribe-eq-cuts { gap: 6px; }
+  .transcribe-flat-sidebar #transcribe-clear-saved,
+  .transcribe-flat-sidebar #transcribe-section-stems .transcribe-stems-actions #transcribe-stems-enabled,
+  .transcribe-flat-sidebar .transcribe-stem-list button {
+    height: auto;
+    min-height: 44px;
+  }
+  .transcribe-app .transcribe-transport-sliders input {
+    height: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Reserve the measured footer even when text forces the signal workspace to scroll. */
+@media (any-pointer: coarse) and (max-width: 720px), (pointer: coarse) and (max-height: 500px) {
+  .transcribe-app[data-view-mode] .transcribe-workspace {
+    padding-bottom: var(--tr-footer-height, 163px) !important;
+  }
+  .transcribe-app .transcribe-workspace > .transcribe-transport {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    z-index: 31;
+    visibility: visible;
+  }
+}
+@media (any-pointer: coarse) and (max-width: 720px), (pointer: coarse) and (max-height: 500px) {
+  .transcribe-app .transcribe-transport {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: auto 44px auto;
+  }
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-transport {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-transport-sliders,
+  .transcribe-app .transcribe-workspace.has-markers .transcribe-transport-sliders {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    gap: 8px;
+    padding: 0;
+  }
+  .transcribe-app .transcribe-transport-sliders > label {
+    grid-column: auto;
+    grid-row: 1;
+    grid-template-rows: auto 44px;
+  }
+}
+@media (pointer: coarse) and (max-height: 500px) {
+  .transcribe-app .transcribe-empty { overflow: hidden; }
+}
+
+/* Wide, short touch screens use horizontal transport space for the signal panes. */
+@media (pointer: coarse) and (min-width: 560px) and (max-height: 500px) {
+  .transcribe-navbar-row,
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+  }
+  .transcribe-navbar-row .transcribe-identity,
+  .transcribe-workspace.mobile-section-open .transcribe-navbar-row .transcribe-identity {
+    height: auto;
+    min-height: 44px;
+    padding-block: 0;
+  }
+  .transcribe-navbar-row .transcribe-file-control { grid-column: 1; }
+  .transcribe-navbar-row .transcribe-playback-settings {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .transcribe-navbar-row .transcribe-panel-buttons { grid-column: 3; }
+  .transcribe-navbar-row .transcribe-speed-buttons > button,
+  .transcribe-navbar-row .transcribe-custom-speed-slot { min-width: 44px; }
+  .transcribe-navbar-row .transcribe-speed-buttons { max-width: 100%; }
+  .transcribe-app .transcribe-timeline {
+    grid-template-rows: 44px 44px minmax(44px, 1fr);
+  }
+  .transcribe-app .transcribe-timeline:not(.has-markers) {
+    grid-template-rows: 44px minmax(44px, 1fr);
+  }
+  .transcribe-app[data-view-mode] .transcribe-workspace,
+  .transcribe-app[data-view-mode] .transcribe-workspace:not(.has-markers) {
+    --tr-timeline-min-height: 132px;
+    grid-template-rows: auto minmax(var(--tr-timeline-min-height), 1fr) clamp(44px, 18dvh, 80px) auto;
+  }
+  .transcribe-app[data-view-mode] .transcribe-workspace:not(.has-markers) {
+    --tr-timeline-min-height: 88px;
+  }
+  .transcribe-app #transcribe-mark-ruler { height: 44px; }
+  .transcribe-app .transcribe-transport,
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-transport {
+    grid-template-columns: repeat(7, 44px) minmax(44px, 1fr) minmax(104px, 0.65fr);
+    grid-template-rows: auto;
+    align-items: center;
+    gap: 0;
+  }
+  .transcribe-app .transcribe-transport > button { grid-row: 1; }
+  .transcribe-app .transcribe-transport .transcribe-playback-progress {
+    grid-column: 8;
+    grid-row: 1;
+    padding-inline: 8px;
+  }
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-transport {
+    grid-template-columns: repeat(6, 44px) minmax(44px, 1fr) minmax(104px, 0.65fr);
+  }
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-playback-progress {
+    grid-column: 7;
+  }
+  .transcribe-app .transcribe-workspace:not(.has-markers) .transcribe-transport-sliders,
+  .transcribe-app .transcribe-workspace.has-markers .transcribe-transport-sliders {
+    grid-column: -2;
+    grid-row: 1;
+    padding-left: 8px;
+  }
+}

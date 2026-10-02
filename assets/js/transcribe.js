@@ -168,6 +168,7 @@
   }
 
   function setPlaybackSpeed(speed) {
+
     elements.audio.playbackRate = speed;
     updatePitchPreservation();
     let presetIsActive = false;
@@ -362,10 +363,12 @@
   }
 
   function midiCenterToKeyboardX(midi, width) {
-    const boundedMidi = clamp(midi, minimumSpectrumMidi, maximumSpectrumMidi - 1);
+    const boundedMidi = clamp(midi, minimumSpectrumMidi - 0.5, maximumSpectrumMidi - 0.5);
+    const keyWidth = width / spectrumWhiteKeyCount;
+    if (boundedMidi < minimumSpectrumMidi) return (boundedMidi - minimumSpectrumMidi + 0.5) * keyWidth;
+    if (boundedMidi > maximumSpectrumMidi - 1) return width + (boundedMidi - maximumSpectrumMidi + 0.5) * keyWidth;
     const lowerMidi = Math.floor(boundedMidi);
     const fraction = boundedMidi - lowerMidi;
-    const keyWidth = width / spectrumWhiteKeyCount;
     const centerForNote = (note) => {
       const whiteIndex = whiteKeysBefore(note);
       return (whiteIndex + (isBlackKey(note) ? 0 : 0.5)) * keyWidth;
@@ -377,17 +380,17 @@
 
   function keyboardXToMidi(x, width) {
     const boundedX = clamp(x, 0, width);
-    let previousMidi = minimumSpectrumMidi;
+    let previousMidi = minimumSpectrumMidi - 0.5;
     let previousX = midiCenterToKeyboardX(previousMidi, width);
-    for (let midi = minimumSpectrumMidi + 1; midi < maximumSpectrumMidi; midi += 1) {
+    for (let midi = minimumSpectrumMidi; midi < maximumSpectrumMidi; midi += 1) {
       const nextX = midiCenterToKeyboardX(midi, width);
       if (boundedX <= nextX) {
-        return previousMidi + clamp((boundedX - previousX) / Math.max(1, nextX - previousX), 0, 1);
+        return previousMidi + (midi - previousMidi) * clamp((boundedX - previousX) / Math.max(1, nextX - previousX), 0, 1);
       }
       previousMidi = midi;
       previousX = nextX;
     }
-    return maximumSpectrumMidi - 1;
+    return previousMidi + (boundedX - previousX) / Math.max(1, width - previousX) * 0.5;
   }
 
   // Match the painted key shapes, including the white area below black keys.
@@ -710,6 +713,7 @@
   }
 
   function drawKeyboard(cursorMidi = null) {
+    if (document.activeElement === elements.keyboard && document.documentElement.dataset.keyboardNavigation === 'on') cursorMidi = keyboardSelectedMidi;
     const { context, width, height } = configureCanvas(elements.keyboard);
     const whiteKeyWidth = width / spectrumWhiteKeyCount;
     const blackKeyWidth = whiteKeyWidth * 0.62;
@@ -720,6 +724,8 @@
     elements.keyboard.setAttribute('aria-label', likelyNoteLabel
       ? `Horizontal piano keyboard from ${midiToName(minimumSpectrumMidi)} to ${midiToName(maximumSpectrumMidi - 1)}. Relative note strengths: ${likelyNoteLabel}.`
       : `Horizontal piano keyboard from ${midiToName(minimumSpectrumMidi)} to ${midiToName(maximumSpectrumMidi - 1)}.`);
+    elements.keyboard.setAttribute('aria-valuenow', String(keyboardSelectedMidi));
+    elements.keyboard.setAttribute('aria-valuetext', midiToName(keyboardSelectedMidi));
 
     context.clearRect(0, 0, width, height);
     context.fillStyle = colors.background;
@@ -965,19 +971,22 @@
 
     context.beginPath();
     let spectrumPathStarted = false;
+    let spectrumLastY = 0;
     profile.forEach((value, row) => {
       const note = minimumMidi + row / binsPerSemitone;
-      if (note < minimumSpectrumMidi || note > maximumSpectrumMidi - 1) return;
+      if (note < minimumSpectrumMidi || note > maximumSpectrumMidi - 0.5) return;
       const x = midiCenterToKeyboardX(minimumMidi + row / binsPerSemitone, width);
       const amplitude = Math.min(1, value / reference);
       const level = elements.spectrumScale.value === 'db'
         ? clamp((20 * Math.log10(Math.max(amplitude, 1e-8)) + 62) / 62, 0, 1)
         : amplitude;
       const y = height - level * (height - 10) - 5;
-      if (!spectrumPathStarted) context.moveTo(x, y);
-      else context.lineTo(x, y);
+      if (!spectrumPathStarted) context.moveTo(0, y);
+      context.lineTo(x, y);
+      spectrumLastY = y;
       spectrumPathStarted = true;
     });
+    if (spectrumPathStarted) context.lineTo(width, spectrumLastY);
     context.strokeStyle = colors.text;
     context.lineWidth = 2;
     context.lineJoin = 'round';
@@ -1240,6 +1249,7 @@
   }
 
   async function togglePlayback() {
+
     if (!state.duration) {
       return;
     }
@@ -1249,6 +1259,12 @@
     if (elements.audio.paused) {
       if (selectionPlayback() && (transport.currentTime < state.loopStart || transport.currentTime >= state.loopEnd)) {
         transport.currentTime = state.loopStart;
+        // Complete the initial seek before starting playback.
+        if (elements.audio.seeking) await new Promise(resolve => {
+          const done = () => { clearTimeout(timer); elements.audio.removeEventListener('seeked', done); resolve(); };
+          const timer = setTimeout(done, 1000);
+          elements.audio.addEventListener('seeked', done, {once:true});
+        });
       }
       await elements.audio.play();
     } else {
@@ -1257,6 +1273,7 @@
   }
 
   function seekBy(seconds) {
+
     if (!state.duration) {
       return;
     }
@@ -1366,6 +1383,7 @@
   // Store the original audio only when a recording changes; config writes stay small.
   let sessionFile = null, sessionRevision = 0, sessionAudioSaved = false;
   let savedSessionJSON = null, sessionSaving = false, retrySaveAfter = 0;
+  let sessionSaveDisabled = false, sessionWrite = Promise.resolve();
   function sessionStorage(mode, operation) {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('transcribe-session', 1);
@@ -1384,16 +1402,17 @@
     });
   }
   async function saveSession() {
-    if (!sessionFile || !marks.identity || sessionSaving || Date.now() < retrySaveAfter) return;
+    if (sessionSaveDisabled || !sessionFile || !marks.identity || sessionSaving || Date.now() < retrySaveAfter) return;
     const config = captureConfig(), json = JSON.stringify(config);
     if (json === savedSessionJSON) return;
     const revision = sessionRevision, file = sessionFile, includeAudio = !sessionAudioSaved;
     sessionSaving = true;
     try {
-      await sessionStorage('readwrite', store => {
+      sessionWrite = sessionStorage('readwrite', store => {
         if (includeAudio) store.put(file, 'audio');
         store.put(config, 'config');
       });
+      await sessionWrite;
       if (revision === sessionRevision) {
         sessionAudioSaved = true;
         savedSessionJSON = json;
@@ -1406,7 +1425,7 @@
     } finally {
       sessionSaving = false;
       // A change during a write must be committed before showing the final saved state.
-      if (sessionFile && JSON.stringify(captureConfig()) !== savedSessionJSON && Date.now() >= retrySaveAfter) saveSession();
+      if (!sessionSaveDisabled && sessionFile && JSON.stringify(captureConfig()) !== savedSessionJSON && Date.now() >= retrySaveAfter) saveSession();
     }
   }
   async function restoreSession() {
@@ -1437,7 +1456,7 @@
         loopStart: marks.rangeAnchor ? null : state.loopStart, loopEnd: marks.rangeAnchor ? null : state.loopEnd, loopEnabled: marks.rangeAnchor ? false : state.loopEnabled,
         selectionOnly: marks.rangeAnchor ? false : state.selectionOnly,
         spectrumScroll: state.spectrumScrollProgress, viewMode: app.dataset.viewMode,
-        controlsOpen: !controlsPanel.hidden,
+        controlsOpen: sidebarOpen,
         eq: TranscribeEQ.settings(),
         stems: stems?.settings()
       }
@@ -1512,7 +1531,7 @@
       button.setAttribute('aria-pressed', String(active));
     });
     controlsPanel.hidden = true;
-    controlsToggle.setAttribute('aria-expanded', String(saved.controlsOpen));
+    updateSections();
     stems?.restore(saved.stems);
     reconnectChannels(); updateFilters(); updateVolume(); updatePitchShift();
     updateLoopControls(); updateTimecode(); renderAll();
@@ -1591,6 +1610,7 @@
       return;
     }
 
+    sessionSaveDisabled = false; marks.persistenceDisabled = false;
     stopSelectionScroll();
     clearWaveformHoverGuide();
     state.dragging = null;
@@ -1614,6 +1634,8 @@
     marks.reset();
     const loadGeneration = marks.generation;
     elements.audio.pause();
+    // Replacing src can discard the old source's queued pause event.
+    syncPlaybackButton();
     state.fileUrl = URL.createObjectURL(file);
     elements.audio.src = state.fileUrl;
     elements.fileName.textContent = file.name;
@@ -2008,14 +2030,15 @@
     const time = (state.spectrogram.start + state.spectrogram.end) / 2;
     const midi = clamp(
       state.spectrumCursor.midi + (event.key === 'ArrowLeft' ? -0.1 : 0.1),
-      state.spectrogram.minimumMidi,
-      state.spectrogram.maximumMidi
+      minimumSpectrumMidi - 0.5,
+      maximumSpectrumMidi - 0.5
     );
     updatePitchReadout(time, midi);
     drawSpectrogram();
   }
 
   function updatePlaybackFrame() {
+
     updateTimecode();
 
     enforcePlaybackRange();
@@ -2214,6 +2237,43 @@
     else setTimelineViewStart(state.viewStart + direction * amount);
   });
   elements.keyboard.style.cursor = 'pointer';
+  let keyboardSelectedMidi = 60;
+  const keyboardVoiceId = 'keyboard-audition';
+  function selectKeyboardNote(midi) {
+    stopKeyboardNote(keyboardVoiceId);
+    keyboardSelectedMidi = clamp(midi, minimumSpectrumMidi, maximumSpectrumMidi - 1);
+    drawKeyboard();
+    const width = elements.keyboard.getBoundingClientRect().width;
+    const x = midiCenterToKeyboardX(keyboardSelectedMidi, width);
+    const viewport = elements.analysisGrid;
+    if (x < viewport.scrollLeft || x > viewport.scrollLeft + viewport.clientWidth) {
+      viewport.scrollLeft = clamp(x - viewport.clientWidth / 2, 0, viewport.scrollWidth - viewport.clientWidth);
+    }
+  }
+  elements.keyboard.setAttribute('aria-valuemin', String(minimumSpectrumMidi));
+  elements.keyboard.setAttribute('aria-valuemax', String(maximumSpectrumMidi - 1));
+  elements.keyboard.addEventListener('focus', () => selectKeyboardNote(keyboardSelectedMidi));
+  elements.keyboard.addEventListener('keydown', event => {
+    if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+    const steps = { ArrowLeft: -1, ArrowRight: 1, ArrowDown: -12, ArrowUp: 12 };
+    if (!(event.key in steps) && !['Home', 'End', ' ', 'Enter'].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.key in steps) selectKeyboardNote(keyboardSelectedMidi + steps[event.key]);
+    else if (event.key === 'Home') selectKeyboardNote(minimumSpectrumMidi);
+    else if (event.key === 'End') selectKeyboardNote(maximumSpectrumMidi - 1);
+    else if (!event.repeat) playKeyboardNote(keyboardSelectedMidi, keyboardVoiceId).catch(error => {
+      stopKeyboardNote(keyboardVoiceId);
+      console.error('Could not play keyboard note:', error);
+    });
+  });
+  elements.keyboard.addEventListener('keyup', event => {
+    if (![' ', 'Enter'].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    stopKeyboardNote(keyboardVoiceId);
+  });
+  elements.keyboard.addEventListener('blur', () => { stopKeyboardNote(keyboardVoiceId); drawKeyboard(); });
   elements.keyboard.style.touchAction = 'none';
   elements.keyboard.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
@@ -2296,20 +2356,27 @@
     elements.analysisGrid.scrollTo({ left, behavior });
   });
 
+  function syncPlaybackButton() {
+    const playing = !elements.audio.paused && !elements.audio.ended && !elements.audio.error;
+    const label = playing ? 'Pause' : 'Play';
+    elements.play.classList.toggle('is-playing', playing);
+    elements.play.setAttribute('aria-label', label);
+    elements.play.dataset.tooltip = label;
+    if (!playing) cancelAnimationFrame(state.animationFrame);
+    return playing;
+  }
+
+  elements.audio.addEventListener('emptied', syncPlaybackButton);
+  elements.audio.addEventListener('error', syncPlaybackButton);
   elements.audio.addEventListener('play', () => {
     syncSmoothPlayback();
-    elements.play.classList.add('is-playing');
-    elements.play.setAttribute('aria-label', 'Pause');
-    elements.play.dataset.tooltip = 'Pause';
+    if (!syncPlaybackButton()) return;
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = requestAnimationFrame(updatePlaybackFrame);
   });
   elements.audio.addEventListener('pause', () => {
     syncSmoothPlayback();
-    elements.play.classList.remove('is-playing');
-    elements.play.setAttribute('aria-label', 'Play');
-    elements.play.dataset.tooltip = 'Play';
-    cancelAnimationFrame(state.animationFrame);
+    syncPlaybackButton();
     renderAll();
     requestSpectrumAt(transport.currentTime, true);
   });
@@ -2319,9 +2386,7 @@
       elements.audio.play().catch(() => renderAll());
       return;
     }
-    elements.play.classList.remove('is-playing');
-    elements.play.setAttribute('aria-label', 'Play');
-    elements.play.dataset.tooltip = 'Play';
+    syncPlaybackButton();
     syncSmoothPlayback();
     updateTimecode();
   });
@@ -2408,79 +2473,144 @@
 
   const controlsToggle = document.getElementById('transcribe-controls-toggle');
   const controlsPanel = document.getElementById('transcribe-controls-panel');
-  // Reparent existing controls so audio state and listeners stay intact.
+  // Move the existing controls without replacing their state or listeners.
   const sidebar = document.createElement('aside');
+  sidebar.id = 'transcribe-sidebar';
   sidebar.className = 'transcribe-sidebar';
-  sidebar.setAttribute('aria-label', 'Optional controls');
+  sidebar.setAttribute('aria-label', 'Transcription controls');
+  sidebar.hidden = true;
   elements.workspace.append(sidebar);
-  const sectionButtons = document.createElement('div');
-  sectionButtons.className = 'transcribe-section-buttons';
-  sectionButtons.setAttribute('role', 'group');
-  sectionButtons.setAttribute('aria-label', 'Show or hide sections');
-  app.querySelector('.transcribe-panel-buttons').append(sectionButtons);
-  const sectionIcons = {
-    settings: 'M4 5h16M4 12h16M4 19h16M8 3v4M16 10v4M10 17v4',
-    analysis: 'M4 20V4M4 20h16M7 16l4-7 4 4 5-9',
-    markers: 'M6 21V3h13l-3 4 3 4H6',
-    shortcuts: 'M3 5h18v14H3zM6 9h1m3 0h1m3 0h1m3 0h1M6 13h1m3 0h1m3 0h1m3 0h1M8 16h8',
-    stems: 'M12 3v6M5 21v-6h14v6M12 9v12M5 15V9h14v6',
-    eq: 'M2 12h3l3-7 4 14 4-14 3 7h3',
-    spectrum: 'M3 18v-5m4 5V8m5 10V3m5 15V8m4 10v-5'
-  };
-  function sectionButton(id, title, target) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.dataset.tooltip = title;
-    button.setAttribute('aria-label', title);
-    button.setAttribute('aria-controls', target);
-    const shortcut = { settings: 'C', shortcuts: 'Shift+/', stems: 'T', spectrum: 'F' }[id];
-    if (shortcut) {
-      button.setAttribute('aria-keyshortcuts', shortcut);
-      button.dataset.tooltip = `${title} (${id === 'shortcuts' ? '?' : shortcut})`;
-    }
-    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${sectionIcons[id]}"/></svg>`;
-    sectionButtons.append(button);
-    return button;
-  }
-  const definitions = [
-    ['settings', 'Settings', ['#transcribe-pitch-lock', '#transcribe-chords-toggle', '.transcribe-sound-controls', '.transcribe-audio-pitch', '[for="transcribe-spectrum-scale"]', '[for="transcribe-note-tolerance"]', '#transcribe-analyze-selection', '#transcribe-marks']],
-    ['shortcuts', 'Keyboard shortcuts', ['#transcribe-shortcuts']],
-    ['stems', 'Stems', ['#transcribe-stems-panel']],
-    ['eq', 'EQ', ['#transcribe-eq-panel']]
-  ];
-  let visibleSections = [];
-  try { const saved = JSON.parse(localStorage.getItem('transcribe-sections')); if (Array.isArray(saved)) visibleSections = saved; } catch {}
-  if (visibleSections.some(id => ['sound', 'analysis', 'markers'].includes(id))) visibleSections.push('settings');
-  if (visibleSections.includes('markers')) visibleSections.push('shortcuts');
-  const sections = definitions.map(([id, title, selectors]) => {
-    const section = document.createElement('section');
-    section.className = 'transcribe-sidebar-section';
-    section.id = `transcribe-section-${id}`;
-    const heading = document.createElement('h2');
-    heading.textContent = title;
-    section.append(heading);
-    selectors.forEach(selector => section.append(app.querySelector(selector)));
-    if (id === 'settings') {
-      const toggles = document.createElement('div');
-      toggles.className = 'transcribe-settings-toggles';
-      toggles.setAttribute('role', 'group');
-      toggles.setAttribute('aria-label', 'Analysis options');
-      toggles.append(elements.pitchLock, chordToggle, elements.analyzeSelection);
-      heading.after(toggles);
-    }
-    sidebar.append(section);
-    const checkbox = sectionButton(id, title, section.id);
-    checkbox.checked = visibleSections.includes(id);
-    checkbox.addEventListener('click', () => toggleSection(id));
-    return { id, section, checkbox };
-  });
-  const fileControl = app.querySelector('.transcribe-file-control');
-  const settingsSection = sections.find(({ id }) => id === 'settings').section;
-  app.querySelector('.transcribe-sound-controls').append(document.getElementById('transcribe-marks'));
+  const sidebarHeader = document.createElement('div');
+  sidebarHeader.className = 'transcribe-sidebar-header';
+  const sidebarTitle = document.createElement('h2');
+  sidebarTitle.textContent = 'Controls';
+  const closeSidebar = document.createElement('button');
+  closeSidebar.type = 'button';
+  closeSidebar.textContent = 'Close';
+  closeSidebar.setAttribute('aria-label', 'Close controls');
+  sidebarHeader.append(sidebarTitle, closeSidebar);
   const sidebarScroll = document.createElement('div');
   sidebarScroll.className = 'transcribe-sidebar-scroll';
-  sections.forEach(({ section }) => sidebarScroll.append(section));
-  sidebar.append(sidebarScroll);
+  sidebar.append(sidebarHeader, sidebarScroll);
+  let sidebarOpen = false;
+  let activeSidebar = null;
+  const shortcutsToggle = document.createElement('button');
+  shortcutsToggle.id = 'transcribe-shortcuts-toggle';
+  shortcutsToggle.type = 'button';
+  shortcutsToggle.setAttribute('aria-label', 'Keyboard shortcuts');
+  shortcutsToggle.setAttribute('aria-keyshortcuts', 'Shift+/');
+  shortcutsToggle.dataset.tooltip = 'Keyboard shortcuts (?)';
+  shortcutsToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M6 9h2m2 0h2m2 0h2m2 0h1M6 13h2m2 0h2m2 0h2m2 0h1M8 16h8"/></svg>';
+  controlsToggle.after(shortcutsToggle);
+  sidebar.classList.add('transcribe-flat-sidebar');
+  sidebarScroll.classList.add('transcribe-controls-grid');
+  sidebarScroll.id = 'transcribe-controls-content';
+  const shortcutsPane = document.createElement('div');
+  shortcutsPane.id = 'transcribe-shortcuts-content';
+  shortcutsPane.className = 'transcribe-shortcuts-pane';
+  shortcutsPane.hidden = true;
+  sidebar.append(shortcutsPane);
+  shortcutsToggle.setAttribute('aria-controls', shortcutsPane.id);
+  function makeGroup(id, title, parent, selectors, reset = null) {
+    const section = document.createElement('section');
+    section.id = `transcribe-section-${id}`;
+    section.className = 'transcribe-sidebar-section';
+    const heading = document.createElement('h3');
+    const label = document.createElement('span');
+    label.textContent = title;
+    heading.append(label);
+    const content = document.createElement('div');
+    content.id = `transcribe-${id}-contents`;
+    content.className = 'transcribe-group-content';
+    if (reset) {
+      const button = id === 'eq' ? document.getElementById('transcribe-eq-reset') : document.createElement('button');
+      button.type = 'button';
+      button.className = 'transcribe-section-reset';
+      button.textContent = 'Reset';
+      button.setAttribute('aria-label', `Reset ${title} to default`);
+      if (id !== 'eq') button.addEventListener('click', reset);
+      heading.append(button);
+    }
+    selectors.forEach(selector => content.append(app.querySelector(selector)));
+    section.append(heading, content);
+    parent.append(section);
+    return content;
+  }
+  function resetInputs(keys) {
+    keys.forEach(key => {
+      const input = elements[key];
+      input.value = input.tagName === 'SELECT' ? ([...input.options].find(option => option.defaultSelected) || input.options[0]).value : input.defaultValue;
+    });
+  }
+  function resetSection(id) {
+    if (id === 'sound') {
+      resetInputs(['channel','semitones','cents']);
+      elements.semitonesNumber.value = elements.semitones.value;
+      elements.centsNumber.value = elements.cents.value;
+      elements.pitchLock.setAttribute('aria-pressed', 'true');
+      elements.pitchLock.classList.add('is-active');
+      elements.pitchLock.querySelector('strong').textContent = 'On';
+      reconnectChannels(); updatePitchShift(); updatePitchPreservation();
+    } else if (id === 'analysis') {
+      resetInputs(['noteTolerance','spectrumScale']);
+      if (chordsEnabled) chordToggle.click();
+      elements.analyzeSelection.checked = false;
+      updateAnalyzeSelectionToggle();
+      spectrumCheckbox.checked = true;
+      updateSpectrumVisibility();
+      requestSpectrumAt(transport.currentTime, true);
+    } else if (id === 'stems') stems.reset();
+    renderAll(); saveSession();
+    showConfigStatus('Section settings reset to default.');
+  }
+  elements.channel.dataset.tooltip = 'Playback channel';
+  const soundContents = makeGroup('sound', 'Sound', sidebarScroll, ['#transcribe-pitch-lock', '.transcribe-sound-controls', '.transcribe-audio-pitch'], () => resetSection('sound'));
+  const analysisContents = makeGroup('analysis', 'Analysis', sidebarScroll, ['#transcribe-chords-toggle', '#transcribe-analyze-selection', '[for="transcribe-spectrum-scale"]', '[for="transcribe-note-tolerance"]'], () => resetSection('analysis'));
+  makeGroup('eq', 'EQ', sidebarScroll, ['#transcribe-eq-panel'], () => {});
+  makeGroup('stems', 'Stems', sidebarScroll, ['#transcribe-stems-panel'], () => resetSection('stems'));
+  document.getElementById('transcribe-stems-panel').hidden = false;
+  async function clearSavedConfigData(button) {
+    if (!window.confirm('Clear all saved Transcribe data for every recording? This removes local marker autosaves, settings, and the cached recording. Your current work and exported files stay intact. Autosave resumes when you open audio again.')) return;
+    button.disabled = true;
+    sessionSaveDisabled = true;marks.persistenceDisabled = true;sessionRevision++;
+    try {
+      await Promise.allSettled([sessionWrite,marks.saveQueue]);
+      await Promise.all([
+        sessionStorage('readwrite', store => store.clear()),
+        marks.storage('readwrite', store => store.clear())
+      ]);
+      for (const key of ['transcribe-sections','transcribe-sidebar-groups','transcribe-spectrum-visible']) localStorage.removeItem(key);
+      sessionAudioSaved = false;savedSessionJSON = null;
+      elements.localStatus.textContent = 'Not autosaving';
+      showConfigStatus('Saved Transcribe data cleared. Current work stays open; open audio again to resume autosave.');
+    } catch { showConfigStatus('Could not clear all saved data. Autosave is paused; try again.'); }
+    finally { button.disabled = false; }
+  }
+  const deleteMeasures = document.createElement('button');
+  deleteMeasures.id = 'transcribe-delete-measures';
+  deleteMeasures.type = 'button';
+  deleteMeasures.textContent = 'Delete measures';
+  deleteMeasures.setAttribute('aria-label', 'Delete measure markers');
+  deleteMeasures.disabled = true;
+  deleteMeasures.dataset.tooltip = 'Delete measure markers; keep section starts. Supports Undo.';
+  deleteMeasures.addEventListener('click', () => marks.deleteMeasures());
+  marks.root.querySelector('fieldset').append(deleteMeasures);
+  const footer = document.createElement('footer');
+  footer.className = 'transcribe-sidebar-footer';
+  footer.setAttribute('aria-label', 'Saved data');
+  const dataActions = document.createElement('div');
+  dataActions.className = 'transcribe-data-actions';
+  const clearSaved = document.createElement('button');
+  clearSaved.id = 'transcribe-clear-saved';
+  clearSaved.type = 'button';
+  clearSaved.textContent = 'Clear saved data';
+  clearSaved.setAttribute('aria-label', 'Clear all saved config data');
+  clearSaved.addEventListener('click', () => clearSavedConfigData(clearSaved));
+  dataActions.append(clearSaved);
+  footer.append(dataActions);
+  app.querySelector('.transcribe-file-control').insertBefore(configActions, document.getElementById('transcribe-config-file'));
+  sidebarScroll.append(footer);
+  shortcutsPane.append(document.getElementById('transcribe-shortcuts'));
   const stemPanel = document.getElementById('transcribe-stems-panel');
   const stemInfo = document.createElement('div');
   stemInfo.id = 'transcribe-stems-info';
@@ -2497,8 +2627,9 @@
   infoButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>';
   const stemActions = document.createElement('div');
   stemActions.className = 'transcribe-stems-actions';
-  stemActions.append(document.getElementById('transcribe-stems-enabled'), infoButton);
+  stemActions.append(document.getElementById('transcribe-stems-enabled'));
   stemPanel.prepend(stemActions);
+  document.querySelector('#transcribe-section-stems > h3').append(infoButton);
   stemPanel.append(stemInfo);
   const shortcuts = document.getElementById('transcribe-shortcuts');
   shortcuts.querySelector('h2').hidden = true;
@@ -2507,166 +2638,153 @@
   shortcuts.querySelectorAll('[data-platform-modifier]').forEach(key => { key.textContent = appleKeyboard ? 'Cmd' : 'Ctrl'; });
   shortcuts.querySelectorAll('[data-platform-alt]').forEach(key => { key.textContent = appleKeyboard ? 'Option' : 'Alt'; });
 
-  sections.forEach(item => {
-    const heading = item.section.querySelector('h2');
-    const disclosure = document.createElement('button');
-    disclosure.type = 'button';
-    disclosure.className = 'transcribe-section-disclosure';
-    disclosure.innerHTML = `<span>${item.checkbox.getAttribute('aria-label')}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
-    const contents = [...item.section.children].filter(child => child !== heading);
-    contents.forEach((child, index) => { if (!child.id) child.id = `transcribe-${item.id}-content-${index}`; });
-    disclosure.setAttribute('aria-controls', contents.map(child => child.id).join(' '));
-    disclosure.addEventListener('click', () => toggleSection(item.id));
-    heading.addEventListener('click', event => {
-      if (!event.target.closest('button')) toggleSection(item.id);
-    });
-    heading.firstChild.replaceWith(disclosure);
-    item.disclosure = disclosure;
-  });
-  const spectrumCheckbox = sectionButton('spectrum', 'Spectrum & keyboard', 'transcribe-analysis');
+  const spectrumCheckbox = document.createElement('button');
+  spectrumCheckbox.type = 'button';
   spectrumCheckbox.id = 'transcribe-spectrum-visible';
-  spectrumCheckbox.checked = true;
+  spectrumCheckbox.className = 'transcribe-tool-toggle';
+  spectrumCheckbox.innerHTML = '<span>Spectrum</span><strong>On</strong>';
+  spectrumCheckbox.setAttribute('aria-label', 'Spectrum and keyboard');
   spectrumCheckbox.setAttribute('aria-controls', 'transcribe-analysis');
+  spectrumCheckbox.setAttribute('aria-keyshortcuts', 'F');
+  spectrumCheckbox.checked = true;
   try { spectrumCheckbox.checked = localStorage.getItem('transcribe-spectrum-visible') !== 'false'; } catch {}
-
+  analysisContents.prepend(spectrumCheckbox);
+  app.querySelector('[for="transcribe-spectrum-scale"] > span').textContent = 'Scale';
+  elements.spectrumScale.setAttribute('aria-label', 'Spectrum scale');
+  app.querySelector('[for="transcribe-note-tolerance"] > span').textContent = 'Tolerance';
+  elements.noteTolerance.setAttribute('aria-label', 'Note tolerance');
+  chordToggle.querySelector('span').textContent = 'Chords';
+  chordToggle.setAttribute('aria-label', 'Chord guesses');
+  const bandHeading = document.querySelector('.transcribe-eq-table thead th');
+  if (bandHeading) { bandHeading.textContent = ''; bandHeading.setAttribute('aria-label', 'Band'); }
   function updateSpectrumVisibility() {
     spectrumCheckbox.setAttribute('aria-pressed', String(spectrumCheckbox.checked));
+    spectrumCheckbox.classList.toggle('is-active', spectrumCheckbox.checked);
+    spectrumCheckbox.querySelector('strong').textContent = spectrumCheckbox.checked ? 'On' : 'Off';
     document.getElementById('transcribe-analysis').hidden = !spectrumCheckbox.checked;
     elements.workspace.classList.toggle('spectrum-hidden', !spectrumCheckbox.checked);
-    try { localStorage.setItem('transcribe-spectrum-visible', String(spectrumCheckbox.checked)); } catch {}
+    try { if (!sessionSaveDisabled) localStorage.setItem('transcribe-spectrum-visible', String(spectrumCheckbox.checked)); } catch {}
     requestAnimationFrame(resizeCanvases);
   }
   spectrumCheckbox.addEventListener('click', () => { spectrumCheckbox.checked = !spectrumCheckbox.checked; updateSpectrumVisibility(); });
   updateSpectrumVisibility();
   controlsPanel.replaceChildren();
-  controlsToggle.hidden = true;
   controlsPanel.hidden = true;
-  controlsPanel.setAttribute('aria-label', 'Visible sections');
-  controlsToggle.textContent = 'Sections';
+  controlsToggle.hidden = false;
+  controlsToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18M8 3v6M16 9v6M10 15v6"/></svg>';
+  controlsToggle.setAttribute('aria-label', 'Controls');
+  controlsToggle.dataset.tooltip = 'Controls (C)';
+  controlsToggle.title = 'Controls (C)';
+  controlsToggle.setAttribute('aria-controls', sidebarScroll.id);
+  closeSidebar.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
   document.getElementById('transcribe-stems-toggle').hidden = true;
-  const sidebarMotionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-  let sidebarInitialized = false;
-  let sidebarAnimations = [];
-  let sidebarMotionVersion = 0;
-  function updateSections(skipMotion = false) {
-    const version = ++sidebarMotionVersion;
-    const animate = sidebarInitialized && !skipMotion && !sidebarMotionPreference.matches;
-    const wasVisible = !sidebar.hidden;
-    const previous = sections.map(({section}) => ({
-      top: section.getBoundingClientRect().top,
-      expanded: !section.classList.contains('is-collapsed')
-    }));
-    sidebarAnimations.forEach(animation => animation.cancel());
-    sidebarAnimations = [];
-    if (mobileWorkspace.matches) {
-      const active = sections.find(item => item.checkbox.checked);
-      sections.forEach(({section, checkbox, disclosure}) => {
-        checkbox.checked = checkbox === active?.checkbox;
-        checkbox.setAttribute('aria-pressed', String(checkbox.checked));
-        checkbox.setAttribute('aria-expanded', String(checkbox.checked));
-        disclosure.setAttribute('aria-expanded', String(checkbox.checked));
-        section.hidden = !checkbox.checked;
-        section.classList.remove('is-collapsed');
-      });
-      document.getElementById('transcribe-stems-panel').hidden = active?.id !== 'stems';
-      sidebar.hidden = !active;
-      elements.workspace.classList.remove('has-sidebar');
-      elements.workspace.classList.toggle('mobile-section-open', !!active);
-      if (animate && active) {
-        sidebarAnimations.push(sidebar.animate(
-          [{opacity: 0, transform: 'translateY(-8px)'}, {opacity: 1, transform: 'translateY(0)'}],
-          {duration: 160, easing: 'cubic-bezier(.16, 1, .3, 1)'}
-        ));
-      }
-      sidebarInitialized = true;
-      requestAnimationFrame(resizeCanvases);
-      return;
+  // Hints stay available without consuming permanent control space.
+  function addGroupInfo(id, nodes, title) {
+    const info = document.createElement('div');
+    info.id = `transcribe-${id}-info`;
+    info.setAttribute('popover', 'auto');
+    info.setAttribute('role', 'note');
+    info.setAttribute('aria-label', title);
+    nodes.forEach(node => info.append(node));
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'transcribe-info-button';
+    button.setAttribute('popovertarget', info.id);
+    button.setAttribute('aria-label', title);
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>';
+    document.getElementById(`transcribe-section-${id}`).querySelector('h3').append(button);
+    sidebar.append(info);
+  }
+  addGroupInfo('eq', [...app.querySelectorAll('.transcribe-eq-hint')], 'Using the equalizer');
+  const sidebarHelp = [...sidebar.querySelectorAll('.transcribe-info-button[popovertarget]')].map(button => {
+    const info = document.getElementById(button.getAttribute('popovertarget'));
+    info.classList.add('transcribe-anchored-info');
+    function position() {
+      if (!info.matches(':popover-open')) return;
+      const anchor = button.getBoundingClientRect();
+      const panel = info.getBoundingClientRect();
+      const gap = 6, edge = 8;
+      const left = clamp(anchor.right - panel.width, edge, Math.max(edge, innerWidth - panel.width - edge));
+      let top = anchor.bottom + gap;
+      if (top + panel.height > innerHeight - edge) top = anchor.top - panel.height - gap;
+      info.style.left = `${left}px`;
+      info.style.top = `${clamp(top, edge, Math.max(edge, innerHeight - panel.height - edge))}px`;
     }
-    sections.forEach(({checkbox}) => checkbox.removeAttribute('aria-expanded'));
-    const active = sections.filter(item => item.checkbox.checked);
-    const motion = (element, frames, duration = 200) => {
-      const animation = element.animate(frames, {duration, easing: 'cubic-bezier(.16, 1, .3, 1)'});
-      sidebarAnimations.push(animation);
-      return animation;
-    };
-    // Keep the rail in place for its brief exit; a new toggle cancels this work.
-    if (animate && wasVisible && !active.length) {
-      sections.forEach(({checkbox}) => checkbox.setAttribute('aria-pressed', String(checkbox.checked)));
-      motion(sidebar, [{opacity: 1, transform: 'translateX(0)'}, {opacity: 0, transform: 'translateX(8px)'}], 120)
-        .finished.then(() => { if (version === sidebarMotionVersion) updateSections(true); }).catch(() => {});
-      return;
-    }
-    sections.forEach(({id, section, checkbox, disclosure}) => {
-      checkbox.setAttribute('aria-pressed', String(checkbox.checked));
-      section.hidden = false;
-      section.classList.toggle('is-collapsed', !checkbox.checked);
-      disclosure.setAttribute('aria-expanded', String(checkbox.checked));
-      if (id === 'stems') document.getElementById('transcribe-stems-panel').hidden = !checkbox.checked;
-    });
-    sidebar.hidden = !active.length;
-    elements.workspace.classList.remove('mobile-section-open');
-    elements.workspace.classList.toggle('has-sidebar', !!active.length);
-    if (animate && active.length) {
-      if (!wasVisible) {
-        motion(sidebar, [{opacity: 0, transform: 'translateX(12px)'}, {opacity: 1, transform: 'translateX(0)'}]);
-      } else {
-        sections.forEach(({section, checkbox}, index) => {
-          const offset = previous[index].top - section.getBoundingClientRect().top;
-          if (Math.abs(offset) > 1) motion(section, [{transform: `translateY(${offset}px)`}, {transform: 'translateY(0)'}]);
-          if (checkbox.checked && !previous[index].expanded) {
-            [...section.children].filter(child => child.tagName !== 'H2' && !child.hidden).forEach(child => {
-              motion(child, [{opacity: 0}, {opacity: 1}], 160);
-            });
-          }
-        });
-      }
-    }
-    sidebarInitialized = true;
-    try { localStorage.setItem('transcribe-sections', JSON.stringify(active.map(item => item.id))); } catch {}
+    info.addEventListener('toggle', position);
+    window.addEventListener('resize', position);
+    window.addEventListener('scroll', position, {capture: true, passive: true});
+    new ResizeObserver(position).observe(info);
+    return info;
+  });
+  function updateSections() {
+    if (activeSidebar !== 'controls') sidebarHelp.forEach(info => { if (info.matches(':popover-open')) info.hidePopover(); });
+    sidebarOpen = activeSidebar !== null;
+    sidebar.hidden = !sidebarOpen;
+    sidebarScroll.hidden = activeSidebar !== 'controls';
+    shortcutsPane.hidden = activeSidebar !== 'shortcuts';
+    sidebarTitle.textContent = activeSidebar === 'shortcuts' ? 'Keyboard shortcuts' : 'Controls';
+    sidebar.setAttribute('aria-label', sidebarTitle.textContent);
+    closeSidebar.setAttribute('aria-label', `Close ${activeSidebar === 'shortcuts' ? 'keyboard shortcuts' : 'controls'}`);
+    controlsToggle.setAttribute('aria-expanded', String(activeSidebar === 'controls'));
+    shortcutsToggle.setAttribute('aria-expanded', String(activeSidebar === 'shortcuts'));
+    elements.workspace.classList.toggle('has-sidebar', sidebarOpen && !mobileWorkspace.matches);
+    elements.workspace.classList.toggle('mobile-section-open', sidebarOpen && mobileWorkspace.matches);
     requestAnimationFrame(resizeCanvases);
   }
-  sidebarMotionPreference.addEventListener('change', () => updateSections(true));
-  function toggleSection(id) {
-    const button = sections.find(item => item.id === id).checkbox;
-    const opening = !button.checked;
-    if (mobileWorkspace.matches) sections.forEach(({checkbox}) => { checkbox.checked = false; });
-    button.checked = opening;
+  function setSidebarView(view) {
+    const previous = activeSidebar;
+    const restoreFocus = sidebar.contains(document.activeElement);
+    activeSidebar = view;
     updateSections();
+    if (view && mobileWorkspace.matches) {
+      requestAnimationFrame(() => {
+        if (activeSidebar !== view) return;
+        const workspace = elements.workspace;
+        const top = sidebar.getBoundingClientRect().top - workspace.getBoundingClientRect().top;
+        workspace.scrollTop += top;
+      });
+    }
+    if (restoreFocus) {
+      if (view) closeSidebar.focus();
+      else (previous === 'shortcuts' ? shortcutsToggle : controlsToggle).focus();
+    }
   }
+  function toggleSection(id) {
+    if (id === 'settings') { setSidebarView(activeSidebar === 'controls' ? null : 'controls'); return; }
+    if (id === 'shortcuts') { setSidebarView(activeSidebar === 'shortcuts' ? null : 'shortcuts'); return; }
+    setSidebarView('controls');
+    if (id === 'stems') {
+      const button = document.getElementById('transcribe-stems-enabled');
+      if (!button.disabled) button.focus();
+    }
+  }
+  controlsToggle.addEventListener('click', () => toggleSection('settings'));
+  shortcutsToggle.addEventListener('click', () => toggleSection('shortcuts'));
+  closeSidebar.addEventListener('click', () => setSidebarView(null));
   document.addEventListener('pointerdown', event => {
-    if (!mobileWorkspace.matches || sidebar.hidden || sidebar.contains(event.target) || sectionButtons.contains(event.target)) return;
-    sections.forEach(({checkbox}) => { checkbox.checked = false; });
-    updateSections(true);
+    if (mobileWorkspace.matches && sidebarOpen && !sidebar.contains(event.target) && !controlsToggle.contains(event.target) && !shortcutsToggle.contains(event.target)) setSidebarView(null);
   });
   document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || !mobileWorkspace.matches || sidebar.hidden) return;
-    const active = sections.find(({checkbox}) => checkbox.checked);
-    const restoreFocus = sidebar.contains(document.activeElement);
-    sections.forEach(({checkbox}) => { checkbox.checked = false; });
-    updateSections(true);
-    if (restoreFocus) active?.checkbox.focus();
+    if (event.key === 'Escape' && sidebarOpen && !document.querySelector(':popover-open')) {
+      event.preventDefault();
+      const trigger = activeSidebar === 'shortcuts' ? shortcutsToggle : controlsToggle;
+      setSidebarView(null);
+      trigger.focus();
+    }
   });
   function adaptWorkspace() {
-    const mobile = mobileWorkspace.matches;
-    if (mobile) settingsSection.querySelector('h2').after(configActions);
-    else fileControl.insertBefore(configActions, document.getElementById('transcribe-config-file'));
-    updateSections(true);
+    updateSections();
     state.spectrumCursor = null;
     requestAnimationFrame(() => {
       const maximumScroll = Math.max(0, elements.analysisGrid.scrollWidth - elements.analysisGrid.clientWidth);
       const whiteKeyWidth = elements.keyboard.getBoundingClientRect().width / spectrumWhiteKeyCount;
-      elements.analysisGrid.scrollLeft = mobile
-        ? clamp(whiteKeysBefore(53) * whiteKeyWidth, 0, maximumScroll)
-        : 0;
-      state.spectrumScrollProgress = maximumScroll
-        ? elements.analysisGrid.scrollLeft / maximumScroll
-        : 0;
+      elements.analysisGrid.scrollLeft = mobileWorkspace.matches ? clamp(whiteKeysBefore(53) * whiteKeyWidth, 0, maximumScroll) : 0;
+      state.spectrumScrollProgress = maximumScroll ? elements.analysisGrid.scrollLeft / maximumScroll : 0;
       resizeCanvases();
     });
   }
   mobileWorkspace.addEventListener('change', adaptWorkspace);
   adaptWorkspace();
-  updateSections();
 
   const refreshTheme = () => { updateThemeColors(); renderAll(); };
   new MutationObserver(refreshTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -2674,6 +2792,14 @@
 
   const resizeObserver = new ResizeObserver(() => resizeCanvases());
   [elements.overview, elements.waveform, elements.analysisGrid].forEach((element) => resizeObserver.observe(element));
+  const transportElement = app.querySelector('.transcribe-transport');
+  const transportResizeObserver = new ResizeObserver(() => {
+    const height = `${transportElement.getBoundingClientRect().height}px`;
+    if (app.style.getPropertyValue('--tr-footer-height') !== height) {
+      app.style.setProperty('--tr-footer-height', height);
+    }
+  });
+  transportResizeObserver.observe(transportElement);
 
   app.dataset.viewMode = 'timeline';
   requestAnimationFrame(() => {

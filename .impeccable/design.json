@@ -123,7 +123,7 @@
       "refersTo": "button-primary",
       "description": "Primary action for a task or form.",
       "html": "<button class=\"ds-btn-primary\">SAVE CHANGES</button>",
-      "css": ".ds-btn-primary { min-height: 2.5rem; border: 1px solid #e3262e; border-radius: 0; padding: 0.7rem 1rem; background: #e3262e; color: #fff; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-transform: uppercase; transition: background-color 0.16s ease, border-color 0.16s ease; } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: #b90f17; border-color: #b90f17; outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "css": ".ds-btn-primary { min-height: 2.5rem; border: 1px solid #e3262e; border-radius: 0; padding: 0.7rem 1rem; background: #e3262e; color: #fff; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-transform: uppercase; transition: background-color 0.16s ease, border-color 0.16s ease; } .ds-btn-primary:hover,:root[data-keyboard-navigation=\"on\"] .ds-btn-primary:focus-visible{ background: #b90f17; border-color: #b90f17; outline: 2px solid #e3262e; outline-offset: 2px; }"
     },
     {
       "name": "Tool Field",
@@ -131,7 +131,7 @@
       "refersTo": "tool-control",
       "description": "Square input for compact calculator and tracker forms.",
       "html": "<label class=\"ds-field\">AMOUNT<input value=\"1000\" inputmode=\"decimal\"></label>",
-      "css": ".ds-field { display: grid; gap: 0.35rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.1; text-transform: uppercase; } .ds-field input { min-height: 2.5rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.5rem 0.65rem; background: #f2f2f2; color: #0a0a0a; font: inherit; letter-spacing: 0; text-transform: none; } .ds-field input:focus-visible { outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "css": ".ds-field { display: grid; gap: 0.35rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.1; text-transform: uppercase; } .ds-field input { min-height: 2.5rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.5rem 0.65rem; background: #f2f2f2; color: #0a0a0a; font: inherit; letter-spacing: 0; text-transform: none; }:root[data-keyboard-navigation=\"on\"] .ds-field input:focus-visible{ outline: 2px solid #e3262e; outline-offset: 2px; }"
     },
     {
       "name": "Primary Navigation Link",
@@ -139,7 +139,7 @@
       "refersTo": "navigation-link",
       "description": "Compact uppercase route link with a signal underline on interaction.",
       "html": "<a class=\"ds-nav-link\" href=\"#\">PROJECTS</a>",
-      "css": ".ds-nav-link { position: relative; display: inline-block; padding: 0.55rem 0 0.5rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-decoration: none; text-transform: uppercase; } .ds-nav-link::after { position: absolute; right: 0; bottom: 0.15rem; left: 0; height: 2px; background: #e3262e; content: ''; transform: scaleX(0); transform-origin: left center; transition: transform 0.16s ease; } .ds-nav-link:hover, .ds-nav-link:focus-visible { color: #0a0a0a; outline: 2px solid #e3262e; outline-offset: 2px; } .ds-nav-link:hover::after, .ds-nav-link:focus-visible::after { transform: scaleX(1); }"
+      "css": ".ds-nav-link { position: relative; display: inline-block; padding: 0.55rem 0 0.5rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-decoration: none; text-transform: uppercase; } .ds-nav-link::after { position: absolute; right: 0; bottom: 0.15rem; left: 0; height: 2px; background: #e3262e; content: ''; transform: scaleX(0); transform-origin: left center; transition: transform 0.16s ease; } .ds-nav-link:hover,:root[data-keyboard-navigation=\"on\"] .ds-nav-link:focus-visible{ color: #0a0a0a; outline: 2px solid #e3262e; outline-offset: 2px; } .ds-nav-link:hover::after,:root[data-keyboard-navigation=\"on\"] .ds-nav-link:focus-visible::after{ transform: scaleX(1); }"
     },
     {
       "name": "Post Card",
@@ -147,7 +147,7 @@
       "refersTo": "post-card",
       "description": "Click-through article summary with metadata, display title, and plain-language description.",
       "html": "<a class=\"ds-post-card\" href=\"#\"><span class=\"ds-post-meta\">ARTICLE · JUL 6, 2026</span><strong>CHICAGO 'L' LIVE ART</strong><span>A live artwork made from real train positions.</span></a>",
-      "css": ".ds-post-card { display: grid; gap: 1.25rem; min-height: 8rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.85rem; background: #f7f7f7; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; text-decoration: none; transition: background-color 0.15s ease, border-color 0.15s ease; } .ds-post-card strong { font-family: 'Archivo Black', Impact, sans-serif; font-size: 1.15rem; line-height: 1.05; } .ds-post-meta { color: #e3262e; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; } .ds-post-card:hover, .ds-post-card:focus-visible { background: color-mix(in srgb, #f7f7f7 88%, #0a0a0a); border-color: rgba(10, 10, 10, 0.7); outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "css": ".ds-post-card { display: grid; gap: 1.25rem; min-height: 8rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.85rem; background: #f7f7f7; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; text-decoration: none; transition: background-color 0.15s ease, border-color 0.15s ease; } .ds-post-card strong { font-family: 'Archivo Black', Impact, sans-serif; font-size: 1.15rem; line-height: 1.05; } .ds-post-meta { color: #e3262e; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; } .ds-post-card:hover,:root[data-keyboard-navigation=\"on\"] .ds-post-card:focus-visible{ background: color-mix(in srgb, #f7f7f7 88%, #0a0a0a); border-color: rgba(10, 10, 10, 0.7); outline: 2px solid #e3262e; outline-offset: 2px; }"
     },
     {
       "name": "Tool Switcher",
@@ -155,7 +155,7 @@
       "refersTo": "tool-switcher",
       "description": "Square segmented route switcher for closely related calculator tools.",
       "html": "<nav class=\"ds-switcher\"><a class=\"ds-switcher-active\" href=\"#\">STOCK</a><a href=\"#\">INTEREST</a></nav>",
-      "css": ".ds-switcher { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(10, 10, 10, 0.18); background: rgba(10, 10, 10, 0.18); } .ds-switcher a { min-width: 7rem; padding: 0.55rem 0.8rem; background: #f2f2f2; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1; text-align: center; text-decoration: none; text-transform: uppercase; } .ds-switcher a + a { border-left: 1px solid rgba(10, 10, 10, 0.18); } .ds-switcher a:hover, .ds-switcher a:focus-visible { outline: 2px solid #e3262e; outline-offset: 2px; } .ds-switcher .ds-switcher-active { box-shadow: inset 0 0 0 1px #e3262e; color: #e3262e; }"
+      "css": ".ds-switcher { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(10, 10, 10, 0.18); background: rgba(10, 10, 10, 0.18); } .ds-switcher a { min-width: 7rem; padding: 0.55rem 0.8rem; background: #f2f2f2; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1; text-align: center; text-decoration: none; text-transform: uppercase; } .ds-switcher a + a { border-left: 1px solid rgba(10, 10, 10, 0.18); } .ds-switcher a:hover,:root[data-keyboard-navigation=\"on\"] .ds-switcher a:focus-visible{ outline: 2px solid #e3262e; outline-offset: 2px; } .ds-switcher .ds-switcher-active { box-shadow: inset 0 0 0 1px #e3262e; color: #e3262e; }"
     },
     {
       "name": "Workbench Tool Toggle",
@@ -163,7 +163,7 @@
       "refersTo": "workbench-command",
       "description": "Dense two-line command used in the transcription setup band.",
       "html": "<button class=\"ds-workbench-toggle\" aria-pressed=\"true\"><span>Pitch lock</span><strong>On</strong></button>",
-      "css": ".ds-workbench-toggle { display: grid; min-width: max-content; min-height: 4.3rem; align-content: center; gap: 0.15rem; cursor: pointer; border: 0; border-right: 1px solid rgb(246 246 246 / 0.42); border-radius: 0; padding: 0.55rem 0.8rem; background: #000; color: #f6f6f6; font-family: 'Familjen Grotesk', Arial, sans-serif; text-align: left; } .ds-workbench-toggle span { color: #a7a7a7; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1; text-transform: uppercase; } .ds-workbench-toggle strong { color: #ff343d; font-size: 0.84rem; line-height: 1.2; text-transform: uppercase; } .ds-workbench-toggle:hover { background: #141414; } .ds-workbench-toggle:focus-visible { outline: 2px solid #ff343d; outline-offset: 2px; }"
+      "css": ".ds-workbench-toggle { display: grid; min-width: max-content; min-height: 4.3rem; align-content: center; gap: 0.15rem; cursor: pointer; border: 0; border-right: 1px solid rgb(246 246 246 / 0.42); border-radius: 0; padding: 0.55rem 0.8rem; background: #000; color: #f6f6f6; font-family: 'Familjen Grotesk', Arial, sans-serif; text-align: left; } .ds-workbench-toggle span { color: #a7a7a7; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1; text-transform: uppercase; } .ds-workbench-toggle strong { color: #ff343d; font-size: 0.84rem; line-height: 1.2; text-transform: uppercase; } .ds-workbench-toggle:hover { background: #141414; }:root[data-keyboard-navigation=\"on\"] .ds-workbench-toggle:focus-visible{ outline: 2px solid #ff343d; outline-offset: 2px; }"
     },
     {
       "name": "Mobile Workspace Emphasis",
@@ -171,7 +171,7 @@
       "refersTo": "workbench-emphasis-active",
       "description": "Mobile-only square switch that reallocates height between timeline and analysis without hiding either band.",
       "html": "<div class=\"ds-workbench-switcher\" role=\"group\" aria-label=\"Workspace emphasis\"><button class=\"ds-active\" aria-pressed=\"true\">Timeline</button><button aria-pressed=\"false\">Analysis</button></div>",
-      "css": ".ds-workbench-switcher { display: inline-flex; border: 1px solid rgb(246 246 246 / 0.42); background: #000; } .ds-workbench-switcher button { min-height: 2rem; cursor: pointer; border: 0; border-radius: 0; padding: 0.35rem 0.65rem; background: transparent; color: #a7a7a7; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; } .ds-workbench-switcher button + button { border-left: 1px solid rgb(246 246 246 / 0.42); } .ds-workbench-switcher button:hover, .ds-workbench-switcher button.ds-active { background: #141414; color: #f6f6f6; } .ds-workbench-switcher button:focus-visible { outline: 2px solid #ff343d; outline-offset: 2px; }"
+      "css": ".ds-workbench-switcher { display: inline-flex; border: 1px solid rgb(246 246 246 / 0.42); background: #000; } .ds-workbench-switcher button { min-height: 2rem; cursor: pointer; border: 0; border-radius: 0; padding: 0.35rem 0.65rem; background: transparent; color: #a7a7a7; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; } .ds-workbench-switcher button + button { border-left: 1px solid rgb(246 246 246 / 0.42); } .ds-workbench-switcher button:hover, .ds-workbench-switcher button.ds-active { background: #141414; color: #f6f6f6; }:root[data-keyboard-navigation=\"on\"] .ds-workbench-switcher button:focus-visible{ outline: 2px solid #ff343d; outline-offset: 2px; }"
     },
     {
       "name": "Persistent Pitch Readout",
@@ -224,14 +224,16 @@
       }
     ],
     "dos": [
+      "Keep keyboard navigation off by default; enable Tab navigation and focus indicators only through the shared toggle or Alt+Shift+K (Option+Shift+K on Mac).",
       "Use full-width dividers, alignment, and tonal shifts before adding a panel.",
       "Keep broad outlined regions on the page field and use tonal fill only for compact controls or labels.",
       "Keep interactive controls square, bordered, and touch-sized on small screens.",
-      "Use red sparingly for emphasis, active state, focus, and meaningful status.",
+      "Use red sparingly for emphasis, active state, opt-in keyboard focus, and meaningful status.",
       "Do keep transcription setup above the signal, the overview above the zoomed waveform, pitch analysis aligned below it, and essential transport fixed at hand on mobile.",
       "Do preserve Hz, note, and cents together when exposing pitch inspection; the crosshair and readout are one persistent state."
     ],
     "donts": [
+      "Do not add unconditional focus styling or focus-triggered tooltips. Scope positive focus selectors to :root[data-keyboard-navigation=\"on\"]. Preserve app shortcuts and native field editing in both modes.",
       "Do not introduce rounded SaaS cards, pill controls, or decorative gradient fields.",
       "Do not use red as a generic background or substitute it for hierarchy.",
       "Do not give an outer card and its smaller bordered children the same tonal fill.",

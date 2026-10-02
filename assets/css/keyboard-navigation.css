@@ -1,0 +1,26 @@
+/* Keyboard navigation is an explicit, site-wide accessibility preference. */
+:root:not([data-keyboard-navigation="on"]) :focus,
+:root:not([data-keyboard-navigation="on"]) :focus-visible {
+  outline: none !important;
+}
+:root[data-keyboard-navigation="on"] :focus-visible {
+  outline: 2px solid var(--site-accent, #b90f17) !important;
+  outline-offset: 2px;
+}
+.keyboard-navigation-toggle {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--site-border, currentColor);
+  border-radius: 0;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+}
+.keyboard-navigation-toggle--standalone {
+  position: fixed;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  z-index: 100;
+  background: var(--site-bg, #000);
+  color: var(--site-text, #fff);
+}

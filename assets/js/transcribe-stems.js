@@ -122,11 +122,14 @@
       this.master.disabled = !this.job && !this.result && (!this.buffer() || !range || !Number.isFinite(duration) || duration <= 0 || duration > core.maxSeconds);
       if (this.result) this.master.setAttribute('aria-pressed', String(this.enabled));
       else this.master.removeAttribute('aria-pressed');
-      this.master.textContent = this.job ? 'Cancel' : this.result ? (this.enabled ? 'On' : 'Off') : 'Separate';
+      this.master.textContent = this.job ? 'Cancel' : this.result ? (this.enabled ? 'Stems On' : 'Stems Off') : 'Separate';
       this.master.setAttribute('aria-label', this.result ? 'Stems' : this.job ? 'Cancel separation' : 'Separate highlighted segment');
       this.master.classList.toggle('is-active', this.enabled);
       this.updateToggleProgress();
       this.progress.hidden = !this.job;
+      this.master.hidden = Boolean(this.result);
+      if (this.master.parentElement.classList.contains('transcribe-stems-actions')) this.master.parentElement.hidden = Boolean(this.result);
+      this.panel.querySelector('.transcribe-stem-list').hidden = !this.result;
       this.rows.forEach(row => {
         const i = core.names.indexOf(row.dataset.stem), button = row.querySelector('button');
         button.disabled = !this.result;
@@ -134,7 +137,8 @@
         button.textContent = this.flags[i] ? 'On' : 'Off';
         button.classList.toggle('is-active', this.flags[i] && Boolean(this.result));
         const quiet = Boolean(this.result?.activity[i].quiet) && (row.dataset.stem !== 'guitar' || Boolean(this.result?.activity[core.names.indexOf('piano')].quiet));
-        row.querySelector('[data-stem-activity]').textContent = !this.result ? 'Not analyzed' : quiet ? 'Low audio' : 'Audio detected';
+        row.querySelector('[data-stem-activity]').textContent = quiet ? 'Low audio detected' : '';
+        row.querySelector('[data-stem-activity]').hidden = !quiet;
         row.classList.toggle('is-quiet', quiet);
       });
     }

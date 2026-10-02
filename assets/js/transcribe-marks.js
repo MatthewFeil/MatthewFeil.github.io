@@ -12,15 +12,18 @@
     });
   }
   function validate(value, identity, duration) {
-    if (!value || value.version !== 1 || value.identity !== identity || !['section', 'continuous'].includes(value.numbering) || !Array.isArray(value.markers) || value.markers.length > 100000) throw Error('This annotation file does not match this recording or format.');
+    if (!value || ![1,2].includes(value.version) || value.identity !== identity || !['section', 'continuous'].includes(value.numbering) || !Array.isArray(value.markers) || value.markers.length > 100000) throw Error('This annotation file does not match this recording or format.');
     const ids = new Set();
     const markers = value.markers.map(m => {
       if (!m || typeof m.id !== 'string' || !m.id || ids.has(m.id) || !Number.isFinite(m.time) || m.time < 0 || m.time > duration || typeof m.section !== 'boolean') throw Error('Invalid marker data.');
-      ids.add(m.id); return { id: m.id, time: m.time, section: m.section };
+      if (value.version === 2 && m.source !== undefined && m.source !== 'generated') throw Error('Invalid marker source.');
+      ids.add(m.id); return { id: m.id, time: m.time, section: m.section, ...(value.version === 2 && m.source === 'generated' ? {source:'generated'} : {}) };
     });
     const ordered = [...markers].sort((a,b) => a.time-b.time);
     if (ordered.some((m,i) => i && m.time === ordered[i-1].time)) throw Error('Markers must have distinct positions.');
-    return { markers, numbering: value.numbering };
+    const doc = { markers, numbering: value.numbering };
+    // Legacy beat data is ignored; markers and numbering remain importable.
+    return doc;
   }
   class Marks {
     constructor(host) {
@@ -67,9 +70,9 @@
       this.time?.addEventListener('change', () => {
         const time = Number(this.time.value);
         if (!this.time.value || !Number.isFinite(time) || time < 0 || time > host.duration() || this.doc.markers.some(m => m.id !== this.selected && Math.abs(m.time-time) < 0.001)) { this.say('Enter a distinct time within this recording.'); this.edit(); return; }
-        this.change(() => { this.doc.markers.find(m => m.id === this.selected).time = time; });
+        this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected), old = m.time; m.time = time; this.promote(m, old); });
       });
-      this.section?.addEventListener('change', () => this.change(() => { this.doc.markers.find(m => m.id === this.selected).section = this.section.checked; }));
+      this.section?.addEventListener('change', () => this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected); m.section = this.section.checked; this.promote(m); }));
       this.root.querySelector('[data-file]')?.addEventListener('change', async e => {
         const file = e.target.files[0], generation = this.generation; e.target.value = ''; if (!file) return;
         try {
@@ -109,23 +112,25 @@
         if (!this.drag) return;
         const before = this.drag.before; this.drag = null;
         if (e.type === 'pointercancel') this.doc = before;
-        else if (JSON.stringify(before) !== JSON.stringify(this.doc)) { this.undoStack.push(before); this.redoStack = []; this.save(); }
+        else if (JSON.stringify(before) !== JSON.stringify(this.doc)) { const m = this.doc.markers.find(m => m.id === this.selected); this.promote(m, before.markers.find(old => old.id === m.id).time); this.undoStack.push(before); this.redoStack = []; this.host.changed?.(); this.save(); }
         this.refresh();
       };
       this.ruler.addEventListener('pointerup', end); this.ruler.addEventListener('pointercancel', end);
       this.refresh();
     }
     say(text) { this.status.textContent = text; if (this.measurePanel) { this.measurePanel.querySelector('[data-measure-status]').textContent = text; this.positionMeasures(); } }
-    change(fn) { this.undoStack.push(structuredClone(this.doc)); this.redoStack = []; fn(); this.refresh(); this.save(); }
+    change(fn) { this.undoStack.push(structuredClone(this.doc)); this.redoStack = []; fn(); this.host.changed?.(); this.refresh(); this.save(); }
+    promote(marker) { delete marker.source; }
+
     select(id) { this.selected = id; this.refresh(); }
     mark(section) {
       if (!this.ready) return;
       const time = this.host.current();
       const near = this.doc.markers.find(m => Math.abs(m.time-time) <= 0.05);
-      if (near && (!section || near.section)) { this.select(near.id); this.say('Existing measure selected.'); return; }
+      if (near && (!section || near.section)) { if (near.source === 'generated') this.change(() => this.promote(near)); this.select(near.id); this.say('Existing measure selected.'); return; }
       this.change(() => {
-        if (near) { near.section = true; this.selected = near.id; }
-        else { const m = { id: crypto.randomUUID(), time, section: section || !this.doc.markers.length }; this.doc.markers.push(m); this.selected = m.id; }
+        if (near) { near.section = true; this.promote(near); this.selected = near.id; }
+        else { const m = { id: crypto.randomUUID(), time, section: section || !this.doc.markers.length }; this.doc.markers.push(m); this.promote(m); this.selected = m.id; }
       });
       this.say(`${section ? 'Section' : 'Measure'} ${rows(this.doc).find(m => m.id === this.selected).label} marked.`);
     }
@@ -138,9 +143,17 @@
         this.selected = (this.doc.markers[index - 1] || this.doc.markers[index])?.id ?? null;
       });
     }
+    deleteMeasures() {
+      if (!this.ready) return;
+      const sections = new Set(rows(this.doc).filter(m => m.section).map(m => m.id));
+      if (sections.size === this.doc.markers.length) { this.say('No measure markers to delete. Section starts are kept.'); return; }
+      this.rangeAnchor = null;
+      this.change(() => { this.doc.markers = this.doc.markers.filter(m => sections.has(m.id)); this.selected = null; });
+      this.say('Measure markers deleted. Section starts kept. Undo to restore them.');
+    }
     history(redo) {
       const from = redo ? this.redoStack : this.undoStack, to = redo ? this.undoStack : this.redoStack;
-      if (!from.length) return; to.push(structuredClone(this.doc)); this.doc = from.pop(); this.refresh(); this.save();
+      if (!from.length) return; to.push(structuredClone(this.doc)); this.doc = from.pop(); this.host.changed?.(); this.refresh(); this.save();
     }
     navigate(direction, section = false) {
       const candidates = rows(this.doc).filter(m => !section || m.section), now = this.host.current();
@@ -256,6 +269,8 @@
       this.ruler.closest('.transcribe-workspace').classList.toggle('has-markers', hasMarkers);
       if (this.measureButton) this.measureButton.disabled = !this.ready;
       this.fieldset.disabled = !this.ready; this.numbering.value = this.doc.numbering;
+      const deleteMeasures = document.getElementById("transcribe-delete-measures");
+      if (deleteMeasures) deleteMeasures.disabled = !this.ready || !rows(this.doc).some(m => !m.section);
       if (!this.list) { this.host.render(); return; }
       const focusedId = this.list.contains(document.activeElement) ? document.activeElement.dataset.id : null;
       this.list.replaceChildren();
@@ -273,7 +288,7 @@
       this.edit(); this.host.render();
     }
     draw() {
-      const width = this.ruler.clientWidth, height = 32, ratio = window.devicePixelRatio || 1;
+      const width = this.ruler.clientWidth, height = this.ruler.clientHeight, ratio = window.devicePixelRatio || 1;
       this.ruler.width = Math.round(width*ratio); this.ruler.height = height*ratio;
       const theme = getComputedStyle(document.documentElement);
       const ink = theme.getPropertyValue('--tr-text').trim(), accent = theme.getPropertyValue('--tr-accent').trim(), muted = theme.getPropertyValue('--tr-muted').trim();
@@ -286,7 +301,7 @@
       for (const m of rows(this.doc)) {
         const x = this.host.x(m.time,width); if (x < 0 || x > width) continue;
         ctx.strokeStyle = m.id === this.selected ? accent : m.section ? ink : muted;
-        ctx.beginPath(); ctx.moveTo(x+0.5,m.section ? 0 : 19); ctx.lineTo(x+0.5,32); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+0.5,m.section ? 0 : 19); ctx.lineTo(x+0.5,height); ctx.stroke();
         if (x > right) { ctx.fillStyle = m.id === this.selected ? accent : ink; ctx.fillText(m.label,x+4,14); right = x+ctx.measureText(m.label).width+12; }
       }
     }
@@ -306,7 +321,7 @@
         await this.saveQueue;
         if (generation !== this.generation) return;
         const saved = await this.storage('readonly', store => store.get(identity));
-        if (generation !== this.generation) return;
+        if (generation !== this.generation || this.persistenceDisabled) return;
         if (saved) {
           const restored = validate(saved,identity,this.host.duration());
           if (!this.undoStack.length) this.doc = restored;
@@ -316,8 +331,8 @@
             this.change(() => {
               for (const m of captured.markers) {
                 const near = this.doc.markers.find(existing => Math.abs(existing.time-m.time) <= 0.05);
-                if (near) near.section ||= m.section;
-                else this.doc.markers.push(m);
+                if (near) { near.section ||= m.section; if (m.source !== 'generated') this.promote(near); }
+                else { this.doc.markers.push(m); if (m.source !== 'generated') this.promote(m); }
               }
             });
           }
@@ -337,9 +352,9 @@
         };
       });
     }
-    document() { return { version: 1, identity: this.identity, ...structuredClone(this.doc) }; }
+    document() { return { version: 2, identity: this.identity, ...structuredClone(this.doc) }; }
     save() {
-      if (!this.identity) return;
+      if (!this.identity || this.persistenceDisabled) return;
       const value = this.document(), generation = this.generation;
       this.saveQueue = (this.saveQueue || Promise.resolve()).then(() => this.storage('readwrite', store => store.put(value,value.identity))).catch(() => { if (generation === this.generation) this.say('Could not autosave. Export marks to keep a copy.'); });
     }

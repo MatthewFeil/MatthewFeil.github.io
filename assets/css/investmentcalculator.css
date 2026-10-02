@@ -56,7 +56,7 @@
 }
 
 .investment-tool-switcher a:hover,
-.investment-tool-switcher a:focus-visible {
+:root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
   background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
   color: var(--site-text);
 }
@@ -251,18 +251,18 @@
   outline: none;
 }
 
-.investment-field input:focus-visible,
-.investment-field select:focus-visible,
-.investment-date-control:focus-within,
-.investment-input-grid button:focus-visible,
-.investment-details-toggle:focus-visible,
-.investment-tool-switcher a:focus-visible {
+:root[data-keyboard-navigation="on"] .investment-field input:focus-visible,
+:root[data-keyboard-navigation="on"] .investment-field select:focus-visible,
+:root[data-keyboard-navigation="on"] .investment-date-control:focus-within,
+:root[data-keyboard-navigation="on"] .investment-input-grid button:focus-visible,
+:root[data-keyboard-navigation="on"] .investment-details-toggle:focus-visible,
+:root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
   border-color: var(--site-accent);
   outline: none;
 }
 
-.investment-money-field:focus-within,
-.investment-percent-field:focus-within {
+:root[data-keyboard-navigation="on"] .investment-money-field:focus-within,
+:root[data-keyboard-navigation="on"] .investment-percent-field:focus-within {
   border-color: var(--site-accent);
 }
 
@@ -610,12 +610,12 @@
 
 @media (hover: none), (pointer: coarse) {
   .investment-tool-switcher a:hover,
-  .investment-tool-switcher a:focus-visible {
+  :root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
     background: var(--investment-surface);
   }
 
   .investment-tool-switcher a.is-active:hover,
-  .investment-tool-switcher a.is-active:focus-visible {
+  :root[data-keyboard-navigation="on"] .investment-tool-switcher a.is-active:focus-visible {
     background: var(--investment-surface);
     color: var(--investment-button);
   }

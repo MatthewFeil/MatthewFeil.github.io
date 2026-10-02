@@ -111,8 +111,8 @@ The transcription workbench is a scoped **Operate-mode extension** of Signalboar
 The palette relies on strong neutral contrast and one rare red signal; semantic green, amber, and red appear only for meaningful status.
 
 ### Primary
-- **Signal Red** (`#b90f17`): marks a key initial, active tool state, focus, and high-priority action in light mode. Red hover text uses this same shade.
-- **Bright Signal Red** (`#ff343d`): the shared dark-mode signal and transcription workbench's active state, playhead, A–B selection, analysis crosshair, and keyboard focus signal against pure black.
+- **Signal Red** (`#b90f17`): marks a key initial, active tool state, opt-in keyboard focus, and high-priority action in light mode. Red hover text uses this same shade.
+- **Bright Signal Red** (`#ff343d`): the shared dark-mode signal and transcription workbench's active state, playhead, A–B selection, analysis crosshair, and opt-in keyboard focus signal against pure black.
 
 ### Neutral
 - **Field Gray** (`#f7f7f7`): light-mode page field.
@@ -163,18 +163,18 @@ At `1180px`, setup controls move to their own horizontally scrollable row and th
 
 ## Elevation & Depth
 
-The system is flat by default. Borders, tonal surface changes, and spacing establish hierarchy. Hover never moves an element, adds a shadow, or adds a second perimeter: interactive cards and controls simply strengthen their existing border and, where useful, their surface tone. Signal Red is not a generic hover color, so it continues to communicate focus, active state, and priority rather than availability.
+The system is flat by default. Borders, tonal surface changes, and spacing establish hierarchy. Hover never moves an element, adds a shadow, or adds a second perimeter: interactive cards and controls simply strengthen their existing border and, where useful, their surface tone. Signal Red is not a generic hover color, so it continues to communicate opt-in keyboard focus, active state, and priority rather than availability.
 
 ### Named Rules
 **The Flat-By-Default Rule.** Do not add resting shadows, hover shadows, glass layers, or ornamental blur. Do not translate elements on hover. Depth must explain interaction or content grouping.
 
-**The Active Border Rule.** Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Keyboard focus remains a clearly visible Signal Red outline, while destructive actions retain their semantic error color.
+**The Active Border Rule.** Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Only in explicitly enabled keyboard-navigation mode does keyboard focus use a clearly visible Signal Red outline, while destructive actions retain their semantic error color.
 
 ## Shapes
 
 All controls, panels, cards, and tool surfaces use square corners (`border-radius: 0`) and thin, high-contrast borders. Borders are structural rules, not decorative frames. Controls use a standard minimum height of `2.5rem`, rising to the `2.75rem` touch target on narrow screens.
 
-Canvas graphics follow the same geometry: crisp one-pixel time, measure, beat, octave, selection, playhead, and crosshair rules. The workbench does not wrap the waveform or spectrum in decorative cards; their rectangular bands are the interface.
+Canvas graphics follow the same geometry: crisp one-pixel time, measure, octave, selection, playhead, and crosshair rules. The workbench does not wrap the waveform or spectrum in decorative cards; their rectangular bands are the interface.
 
 ## Components
 
@@ -182,7 +182,7 @@ Canvas graphics follow the same geometry: crisp one-pixel time, measure, beat, o
 Buttons are compact commands, not pill-shaped decoration.
 - **Shape:** square corners (`0`) with a `1px` border.
 - **Primary:** Signal Red background with white text, `0.7rem 1rem` padding, and the label type role.
-- **Hover / Focus:** pointer hover strengthens the existing border; keyboard focus uses the shared red focus outline.
+- **Hover / Focus:** pointer hover strengthens the existing border; keyboard focus uses the shared red outline only when keyboard navigation is enabled.
 - **Secondary:** neutral surface with a structural border; do not add a fill merely to create variation.
 
 ### Cards / Containers
@@ -199,7 +199,7 @@ Cards frame repeated posts and dense tool groups, never whole page sections.
 - **State:** a selected, semantic, or primary control may use its established accent or status color. It never creates a new ambient surface tier.
 
 ### Inputs / Fields
-Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus is communicated by the red outline or border shift, never by color alone.
+Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus styling is disabled by default. In opt-in keyboard-navigation mode, use the shared red outline rather than color alone.
 
 ### Navigation
 The sticky header uses a translucent page-colored surface and a `2px` structural bottom border. Desktop links are compact uppercase labels with a red underline reveal. At `1040px` and below, a touch-sized Menu control reveals the right-aligned navigation stack; dropdowns open through opacity and transform motion without animating layout properties.
@@ -213,7 +213,7 @@ Tool switchers are square segmented controls with a thin shared border. The acti
 ### Transcription Workbench
 The workbench is a local-audio task surface whose hierarchy comes from aligned signal bands rather than nested panels.
 - **Control band:** identity, file state, local-processing status, speed, pitch lock, loop, channel, filters, spectrum, and measure marking share a compact row. Controls use the Operational Floor and square one-pixel separations; overflow scrolls rather than wrapping into cards.
-- **Timeline band:** a complete-recording overview sits above a zoomed stereo waveform. Canvas rendering supplies time ticks, a user-marked measure and four-beat lattice, a bright-red playhead, and a translucent red A–B region with explicit draggable endpoints.
+- **Timeline band:** a complete-recording overview sits above a zoomed stereo waveform. Canvas rendering supplies time ticks, user-marked measure and section boundaries, a bright-red playhead, and a translucent red A–B region with explicit draggable endpoints.
 - **Analysis band:** selection-driven grayscale frequency energy is vertically aligned from C2 through C8 with a rendered piano keyboard. Pointer, touch, and arrow-key inspection leaves a persistent red crosshair and reports time, Hz, nearest note, and cents offset.
 - **Transport band:** playback navigation, A–B loop state, millisecond timecode, volume, and zoom form one continuous bottom rule. On mobile only the essential transport remains fixed at hand.
 - **Local file state:** “Local” and the empty-state promise communicate that playback and analysis remain on-device. Decode progress and unsupported-file failure replace that state without adding a modal.
@@ -226,7 +226,7 @@ The workbench is a local-audio task surface whose hierarchy comes from aligned s
 - **Do** use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.
 - **Do** use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.
 - **Do** keep broad outlined regions on the page field and use tonal fill only for compact controls or labels inside them.
-- **Do** use red sparingly for emphasis, active state, focus, and meaningful status.
+- **Do** use red sparingly for emphasis, active state, opt-in keyboard focus, and meaningful status.
 - **Do** keep interactive controls square, bordered, and touch-sized on small screens.
 - **Do** keep transcription setup above the signal, the overview above the zoomed waveform, pitch analysis aligned below it, and essential transport fixed at hand on mobile.
 - **Do** preserve Hz, note, and cents together when exposing pitch inspection; the crosshair and readout are one persistent state.
@@ -244,3 +244,7 @@ The workbench is a local-audio task surface whose hierarchy comes from aligned s
 ### Transcribe mobile workspace
 
 At widths up to 720px (and short touch landscape viewports), Transcribe keeps its navbar, overview, measure ruler, waveform, spectrum, keyboard, seek bar, and playback buttons within the dynamic viewport. The timeline receives more height than the spectrum. Mobile pitch inspection spans F3 through F6; desktop retains C1 through B6. Controls expands a scrolling panel containing the existing speed, sound, configuration, volume, zoom, and analysis controls. The same controls return to their desktop positions when the viewport widens, preserving their values and listeners.
+
+### Opt-in keyboard navigation
+
+Keyboard navigation is off by default site-wide. Do not add unconditional focus outlines, rings, border/color changes, focus-only reveals, or focus-triggered tooltips. Scope positive `:focus`, `:focus-visible`, and `:focus-within` selectors beneath `:root[data-keyboard-navigation="on"]`. The shared keyboard-navigation assets suppress Tab navigation and browser outlines in default mode. Preserve app shortcuts, native pointer focus, text editing, semantics, and focus-return logic. A toggle and Alt+Shift+K (Option+Shift+K on Mac) enable navigation and visible indicators; persist this preference across pages. Load the shared include on every layout, including standalone pages. This explicit user preference overrides generic Impeccable focus styling guidance.

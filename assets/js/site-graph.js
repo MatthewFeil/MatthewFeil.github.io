@@ -723,6 +723,7 @@
       hitArea.addEventListener('pointermove', (event) => choose(indexFromPointer(event)));
       hitArea.addEventListener('pointerdown', (event) => choose(indexFromPointer(event), true));
       hitArea.addEventListener('focus', () => {
+        if (document.documentElement.dataset.keyboardNavigation !== 'on') return;
         const selected = this.selectedX === null ? xValues.length - 1 : nearestIndex(this.selectedX);
         choose(selected, true);
       });

@@ -167,7 +167,7 @@ a {
 }
 
 a:hover,
-a:focus-visible {
+:root[data-keyboard-navigation="on"] a:focus-visible {
   color: var(--site-accent-text);
 }
 
@@ -186,7 +186,7 @@ a:focus-visible {
   transform: translateY(calc(-100% - 1rem));
 }
 
-.skip-link:focus-visible {
+:root[data-keyboard-navigation="on"] .skip-link:focus-visible {
   color: var(--site-accent-text);
   outline: 2px solid var(--site-accent);
   outline-offset: 3px;
@@ -207,15 +207,15 @@ label {
   font-family: var(--font-ui);
 }
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+:root[data-keyboard-navigation="on"] button:focus-visible,
+:root[data-keyboard-navigation="on"] input:focus-visible,
+:root[data-keyboard-navigation="on"] select:focus-visible,
+:root[data-keyboard-navigation="on"] textarea:focus-visible {
   outline: none;
   border-color: var(--site-accent);
 }
 
-button:focus-visible {
+:root[data-keyboard-navigation="on"] button:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -263,7 +263,7 @@ table {
 }
 
 .site-title:hover,
-.site-title:focus-visible {
+:root[data-keyboard-navigation="on"] .site-title:focus-visible {
   color: var(--site-accent);
 }
 
@@ -296,7 +296,7 @@ table {
 }
 
 .nav-toggle:hover,
-.nav-toggle:focus-visible {
+:root[data-keyboard-navigation="on"] .nav-toggle:focus-visible {
   border-color: var(--site-accent);
   background: color-mix(in srgb, var(--site-bg) 84%, var(--site-text));
 }
@@ -331,11 +331,11 @@ table {
 }
 
 .theme-toggle:hover,
-.theme-toggle:focus-visible {
+:root[data-keyboard-navigation="on"] .theme-toggle:focus-visible {
   color: var(--site-accent);
 }
 
-.theme-toggle:focus-visible {
+:root[data-keyboard-navigation="on"] .theme-toggle:focus-visible {
   outline: none;
   background: var(--site-panel);
 }
@@ -385,12 +385,12 @@ table {
 }
 
 .page-link:hover,
-.page-link:focus-visible {
+:root[data-keyboard-navigation="on"] .page-link:focus-visible {
   color: var(--site-accent);
 }
 
-.page-link:not(button):focus-visible,
-.nav-shelf-item:focus-visible {
+:root[data-keyboard-navigation="on"] .page-link:not(button):focus-visible,
+:root[data-keyboard-navigation="on"] .nav-shelf-item:focus-visible {
   outline: 2px solid var(--site-accent);
   outline-offset: 3px;
 }
@@ -568,7 +568,7 @@ table {
 }
 
 .nav-shelf-item:hover,
-.nav-shelf-item:focus-visible {
+:root[data-keyboard-navigation="on"] .nav-shelf-item:focus-visible {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   color: var(--site-accent);
 }
@@ -775,7 +775,7 @@ table {
 }
 
 .home-featured-project-title:hover,
-.home-featured-project-title:focus-visible {
+:root[data-keyboard-navigation="on"] .home-featured-project-title:focus-visible {
   color: var(--site-accent-text);
 }
 
@@ -783,8 +783,8 @@ table {
   transition: color 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-featured-project-title:focus-visible,
-.home-link-list a:focus-visible {
+:root[data-keyboard-navigation="on"] .home-featured-project-title:focus-visible,
+:root[data-keyboard-navigation="on"] .home-link-list a:focus-visible {
   outline: 2px solid var(--site-accent);
   outline-offset: 4px;
 }
@@ -894,11 +894,11 @@ table {
 }
 
 .work-card:hover .work-card-title,
-.work-card:focus-visible .work-card-title {
+:root[data-keyboard-navigation="on"] .work-card:focus-visible .work-card-title {
   color: var(--site-accent-text);
 }
 
-.work-card:focus-visible {
+:root[data-keyboard-navigation="on"] .work-card:focus-visible {
   outline: 2px solid var(--site-accent);
   outline-offset: 4px;
 }
@@ -1033,12 +1033,12 @@ table {
 }
 
 .home-link-list a:hover,
-.home-link-list a:focus-visible {
+:root[data-keyboard-navigation="on"] .home-link-list a:focus-visible {
   color: var(--site-accent-text);
 }
 
 .home-link-list a:hover::after,
-.home-link-list a:focus-visible::after {
+:root[data-keyboard-navigation="on"] .home-link-list a:focus-visible::after {
   transform: scaleX(1);
 }
 
@@ -1076,13 +1076,13 @@ table {
 }
 
 .post-card:hover,
-.post-card:focus-visible {
+:root[data-keyboard-navigation="on"] .post-card:focus-visible {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
   color: var(--site-text);
 }
 
-.post-card:focus-visible {
+:root[data-keyboard-navigation="on"] .post-card:focus-visible {
   outline: 2px solid var(--site-accent);
   outline-offset: 3px;
 }
@@ -1252,7 +1252,7 @@ table {
 }
 
 .playlist-card:hover,
-.playlist-card:focus-within {
+:root[data-keyboard-navigation="on"] .playlist-card:focus-within {
   background: color-mix(in srgb, var(--site-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--site-border) 70%, var(--site-text));
 }
@@ -1437,9 +1437,9 @@ table {
   }
 
   .post-card:hover,
-  .post-card:focus-visible,
+  :root[data-keyboard-navigation="on"] .post-card:focus-visible,
   .playlist-card:hover,
-  .playlist-card:focus-within {
+  :root[data-keyboard-navigation="on"] .playlist-card:focus-within {
     background: var(--site-bg);
     border-color: var(--site-soft-border);
   }
@@ -1816,7 +1816,7 @@ table {
   }
 }
 
-button.page-link:focus-visible {
+:root[data-keyboard-navigation="on"] button.page-link:focus-visible {
   outline: none;
   text-decoration: underline;
   text-underline-offset: 0.2em;

@@ -5,7 +5,7 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20260922-timeline-hover-guide
+  - /assets/css/transcribe.css?v=20261001-sidebar-header
 ---
 
 <main class="transcribe-app" id="transcribe-main" data-transcribe-app>
@@ -45,6 +45,7 @@ extra_css:
 
       <div class="transcribe-navbar-controls">
       <div class="transcribe-playback-settings" aria-label="Playback settings">
+        <div class="transcribe-speed-modes">
         <fieldset class="transcribe-speed-control">
           <legend>Speed</legend>
           <div class="transcribe-speed-buttons" id="transcribe-speed" aria-label="Playback speed">
@@ -61,6 +62,7 @@ extra_css:
             </span>
           </div>
         </fieldset>
+        </div>
         <button class="transcribe-tool-toggle is-active" id="transcribe-pitch-lock" type="button" aria-pressed="true" data-tooltip="Keep pitch steady when slowing audio">
           <span>Pitch lock</span>
           <strong>On</strong>
@@ -79,7 +81,7 @@ extra_css:
       </div>
       <div class="transcribe-panel-buttons">
       <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel" data-tooltip="Separate instruments in a highlight">Stems <strong>Off</strong><span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden></span></button>
-      <button type="button" id="transcribe-controls-toggle" title="Sections (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
+      <button type="button" id="transcribe-controls-toggle" title="Controls (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
       </div>
       </div>
       </div>
@@ -99,12 +101,13 @@ extra_css:
           <li data-stem="other"><span>Other / horns<small data-stem-activity>Not analyzed</small></span><button type="button" aria-label="Other / horns stem" aria-pressed="true" disabled>On</button></li>
         </ul>
         <p class="transcribe-stems-help">Drag on the waveform or use [ and ] to highlight up to 60 seconds. Highlight stems play only that passage and clear when it changes.</p>
-        <p class="transcribe-stems-help">Six-stem Demucs downloads a 136 MB model on first use and caches it when storage allows. Processing stays on your device. Guitar and piano play together; horns usually remain in Other. “Low audio” describes a quiet output, not proof an instrument is absent.</p>
+        <p class="transcribe-stems-help">Six-stem Demucs downloads a 136 MB model on first use and caches it when storage allows. Processing stays on your device. Guitar and piano play together; horns usually remain in Other. Dimmer names indicate quieter output, not proof an instrument is absent.</p>
       </section>
       <div id="transcribe-eq-panel">
         <div class="transcribe-eq-actions"><span>4-band parametric EQ</span><button type="button" id="transcribe-eq-reset" data-tooltip="Restore flat EQ">Reset</button></div>
         <svg id="transcribe-eq-graph" viewBox="0 0 320 210" role="group" aria-label="Equalizer. Drag bands to adjust frequency and gain; scroll over a band to adjust Q. Drag or scroll the cut handles to adjust low and high cuts."></svg>
-        <p class="transcribe-eq-hint">Drag bands: frequency / gain · Scroll: Q<br>Cut handles: drag or scroll cutoff</p>
+        <p class="transcribe-eq-hint">Drag bands: frequency / gain · Scroll: Q</p>
+        <p class="transcribe-eq-hint">Cut handles: drag or scroll cutoff</p>
         <div class="transcribe-eq-cuts">
           <label>Low cut · Hz<input id="transcribe-highpass" type="number" min="20" max="20000" step="1" value="20"></label>
           <label>High cut · Hz<input id="transcribe-lowpass" type="number" min="20" max="20000" step="1" value="20000"></label>
@@ -152,12 +155,6 @@ extra_css:
             <option value="0.22">Sensitive</option>
           </select>
         </label>
-        <div id="transcribe-marks" class="transcribe-numbering-control">
-          <fieldset disabled>
-            <label class="transcribe-tolerance-control"><span>Measure numbering</span><select data-numbering><option value="section">Per section</option><option value="continuous">Continuous</option></select></label>
-          </fieldset>
-          <output data-status role="status" aria-live="polite"></output>
-        </div>
         <output class="transcribe-pitch-readout" aria-label="Pitch inspection" hidden>
           <span id="transcribe-pitch-hz">— Hz</span>
           <strong id="transcribe-pitch-note">—</strong>
@@ -176,9 +173,10 @@ extra_css:
             <div><dt><kbd>R</kbd> or <kbd>L</kbd></dt><dd>Repeat on / off</dd></div>
             <div><dt><kbd>,</kbd> / <kbd>.</kbd></dt><dd>Speed down / up</dd></div>
             <div><dt><kbd>−</kbd> / <kbd>=</kbd></dt><dd>Zoom out / in</dd></div>
-            <div><dt><kbd>C</kbd></dt><dd>Show / hide Settings</dd></div>
-            <div><dt><kbd>?</kbd></dt><dd>Show / hide keyboard guide</dd></div>
-            <div><dt><kbd>T</kbd></dt><dd>Show / hide Stems</dd></div>
+            <div><dt><kbd>C</kbd></dt><dd>Show / hide Controls</dd></div>
+            <div><dt><kbd>?</kbd></dt><dd>Open keyboard shortcuts</dd></div>
+            <div><dt><span class="transcribe-key-combo"><kbd data-platform-alt>Alt</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>K</kbd></span></dt><dd>Toggle keyboard navigation</dd></div>
+            <div><dt><kbd>T</kbd></dt><dd>Open Stems</dd></div>
             <div><dt><kbd>F</kbd></dt><dd>Show / hide spectrum &amp; keyboard</dd></div>
           </dl>
           <h3>Measures &amp; sections</h3>
@@ -210,7 +208,7 @@ extra_css:
       <div class="transcribe-overview-wrap" id="transcribe-overview-navigator" role="scrollbar" aria-label="Timeline overview and visible range" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" tabindex="0">
         <canvas id="transcribe-overview" class="transcribe-overview" aria-label="Complete recording overview"></canvas>
       </div>
-      <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Shift-click to anchor a range, then move and click to place its other endpoint. Drag marks to move them."></canvas>
+      <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Swipe vertically to scroll the timeline; drag marks horizontally to move them. Shift-click to anchor a range, then move and click to place its other endpoint."></canvas>
       <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
         <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag or use one finger to select; swipe with two fingers to pan the timeline. Shift-click anchors a loop range."></canvas>
         <div id="transcribe-waveform-hover-guide" aria-hidden="true" hidden></div>
@@ -231,7 +229,8 @@ extra_css:
       <div class="transcribe-analysis-grid" id="transcribe-analysis-grid" tabindex="0" aria-label="Pitch spectrum from C1 to B6.">
         <div class="transcribe-spectrum-scroll">
           <canvas id="transcribe-spectrogram" class="transcribe-spectrogram" tabindex="0" aria-label="EQ-style pitch spectrum. Tap or use left and right arrow keys to inspect pitch; swipe with one finger to pan on mobile."></canvas>
-          <canvas id="transcribe-keyboard" class="transcribe-keyboard" aria-label="Horizontal piano keyboard from C1 to B6"></canvas>
+          <canvas id="transcribe-keyboard" class="transcribe-keyboard" tabindex="0" role="slider" aria-orientation="horizontal" aria-label="Horizontal piano keyboard from C1 to B6" aria-valuemin="24" aria-valuemax="95" aria-valuenow="60" aria-valuetext="C4" aria-describedby="transcribe-piano-help"></canvas>
+          <span id="transcribe-piano-help" class="transcribe-piano-help">Left/right: semitone. Up/down: octave. Home/End: first/last note. Hold Space or Enter to play; release to stop.</span>
         </div>
       </div>
       <div class="transcribe-analysis-progress" id="transcribe-analysis-progress" hidden>
@@ -270,7 +269,12 @@ extra_css:
           <label>Loop start <input data-loop-start type="text" placeholder="A2 or A" autocomplete="off"></label>
           <label>Loop end <input data-loop-end type="text" placeholder="B3 or B" autocomplete="off"></label>
         </form>
-        <output data-measure-status role="status" aria-live="polite"></output>
+        <div id="transcribe-marks" class="transcribe-numbering-control">
+          <fieldset disabled>
+            <label><span>Measure numbering</span><select data-numbering><option value="section">Per section</option><option value="continuous">Continuous</option></select></label>
+          </fieldset>
+          <output data-status data-measure-status role="status" aria-live="polite"></output>
+        </div>
       </div>
 
       <div class="transcribe-playback-progress">
@@ -299,10 +303,10 @@ extra_css:
 </main>
 
 <script src="{{ "/assets/js/site.js?v=20260922-tooltips" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-marks.js?v=20260915-mobile-markers" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-marks.js?v=20261001-no-beats" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-chords.js?v=20260910-1" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-stems.js?v=20260914-stem-controls" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-eq.js?v=20260922-tooltips" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20260923-shift-edge-scroll" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-stems.js?v=20261001-quiet-stems" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-eq.js?v=20261001-eq-width" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20261001-spectrum-edges" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-tooltips.js?v=20260922-controls" | relative_url }}" defer></script>

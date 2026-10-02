@@ -127,8 +127,8 @@ permalink: /cta-l-live-art/
         font-weight: 800;
       }
 
-      button:focus-visible,
-      input:focus-visible {
+      :root[data-keyboard-navigation="on"] button:focus-visible,
+      :root[data-keyboard-navigation="on"] input:focus-visible {
         outline: 2px solid #e3262e;
         outline-offset: 2px;
       }
@@ -269,6 +269,7 @@ permalink: /cta-l-live-art/
         }
       }
     </style>
+    {% include keyboard-navigation.html %}
   </head>
   <body>
     <div class="pause-banner usage-banner" role="status" aria-live="polite">
