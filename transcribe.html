@@ -5,10 +5,11 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20261001-sidebar-header
+  - /assets/css/transcribe.css?v=20261004-note-fields
 ---
 
-<main class="transcribe-app" id="transcribe-main" data-transcribe-app>
+<main class="transcribe-app" id="transcribe-main" data-transcribe-app data-loading>
+
   <section class="transcribe-workspace" id="transcribe-workspace" aria-label="Music transcription playback workspace">
     <div id="transcribe-config-status" hidden>
       <span id="transcribe-config-message" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -139,22 +140,20 @@ extra_css:
           </label>
         </div>
       </div>
-        <label class="transcribe-tolerance-control" for="transcribe-spectrum-scale">
-          <span>Spectrum scale</span>
-          <select id="transcribe-spectrum-scale" data-tooltip="Change how quiet frequencies appear">
-            <option value="linear" selected>Linear</option>
-            <option value="db">Detailed (dB)</option>
-          </select>
-        </label>
+        <div class="transcribe-detection-controls" id="transcribe-detection-controls">
+          <label class="transcribe-tolerance-control" for="transcribe-detection-mode">
+            <span>Detection</span>
+            <select id="transcribe-detection-mode" data-tooltip="Choose which notes to emphasize">
+              <option value="balanced" selected>Balanced</option>
+              <option value="bass">Bass</option>
+              <option value="chordal">Chordal</option>
+              <option value="melody">Melody</option>
+            </select>
+          </label>
+          <label class="transcribe-tolerance-control" for="transcribe-detection-low"><span>Low note</span><input type="text" spellcheck="false" autocomplete="off" autocapitalize="characters" enterkeyhint="done" id="transcribe-detection-low" aria-label="Preferred lowest note" data-tooltip="Favor notes at or above this pitch; stronger notes outside the range can still appear"></label>
+          <label class="transcribe-tolerance-control" for="transcribe-detection-high"><span>High note</span><input type="text" spellcheck="false" autocomplete="off" autocapitalize="characters" enterkeyhint="done" id="transcribe-detection-high" aria-label="Preferred highest note" data-tooltip="Favor notes at or below this pitch; stronger notes outside the range can still appear"></label>
+        </div>
         <button class="transcribe-tool-toggle" id="transcribe-analyze-selection" type="button" aria-pressed="false" data-tooltip="Analyze the whole highlighted passage"><span>Whole highlight</span><strong>Off</strong></button>
-        <label class="transcribe-tolerance-control" for="transcribe-note-tolerance">
-          <span>Note tolerance</span>
-          <select id="transcribe-note-tolerance" data-tooltip="Adjust sensitivity of note guesses">
-            <option value="0.7">Focused</option>
-            <option value="0.45" selected>Balanced</option>
-            <option value="0.22">Sensitive</option>
-          </select>
-        </label>
         <output class="transcribe-pitch-readout" aria-label="Pitch inspection" hidden>
           <span id="transcribe-pitch-hz">— Hz</span>
           <strong id="transcribe-pitch-note">—</strong>
@@ -217,6 +216,13 @@ extra_css:
           <strong>Drop an audio file here or click to open</strong>
           <span>Audio stays on this device.</span>
         </button>
+        <div class="transcribe-loading" id="transcribe-loading" role="status" aria-live="polite">
+          <div class="transcribe-loading-signal" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <strong id="transcribe-loading-stage">Preparing workspace</strong>
+          <span id="transcribe-loading-file"></span>
+          <small>Audio stays on this device.</small>
+        </div>
+
       </div>
     </section>
 
@@ -304,9 +310,10 @@ extra_css:
 
 <script src="{{ "/assets/js/site.js?v=20260922-tooltips" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-marks.js?v=20261001-no-beats" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe-chords.js?v=20260910-1" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-notes.js?v=20261004-melody-dropouts" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe-chords.js?v=20261005-chord-stability" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems.js?v=20261001-quiet-stems" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-eq.js?v=20261001-eq-width" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20261001-spectrum-edges" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20261005-chord-stability" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-tooltips.js?v=20260922-controls" | relative_url }}" defer></script>

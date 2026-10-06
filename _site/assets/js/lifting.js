@@ -93,11 +93,51 @@
     status: document.getElementById('lifting-status')
   };
   const logDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const motionAnimations = new Map();
+
+  function animateFeedback(element, keyframes, duration) {
+    motionAnimations.get(element)?.cancel();
+    if (!element?.animate || document.hidden) return;
+    const animation = element.animate(keyframes, {
+      duration,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
+    });
+    motionAnimations.set(element, animation);
+    const clear = () => {
+      if (motionAnimations.get(element) === animation) motionAnimations.delete(element);
+    };
+    animation.addEventListener('finish', clear, { once: true });
+    animation.addEventListener('cancel', clear, { once: true });
+  }
+
+  function stopMotion() {
+    motionAnimations.forEach((animation) => animation.cancel());
+    motionAnimations.clear();
+  }
+
+  reducedMotion.addEventListener('change', stopMotion);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopMotion();
+  });
+
+  function highlightUpdate(element) {
+    if (!element) return;
+    animateFeedback(element, [
+      { backgroundColor: 'color-mix(in srgb, var(--lifting-good) 13%, var(--lifting-soft))' },
+      { backgroundColor: 'var(--lifting-soft)' }
+    ], reducedMotion.matches ? 140 : 420);
+  }
+
   function setStatus(message, isError = false) {
+    const changed = els.status.textContent !== message;
     els.status.textContent = message;
     els.status.style.color = isError ? 'var(--lifting-warn)' : '';
     els.status.classList.toggle('is-loading', !isError && message.endsWith('...'));
     els.status.setAttribute('aria-busy', String(!isError && message.endsWith('...')));
+    if (changed && message) {
+      animateFeedback(els.status, [{ opacity: 0.7 }, { opacity: 1 }], reducedMotion.matches ? 100 : 180);
+    }
   }
 
   function setButtonLoading(button, isLoading, loadingText = 'Working...') {
@@ -215,7 +255,11 @@
     }, 0);
     const totalWeight = 45 + (platesPerSide * 2);
     els.barbellTotals.forEach((total) => {
+      const changed = total.textContent !== `${totalWeight} lb total`;
       total.textContent = `${totalWeight} lb total`;
+      if (changed && els.logSetModal.open && !els.barbellCalculator.hidden) {
+        animateFeedback(total, [{ opacity: 0.55 }, { opacity: 1 }], reducedMotion.matches ? 100 : 180);
+      }
     });
     els.logWeight.value = String(totalWeight);
     syncSubmitButton(els.logForm);
@@ -446,6 +490,13 @@
   }
 
   function renderList() {
+    // A search or refresh replaces the rows; discard effects on old content.
+    motionAnimations.forEach((animation, element) => {
+      if (els.list.contains(element)) {
+        animation.cancel();
+        motionAnimations.delete(element);
+      }
+    });
     const allMetrics = state.lifts.map(metricsForLift);
 
     const filtered = allMetrics.filter((item) => (
@@ -496,12 +547,17 @@
     renderList();
   }
 
-  async function loadLifts() {
+  async function loadLifts(updatedLiftId = '') {
     setStatus('Loading lifts...');
     const data = await api('list');
     state.lifts = data.lifts || [];
     state.logs = data.logs || [];
     render();
+    if (updatedLiftId) {
+      const row = [...els.list.querySelectorAll('[data-toggle-lift]')]
+        .find((button) => button.dataset.toggleLift === updatedLiftId);
+      highlightUpdate(row?.closest('.lifting-card-summary'));
+    }
     setStatus(`Updated ${new Date().toLocaleTimeString()}.`);
   }
 
@@ -615,7 +671,7 @@
       els.logDate.valueAsDate = new Date();
       els.logLift.value = selectedLift;
       els.logSetModal.close();
-      await loadLifts();
+      await loadLifts(selectedLift);
     } catch (error) {
       setStatus(error.message, true);
     } finally {
@@ -641,7 +697,7 @@
         equipment_type: form.get('equipment_type')
       });
       els.renameLiftModal.close();
-      await loadLifts();
+      await loadLifts(id);
     } catch (error) {
       setStatus(error.message, true);
     } finally {
@@ -764,6 +820,15 @@
         const isHidden = details.hidden;
         details.hidden = !isHidden;
         toggleButton.setAttribute('aria-expanded', String(isHidden));
+        const targets = details.querySelector('section');
+        if (isHidden) {
+          animateFeedback(targets, reducedMotion.matches
+            ? [{ opacity: 0.75 }, { opacity: 1 }]
+            : [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }],
+          reducedMotion.matches ? 100 : 260);
+        } else {
+          motionAnimations.get(targets)?.cancel();
+        }
       }
 
       if (logsButton) {

@@ -233,20 +233,26 @@
       return;
     }
 
-    els.todoistList.innerHTML = todoist.map((task, index) => `
-      <li class="personal-dashboard-entry" style="--entry-index: ${Math.min(index, 6)}" data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" data-task-title="${escapeHtml(task.title)}">
-        <button class="personal-task-check" type="button" data-complete-task="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" aria-label="Complete ${escapeHtml(task.title)}"></button>
+    els.todoistList.innerHTML = todoist.map((task, index) => {
+      const uncompletable = String(task.title ?? '').startsWith('* ');
+      const title = uncompletable ? task.title.slice(2) : task.title;
+      return `
+      <li class="personal-dashboard-entry" style="--entry-index: ${Math.min(index, 6)}" data-task-id="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" data-task-title="${escapeHtml(title)}">
+        ${uncompletable
+          ? '<span class="personal-task-placeholder" aria-hidden="true"></span>'
+          : `<button class="personal-task-check" type="button" data-complete-task="${escapeHtml(task.id || '')}" data-priority="${escapeHtml(task.priority || 1)}" aria-label="Complete ${escapeHtml(title)}"></button>`}
         <div class="personal-task-content">
-          <a href="${escapeHtml(task.url || 'https://todoist.com/app/today')}" target="_blank" rel="noopener" aria-label="Open ${escapeHtml(task.title)} in Todoist (opens in a new tab)">
+          <a href="${escapeHtml(task.url || 'https://todoist.com/app/today')}" target="_blank" rel="noopener" aria-label="Open ${escapeHtml(title)} in Todoist (opens in a new tab)">
             <span class="personal-task-title-line">
               ${taskTime(task) ? `<span class="personal-task-time">${escapeHtml(taskTime(task))}</span>` : ''}
-              <strong>${escapeHtml(task.title)}</strong>
+              <strong>${escapeHtml(title)}</strong>
             </span>
             ${taskDetails(task).map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}
           </a>
         </div>
       </li>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderEmptyState(list, message) {

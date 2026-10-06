@@ -38,6 +38,8 @@
   <link rel="stylesheet" href="/assets/css/style.css">
   
   <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+<link rel="stylesheet" href="/assets/css/keyboard-navigation.css">
+<script src="/assets/js/keyboard-navigation.js"></script>
 </head>
 <body>
 
@@ -322,9 +324,9 @@
     outline: none;
   }
 
-  .grade-v2-entry:focus-within,
-  .example-entry:focus-within,
-  .setting-row:focus-within {
+  :root[data-keyboard-navigation="on"] .grade-v2-entry:focus-within,
+  :root[data-keyboard-navigation="on"] .example-entry:focus-within,
+  :root[data-keyboard-navigation="on"] .setting-row:focus-within {
     background: var(--gc-accent-wash);
     border-color: var(--site-accent);
   }
@@ -335,15 +337,15 @@
     border-color: var(--gc-bad);
   }
 
-  .grade-v2-entry:has(input[aria-invalid="true"]):focus-within,
-  .example-entry:has(input[aria-invalid="true"]):focus-within,
-  .setting-row:has(input[aria-invalid="true"]):focus-within {
+  :root[data-keyboard-navigation="on"] .grade-v2-entry:has(input[aria-invalid="true"]):focus-within,
+  :root[data-keyboard-navigation="on"] .example-entry:has(input[aria-invalid="true"]):focus-within,
+  :root[data-keyboard-navigation="on"] .setting-row:has(input[aria-invalid="true"]):focus-within {
     border-color: var(--gc-bad);
   }
 
-  .scale-grid input:focus-visible,
-  .grade-v2 button:focus-visible,
-  .grade-dialog button:focus-visible {
+  :root[data-keyboard-navigation="on"] .scale-grid input:focus-visible,
+  :root[data-keyboard-navigation="on"] .grade-v2 button:focus-visible,
+  :root[data-keyboard-navigation="on"] .grade-dialog button:focus-visible {
     border-color: var(--site-accent);
     outline: 2px solid var(--site-accent);
     outline-offset: 2px;
@@ -496,7 +498,7 @@
     border-color: color-mix(in srgb, var(--gc-border) 70%, var(--site-text));
   }
 
-  .secondary-action {
+  .control-stack .secondary-action {
     min-height: 2.5rem;
     min-width: 0;
     padding: 0.5rem 0.62rem;
@@ -504,7 +506,7 @@
     color: var(--site-text);
     font-size: 0.78rem;
     font-weight: 800;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .toggle-action {
@@ -1608,7 +1610,9 @@
     </main><footer class="site-footer">
   <div class="site-footer-inner">
     <p>Matthew Feil</p>
-    <p>The website of a highschooler with a passion for music, technology, and learning.</p>
+    <div class="site-footer-details">
+      <p>The website of a highschooler with a passion for music, technology, and learning.</p>
+    </div>
   </div>
 </footer>
 <script src="/assets/js/site.js" defer></script>

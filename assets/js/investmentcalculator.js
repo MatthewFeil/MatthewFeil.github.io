@@ -75,63 +75,19 @@
     return `${year}-${month}-${day}`;
   }
 
-  function toLocalInputDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+  const { formatLocal: toLocalInputDate, parse: parseInputDate } = window.CalculatorDates;
+  const validateDates = window.CalculatorDates.bind({
+    startInput: dateInput,
+    endInput: endDateInput,
+    allowFuture: false,
+    setFieldInvalid,
+    setStatus,
+    status
+  });
 
-  function parseInputDate(value) {
-    const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-    if (!match) {
-      return null;
-    }
-
-    const [, yearText, monthText, dayText] = match;
-    const year = Number(yearText);
-    const month = Number(monthText);
-    const day = Number(dayText);
-    const date = new Date(Date.UTC(year, month - 1, day));
-
-    if (
-      date.getUTCFullYear() !== year ||
-      date.getUTCMonth() !== month - 1 ||
-      date.getUTCDate() !== day
-    ) {
-      return null;
-    }
-
-    return date;
-  }
-
-  function updateDateDisplay(input) {
-    const display = document.querySelector(`[data-date-display="${input.id}"]`);
-
-    if (!display) {
-      return;
-    }
-
-    display.textContent = input.value || 'YYYY-MM-DD';
-  }
-
-  function openDatePicker(input) {
-    try {
-      input.focus({ preventScroll: true });
-    } catch {
-      input.focus();
-    }
-
-    if (typeof input.showPicker !== 'function') {
-      return;
-    }
-
-    try {
-      input.showPicker();
-    } catch {
-      // Some browsers only allow the native picker from the input's own default tap.
-    }
+  function parsePriceDate(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+    return match ? parseInputDate(`${match[2]}-${match[3]}-${match[1]}`) : null;
   }
 
   function formatDate(date) {
@@ -246,11 +202,11 @@
       name: data.name || symbol,
       source: data.source || 'Yahoo Finance',
       purchase: {
-        date: parseInputDate(data.purchase?.date),
+        date: parsePriceDate(data.purchase?.date),
         price: Number(data.purchase?.price)
       },
       current: {
-        date: parseInputDate(data.current?.date),
+        date: parsePriceDate(data.current?.date),
         price: Number(data.current?.price)
       },
       inflation: data.inflation && Number.isFinite(Number(data.inflation.factor))
@@ -334,11 +290,11 @@
     event.preventDefault();
 
     clearFieldErrors();
+    if (!validateDates(true)) return;
 
     const amount = Number(amountInput.value);
     const startDate = parseInputDate(dateInput.value);
     const endDate = parseInputDate(endDateInput.value);
-    const today = new Date();
     const symbol = normalizeSymbol(symbolInput.value);
 
     if (!Number.isFinite(amount) || amount <= 0 || !startDate || !endDate || !symbol) {
@@ -349,19 +305,6 @@
         !symbol ? symbolInput : null
       ].filter(Boolean);
       showValidationError('Enter an amount, dates, and ticker.', invalidInputs);
-      return;
-    }
-
-    if (startDate > today || endDate > today) {
-      showValidationError('Choose dates that have already happened.', [
-        ...(startDate > today ? [dateInput] : []),
-        ...(endDate > today ? [endDateInput] : [])
-      ]);
-      return;
-    }
-
-    if (endDate < startDate) {
-      showValidationError('Choose an end date after the start date.', [endDateInput]);
       return;
     }
 
@@ -403,31 +346,14 @@
     const defaultDate = new Date(today);
     defaultDate.setFullYear(defaultDate.getFullYear() - 10);
 
-    dateInput.max = toLocalInputDate(today);
-    endDateInput.max = toLocalInputDate(today);
     dateInput.value = toLocalInputDate(defaultDate);
     endDateInput.value = toLocalInputDate(today);
-    updateDateDisplay(dateInput);
-    updateDateDisplay(endDateInput);
   }
 
   initDefaults();
   setDetailsOpen(false);
   detailsToggle.addEventListener('click', () => {
     setDetailsOpen(detailsPanel.hidden);
-  });
-  [dateInput, endDateInput].forEach((input) => {
-    input.addEventListener('input', () => {
-      updateDateDisplay(input);
-      setFieldInvalid(input, false);
-    });
-    input.addEventListener('change', () => {
-      updateDateDisplay(input);
-      setFieldInvalid(input, false);
-    });
-    input.closest('.investment-date-control')?.addEventListener('click', () => {
-      openDatePicker(input);
-    });
   });
   [amountInput, symbolInput].forEach((input) => {
     input.addEventListener('input', () => setFieldInvalid(input, false));

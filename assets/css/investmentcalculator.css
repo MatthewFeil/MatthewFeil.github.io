@@ -36,7 +36,11 @@
   background: var(--investment-border);
 }
 
-.investment-tool-switcher a {
+.investment-tool-switcher button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
   min-width: 7rem;
   padding: 0.55rem 0.8rem;
   background: var(--investment-surface);
@@ -51,17 +55,17 @@
   text-transform: uppercase;
 }
 
-.investment-tool-switcher a + a {
+.investment-tool-switcher button + button {
   border-left: 1px solid var(--investment-border);
 }
 
-.investment-tool-switcher a:hover,
-:root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
+.investment-tool-switcher button:hover,
+:root[data-keyboard-navigation="on"] .investment-tool-switcher button:focus-visible {
   background: color-mix(in srgb, var(--investment-surface) 88%, var(--site-text));
   color: var(--site-text);
 }
 
-.investment-tool-switcher a.is-active {
+.investment-tool-switcher button.is-active {
   background: var(--investment-surface);
   box-shadow: inset 0 0 0 1px var(--investment-button);
   color: var(--investment-button);
@@ -144,57 +148,39 @@
   min-width: 0;
 }
 
-.investment-date-control {
+.investment-date-mask {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  display: block;
   min-width: 0;
-  overflow: hidden;
 }
 
-.investment-date-display {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  min-width: 0;
+.investment-date-mask .investment-date-input {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
-  line-height: 1.2;
+  font-kerning: none;
+  caret-color: var(--site-text);
+}
+
+.investment-date-ink {
+  position: absolute;
+  inset: 1px;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.65rem;
   overflow: hidden;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--site-text);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-kerning: none;
+  white-space: pre;
   pointer-events: none;
 }
 
-.investment-date-control .investment-date-input {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  border: 0;
-  background: transparent;
-  color: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-family: var(--font-ui);
-  font-weight: 800;
-  caret-color: transparent;
-  -webkit-text-fill-color: transparent;
-  padding: 0;
-}
-
-.investment-date-control .investment-date-input::-webkit-date-and-time-value {
-  color: transparent;
-}
-
-.investment-date-control .investment-date-input::-webkit-calendar-picker-indicator {
-  opacity: 0;
+.investment-date-ink .is-placeholder {
+  color: var(--investment-muted);
 }
 
 .investment-field input {
@@ -256,7 +242,7 @@
 :root[data-keyboard-navigation="on"] .investment-date-control:focus-within,
 :root[data-keyboard-navigation="on"] .investment-input-grid button:focus-visible,
 :root[data-keyboard-navigation="on"] .investment-details-toggle:focus-visible,
-:root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
+:root[data-keyboard-navigation="on"] .investment-tool-switcher button:focus-visible {
   border-color: var(--site-accent);
   outline: none;
 }
@@ -280,6 +266,7 @@
 }
 
 .investment-field.is-invalid > input,
+.investment-field.is-invalid .investment-date-input,
 .investment-field.is-invalid > select,
 .investment-field.is-invalid .investment-money-field,
 .investment-field.is-invalid .investment-percent-field,
@@ -609,13 +596,13 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .investment-tool-switcher a:hover,
-  :root[data-keyboard-navigation="on"] .investment-tool-switcher a:focus-visible {
+  .investment-tool-switcher button:hover,
+  :root[data-keyboard-navigation="on"] .investment-tool-switcher button:focus-visible {
     background: var(--investment-surface);
   }
 
-  .investment-tool-switcher a.is-active:hover,
-  :root[data-keyboard-navigation="on"] .investment-tool-switcher a.is-active:focus-visible {
+  .investment-tool-switcher button.is-active:hover,
+  :root[data-keyboard-navigation="on"] .investment-tool-switcher button.is-active:focus-visible {
     background: var(--investment-surface);
     color: var(--investment-button);
   }
@@ -659,7 +646,7 @@
     width: 100%;
   }
 
-  .investment-tool-switcher a {
+  .investment-tool-switcher button {
     display: flex;
     min-height: var(--touch-target);
     align-items: center;

@@ -92,12 +92,58 @@
   const graphReadoutDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
   const REQUEST_TIMEOUT_MS = 20000;
   let portfolioGraph = null;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const motionAnimations = new Map();
+  let graphMotionFrame = 0;
+  let graphMotion = null;
+
+  function animateFeedback(element, keyframes, duration) {
+    motionAnimations.get(element)?.cancel();
+    if (!element?.animate || document.hidden) return null;
+    const animation = element.animate(keyframes, {
+      duration,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
+    });
+    motionAnimations.set(element, animation);
+    const clear = () => {
+      if (motionAnimations.get(element) === animation) motionAnimations.delete(element);
+    };
+    animation.addEventListener('finish', clear, { once: true });
+    animation.addEventListener('cancel', clear, { once: true });
+    return animation;
+  }
+
+  function stopMotion() {
+    window.cancelAnimationFrame(graphMotionFrame);
+    motionAnimations.forEach((animation) => animation.cancel());
+    motionAnimations.clear();
+  }
+
+  reducedMotion.addEventListener('change', stopMotion);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopMotion();
+  });
+
+  function updateSummaryValue(element, text) {
+    const changed = element.textContent !== text;
+    element.textContent = text;
+    if (!changed) return;
+    // Keep the final financial value readable throughout the acknowledgment.
+    animateFeedback(element.parentElement, [
+      { backgroundColor: 'color-mix(in srgb, var(--site-text) 12%, var(--portfolio-surface))' },
+      { backgroundColor: 'var(--portfolio-surface)' }
+    ], reducedMotion.matches ? 140 : 360);
+  }
 
   function setStatus(message, isError = false) {
+    const changed = els.status.textContent !== message;
     els.status.textContent = message;
     els.status.classList.toggle('portfolio-negative', isError);
     els.status.classList.toggle('is-loading', !isError && message.endsWith('...'));
     els.status.setAttribute('aria-busy', String(!isError && message.endsWith('...')));
+    if (changed && message) {
+      animateFeedback(els.status, [{ opacity: 0.65 }, { opacity: 1 }], reducedMotion.matches ? 100 : 180);
+    }
   }
 
   function setButtonLoading(button, isLoading, loadingText = 'Working...') {
@@ -358,6 +404,8 @@
 
   function renderGraph() {
     if (!window.SiteGraph || !els.graph) return;
+    window.cancelAnimationFrame(graphMotionFrame);
+    graphMotion?.cancel();
     const data = graphData();
     els.graph.setAttribute('aria-busy', 'false');
     const series = [{
@@ -428,6 +476,18 @@
       });
       renderGraphDetail(data[data.length - 1]);
     }
+    // Wait for the graph's initial ResizeObserver draw. Axes and the readout
+    // stay visible; only the history is revealed from earlier to later dates.
+    graphMotionFrame = window.requestAnimationFrame(() => {
+      graphMotionFrame = window.requestAnimationFrame(() => {
+        const history = els.graph.querySelector('.site-graph-series-root');
+        if (!history || !data.length) return;
+        graphMotion = animateFeedback(history, reducedMotion.matches
+          ? [{ opacity: 0.75 }, { opacity: 1 }]
+          : [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }],
+        reducedMotion.matches ? 100 : 560);
+      });
+    });
   }
 
   function costBasisForLogs(logs) {
@@ -530,10 +590,10 @@
     }, { cost: 0, value: 0, performanceGain: 0, performanceBasis: 0, performanceAvailable: true });
     const percent = totals.performanceBasis > 0 ? (totals.performanceGain / totals.performanceBasis) * 100 : 0;
 
-    els.summaryValue.textContent = money.format(totals.value);
-    els.summaryCost.textContent = money.format(totals.cost);
-    els.summaryGain.textContent = totals.performanceAvailable ? money.format(totals.performanceGain) : 'Unavailable';
-    els.summaryPercent.textContent = totals.performanceAvailable ? `${percent.toFixed(2)}%` : 'Unavailable';
+    updateSummaryValue(els.summaryValue, money.format(totals.value));
+    updateSummaryValue(els.summaryCost, money.format(totals.cost));
+    updateSummaryValue(els.summaryGain, totals.performanceAvailable ? money.format(totals.performanceGain) : 'Unavailable');
+    updateSummaryValue(els.summaryPercent, totals.performanceAvailable ? `${percent.toFixed(2)}%` : 'Unavailable');
     els.summaryGain.className = totals.performanceAvailable ? gainClass(totals.performanceGain) : '';
     els.summaryPercent.className = totals.performanceAvailable ? gainClass(percent) : '';
   }

@@ -733,7 +733,8 @@
   min-width: 0;
 }
 
-.personal-task-list .personal-task-check {
+.personal-task-list .personal-task-check,
+.personal-task-list .personal-task-placeholder {
   --task-priority-color: var(--personal-muted);
   appearance: none;
   display: inline-grid;
@@ -758,6 +759,10 @@
   line-height: 0;
   transform: none;
   transition: none;
+}
+
+.personal-task-list .personal-task-placeholder {
+  cursor: default;
 }
 
 .personal-task-list .personal-task-check::before {

@@ -580,7 +580,9 @@ table {
 
 .page-link-personal {
   margin-left: -0.25rem;
+  margin-right: -0.25rem;
   padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .page-link-personal::before {
@@ -609,6 +611,7 @@ table {
   text-transform: uppercase;
 }
 
+.page-link-personal::after,
 .page-link-transcribe::after {
   position: absolute;
   top: 25%;
@@ -660,17 +663,30 @@ table {
   margin: 0;
 }
 
-.site-footer p:first-child {
+.site-footer-inner > p {
   color: var(--site-text);
   font-family: var(--font-display);
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.site-footer p:last-child {
+.site-footer-details {
+  min-width: 0;
+  margin-left: auto;
+  text-align: right;
+}
+
+.site-footer-details p {
   font-family: var(--font-body);
   font-weight: 600;
+}
+
+.site-footer-details .keyboard-navigation-toggle {
+  display: block;
+  margin-left: auto;
+  font-size: 0.75rem;
 }
 
 .home {
@@ -1695,13 +1711,16 @@ table {
 
   .page-link-personal {
     margin-left: 0;
+    margin-right: 0;
     border-top: 0;
     border-bottom: 1px solid var(--site-soft-border);
     padding-top: 0;
     padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
 
-  .page-link-personal::before {
+  .page-link-personal::before,
+  .page-link-personal::after {
     display: none;
   }
 

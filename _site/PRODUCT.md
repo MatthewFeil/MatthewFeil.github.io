@@ -20,7 +20,7 @@ The site combines a personal record of music, technology, and other interests wi
 
 ## Operating Context
 
-Visitors browse public pages and posts on the web. A public My Work gallery links to Transcribe, Chicago 'L' Live Art, the Finals Grade Calculator, the Stock Return Calculator, and the Interest Calculator. The homepage features Transcribe and links to Live Art and the Finals Grade Calculator, while the main navigation links directly to My Work. Transcribe processes user-selected audio locally. A separately authenticated Personal Space dashboard links to private portfolio and lifting trackers and integrates Todoist and Google Calendar views.
+Visitors browse public pages and posts on the web. A public My Work gallery links to Transcribe, Chicago 'L' Live Art, the Finals Grade Calculator, and the Investment Calculator (stock returns and interest). The homepage features Transcribe and links to Live Art and the Finals Grade Calculator, while the main navigation links directly to My Work. Transcribe processes user-selected audio locally. A separately authenticated Personal Space dashboard links to private portfolio and lifting trackers and integrates Todoist and Google Calendar views.
 
 ## Capabilities and Constraints
 
@@ -43,4 +43,8 @@ Public content and project entry points are present in the root pages and `_post
 
 ## Accessibility & Inclusion
 
-The existing web implementation includes semantic form labels, status announcements, visible keyboard focus styling, responsive minimum widths, and light and dark color-scheme support.
+The existing web implementation includes semantic form labels, status announcements, opt-in keyboard navigation and focus styling, responsive minimum widths, and light and dark color-scheme support.
+
+Keyboard navigation is off by default across matthewfeil.com. Users can enable Tab/Shift+Tab navigation and visible focus indicators with the Keyboard navigation toggle or Alt+Shift+K (Option+Shift+K on Mac). The preference persists across pages. App shortcuts and normal field editing work in both modes.
+
+Transcribe uses percentage-based playback speed. Beat analysis, BPM speed mode, metronome/count-in, and the Timing sidebar group are removed. Measure and section markers remain; numbering and bulk measure deletion live in the measure navigation popover. Legacy configs may retain beat metadata, which is ignored on import.

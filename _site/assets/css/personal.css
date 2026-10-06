@@ -153,7 +153,7 @@
   opacity: 1;
 }
 
-.personal-login-field input:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-login-field input:focus-visible {
   border-color: var(--site-accent);
   box-shadow: none;
 }
@@ -200,21 +200,21 @@
 }
 
 .personal-form button:hover,
-.personal-form button:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-form button:focus-visible {
   border-color: var(--site-accent-strong);
   background: color-mix(in srgb, var(--site-accent) 10%, transparent);
   color: var(--site-accent-strong);
 }
 
 .personal-home-link:hover,
-.personal-home-link:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-home-link:focus-visible {
   border-color: var(--site-accent-strong);
   background: color-mix(in srgb, var(--site-accent) 10%, transparent);
   color: var(--site-accent-strong);
 }
 
-.personal-form button:focus-visible,
-.personal-home-link:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-form button:focus-visible,
+:root[data-keyboard-navigation="on"] .personal-home-link:focus-visible {
   outline-color: var(--site-accent);
 }
 
@@ -339,13 +339,13 @@
 }
 
 .personal-heading button:hover,
-.personal-heading button:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-heading button:focus-visible {
   background: color-mix(in srgb, var(--personal-surface) 88%, var(--site-text));
   border-color: var(--site-text);
   color: var(--site-text);
 }
 
-.personal-heading button:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-heading button:focus-visible {
   outline-color: var(--site-accent);
 }
 
@@ -469,7 +469,7 @@
 }
 
 .personal-widget h3 a:hover,
-.personal-widget h3 a:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-widget h3 a:focus-visible {
   color: var(--site-accent);
 }
 
@@ -504,13 +504,13 @@
 }
 
 .personal-tracker-link:hover,
-.personal-tracker-link:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-tracker-link:focus-visible {
   background: color-mix(in srgb, var(--personal-bg) 88%, var(--site-text));
   border-color: color-mix(in srgb, var(--personal-border) 70%, var(--site-text));
   color: var(--site-accent);
 }
 
-.personal-tracker-link:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-tracker-link:focus-visible {
   outline-color: var(--site-accent);
 }
 
@@ -679,7 +679,7 @@
 }
 
 .post-content .personal-empty-message .personal-reload-message:hover,
-.post-content .personal-empty-message .personal-reload-message:focus-visible {
+:root[data-keyboard-navigation="on"] .post-content .personal-empty-message .personal-reload-message:focus-visible {
   color: var(--site-accent);
   outline: none;
   text-decoration: underline;
@@ -707,9 +707,9 @@
 }
 
 .personal-agenda-list a:hover,
-.personal-agenda-list a:focus-visible,
+:root[data-keyboard-navigation="on"] .personal-agenda-list a:focus-visible,
 .personal-task-list a:hover,
-.personal-task-list a:focus-visible {
+:root[data-keyboard-navigation="on"] .personal-task-list a:focus-visible {
   color: var(--site-accent);
 }
 
@@ -733,7 +733,8 @@
   min-width: 0;
 }
 
-.personal-task-list .personal-task-check {
+.personal-task-list .personal-task-check,
+.personal-task-list .personal-task-placeholder {
   --task-priority-color: var(--personal-muted);
   appearance: none;
   display: inline-grid;
@@ -758,6 +759,10 @@
   line-height: 0;
   transform: none;
   transition: none;
+}
+
+.personal-task-list .personal-task-placeholder {
+  cursor: default;
 }
 
 .personal-task-list .personal-task-check::before {
@@ -786,7 +791,7 @@
 
 .personal-task-list li[data-priority="4"],
 .personal-task-check[data-priority="4"] {
-  --task-priority-color: #de4c4a;
+  --task-priority-color: var(--site-bad);
 }
 
 .personal-task-list li[data-priority="3"],
@@ -805,14 +810,14 @@
 }
 
 .post-content .personal-task-list .personal-task-check:hover,
-.post-content .personal-task-list .personal-task-check:focus-visible {
+:root[data-keyboard-navigation="on"] .post-content .personal-task-list .personal-task-check:focus-visible {
   outline: none;
   box-shadow: none !important;
   transform: none !important;
 }
 
 .post-content .personal-task-list .personal-task-check:hover::before,
-.post-content .personal-task-list .personal-task-check:focus-visible::before {
+:root[data-keyboard-navigation="on"] .post-content .personal-task-list .personal-task-check:focus-visible::before {
   border-color: color-mix(in srgb, var(--task-priority-color) 78%, var(--site-text));
   background: color-mix(in srgb, var(--task-priority-color) 22%, transparent);
 }

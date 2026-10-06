@@ -1,0 +1,8 @@
+- generic [active] [ref=e1]:
+  - link "Skip to audio workspace" [ref=e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=e3]:
+    - status [ref=e4]:
+      - strong [ref=e13]: Preparing workspace
+      - generic [ref=e14]: Audio stays on this device.
+  - status [ref=e15]

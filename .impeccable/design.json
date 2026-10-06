@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-07T00:00:00Z",
+  "generatedAt": "2026-10-06T01:59:47.431100+00:00",
   "title": "Design System: Matthew Feil",
   "extensions": {
     "colorMeta": {
@@ -8,67 +8,316 @@
         "role": "neutral",
         "displayName": "Field Gray",
         "canonical": "#f7f7f7",
-        "tonalRamp": ["#f7f7f7", "#f2f2f2", "#e7e7e7"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Surface Light",
+        "canonical": "#f2f2f2",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "panel-light": {
+        "role": "neutral",
+        "displayName": "Panel Light",
+        "canonical": "#e7e7e7",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
       },
       "text-light": {
         "role": "neutral",
         "displayName": "Near-Black Ink",
         "canonical": "#0a0a0a",
-        "tonalRamp": ["#626262", "#151515", "#0a0a0a"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Light",
+        "canonical": "#626262",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "border-light": {
+        "role": "neutral",
+        "displayName": "Border Light",
+        "canonical": "#151515",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
       },
       "background-dark": {
         "role": "neutral",
         "displayName": "Night Field",
         "canonical": "#000000",
-        "tonalRamp": ["#000000", "#141414", "#202020"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface Dark",
+        "canonical": "#141414",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "panel-dark": {
+        "role": "neutral",
+        "displayName": "Panel Dark",
+        "canonical": "#202020",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
       },
       "text-dark": {
         "role": "neutral",
         "displayName": "Bright Ink",
         "canonical": "#f6f6f6",
-        "tonalRamp": ["#a7a7a7", "#f6f6f6"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Dark",
+        "canonical": "#a7a7a7",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Border Dark",
+        "canonical": "#f6f6f6",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
       },
       "signal-red": {
         "role": "primary",
         "displayName": "Signal Red",
-        "canonical": "#e3262e",
-        "tonalRamp": ["#b90f17", "#e3262e", "#ff343d", "#ff5c63"]
+        "canonical": "#b90f17",
+        "tonalRamp": [
+          "oklch(15% 0.19678 27.13)",
+          "oklch(26% 0.19678 27.13)",
+          "oklch(38% 0.19678 27.13)",
+          "oklch(49% 0.19678 27.13)",
+          "oklch(61% 0.19678 27.13)",
+          "oklch(72% 0.19678 27.13)",
+          "oklch(84% 0.19678 27.13)",
+          "oklch(95% 0.19678 27.13)"
+        ]
+      },
+      "signal-red-strong": {
+        "role": "primary",
+        "displayName": "Signal Red Strong",
+        "canonical": "#b90f17",
+        "tonalRamp": [
+          "oklch(15% 0.19678 27.13)",
+          "oklch(26% 0.19678 27.13)",
+          "oklch(38% 0.19678 27.13)",
+          "oklch(49% 0.19678 27.13)",
+          "oklch(61% 0.19678 27.13)",
+          "oklch(72% 0.19678 27.13)",
+          "oklch(84% 0.19678 27.13)",
+          "oklch(95% 0.19678 27.13)"
+        ]
       },
       "signal-red-bright": {
         "role": "primary",
         "displayName": "Bright Signal Red",
         "canonical": "#ff343d",
-        "tonalRamp": ["#490006", "#76000a", "#a90012", "#dc1922", "#ff343d", "#ff6b72", "#ffa2a6", "#ffd9da"]
+        "tonalRamp": [
+          "oklch(15% 0.23534 24.97)",
+          "oklch(26% 0.23534 24.97)",
+          "oklch(38% 0.23534 24.97)",
+          "oklch(49% 0.23534 24.97)",
+          "oklch(61% 0.23534 24.97)",
+          "oklch(72% 0.23534 24.97)",
+          "oklch(84% 0.23534 24.97)",
+          "oklch(95% 0.23534 24.97)"
+        ]
       },
       "signal-red-soft": {
         "role": "primary",
         "displayName": "Signal Selection Wash",
         "canonical": "rgb(255 52 61 / 0.13)",
-        "tonalRamp": ["rgb(73 0 6 / 0.13)", "rgb(118 0 10 / 0.13)", "rgb(169 0 18 / 0.13)", "rgb(220 25 34 / 0.13)", "rgb(255 52 61 / 0.13)", "rgb(255 107 114 / 0.13)", "rgb(255 162 166 / 0.13)", "rgb(255 217 218 / 0.13)"]
+        "tonalRamp": [
+          "oklch(15% 0.23534 24.97 / 0.13)",
+          "oklch(26% 0.23534 24.97 / 0.13)",
+          "oklch(38% 0.23534 24.97 / 0.13)",
+          "oklch(49% 0.23534 24.97 / 0.13)",
+          "oklch(61% 0.23534 24.97 / 0.13)",
+          "oklch(72% 0.23534 24.97 / 0.13)",
+          "oklch(84% 0.23534 24.97 / 0.13)",
+          "oklch(95% 0.23534 24.97 / 0.13)"
+        ]
       },
       "workbench-border": {
         "role": "neutral",
         "displayName": "Workbench Rule",
         "canonical": "rgb(246 246 246 / 0.42)",
-        "tonalRamp": ["rgb(246 246 246 / 0.12)", "rgb(246 246 246 / 0.2)", "rgb(246 246 246 / 0.3)", "rgb(246 246 246 / 0.42)", "rgb(246 246 246 / 0.55)", "rgb(246 246 246 / 0.68)", "rgb(246 246 246 / 0.82)", "rgb(246 246 246 / 0.95)"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00 / 0.42)",
+          "oklch(26% 0.00000 0.00 / 0.42)",
+          "oklch(38% 0.00000 0.00 / 0.42)",
+          "oklch(49% 0.00000 0.00 / 0.42)",
+          "oklch(61% 0.00000 0.00 / 0.42)",
+          "oklch(72% 0.00000 0.00 / 0.42)",
+          "oklch(84% 0.00000 0.00 / 0.42)",
+          "oklch(95% 0.00000 0.00 / 0.42)"
+        ]
       },
       "workbench-border-soft": {
         "role": "neutral",
         "displayName": "Workbench Soft Rule",
         "canonical": "rgb(246 246 246 / 0.2)",
-        "tonalRamp": ["rgb(246 246 246 / 0.05)", "rgb(246 246 246 / 0.08)", "rgb(246 246 246 / 0.12)", "rgb(246 246 246 / 0.2)", "rgb(246 246 246 / 0.3)", "rgb(246 246 246 / 0.42)", "rgb(246 246 246 / 0.55)", "rgb(246 246 246 / 0.68)"]
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00 / 0.2)",
+          "oklch(26% 0.00000 0.00 / 0.2)",
+          "oklch(38% 0.00000 0.00 / 0.2)",
+          "oklch(49% 0.00000 0.00 / 0.2)",
+          "oklch(61% 0.00000 0.00 / 0.2)",
+          "oklch(72% 0.00000 0.00 / 0.2)",
+          "oklch(84% 0.00000 0.00 / 0.2)",
+          "oklch(95% 0.00000 0.00 / 0.2)"
+        ]
       },
       "success-green": {
         "role": "secondary",
         "displayName": "Status Green",
         "canonical": "#16703a",
-        "tonalRamp": ["#16703a", "#54c982"]
+        "tonalRamp": [
+          "oklch(15% 0.11792 151.61)",
+          "oklch(26% 0.11792 151.61)",
+          "oklch(38% 0.11792 151.61)",
+          "oklch(49% 0.11792 151.61)",
+          "oklch(61% 0.11792 151.61)",
+          "oklch(72% 0.11792 151.61)",
+          "oklch(84% 0.11792 151.61)",
+          "oklch(95% 0.11792 151.61)"
+        ]
       },
       "warning-amber": {
         "role": "secondary",
         "displayName": "Status Amber",
         "canonical": "#9b6300",
-        "tonalRamp": ["#9b6300", "#e0b35b"]
+        "tonalRamp": [
+          "oklch(15% 0.11784 71.12)",
+          "oklch(26% 0.11784 71.12)",
+          "oklch(38% 0.11784 71.12)",
+          "oklch(49% 0.11784 71.12)",
+          "oklch(61% 0.11784 71.12)",
+          "oklch(72% 0.11784 71.12)",
+          "oklch(84% 0.11784 71.12)",
+          "oklch(95% 0.11784 71.12)"
+        ]
+      },
+      "error-red": {
+        "role": "secondary",
+        "displayName": "Error Red",
+        "canonical": "#b91c1c",
+        "tonalRamp": [
+          "oklch(15% 0.19049 27.52)",
+          "oklch(26% 0.19049 27.52)",
+          "oklch(38% 0.19049 27.52)",
+          "oklch(49% 0.19049 27.52)",
+          "oklch(61% 0.19049 27.52)",
+          "oklch(72% 0.19049 27.52)",
+          "oklch(84% 0.19049 27.52)",
+          "oklch(95% 0.19049 27.52)"
+        ]
       }
     },
     "typographyMeta": {
@@ -93,8 +342,23 @@
     "motion": [
       {
         "name": "quick-interaction",
-        "value": "0.15s to 0.32s ease",
-        "purpose": "Border, color, and background changes for direct interaction."
+        "value": "0.15s ease",
+        "purpose": "Border and background changes in tool controls and post cards."
+      },
+      {
+        "name": "navigation-reveal",
+        "value": "0.2s cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Opacity and transform reveal for navigation menus; reduced-motion mode suppresses transitions."
+      },
+      {
+        "name": "calculator-status",
+        "value": "180ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Arrival of calculation status messages."
+      },
+      {
+        "name": "calculator-results",
+        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Arrival of calculated results; disabled when reduced motion is requested."
       }
     ],
     "breakpoints": [
@@ -105,6 +369,18 @@
       {
         "name": "narrow-mobile",
         "value": "560px"
+      },
+      {
+        "name": "calculator-two-columns",
+        "value": "880px"
+      },
+      {
+        "name": "calculator-single-column",
+        "value": "760px"
+      },
+      {
+        "name": "calculator-touch",
+        "value": "640px"
       },
       {
         "name": "workbench-compact",
@@ -120,75 +396,77 @@
     {
       "name": "Primary Button",
       "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Primary action for a task or form.",
-      "html": "<button class=\"ds-btn-primary\">SAVE CHANGES</button>",
-      "css": ".ds-btn-primary { min-height: 2.5rem; border: 1px solid #e3262e; border-radius: 0; padding: 0.7rem 1rem; background: #e3262e; color: #fff; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-transform: uppercase; transition: background-color 0.16s ease, border-color 0.16s ease; } .ds-btn-primary:hover,:root[data-keyboard-navigation=\"on\"] .ds-btn-primary:focus-visible{ background: #b90f17; border-color: #b90f17; outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "description": "Compact primary action with a signal fill and opt-in keyboard focus.",
+      "html": "<button class=\"ds-primary\">Save changes</button>",
+      "css": ".ds-primary { min-height: 2.5rem; border: 1px solid var(--site-accent, #b90f17); border-radius: 0; padding: 0.7rem 1rem; background: var(--site-accent, #b90f17); color: var(--site-accent-ink, #fff); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; cursor: pointer; transition: border-color 0.15s ease; } .ds-primary:hover { border-color: color-mix(in srgb, currentColor 52%, transparent); } .ds-primary:disabled { opacity: 0.6; cursor: default; } .ds-primary:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-primary:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-primary:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }@media (prefers-reduced-motion: reduce) { .ds-primary { transition: none; animation: none; } }",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Calculator Button",
+      "kind": "button",
+      "description": "Outlined calculator action with a restrained signal hover.",
+      "html": "<button class=\"ds-calculate\">Calculate</button>",
+      "css": ".ds-calculate { min-height: 2.5rem; border: 1px solid var(--site-accent, #b90f17); border-radius: 0; padding: 0.5rem 0.65rem; background: transparent; color: var(--site-accent, #b90f17); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease; } .ds-calculate:not(:disabled):hover { background: color-mix(in srgb, var(--site-accent, #b90f17) 10%, transparent); } .ds-calculate:disabled { opacity: 0.82; cursor: wait; } .ds-calculate:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-calculate:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-calculate:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }@media (prefers-reduced-motion: reduce) { .ds-calculate { transition: none; animation: none; } }"
     },
     {
       "name": "Tool Field",
       "kind": "input",
-      "refersTo": "tool-control",
-      "description": "Square input for compact calculator and tracker forms.",
-      "html": "<label class=\"ds-field\">AMOUNT<input value=\"1000\" inputmode=\"decimal\"></label>",
-      "css": ".ds-field { display: grid; gap: 0.35rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1.1; text-transform: uppercase; } .ds-field input { min-height: 2.5rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.5rem 0.65rem; background: #f2f2f2; color: #0a0a0a; font: inherit; letter-spacing: 0; text-transform: none; }:root[data-keyboard-navigation=\"on\"] .ds-field input:focus-visible{ outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "description": "Square entry control used in calculator and tracker forms.",
+      "html": "<label class=\"ds-field\">Amount<input class=\"ds-input\" value=\"1000\" inputmode=\"decimal\"></label>",
+      "css": ".ds-field { display: grid; gap: 0.35rem; color: var(--site-muted, #626262); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.78rem; font-weight: 800; line-height: 1.1; text-transform: uppercase; } .ds-input { min-height: 2.5rem; border: 1px solid var(--site-soft-border, rgb(10 10 10 / 0.18)); border-radius: 0; padding: 0.5rem 0.65rem; background: var(--tool-surface, #e7e7e7); color: var(--site-text, #0a0a0a); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.95rem; font-weight: 800; text-transform: none; caret-color: var(--site-text, #0a0a0a); } .ds-input[aria-invalid=\"true\"] { border-color: var(--site-bad, #b91c1c); } .ds-input:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-input:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-input:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }"
+    },
+    {
+      "name": "Calculator Date Field",
+      "kind": "input",
+      "description": "MM-DD-YYYY text entry; the calculator script inserts hyphens and validates calendar dates.",
+      "html": "<label class=\"ds-date-field\">Start date<input class=\"ds-date\" type=\"text\" inputmode=\"numeric\" placeholder=\"MM-DD-YYYY\" maxlength=\"10\" pattern=\"[0-9]{2}-[0-9]{2}-[0-9]{4}\" value=\"02-29-2024\"></label>",
+      "css": ".ds-date-field { display: grid; gap: 0.35rem; color: var(--site-muted, #626262); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.78rem; font-weight: 800; line-height: 1.1; text-transform: uppercase; } .ds-date { min-height: 2.5rem; border: 1px solid var(--site-soft-border, rgb(10 10 10 / 0.18)); border-radius: 0; padding: 0.5rem 0.65rem; background: var(--tool-surface, #e7e7e7); color: var(--site-text, #0a0a0a); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.95rem; font-weight: 800; font-variant-numeric: tabular-nums; caret-color: var(--site-text, #0a0a0a); } .ds-date::placeholder { color: color-mix(in srgb, var(--site-text, #0a0a0a) 52%, transparent); } .ds-date[aria-invalid=\"true\"] { border-color: var(--site-bad, #b91c1c); } .ds-date:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-date:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-date:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }"
     },
     {
       "name": "Primary Navigation Link",
       "kind": "nav",
-      "refersTo": "navigation-link",
-      "description": "Compact uppercase route link with a signal underline on interaction.",
-      "html": "<a class=\"ds-nav-link\" href=\"#\">PROJECTS</a>",
-      "css": ".ds-nav-link { position: relative; display: inline-block; padding: 0.55rem 0 0.5rem; color: #626262; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1; text-decoration: none; text-transform: uppercase; } .ds-nav-link::after { position: absolute; right: 0; bottom: 0.15rem; left: 0; height: 2px; background: #e3262e; content: ''; transform: scaleX(0); transform-origin: left center; transition: transform 0.16s ease; } .ds-nav-link:hover,:root[data-keyboard-navigation=\"on\"] .ds-nav-link:focus-visible{ color: #0a0a0a; outline: 2px solid #e3262e; outline-offset: 2px; } .ds-nav-link:hover::after,:root[data-keyboard-navigation=\"on\"] .ds-nav-link:focus-visible::after{ transform: scaleX(1); }"
+      "description": "Compact route link with a signal underline and opt-in keyboard focus.",
+      "html": "<a class=\"ds-nav\" href=\"#\"><span class=\"ds-nav-label\">My Work</span></a>",
+      "css": ".ds-nav { display: inline-block; padding: 0.55rem 0; color: var(--site-text, #0a0a0a); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.03em; text-decoration: none; transition: color 0.14s ease; } .ds-nav-label { position: relative; } .ds-nav-label::after { position: absolute; inset: auto 0 -0.55rem; height: 2px; background: var(--site-accent, #b90f17); content: \"\"; transform: scaleX(0); transform-origin: left center; transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1); } .ds-nav:hover { color: var(--site-accent, #b90f17); } .ds-nav:hover .ds-nav-label::after { transform: scaleX(1); } .ds-nav:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-nav:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-nav:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }@media (prefers-reduced-motion: reduce) { .ds-nav, .ds-nav-label::after { transition: none; animation: none; } }"
     },
     {
       "name": "Post Card",
       "kind": "card",
-      "refersTo": "post-card",
-      "description": "Click-through article summary with metadata, display title, and plain-language description.",
-      "html": "<a class=\"ds-post-card\" href=\"#\"><span class=\"ds-post-meta\">ARTICLE · JUL 6, 2026</span><strong>CHICAGO 'L' LIVE ART</strong><span>A live artwork made from real train positions.</span></a>",
-      "css": ".ds-post-card { display: grid; gap: 1.25rem; min-height: 8rem; border: 1px solid rgba(10, 10, 10, 0.18); border-radius: 0; padding: 0.85rem; background: #f7f7f7; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; text-decoration: none; transition: background-color 0.15s ease, border-color 0.15s ease; } .ds-post-card strong { font-family: 'Archivo Black', Impact, sans-serif; font-size: 1.15rem; line-height: 1.05; } .ds-post-meta { color: #e3262e; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; } .ds-post-card:hover,:root[data-keyboard-navigation=\"on\"] .ds-post-card:focus-visible{ background: color-mix(in srgb, #f7f7f7 88%, #0a0a0a); border-color: rgba(10, 10, 10, 0.7); outline: 2px solid #e3262e; outline-offset: 2px; }"
+      "description": "Flat bordered post link; hover strengthens the existing border.",
+      "html": "<a class=\"ds-post\" href=\"#\"><span class=\"ds-post-meta\">Article \u00b7 Oct 5, 2026</span><strong class=\"ds-post-title\">Investment Calculators</strong><span>Stock returns and interest over a date range.</span></a>",
+      "css": ".ds-post { display: grid; gap: clamp(1.25rem, 4vw, 2.25rem); min-height: 8rem; padding: clamp(0.85rem, 2.2vw, 1.2rem); border: 1px solid var(--site-soft-border, rgb(10 10 10 / 0.18)); border-radius: 0; background: var(--site-bg, #f7f7f7); color: var(--site-text, #0a0a0a); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); text-decoration: none; transition: background-color 0.15s ease, border-color 0.15s ease; } .ds-post-meta { color: var(--site-muted, #626262); font-size: 0.78rem; } .ds-post-title { font-family: var(--font-display, \"Archivo Black\", Impact, sans-serif); font-size: 1.15rem; line-height: 1.05; } .ds-post:hover { background: color-mix(in srgb, var(--site-bg, #f7f7f7) 88%, var(--site-text, #0a0a0a)); border-color: color-mix(in srgb, var(--site-border, #151515) 70%, var(--site-text, #0a0a0a)); } .ds-post:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-post:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-post:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }@media (prefers-reduced-motion: reduce) { .ds-post { transition: none; animation: none; } }",
+      "refersTo": "post-card"
     },
     {
       "name": "Tool Switcher",
       "kind": "chip",
-      "refersTo": "tool-switcher",
-      "description": "Square segmented route switcher for closely related calculator tools.",
-      "html": "<nav class=\"ds-switcher\"><a class=\"ds-switcher-active\" href=\"#\">STOCK</a><a href=\"#\">INTEREST</a></nav>",
-      "css": ".ds-switcher { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid rgba(10, 10, 10, 0.18); background: rgba(10, 10, 10, 0.18); } .ds-switcher a { min-width: 7rem; padding: 0.55rem 0.8rem; background: #f2f2f2; color: #0a0a0a; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; line-height: 1; text-align: center; text-decoration: none; text-transform: uppercase; } .ds-switcher a + a { border-left: 1px solid rgba(10, 10, 10, 0.18); } .ds-switcher a:hover,:root[data-keyboard-navigation=\"on\"] .ds-switcher a:focus-visible{ outline: 2px solid #e3262e; outline-offset: 2px; } .ds-switcher .ds-switcher-active { box-shadow: inset 0 0 0 1px #e3262e; color: #e3262e; }"
+      "description": "Square segmented route switcher with an inset signal border on the active route.",
+      "html": "<nav class=\"ds-switcher\" aria-label=\"Calculator type\"><a class=\"ds-switch-active\" href=\"#\" aria-current=\"page\">Stock Return</a><a href=\"#\">Interest</a></nav>",
+      "css": ".ds-switcher { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--site-soft-border, rgb(10 10 10 / 0.18)); background: var(--site-soft-border, rgb(10 10 10 / 0.18)); } .ds-switcher a { min-width: 7rem; padding: 0.55rem 0.8rem; background: var(--tool-surface, #e7e7e7); color: var(--site-text, #0a0a0a); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.07em; line-height: 1; text-align: center; text-decoration: none; text-transform: uppercase; } .ds-switcher a + a { border-left: 1px solid var(--site-soft-border, rgb(10 10 10 / 0.18)); } .ds-switcher a:hover { background: color-mix(in srgb, var(--tool-surface, #e7e7e7) 88%, var(--site-text, #0a0a0a)); } .ds-switcher .ds-switch-active { box-shadow: inset 0 0 0 1px var(--site-accent, #b90f17); color: var(--site-accent, #b90f17); } .ds-switcher a:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-switcher a:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-switcher a:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }"
     },
     {
-      "name": "Workbench Tool Toggle",
+      "name": "Keyboard Navigation Toggle",
       "kind": "button",
-      "refersTo": "workbench-command",
-      "description": "Dense two-line command used in the transcription setup band.",
-      "html": "<button class=\"ds-workbench-toggle\" aria-pressed=\"true\"><span>Pitch lock</span><strong>On</strong></button>",
-      "css": ".ds-workbench-toggle { display: grid; min-width: max-content; min-height: 4.3rem; align-content: center; gap: 0.15rem; cursor: pointer; border: 0; border-right: 1px solid rgb(246 246 246 / 0.42); border-radius: 0; padding: 0.55rem 0.8rem; background: #000; color: #f6f6f6; font-family: 'Familjen Grotesk', Arial, sans-serif; text-align: left; } .ds-workbench-toggle span { color: #a7a7a7; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1; text-transform: uppercase; } .ds-workbench-toggle strong { color: #ff343d; font-size: 0.84rem; line-height: 1.2; text-transform: uppercase; } .ds-workbench-toggle:hover { background: #141414; }:root[data-keyboard-navigation=\"on\"] .ds-workbench-toggle:focus-visible{ outline: 2px solid #ff343d; outline-offset: 2px; }"
+      "description": "Borderless footer control for the site-wide opt-in keyboard preference.",
+      "html": "<button class=\"ds-keyboard\" type=\"button\" aria-pressed=\"false\">Keyboard navigation: Off</button>",
+      "css": ".ds-keyboard { padding: 0.35rem 0; border: 0; border-radius: 0; background: transparent; color: var(--site-muted, #626262); font-family: var(--font-ui, 'Familjen Grotesk', Arial, sans-serif); font-size: 0.75rem; cursor: pointer; } .ds-keyboard:hover { text-decoration: underline; text-underline-offset: 0.15em; } .ds-keyboard:focus { outline: none; } :root[data-keyboard-navigation=\"on\"] .ds-keyboard:focus-visible, :host-context([data-keyboard-navigation=\"on\"]) .ds-keyboard:focus-visible { outline: 2px solid var(--site-accent, #b90f17); outline-offset: 2px; }"
     },
     {
-      "name": "Mobile Workspace Emphasis",
-      "kind": "chip",
-      "refersTo": "workbench-emphasis-active",
-      "description": "Mobile-only square switch that reallocates height between timeline and analysis without hiding either band.",
-      "html": "<div class=\"ds-workbench-switcher\" role=\"group\" aria-label=\"Workspace emphasis\"><button class=\"ds-active\" aria-pressed=\"true\">Timeline</button><button aria-pressed=\"false\">Analysis</button></div>",
-      "css": ".ds-workbench-switcher { display: inline-flex; border: 1px solid rgb(246 246 246 / 0.42); background: #000; } .ds-workbench-switcher button { min-height: 2rem; cursor: pointer; border: 0; border-radius: 0; padding: 0.35rem 0.65rem; background: transparent; color: #a7a7a7; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; } .ds-workbench-switcher button + button { border-left: 1px solid rgb(246 246 246 / 0.42); } .ds-workbench-switcher button:hover, .ds-workbench-switcher button.ds-active { background: #141414; color: #f6f6f6; }:root[data-keyboard-navigation=\"on\"] .ds-workbench-switcher button:focus-visible{ outline: 2px solid #ff343d; outline-offset: 2px; }"
-    },
-    {
-      "name": "Persistent Pitch Readout",
+      "name": "Pitch Readout",
       "kind": "custom",
-      "description": "Hz, nearest note, and cents readout paired with the persistent spectrogram crosshair.",
-      "html": "<output class=\"ds-pitch-readout\" aria-label=\"Pitch inspection\"><span>440.0 Hz</span><strong>A4</strong><span>+0¢</span></output>",
-      "css": ".ds-pitch-readout { display: grid; min-width: 12.75rem; grid-template-columns: 1fr 3.5rem 3.5rem; align-items: baseline; border-left: 1px solid rgb(246 246 246 / 0.42); background: #000; color: #f6f6f6; font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-variant-numeric: tabular-nums; text-align: right; } .ds-pitch-readout span, .ds-pitch-readout strong { padding: 0.45rem 0 0.45rem 0.7rem; } .ds-pitch-readout strong, .ds-pitch-readout span:last-child { color: #ff343d; }"
+      "description": "Hz, nearest note, and cents shown together in the transcription analysis controls.",
+      "html": "<output class=\"ds-pitch-readout\" aria-label=\"Pitch inspection\"><span>440.0 Hz</span><strong>A4</strong><span>+0\u00a2</span></output>",
+      "css": ".ds-pitch-readout { display: grid; min-width: 12.75rem; grid-template-columns: 1fr 3.5rem 3.5rem; align-items: baseline; border-left: 1px solid var(--tr-border, rgb(246 246 246 / 0.42)); background: var(--tr-bg, #000); color: var(--tr-text, #f6f6f6); font-family: 'Familjen Grotesk', Arial, sans-serif; font-size: 0.78rem; font-variant-numeric: tabular-nums; text-align: right; } .ds-pitch-readout span, .ds-pitch-readout strong { padding: 0.45rem 0 0.45rem 0.7rem; } .ds-pitch-readout strong, .ds-pitch-readout span:last-child { color: var(--tr-accent, #ff343d); }"
     }
   ],
   "narrative": {
     "northStar": "Signalboard Studio",
-    "overview": "A high-contrast personal project site that treats real work, tools, and ongoing experiments as public signals. The system is direct, flat, and utilitarian, with visual energy concentrated in display typography, precise red accents, and interaction states.",
+    "overview": "The system treats a personal portfolio as a public signalboard: direct, high-contrast, and built around real projects rather than promotional decoration. Large display type establishes authorship; the page then gives visitors concise, practical routes into work, writing, and tools.\n\nThe visual language is deliberately crisp and utilitarian. Flat tonal surfaces, square borders, compact uppercase labels, and a restrained red signal preserve clarity across the public site and private trackers. The system supports creative technology without becoming a generic technical dashboard.\n\nThe transcription workbench is a scoped **Operate-mode extension** of Signalboard Studio. It stays always dark and arranges the task as four stacked bands: setup controls, recording timeline, pitch analysis, and essential transport. The recording remains central, analysis stays aligned beneath it, and transport stays at hand; this surface is neither a marketing hero nor a panel-heavy DAW clone.",
     "keyCharacteristics": [
-      "Oversized Archivo Black display type paired with Familjen Grotesk reading and UI text.",
-      "Black, white, and gray tonal structure with red used as a rare signal.",
-      "Square borders and field-first surfaces with tonal fill reserved for compact controls and labels.",
-      "Desktop asymmetry that stacks into practical mobile layouts.",
+      "Oversized, decisive display type paired with practical reading and UI text.",
+      "Black, white, and gray tonal structure with red reserved for signal moments.",
+      "Square, bordered components with a calm border-driven interaction response rather than decorative depth.",
+      "Responsive layouts that become single-column and menu-led on smaller screens.",
       "A dense, user-steered signal workspace for local audio, with waveform and pitch evidence kept in one visual stack."
     ],
     "rules": [
@@ -199,7 +477,12 @@
       },
       {
         "name": "The Field-First Fill Rule",
-        "body": "A broad outlined container uses the page field. Reserve the neighboring neutral surface for compact outlined controls, labels, data cells, and readouts inside it.",
+        "body": "A page-scale section, panel, card, table, modal, or repeated-content container uses the page field and its structural border. Reserve the lighter or darker neutral surface for a compact, outlined control or label inside that field: inputs, small buttons, count badges, time tags, stat cells, switcher options, and graph readouts. Never place an equally toned compact control inside an equally toned broad container.",
+        "section": "colors"
+      },
+      {
+        "name": "The Black Signal Field Rule",
+        "body": "Transcription is intentionally always dark. Keep its canvases, bands, and transport on pure black; use Dark Surface only for interactive hover or selected emphasis, never as a stack of floating panels.",
         "section": "colors"
       },
       {
@@ -209,37 +492,34 @@
       },
       {
         "name": "The Flat-By-Default Rule",
-        "body": "Do not add resting shadows, glass layers, or ornamental blur. Depth must explain interaction or content grouping.",
+        "body": "Do not add resting shadows, hover shadows, glass layers, or ornamental blur. Do not translate elements on hover. Depth must explain interaction or content grouping.",
         "section": "elevation"
       },
       {
-        "name": "Probability Playground Literal Statistic Rule",
-        "body": "Hero statistics in the standalone Probability Playground show the complete human-readable result. Do not use exponents, scientific notation, or magnitude abbreviations; scale a wide literal result responsively instead.",
-        "section": "probability-playground"
-      },
-      {
-        "name": "The Black Signal Field Rule",
-        "body": "Transcription is intentionally always dark. Keep its canvases, bands, and transport on pure black; use Dark Surface only for interactive hover or selected emphasis, never as a stack of floating panels.",
-        "section": "colors"
+        "name": "The Active Border Rule",
+        "body": "Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Only in explicitly enabled keyboard-navigation mode does keyboard focus use a clearly visible Signal Red outline, while destructive actions retain their semantic error color.",
+        "section": "elevation"
       }
     ],
     "dos": [
-      "Keep keyboard navigation off by default; enable Tab navigation and focus indicators only through the shared toggle or Alt+Shift+K (Option+Shift+K on Mac).",
-      "Use full-width dividers, alignment, and tonal shifts before adding a panel.",
-      "Keep broad outlined regions on the page field and use tonal fill only for compact controls or labels.",
-      "Keep interactive controls square, bordered, and touch-sized on small screens.",
-      "Use red sparingly for emphasis, active state, opt-in keyboard focus, and meaningful status.",
-      "Do keep transcription setup above the signal, the overview above the zoomed waveform, pitch analysis aligned below it, and essential transport fixed at hand on mobile.",
-      "Do preserve Hz, note, and cents together when exposing pitch inspection; the crosshair and readout are one persistent state."
+      "**Do** reserve Archivo Black for headings, identity, and short high-impact statements.",
+      "**Do** use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.",
+      "**Do** use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.",
+      "**Do** keep broad outlined regions on the page field and use tonal fill only for compact controls or labels inside them.",
+      "**Do** use red sparingly for emphasis, active state, opt-in keyboard focus, and meaningful status.",
+      "**Do** keep interactive controls square, bordered, and touch-sized on small screens.",
+      "**Do** keep transcription setup above the signal, the overview above the zoomed waveform, pitch analysis aligned below it, and essential transport fixed at hand on mobile.",
+      "**Do** preserve Hz, note, and cents together when exposing pitch inspection; the crosshair and readout are one persistent state."
     ],
     "donts": [
-      "Do not add unconditional focus styling or focus-triggered tooltips. Scope positive focus selectors to :root[data-keyboard-navigation=\"on\"]. Preserve app shortcuts and native field editing in both modes.",
-      "Do not introduce rounded SaaS cards, pill controls, or decorative gradient fields.",
-      "Do not use red as a generic background or substitute it for hierarchy.",
-      "Do not give an outer card and its smaller bordered children the same tonal fill.",
-      "Do not animate height, padding, margin, or other layout-driving properties for navigation reveals.",
-      "Don't turn the transcription workbench into a marketing landing page, notation editor, or chrome-heavy DAW imitation.",
-      "Don't recast the casual preview password as authentication or imply that local audio is uploaded."
+      "**Don't** introduce rounded SaaS cards, pill controls, or decorative gradient fields.",
+      "**Don't** use red as a generic background or substitute it for hierarchy.",
+      "**Don't** add a third type family, display face, or technical-looking mono type without a unique content role.",
+      "**Don't** make a whole page a floating card or nest cards within cards.",
+      "**Don't** give an outer card and its smaller bordered children the same tonal fill.",
+      "**Don't** animate height, padding, margin, or other layout-driving properties for navigation reveals.",
+      "**Don't** turn the transcription workbench into a marketing landing page, notation editor, or chrome-heavy DAW imitation.",
+      "**Don't** recast the casual preview password as authentication or imply that local audio is uploaded."
     ]
   }
 }

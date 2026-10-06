@@ -8,12 +8,15 @@
 
 <p>The visual language is deliberately crisp and utilitarian. Flat tonal surfaces, square borders, compact uppercase labels, and a restrained red signal preserve clarity across the public site and private trackers. The system supports creative technology without becoming a generic technical dashboard.</p>
 
+<p>The transcription workbench is a scoped <strong>Operate-mode extension</strong> of Signalboard Studio. It stays always dark and arranges the task as four stacked bands: setup controls, recording timeline, pitch analysis, and essential transport. The recording remains central, analysis stays aligned beneath it, and transport stays at hand; this surface is neither a marketing hero nor a panel-heavy DAW clone.</p>
+
 <p><strong>Key Characteristics:</strong></p>
 <ul>
   <li>Oversized, decisive display type paired with practical reading and UI text.</li>
   <li>Black, white, and gray tonal structure with red reserved for signal moments.</li>
   <li>Square, bordered components with a calm border-driven interaction response rather than decorative depth.</li>
   <li>Responsive layouts that become single-column and menu-led on smaller screens.</li>
+  <li>A dense, user-steered signal workspace for local audio, with waveform and pitch evidence kept in one visual stack.</li>
 </ul>
 
 <h2 id="colors">Colors</h2>
@@ -22,8 +25,8 @@
 
 <h3 id="primary">Primary</h3>
 <ul>
-  <li><strong>Signal Red</strong> (<code class="language-plaintext highlighter-rouge">#e3262e</code>): marks a key initial, active tool state, focus, and high-priority action in light mode.</li>
-  <li><strong>Signal Red Strong</strong> (<code class="language-plaintext highlighter-rouge">#b90f17</code>): deepens red for high-emphasis interaction states.</li>
+  <li><strong>Signal Red</strong> (<code class="language-plaintext highlighter-rouge">#b90f17</code>): marks a key initial, active tool state, opt-in keyboard focus, and high-priority action in light mode. Red hover text uses this same shade.</li>
+  <li><strong>Bright Signal Red</strong> (<code class="language-plaintext highlighter-rouge">#ff343d</code>): the shared dark-mode signal and transcription workbench’s active state, playhead, A–B selection, analysis crosshair, and opt-in keyboard focus signal against pure black.</li>
 </ul>
 
 <h3 id="neutral">Neutral</h3>
@@ -34,12 +37,17 @@
   <li><strong>Night Field</strong> (<code class="language-plaintext highlighter-rouge">#000000</code>): dark-mode page field.</li>
   <li><strong>Dark Surface</strong> (<code class="language-plaintext highlighter-rouge">#141414</code>): compact, bordered controls and data labels in dark mode.</li>
   <li><strong>Bright Ink</strong> (<code class="language-plaintext highlighter-rouge">#f6f6f6</code>): dark-mode reading and display text.</li>
+  <li><strong>Workbench Rules</strong> (<code class="language-plaintext highlighter-rouge">rgb(246 246 246 / 0.42)</code> and <code class="language-plaintext highlighter-rouge">rgb(246 246 246 / 0.2)</code>): strong and soft one-pixel divisions inside the transcription workspace.</li>
 </ul>
+
+<p>Shared tools and Transcribe reuse the site panel and muted-text colors. Workbench borders are mixed from the current text and field colors; canvas grid and signal rules retain separate strengths for legibility.</p>
 
 <h3 id="named-rules">Named Rules</h3>
 <p><strong>The Rare Signal Rule.</strong> Use red to guide attention, communicate state, or punctuate a key word. Do not use it as ambient decoration or a default section background.</p>
 
 <p><strong>The Field-First Fill Rule.</strong> A page-scale section, panel, card, table, modal, or repeated-content container uses the page field and its structural border. Reserve the lighter or darker neutral surface for a compact, outlined control or label inside that field: inputs, small buttons, count badges, time tags, stat cells, switcher options, and graph readouts. Never place an equally toned compact control inside an equally toned broad container.</p>
+
+<p><strong>The Black Signal Field Rule.</strong> Transcription is intentionally always dark. Keep its canvases, bands, and transport on pure black; use Dark Surface only for interactive hover or selected emphasis, never as a stack of floating panels.</p>
 
 <h2 id="typography">Typography</h2>
 
@@ -56,6 +64,7 @@
   <li><strong>Title</strong> (Archivo Black, <code class="language-plaintext highlighter-rouge">clamp(2.15rem, 4.8vw, 4.6rem)</code>, <code class="language-plaintext highlighter-rouge">0.95</code>): page and app headings.</li>
   <li><strong>Body</strong> (Familjen Grotesk, <code class="language-plaintext highlighter-rouge">1rem</code>, <code class="language-plaintext highlighter-rouge">1.6</code>): ordinary reading copy. Post content is constrained to <code class="language-plaintext highlighter-rouge">74ch</code>.</li>
   <li><strong>Label</strong> (Familjen Grotesk, <code class="language-plaintext highlighter-rouge">0.72rem</code> to <code class="language-plaintext highlighter-rouge">0.86rem</code>, <code class="language-plaintext highlighter-rouge">700</code>, <code class="language-plaintext highlighter-rouge">0.07em</code> to <code class="language-plaintext highlighter-rouge">0.1em</code>, uppercase): navigation, metadata, controls, and field labels.</li>
+  <li><strong>Operational Floor</strong> (Familjen Grotesk, <code class="language-plaintext highlighter-rouge">0.72rem</code>, <code class="language-plaintext highlighter-rouge">800</code>, <code class="language-plaintext highlighter-rouge">0.06em</code>, uppercase where categorical): transcription control labels, timeline status, compact analysis text, transport labels, and mobile readouts. Numeric values use tabular figures.</li>
 </ul>
 
 <h3 id="named-rules-1">Named Rules</h3>
@@ -67,18 +76,24 @@
 
 <p>Tool interfaces favor compact CSS grids, fixed control heights, and panel grouping. At smaller widths, navigation becomes a touch-sized menu and major grids collapse to one column without hiding core content.</p>
 
+<p>The transcription workbench fills the viewport with four explicit horizontal bands: an auto-height control bar, a flexible overview-plus-waveform timeline, a flexible keyboard-aligned analysis region, and an auto-height transport. The timeline itself stacks a <code class="language-plaintext highlighter-rouge">4.25rem</code> overview, the zoomed stereo waveform, and a compact status line. The analysis band places a <code class="language-plaintext highlighter-rouge">clamp(4.5rem, 7vw, 6.5rem)</code> piano keyboard directly beside the spectrogram so pitch rows remain spatially accountable.</p>
+
+<p>At <code class="language-plaintext highlighter-rouge">1180px</code>, setup controls move to their own horizontally scrollable row and the nonessential volume control leaves the transport. At <code class="language-plaintext highlighter-rouge">720px</code>, the page may scroll, setup becomes sticky, filters and secondary analysis commands are suppressed, and the essential transport is fixed to the viewport bottom with rewind, play, forward, loop, and timecode. A square Timeline / Analysis switch changes the relative height of the two signal bands instead of hiding either one; the keyboard remains sticky beside a horizontally scrollable spectrogram.</p>
+
 <h2 id="elevation--depth">Elevation &amp; Depth</h2>
 
-<p>The system is flat by default. Borders, tonal surface changes, and spacing establish hierarchy. Hover never moves an element, adds a shadow, or adds a second perimeter: interactive cards and controls simply strengthen their existing border and, where useful, their surface tone. Signal Red is not a generic hover color, so it continues to communicate focus, active state, and priority rather than availability.</p>
+<p>The system is flat by default. Borders, tonal surface changes, and spacing establish hierarchy. Hover never moves an element, adds a shadow, or adds a second perimeter: interactive cards and controls simply strengthen their existing border and, where useful, their surface tone. Signal Red is not a generic hover color, so it continues to communicate opt-in keyboard focus, active state, and priority rather than availability.</p>
 
 <h3 id="named-rules-2">Named Rules</h3>
 <p><strong>The Flat-By-Default Rule.</strong> Do not add resting shadows, hover shadows, glass layers, or ornamental blur. Do not translate elements on hover. Depth must explain interaction or content grouping.</p>
 
-<p><strong>The Active Border Rule.</strong> Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Keyboard focus remains a clearly visible Signal Red outline, while destructive actions retain their semantic error color.</p>
+<p><strong>The Active Border Rule.</strong> Pointer hover strengthens the existing border rather than adding an outer outline. Keep touch hover-neutral. Only in explicitly enabled keyboard-navigation mode does keyboard focus use a clearly visible Signal Red outline, while destructive actions retain their semantic error color.</p>
 
 <h2 id="shapes">Shapes</h2>
 
 <p>All controls, panels, cards, and tool surfaces use square corners (<code class="language-plaintext highlighter-rouge">border-radius: 0</code>) and thin, high-contrast borders. Borders are structural rules, not decorative frames. Controls use a standard minimum height of <code class="language-plaintext highlighter-rouge">2.5rem</code>, rising to the <code class="language-plaintext highlighter-rouge">2.75rem</code> touch target on narrow screens.</p>
+
+<p>Canvas graphics follow the same geometry: crisp one-pixel time, measure, octave, selection, playhead, and crosshair rules. The workbench does not wrap the waveform or spectrum in decorative cards; their rectangular bands are the interface.</p>
 
 <h2 id="components">Components</h2>
 
@@ -87,7 +102,7 @@
 <ul>
   <li><strong>Shape:</strong> square corners (<code class="language-plaintext highlighter-rouge">0</code>) with a <code class="language-plaintext highlighter-rouge">1px</code> border.</li>
   <li><strong>Primary:</strong> Signal Red background with white text, <code class="language-plaintext highlighter-rouge">0.7rem 1rem</code> padding, and the label type role.</li>
-  <li><strong>Hover / Focus:</strong> pointer hover strengthens the existing border; keyboard focus uses the shared red focus outline.</li>
+  <li><strong>Hover / Focus:</strong> pointer hover strengthens the existing border; keyboard focus uses the shared red outline only when keyboard navigation is enabled.</li>
   <li><strong>Secondary:</strong> neutral surface with a structural border; do not add a fill merely to create variation.</li>
 </ul>
 
@@ -109,7 +124,7 @@
 </ul>
 
 <h3 id="inputs--fields">Inputs / Fields</h3>
-<p>Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus is communicated by the red outline or border shift, never by color alone.</p>
+<p>Inputs and selects use a square, bordered surface and the Familjen Grotesk UI role. Labels remain uppercase, compact, and visibly separate from the field. Focus styling is disabled by default. In opt-in keyboard-navigation mode, use the shared red outline rather than color alone.</p>
 
 <h3 id="navigation">Navigation</h3>
 <p>The sticky header uses a translucent page-colored surface and a <code class="language-plaintext highlighter-rouge">2px</code> structural bottom border. Desktop links are compact uppercase labels with a red underline reveal. At <code class="language-plaintext highlighter-rouge">1040px</code> and below, a touch-sized Menu control reveals the right-aligned navigation stack; dropdowns open through opacity and transform motion without animating layout properties.</p>
@@ -120,6 +135,17 @@
 <h3 id="tool-switchers">Tool Switchers</h3>
 <p>Tool switchers are square segmented controls with a thin shared border. The active option uses Signal Red with white text; inactive options remain neutral and legible.</p>
 
+<h3 id="transcription-workbench">Transcription Workbench</h3>
+<p>The workbench is a local-audio task surface whose hierarchy comes from aligned signal bands rather than nested panels.</p>
+<ul>
+  <li><strong>Control band:</strong> identity, file state, local-processing status, speed, pitch lock, loop, channel, filters, spectrum, and measure marking share a compact row. Controls use the Operational Floor and square one-pixel separations; overflow scrolls rather than wrapping into cards.</li>
+  <li><strong>Timeline band:</strong> a complete-recording overview sits above a zoomed stereo waveform. Canvas rendering supplies time ticks, user-marked measure and section boundaries, a bright-red playhead, and a translucent red A–B region with explicit draggable endpoints.</li>
+  <li><strong>Analysis band:</strong> selection-driven grayscale frequency energy is vertically aligned from C2 through C8 with a rendered piano keyboard. Pointer, touch, and arrow-key inspection leaves a persistent red crosshair and reports time, Hz, nearest note, and cents offset.</li>
+  <li><strong>Transport band:</strong> playback navigation, A–B loop state, millisecond timecode, volume, and zoom form one continuous bottom rule. On mobile only the essential transport remains fixed at hand.</li>
+  <li><strong>Local file state:</strong> “Local” and the empty-state promise communicate that playback and analysis remain on-device. Decode progress and unsupported-file failure replace that state without adding a modal.</li>
+  <li><strong>Preview gate:</strong> the centered private-preview password form is a casual client-side visibility gate. It shares the always-dark field, square entry controls, display identity, and bright-red submit action; it must never be described or styled as security for sensitive data.</li>
+</ul>
+
 <h2 id="dos-and-donts">Do’s and Don’ts</h2>
 
 <h3 id="do">Do:</h3>
@@ -128,8 +154,10 @@
   <li><strong>Do</strong> use Familjen Grotesk for reading copy, controls, labels, data entry, and tool status.</li>
   <li><strong>Do</strong> use full-width dividers, alignment, and tonal shifts to organize a page before introducing a panel.</li>
   <li><strong>Do</strong> keep broad outlined regions on the page field and use tonal fill only for compact controls or labels inside them.</li>
-  <li><strong>Do</strong> use red sparingly for emphasis, active state, focus, and meaningful status.</li>
+  <li><strong>Do</strong> use red sparingly for emphasis, active state, opt-in keyboard focus, and meaningful status.</li>
   <li><strong>Do</strong> keep interactive controls square, bordered, and touch-sized on small screens.</li>
+  <li><strong>Do</strong> keep transcription setup above the signal, the overview above the zoomed waveform, pitch analysis aligned below it, and essential transport fixed at hand on mobile.</li>
+  <li><strong>Do</strong> preserve Hz, note, and cents together when exposing pitch inspection; the crosshair and readout are one persistent state.</li>
 </ul>
 
 <h3 id="dont">Don’t:</h3>
@@ -140,4 +168,14 @@
   <li><strong>Don’t</strong> make a whole page a floating card or nest cards within cards.</li>
   <li><strong>Don’t</strong> give an outer card and its smaller bordered children the same tonal fill.</li>
   <li><strong>Don’t</strong> animate height, padding, margin, or other layout-driving properties for navigation reveals.</li>
+  <li><strong>Don’t</strong> turn the transcription workbench into a marketing landing page, notation editor, or chrome-heavy DAW imitation.</li>
+  <li><strong>Don’t</strong> recast the casual preview password as authentication or imply that local audio is uploaded.</li>
 </ul>
+
+<h3 id="transcribe-mobile-workspace">Transcribe mobile workspace</h3>
+
+<p>At widths up to 720px (and short touch landscape viewports), Transcribe keeps its navbar, overview, measure ruler, waveform, spectrum, keyboard, seek bar, and playback buttons within the dynamic viewport. The timeline receives more height than the spectrum. Mobile pitch inspection spans F3 through F6; desktop retains C1 through B6. Controls expands a scrolling panel containing the existing speed, sound, configuration, volume, zoom, and analysis controls. The same controls return to their desktop positions when the viewport widens, preserving their values and listeners.</p>
+
+<h3 id="opt-in-keyboard-navigation">Opt-in keyboard navigation</h3>
+
+<p>Keyboard navigation is off by default site-wide. Do not add unconditional focus outlines, rings, border/color changes, focus-only reveals, or focus-triggered tooltips. Scope positive <code class="language-plaintext highlighter-rouge">:focus</code>, <code class="language-plaintext highlighter-rouge">:focus-visible</code>, and <code class="language-plaintext highlighter-rouge">:focus-within</code> selectors beneath <code class="language-plaintext highlighter-rouge">:root[data-keyboard-navigation="on"]</code>. The shared keyboard-navigation assets suppress Tab navigation and browser outlines in default mode. Preserve app shortcuts, native pointer focus, text editing, semantics, and focus-return logic. A toggle and Alt+Shift+K (Option+Shift+K on Mac) enable navigation and visible indicators; persist this preference across pages. Load the shared include on every layout, including standalone pages. This explicit user preference overrides generic Impeccable focus styling guidance.</p>

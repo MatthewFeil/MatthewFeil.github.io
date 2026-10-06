@@ -199,11 +199,11 @@
   touch-action: pan-y;
 }
 
-.site-graph-hit-area:focus {
+:root[data-keyboard-navigation="on"] .site-graph-hit-area:focus {
   outline: none;
 }
 
-.site-graph-hit-area:focus-visible {
+:root[data-keyboard-navigation="on"] .site-graph-hit-area:focus-visible {
   stroke: var(--site-accent);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;

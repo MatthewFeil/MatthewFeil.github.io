@@ -122,8 +122,8 @@
         font-weight: 800;
       }
 
-      button:focus-visible,
-      input:focus-visible {
+      :root[data-keyboard-navigation="on"] button:focus-visible,
+      :root[data-keyboard-navigation="on"] input:focus-visible {
         outline: 2px solid #e3262e;
         outline-offset: 2px;
       }
@@ -264,6 +264,9 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="/assets/css/keyboard-navigation.css">
+<script src="/assets/js/keyboard-navigation.js"></script>
+
   </head>
   <body>
     <div class="pause-banner usage-banner" role="status" aria-live="polite">

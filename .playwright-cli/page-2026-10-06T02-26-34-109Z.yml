@@ -1,0 +1,94 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Matthew Feil" [ref=e5] [cursor=pointer]:
+        - /url: /
+      - navigation "Primary navigation" [ref=e6]:
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - link "About" [ref=e10] [cursor=pointer]:
+              - /url: /#about
+              - generic [ref=e11]: About
+            - link "Posts" [ref=e12] [cursor=pointer]:
+              - /url: /#posts
+              - generic [ref=e13]: Posts
+            - link "Playlists" [ref=e14] [cursor=pointer]:
+              - /url: /playlists.html/
+              - generic [ref=e15]: Playlists
+            - link "My Work" [ref=e16] [cursor=pointer]:
+              - /url: /work/
+              - generic [ref=e17]: My Work
+          - link "Personal Space" [ref=e18] [cursor=pointer]:
+            - /url: /personal/
+            - generic [ref=e19]: Personal Space
+          - 'button "Theme: System. Activate to switch to light mode." [ref=e20] [cursor=pointer]':
+            - img [ref=e22]
+  - main "Content" [ref=e25]:
+    - article [ref=e27]:
+      - heading "Interest Calculator" [level=1] [ref=e29]
+      - generic [ref=e31]:
+        - navigation "Calculator type" [ref=e32]:
+          - link "Stock Return" [ref=e33] [cursor=pointer]:
+            - /url: /investmentcalculator/
+          - link "Interest" [ref=e34] [cursor=pointer]:
+            - /url: /interestcalculator/
+        - generic "Interest calculator inputs" [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: Starting balance
+            - generic [ref=e39]:
+              - generic [ref=e40]: $
+              - spinbutton "Starting balance" [ref=e41]: "1000"
+          - generic [ref=e42]:
+            - generic [ref=e43]: Start date
+            - generic [ref=e44]:
+              - textbox "Start date" [ref=e45]:
+                - /placeholder: MM-DD-YYYY
+                - text: 10-05-2016
+              - generic:
+                - generic: "1"
+                - generic: "0"
+                - generic: "-"
+                - generic: "0"
+                - generic: "5"
+                - generic: "-"
+                - generic: "2"
+                - generic: "0"
+                - generic: "1"
+                - generic: "6"
+          - generic [ref=e46]:
+            - generic [ref=e47]: End date
+            - generic [ref=e48]:
+              - textbox "End date" [ref=e49]:
+                - /placeholder: MM-DD-YYYY
+                - text: 10-05-2026
+              - generic:
+                - generic: "1"
+                - generic: "0"
+                - generic: "-"
+                - generic: "0"
+                - generic: "5"
+                - generic: "-"
+                - generic: "2"
+                - generic: "0"
+                - generic: "2"
+                - generic: "6"
+          - generic [ref=e50]:
+            - generic [ref=e51]: Annual interest
+            - generic [ref=e52]:
+              - spinbutton "Annual interest" [ref=e53]: "5"
+              - generic [ref=e54]: "%"
+          - generic [ref=e55]:
+            - generic [ref=e56]: Growth type
+            - combobox "Growth type" [ref=e57]:
+              - option "Compound" [selected]
+              - option "Simple"
+          - button "Calculate" [ref=e58] [cursor=pointer]
+  - contentinfo [ref=e59]:
+    - generic [ref=e60]:
+      - paragraph [ref=e61]: Matthew Feil
+      - generic [ref=e62]:
+        - paragraph [ref=e63]: The website of a highschooler with a passion for music, technology, and learning.
+        - 'button "Keyboard navigation: Off" [ref=e64] [cursor=pointer]'
+  - status [ref=e65]

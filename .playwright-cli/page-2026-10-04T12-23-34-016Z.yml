@@ -1,0 +1,75 @@
+- generic [active] [ref=e1]:
+  - link "Skip to audio workspace" [ref=e2] [cursor=pointer]:
+    - /url: "#transcribe-main"
+  - main [ref=e3]:
+    - region "Music transcription playback workspace" [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Return to matthewfeil.com" [ref=e8] [cursor=pointer]:
+            - /url: /
+            - text: Matthew Feil
+          - generic [ref=e9]:
+            - generic [aria-hidden] [ref=e10]: /
+            - strong [ref=e11]: Transcribe
+          - 'button "Theme: System. Activate to switch to light mode." [ref=e12] [cursor=pointer]'
+        - generic [ref=e17]:
+          - button "Open audio" [ref=e19] [cursor=pointer]
+          - generic [ref=e20]:
+            - button "Load config" [disabled] [ref=e21]
+            - button "Save config" [disabled] [ref=e22]
+        - generic [ref=e23]:
+          - generic "Playback settings" [ref=e24]:
+            - group "Speed" [ref=e26]:
+              - generic "Playback speed" [ref=e28]:
+                - button "50%" [ref=e29] [cursor=pointer]
+                - button "60%" [ref=e30] [cursor=pointer]
+                - button "70%" [ref=e31] [cursor=pointer]
+                - button "80%" [ref=e32] [cursor=pointer]
+                - button "90%" [ref=e33] [cursor=pointer]
+                - button "100%" [pressed] [ref=e34] [cursor=pointer]
+                - button "125%" [ref=e35] [cursor=pointer]
+                - button "Other" [ref=e37] [cursor=pointer]
+          - generic [ref=e38]:
+            - button "Controls" [ref=e39] [cursor=pointer]
+            - button "Keyboard shortcuts" [ref=e42]
+      - region "Audio timeline" [ref=e46]:
+        - scrollbar "Timeline overview and visible range" [ref=e47]:
+          - generic "Complete recording overview" [ref=e48]
+        - generic "Measure and section ruler. Swipe vertically to scroll the timeline; drag marks horizontally to move them. Shift-click to anchor a range, then move and click to place its other endpoint." [ref=e49]
+        - generic [ref=e50]:
+          - generic "Zoomed audio waveform. Click to seek, drag or use one finger to select; swipe with two fingers to pan the timeline. Shift-click anchors a loop range." [ref=e51]
+          - button "Drop an audio file here or click to open Audio stays on this device." [ref=e52] [cursor=pointer]:
+            - strong [ref=e55]: Drop an audio file here or click to open
+            - generic [ref=e56]: Audio stays on this device.
+      - region "Pitch-aligned frequency monitor" [ref=e57]:
+        - generic "Pitch spectrum, visible range C1 to C7." [ref=e58]:
+          - generic [ref=e59]:
+            - generic "EQ-style pitch spectrum. Tap or use left and right arrow keys to inspect pitch; swipe with one finger to pan on mobile." [ref=e60]
+            - slider "Horizontal piano keyboard from C1 to B6." [ref=e61]
+            - generic [ref=e62]: "Left/right: semitone. Up/down: octave. Home/End: first/last note. Hold Space or Enter to play; release to stop."
+      - generic "Playback controls" [ref=e63]:
+        - button "Return to track start" [disabled] [ref=e64]
+        - button "Rewind 5 seconds" [disabled] [ref=e67]:
+          - img [aria-hidden] [ref=e68]:
+            - generic [ref=e70]: "5"
+        - button "Play" [disabled] [ref=e71]
+        - button "Forward 5 seconds" [disabled] [ref=e74]:
+          - img [aria-hidden] [ref=e75]:
+            - generic [ref=e77]: "5"
+        - button "Selection only" [disabled] [ref=e78]
+        - button "Loop whole track" [disabled] [ref=e83]
+        - button "Measure navigation and loop (G)" [disabled] [ref=e86]: mm.
+        - generic [ref=e87]:
+          - slider "Playback position" [disabled] [ref=e88]: "0"
+          - generic [ref=e89]:
+            - status "Elapsed time" [ref=e90]: 00:00
+            - status "Time remaining" [ref=e91]: "-00:00"
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: Volume
+            - slider "Volume" [disabled] [ref=e95]: "0.9"
+          - generic [ref=e96]:
+            - generic [ref=e97]: Timeline zoom
+            - slider "Timeline zoom" [disabled] [ref=e98]: "50"
+      - text: Hz dB Q
+  - status [ref=e99]

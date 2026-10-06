@@ -20,7 +20,7 @@ The site combines a personal record of music, technology, and other interests wi
 
 ## Operating Context
 
-Visitors browse public pages and posts on the web. A public My Work gallery links to Transcribe, Chicago 'L' Live Art, the Finals Grade Calculator, the Stock Return Calculator, and the Interest Calculator. The homepage features Transcribe and links to Live Art and the Finals Grade Calculator, while the main navigation links directly to My Work. Transcribe processes user-selected audio locally. A separately authenticated Personal Space dashboard links to private portfolio and lifting trackers and integrates Todoist and Google Calendar views.
+Visitors browse public pages and posts on the web. A public My Work gallery links to Transcribe, Chicago 'L' Live Art, the Finals Grade Calculator, and the Investment Calculator (stock returns and interest). The homepage features Transcribe and links to Live Art and the Finals Grade Calculator, while the main navigation links directly to My Work. Transcribe processes user-selected audio locally. A separately authenticated Personal Space dashboard links to private portfolio and lifting trackers and integrates Todoist and Google Calendar views.
 
 ## Capabilities and Constraints
 

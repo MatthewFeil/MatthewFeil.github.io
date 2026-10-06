@@ -69,64 +69,15 @@
     return `${year}-${month}-${day}`;
   }
 
-  function toLocalInputDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  function parseInputDate(value) {
-    const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-    if (!match) {
-      return null;
-    }
-
-    const [, yearText, monthText, dayText] = match;
-    const year = Number(yearText);
-    const month = Number(monthText);
-    const day = Number(dayText);
-    const date = new Date(Date.UTC(year, month - 1, day));
-
-    if (
-      date.getUTCFullYear() !== year ||
-      date.getUTCMonth() !== month - 1 ||
-      date.getUTCDate() !== day
-    ) {
-      return null;
-    }
-
-    return date;
-  }
-
-  function updateDateDisplay(input) {
-    const display = document.querySelector(`[data-date-display="${input.id}"]`);
-
-    if (!display) {
-      return;
-    }
-
-    display.textContent = input.value || 'YYYY-MM-DD';
-  }
-
-  function openDatePicker(input) {
-    try {
-      input.focus({ preventScroll: true });
-    } catch {
-      input.focus();
-    }
-
-    if (typeof input.showPicker !== 'function') {
-      return;
-    }
-
-    try {
-      input.showPicker();
-    } catch {
-      // Some browsers only allow the native picker from the input's own default tap.
-    }
-  }
+  const { formatLocal: toLocalInputDate, parse: parseInputDate } = window.CalculatorDates;
+  const validateDates = window.CalculatorDates.bind({
+    startInput: dateInput,
+    endInput: endDateInput,
+    allowFuture: true,
+    setFieldInvalid,
+    setStatus,
+    status
+  });
 
   function formatDate(date) {
     return dateFormatter.format(date);
@@ -312,13 +263,13 @@
     event.preventDefault();
 
     clearFieldErrors();
+    if (!validateDates(true)) return;
 
     const principal = Number(principalInput.value);
     const startDate = parseInputDate(dateInput.value);
     const endDate = parseInputDate(endDateInput.value);
     const annualRate = Number(rateInput.value) / 100;
     const method = methodInput.value;
-    const today = new Date();
 
     if (!Number.isFinite(principal) || principal <= 0 || !startDate || !endDate || !Number.isFinite(annualRate)) {
       const invalidInputs = [
@@ -328,19 +279,6 @@
         !Number.isFinite(annualRate) ? rateInput : null
       ].filter(Boolean);
       showValidationError('Enter an amount, dates, and interest rate.', invalidInputs);
-      return;
-    }
-
-    if (startDate > today || endDate > today) {
-      showValidationError('Choose dates that have already happened.', [
-        ...(startDate > today ? [dateInput] : []),
-        ...(endDate > today ? [endDateInput] : [])
-      ]);
-      return;
-    }
-
-    if (endDate < startDate) {
-      showValidationError('Choose an end date after the start date.', [endDateInput]);
       return;
     }
 
@@ -355,7 +293,8 @@
         throw new Error('That interest calculation is not available.');
       }
 
-      const inflation = await fetchInflation(startDate, endDate).catch(() => null);
+      const isProjection = endDate > parseInputDate(toLocalInputDate(new Date()));
+      const inflation = isProjection ? null : await fetchInflation(startDate, endDate).catch(() => null);
 
       renderResults({
         principal,
@@ -368,7 +307,7 @@
         inflation
       });
 
-      setStatus(inflation ? 'Interest calculated.' : 'Interest calculated. Inflation data is unavailable.', inflation ? 'success' : 'warning');
+      setStatus(isProjection ? 'Projected interest calculated. Future inflation is unknown, so inflation-adjusted values are unavailable.' : inflation ? 'Interest calculated.' : 'Interest calculated. Inflation data is unavailable.', inflation ? 'success' : 'warning');
     } catch (error) {
       results.hidden = true;
       delete results.dataset.state;
@@ -384,31 +323,14 @@
     const defaultDate = new Date(today);
     defaultDate.setFullYear(defaultDate.getFullYear() - 10);
 
-    dateInput.max = toLocalInputDate(today);
-    endDateInput.max = toLocalInputDate(today);
     dateInput.value = toLocalInputDate(defaultDate);
     endDateInput.value = toLocalInputDate(today);
-    updateDateDisplay(dateInput);
-    updateDateDisplay(endDateInput);
   }
 
   initDefaults();
   setDetailsOpen(false);
   detailsToggle.addEventListener('click', () => {
     setDetailsOpen(detailsPanel.hidden);
-  });
-  [dateInput, endDateInput].forEach((input) => {
-    input.addEventListener('input', () => {
-      updateDateDisplay(input);
-      setFieldInvalid(input, false);
-    });
-    input.addEventListener('change', () => {
-      updateDateDisplay(input);
-      setFieldInvalid(input, false);
-    });
-    input.closest('.investment-date-control')?.addEventListener('click', () => {
-      openDatePicker(input);
-    });
   });
   [principalInput, rateInput].forEach((input) => {
     input.addEventListener('input', () => setFieldInvalid(input, false));
