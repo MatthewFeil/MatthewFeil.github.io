@@ -6,13 +6,19 @@ no_analytics: true
 noindex: true
 sitemap: false
 extra_css:
-  - /assets/css/birds.css?v=20261007-small2
+  - /assets/css/birds.css?v=20261007-loading
 ---
 <section class="birds-app" aria-labelledby="birds-title" data-birds-app>
   <h1 id="birds-title">Bird Detection</h1>
   <div class="birds-stage">
     <video class="birds-video" autoplay muted playsinline aria-label="Live camera view"></video>
     <div class="birds-overlays" aria-hidden="true"></div>
+    <div class="birds-loading" hidden>
+      <span class="birds-loading-spinner" aria-hidden="true"></span>
+      <p class="birds-instruction">Preparing bird identification</p>
+      <p class="birds-loading-message" aria-hidden="true">Loading selected local model…</p>
+      <p class="birds-loading-note">The camera view will appear when the model is ready.</p>
+    </div>
     <div class="birds-modelbar">
       <label for="birds-model">Model</label>
       <select id="birds-model" aria-label="Local model option">
@@ -37,4 +43,4 @@ extra_css:
     </div>
   </div>
 </section>
-<script type="module" src="{{ '/assets/js/birds.js?v=20261007-small2' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/birds.js?v=20261007-loading' | relative_url }}"></script>

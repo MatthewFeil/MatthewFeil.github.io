@@ -5,15 +5,20 @@ const video=app.querySelector('video'),stage=app.querySelector('.birds-stage'),o
 const welcome=app.querySelector('.birds-welcome'),message=app.querySelector('.birds-message'),toolbar=app.querySelector('.birds-toolbar');
 const start=app.querySelector('.birds-start'),stop=app.querySelector('.birds-stop'),status=app.querySelector('.birds-status');
 const selector=app.querySelector('#birds-model'),timing=app.querySelector('.birds-timing');
+const loading=app.querySelector('.birds-loading'),loadingMessage=app.querySelector('.birds-loading-message');
 const tracker=new BirdTracker(10000),overlayNodes=new Map();
 const motionCanvas=document.createElement('canvas'),motionCtx=motionCanvas.getContext('2d',{willReadFrequently:true});
 let motionWorker,motionPending=false,motionTimer,motionSnapshot=[],motionRate=40;
 let stream,worker,generation=0,ready=false,pending=false,timer,watchdog,overlayExpiry,lastResult=0,lastLatency=500,species=new Map(),tracks=[];
 const expiry=()=>Math.min(10000,Math.max(3000,lastLatency*2+500));
-function setStatus(text) {if(status.textContent!==text) status.textContent=text;}
+function setStatus(text) {if(status.textContent!==text) status.textContent=text;if(!loading.hidden) loadingMessage.textContent=text;}
+function setLoading(active) {
+  loading.hidden=!active;stage.classList.toggle('birds-model-loading',active);stage.setAttribute('aria-busy',String(active));
+}
 function clearAnalysis() {
   generation++;clearTimeout(motionTimer);motionWorker?.terminate();motionWorker=null;motionPending=false;motionSnapshot=[];clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
   ready=false;pending=false;tracker.clear();tracks=[];overlays.replaceChildren();overlayNodes.clear();timing.textContent='';
+  setLoading(false);
 }
 function render() {
   if(!video.videoWidth || performance.now()-lastResult>expiry()) {overlays.replaceChildren();overlayNodes.clear();return;}
@@ -113,6 +118,7 @@ async function frame(token) {
 }
 function loadOption() {
   clearAnalysis();const token=generation;
+  setLoading(true);
   setStatus('Loading selected local model…');
   worker=new Worker(new URL('./birds-worker.mjs?v=20261007-small2',import.meta.url),{type:'module'});
   worker.onmessage=({data})=>{
@@ -120,6 +126,7 @@ function loadOption() {
     if(data.type==='progress') setStatus(data.message);
     else if(data.type==='ready') {
       clearTimeout(watchdog);species=new Map(data.species.map(s=>[s.id,s]));ready=true;lastResult=performance.now();lastLatency=500;
+      setLoading(false);
       setStatus(selector.value==='detect'?'Aim at a bird · outlines only':'Aim at a bird');startMotion(token);frame(token);
     } else if(data.type==='geometry') {
       if(performance.now()-data.timestamp>1500 || data.width!==video.videoWidth || data.height!==video.videoHeight)return;

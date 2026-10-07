@@ -4,6 +4,14 @@
 .birds-stage { position: relative; width: 100%; height: min(65dvh, 48rem); min-height: 20rem; overflow: hidden; border: 1px solid var(--site-border); background: #000; color: #f6f6f6; }
 .birds-video, .birds-overlays { position: absolute; inset: 0; width: 100%; height: 100%; }
 .birds-video { object-fit: cover; }
+.birds-model-loading .birds-video, .birds-model-loading .birds-overlays { visibility: hidden; }
+.birds-loading { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; padding: 5rem 1.5rem 7rem; text-align: center; background: #000; }
+.birds-loading p { margin: 0; max-width: 38rem; }
+.birds-loading-note { font-size: .9rem; color: #bdbdbd; }
+.birds-loading-spinner { width: 2rem; height: 2rem; flex-shrink: 0; border: 3px solid #424242; border-top-color: #ff343d; border-radius: 50%; animation: birds-loading-spin 1s linear infinite; }
+@keyframes birds-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .birds-loading-spinner { animation: none; } }
+@media (max-height: 480px) { .birds-loading { gap: .5rem; padding-top: 4rem; padding-bottom: 5rem; } .birds-loading .birds-instruction { font-size: 1rem; } }
 .birds-overlays { pointer-events: none; overflow: hidden; }
 .birds-welcome { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; padding: 1.5rem; text-align: center; background: #000; }
 .birds-welcome p { margin: 0; max-width: 38rem; }
