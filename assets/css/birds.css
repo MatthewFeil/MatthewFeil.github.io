@@ -1,0 +1,29 @@
+/* Uses the existing site tokens; camera content always has a black field. */
+.birds-app { margin: 1rem 0 2rem; }
+.birds-app h1 { margin: 0 0 1rem; font-size: clamp(2.15rem, 4.8vw, 4.6rem); line-height: .95; }
+.birds-stage { position: relative; width: 100%; height: min(65dvh, 48rem); min-height: 20rem; overflow: hidden; border: 1px solid var(--site-border); background: #000; color: #f6f6f6; }
+.birds-video, .birds-overlays { position: absolute; inset: 0; width: 100%; height: 100%; }
+.birds-video { object-fit: cover; }
+.birds-overlays { pointer-events: none; overflow: hidden; }
+.birds-welcome { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; padding: 1.5rem; text-align: center; background: #000; }
+.birds-welcome p { margin: 0; max-width: 38rem; }
+.birds-instruction { font-size: 1.4rem; font-weight: 700; }
+.birds-message { color: #f6f6f6; }
+.birds-availability { font-size: .9rem; color: #bdbdbd; }
+.birds-app button { min-height: 44px; padding: .7rem 1rem; border: 1px solid #f6f6f6; border-radius: 0; font: 700 .85rem var(--font-ui); letter-spacing: .04em; cursor: pointer; }
+.birds-start { color: #fff; background: #b90f17; }
+.birds-start:hover { background: #8f0c12; }
+.birds-app button:disabled { opacity: .55; cursor: wait; }
+.birds-stop { color: #f6f6f6; background: #141414; white-space: nowrap; }
+.birds-stop:hover { background: #303030; }
+:root[data-keyboard-navigation="on"] .birds-app button:focus-visible { outline: 2px solid #ff343d; outline-offset: 3px; }
+.birds-toolbar { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem max(.75rem, env(safe-area-inset-right)) max(.75rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left)); background: #000; border-top: 1px solid #5c5c5c; }
+.birds-status { margin: 0; font-size: .9rem; line-height: 1.3; }
+.birds-app [hidden] { display: none !important; }
+body.birds-running { overflow: hidden; }
+body.birds-running > .site-header, body.birds-running > .site-footer, body.birds-running > .skip-link { display: none; }
+.birds-running .birds-app > h1 { display: none; }
+.birds-running .birds-stage { position: fixed; inset: 0; z-index: 1000; height: 100dvh; min-height: 0; border: 0; }
+.birds-box { position: absolute; border: 2px solid #ff343d; outline: 1px solid #000; }
+.birds-label { position: absolute; background: #000; color: #fff; padding: .4rem .55rem; max-width: min(16rem, 85vw); box-sizing: border-box; font: 700 .95rem/1.25 var(--font-ui); overflow-wrap: anywhere; }
+@media (max-width: 720px) { .birds-stage { height: 65dvh; } }

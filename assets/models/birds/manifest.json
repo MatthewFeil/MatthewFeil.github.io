@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "release": {
+    "approved": false,
+    "reason": "Commercial model provenance, held-out accuracy and real-phone performance remain unverified."
+  },
+  "detector": null,
+  "classifier": null,
+  "species": []
+}
