@@ -24,14 +24,15 @@ const server = http.createServer((req,res) => {
       const page=await context.newPage();
       page.on('pageerror',e=>errors.push(e.message));
       page.on('request',req=>requests.push({url:req.url(),method:req.method(),body:!!req.postData()}));
+      await page.route('**/assets/models/birds/manifest.json',route=>route.fulfill({json:{experimental:{enabled:false},options:[]}}));
       await page.goto(origin+'/birds/');
       await page.locator('.birds-start').waitFor();
-      assert.match(await page.locator('.birds-availability').textContent(),/not available/);
+      assert.match(await page.locator('.birds-availability').textContent(),/Experimental/);
       assert.equal(await page.evaluate(()=>document.body.scrollWidth>innerWidth),false);
       if(screenshots){fs.mkdirSync(screenshots,{recursive:true});await page.screenshot({path:path.join(screenshots,`idle-${width}.png`),fullPage:true});}
       await page.locator('.birds-start').click();
       await page.waitForFunction(()=>document.body.classList.contains('birds-running'));
-      await page.waitForFunction(()=>document.querySelector('.birds-status').textContent.includes('validation'));
+      await page.waitForFunction(()=>document.querySelector('.birds-status').textContent.includes('disabled'));
       assert.equal(await page.locator('.birds-overlays').locator('*').count(),0);
       assert.equal(await page.locator('.site-header').isVisible(),false);
       const dimensions=await page.locator('.birds-stage').boundingBox();
@@ -48,26 +49,6 @@ const server = http.createServer((req,res) => {
       assert.equal(await page.evaluate(()=>document.querySelector('video').srcObject),null);
       await context.close();
     }
-    // Optional constant ONNX fixtures exercise adapter/runtime plumbing, NOT recognition.
-    if (process.env.BIRDS_FIXTURE_DIR) {
-      const fixtureContext=await browser.newContext({viewport:{width:390,height:844},permissions:['camera']});
-      const fixturePage=await fixtureContext.newPage();
-      fixturePage.on('pageerror',e=>errors.push(e.message));
-      fixturePage.on('request',req=>requests.push({url:req.url(),method:req.method(),body:!!req.postData()}));
-      await fixturePage.route('**/assets/models/birds/*',async route=>{
-        const filename=path.basename(new URL(route.request().url()).pathname);
-        await route.fulfill({path:path.join(process.env.BIRDS_FIXTURE_DIR,filename),contentType:filename.endsWith('.json')?'application/json':'application/octet-stream'});
-      });
-      await fixturePage.goto(origin+'/birds/');
-      await fixturePage.locator('.birds-start').click();
-      fixturePage.on('console',m=>{if(m.type()==='error') console.error('Fixture browser:',m.text());});
-      try { await fixturePage.waitForFunction(()=>document.querySelector('.birds-label')?.textContent.includes('TEST FIXTURE'),{},{timeout:30000}); } catch(error) { console.error('Fixture status:',await fixturePage.locator('.birds-status').textContent()); throw error; }
-      const label=await fixturePage.locator('.birds-label').boundingBox();
-      assert.ok(label.x>=0 && label.x+label.width<=390 && label.y>=0 && label.y+label.height<844);
-      await fixturePage.locator('.birds-stop').click();
-      assert.equal(await fixturePage.locator('.birds-overlays').locator('*').count(),0);
-      await fixtureContext.close();
-    }
     // Permission refusal is a recoverable state, not an immersive screen with no camera.
     const denied=await browser.newContext();const page=await denied.newPage();
     await page.addInitScript(()=>{navigator.mediaDevices.getUserMedia=async()=>{throw new DOMException('Denied','NotAllowedError');};});
@@ -81,6 +62,7 @@ const server = http.createServer((req,res) => {
     const html=fs.readFileSync(path.join(root,'birds/index.html'),'utf8');
     assert.ok(!html.includes('cloudflareinsights') && !html.includes('googletagmanager'));
     assert.ok(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('cloudflareinsights'));
+    assert.ok(!fs.readFileSync(path.join(root,'work/index.html'),'utf8').includes('href="/birds/"'));
     console.log(JSON.stringify({viewports:4, camera:'synthetic Chromium camera', lifecycle:'start/stop/resume/interruption/permission denial', network:'only same-origin GETs, no uploads', errors},null,2));
   } finally {await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

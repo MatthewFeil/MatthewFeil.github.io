@@ -29,9 +29,9 @@ export function suppress(detections, threshold = .45) {
   return kept;
 }
 export class BirdTracker {
-  constructor() { this.tracks = []; this.nextId = 1; }
+  constructor(maxGapMs = 1200) { this.tracks = []; this.nextId = 1; this.maxGapMs = maxGapMs; }
   update(detections, timestamp) {
-    const previous = this.tracks.filter(t => timestamp - t.seen <= 1200), used = new Set();
+    const previous = this.tracks.filter(t => timestamp - t.seen <= this.maxGapMs), used = new Set();
     this.tracks = detections.map(d => {
       let match, overlap = .25;
       for (const t of previous) if (!used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
@@ -58,4 +58,36 @@ export function assertRelease(manifest) {
   if (!manifest.detector.boxes || !manifest.detector.scores || !manifest.detector.labels || !Number.isInteger(manifest.detector.birdClass) || !manifest.classifier.output || !(manifest.classifier.margin >= 0 && manifest.classifier.margin <= 1)) throw new Error('Invalid model outputs.');
   const gates = manifest.release;
   if (!(gates.precision >= .9 && gates.coverage >= .7 && gates.latencyMs <= 3000 && gates.realPhonesVerified === true && gates.commercialUseReviewed === true)) throw new Error('The local models have not met the release requirements.');
+}
+
+// Unlisted experiments can run without pretending to have passed production gates.
+export function experimentOption(manifest, id) {
+  if (manifest.experimental?.enabled !== true || !Array.isArray(manifest.options)) throw new Error('Local model experiments are disabled.');
+  const option = manifest.options.find(value => value.id === id);
+  if (!option || !manifest.detector || !Array.isArray(manifest.species)) throw new Error('This local model option is unavailable.');
+  for (const model of [manifest.detector, option.classifier].filter(Boolean)) {
+    if (!/^\/assets\/models\/birds\/[^?#]+\.onnx$/.test(model.url) || !/^[a-f0-9]{64}$/.test(model.sha256)) throw new Error('Invalid local model asset.');
+    if (!model.input || !model.output || !Array.isArray(model.size) || model.size.length!==2 || !model.size.every(n=>Number.isInteger(n)&&n>0&&n<=2048) || !Array.isArray(model.mean) || model.mean.length!==3 || !model.mean.every(Number.isFinite) || !Array.isArray(model.std) || model.std.length!==3 || !model.std.every(n=>Number.isFinite(n)&&n>0) || !(model.threshold>0&&model.threshold<=1)) throw new Error('Invalid experimental preprocessing.');
+  }
+  if (manifest.detector.format!=='yolox' || manifest.detector.birdClass!==14 || manifest.detector.strides?.join(',')!=='8,16,32') throw new Error('Unsupported experimental detector.');
+  if (option.classifier && (!manifest.species.length || manifest.species.some(s=>!s.id||!s.commonName) || new Set(manifest.species.map(s=>s.id)).size!==manifest.species.length || !(option.classifier.margin>=0&&option.classifier.margin<=1))) throw new Error('Invalid experimental species labels.');
+  return option;
+}
+export function decodeYolox(data, config, sourceWidth, sourceHeight) {
+  const [width,height]=config.size, ratio=Math.min(width/sourceWidth,height/sourceHeight), found=[];
+  let row=0;
+  for(const stride of config.strides) {
+    for(let y=0;y<height/stride;y++) for(let x=0;x<width/stride;x++,row++) {
+      const offset=row*85;
+      if(offset+84>=data.length) throw new Error('Unexpected detector output size.');
+      const score=data[offset+4]*data[offset+5+config.birdClass];
+      if(score<config.threshold || !Number.isFinite(score)) continue;
+      const cx=(data[offset]+x)*stride,cy=(data[offset+1]+y)*stride;
+      const w=Math.exp(data[offset+2])*stride,h=Math.exp(data[offset+3])*stride;
+      const box=[(cx-w/2)/ratio/sourceWidth,(cy-h/2)/ratio/sourceHeight,(cx+w/2)/ratio/sourceWidth,(cy+h/2)/ratio/sourceHeight].map(n=>Math.max(0,Math.min(1,n)));
+      if(box.every(Number.isFinite)&&box[2]>box[0]&&box[3]>box[1]) found.push({box,score});
+    }
+  }
+  if(row*85!==data.length) throw new Error('Unexpected detector output shape.');
+  return suppress(found);
 }

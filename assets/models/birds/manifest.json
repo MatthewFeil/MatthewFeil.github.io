@@ -1,10 +1,2733 @@
 {
-  "version": 1,
+  "version": 2,
   "release": {
     "approved": false,
-    "reason": "Commercial model provenance, held-out accuracy and real-phone performance remain unverified."
+    "reason": "Unlisted experimental models; no commercial provenance or real-phone accuracy claim."
   },
-  "detector": null,
-  "classifier": null,
-  "species": []
+  "experimental": {
+    "enabled": true,
+    "maxBirds": 3
+  },
+  "detector": {
+    "url": "/assets/models/birds/yolox-nano/model.onnx",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "bytes": 3659407,
+    "input": "images",
+    "output": "output",
+    "format": "yolox",
+    "size": [
+      416,
+      416
+    ],
+    "mean": [
+      0,
+      0,
+      0
+    ],
+    "std": [
+      1,
+      1,
+      1
+    ],
+    "birdClass": 14,
+    "threshold": 0.3,
+    "resize": "letterbox-bgr",
+    "strides": [
+      8,
+      16,
+      32
+    ]
+  },
+  "species": [
+    {
+      "id": "bird-0",
+      "commonName": "Abbotts Babbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-1",
+      "commonName": "Abbotts Booby",
+      "scientificName": null
+    },
+    {
+      "id": "bird-2",
+      "commonName": "Abyssinian Ground Hornbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-3",
+      "commonName": "African Crowned Crane",
+      "scientificName": null
+    },
+    {
+      "id": "bird-4",
+      "commonName": "African Emerald Cuckoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-5",
+      "commonName": "African Firefinch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-6",
+      "commonName": "African Oyster Catcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-7",
+      "commonName": "African Pied Hornbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-8",
+      "commonName": "African Pygmy Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-9",
+      "commonName": "Albatross",
+      "scientificName": null
+    },
+    {
+      "id": "bird-10",
+      "commonName": "Alberts Towhee",
+      "scientificName": null
+    },
+    {
+      "id": "bird-11",
+      "commonName": "Alexandrine Parakeet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-12",
+      "commonName": "Alpine Chough",
+      "scientificName": null
+    },
+    {
+      "id": "bird-13",
+      "commonName": "Altamira Yellowthroat",
+      "scientificName": null
+    },
+    {
+      "id": "bird-14",
+      "commonName": "American Avocet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-15",
+      "commonName": "American Bittern",
+      "scientificName": null
+    },
+    {
+      "id": "bird-16",
+      "commonName": "American Coot",
+      "scientificName": null
+    },
+    {
+      "id": "bird-17",
+      "commonName": "American Dipper",
+      "scientificName": null
+    },
+    {
+      "id": "bird-18",
+      "commonName": "American Flamingo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-19",
+      "commonName": "American Goldfinch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-20",
+      "commonName": "American Kestrel",
+      "scientificName": null
+    },
+    {
+      "id": "bird-21",
+      "commonName": "American Pipit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-22",
+      "commonName": "American Redstart",
+      "scientificName": null
+    },
+    {
+      "id": "bird-23",
+      "commonName": "American Robin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-24",
+      "commonName": "American Wigeon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-25",
+      "commonName": "Amethyst Woodstar",
+      "scientificName": null
+    },
+    {
+      "id": "bird-26",
+      "commonName": "Andean Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-27",
+      "commonName": "Andean Lapwing",
+      "scientificName": null
+    },
+    {
+      "id": "bird-28",
+      "commonName": "Andean Siskin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-29",
+      "commonName": "Anhinga",
+      "scientificName": null
+    },
+    {
+      "id": "bird-30",
+      "commonName": "Anianiau",
+      "scientificName": null
+    },
+    {
+      "id": "bird-31",
+      "commonName": "Annas Hummingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-32",
+      "commonName": "Antbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-33",
+      "commonName": "Antillean Euphonia",
+      "scientificName": null
+    },
+    {
+      "id": "bird-34",
+      "commonName": "Apapane",
+      "scientificName": null
+    },
+    {
+      "id": "bird-35",
+      "commonName": "Apostlebird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-36",
+      "commonName": "Araripe Manakin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-37",
+      "commonName": "Ashy Storm Petrel",
+      "scientificName": null
+    },
+    {
+      "id": "bird-38",
+      "commonName": "Ashy Thrushbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-39",
+      "commonName": "Asian Crested Ibis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-40",
+      "commonName": "Asian Dollard Bird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-41",
+      "commonName": "Asian Green Bee Eater",
+      "scientificName": null
+    },
+    {
+      "id": "bird-42",
+      "commonName": "Asian Openbill Stork",
+      "scientificName": null
+    },
+    {
+      "id": "bird-43",
+      "commonName": "Auckland Shaq",
+      "scientificName": null
+    },
+    {
+      "id": "bird-44",
+      "commonName": "Austral Canastero",
+      "scientificName": null
+    },
+    {
+      "id": "bird-45",
+      "commonName": "Australasian Figbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-46",
+      "commonName": "Avadavat",
+      "scientificName": null
+    },
+    {
+      "id": "bird-47",
+      "commonName": "Azaras Spinetail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-48",
+      "commonName": "Azure Breasted Pitta",
+      "scientificName": null
+    },
+    {
+      "id": "bird-49",
+      "commonName": "Azure Jay",
+      "scientificName": null
+    },
+    {
+      "id": "bird-50",
+      "commonName": "Azure Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-51",
+      "commonName": "Azure Tit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-52",
+      "commonName": "Baikal Teal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-53",
+      "commonName": "Bald Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-54",
+      "commonName": "Bald Ibis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-55",
+      "commonName": "Bali Starling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-56",
+      "commonName": "Baltimore Oriole",
+      "scientificName": null
+    },
+    {
+      "id": "bird-57",
+      "commonName": "Bananaquit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-58",
+      "commonName": "Band Tailed Guan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-59",
+      "commonName": "Banded Broadbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-60",
+      "commonName": "Banded Pita",
+      "scientificName": null
+    },
+    {
+      "id": "bird-61",
+      "commonName": "Banded Stilt",
+      "scientificName": null
+    },
+    {
+      "id": "bird-62",
+      "commonName": "Bar-Tailed Godwit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-63",
+      "commonName": "Barn Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-64",
+      "commonName": "Barn Swallow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-65",
+      "commonName": "Barred Puffbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-66",
+      "commonName": "Barrows Goldeneye",
+      "scientificName": null
+    },
+    {
+      "id": "bird-67",
+      "commonName": "Bay-Breasted Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-68",
+      "commonName": "Bearded Barbet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-69",
+      "commonName": "Bearded Bellbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-70",
+      "commonName": "Bearded Reedling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-71",
+      "commonName": "Belted Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-72",
+      "commonName": "Bird Of Paradise",
+      "scientificName": null
+    },
+    {
+      "id": "bird-73",
+      "commonName": "Black And Yellow Broadbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-74",
+      "commonName": "Black Baza",
+      "scientificName": null
+    },
+    {
+      "id": "bird-75",
+      "commonName": "Black Breasted Puffbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-76",
+      "commonName": "Black Cockato",
+      "scientificName": null
+    },
+    {
+      "id": "bird-77",
+      "commonName": "Black Faced Spoonbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-78",
+      "commonName": "Black Francolin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-79",
+      "commonName": "Black Headed Caique",
+      "scientificName": null
+    },
+    {
+      "id": "bird-80",
+      "commonName": "Black Necked Stilt",
+      "scientificName": null
+    },
+    {
+      "id": "bird-81",
+      "commonName": "Black Skimmer",
+      "scientificName": null
+    },
+    {
+      "id": "bird-82",
+      "commonName": "Black Swan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-83",
+      "commonName": "Black Tail Crake",
+      "scientificName": null
+    },
+    {
+      "id": "bird-84",
+      "commonName": "Black Throated Bushtit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-85",
+      "commonName": "Black Throated Huet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-86",
+      "commonName": "Black Throated Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-87",
+      "commonName": "Black Vented Shearwater",
+      "scientificName": null
+    },
+    {
+      "id": "bird-88",
+      "commonName": "Black Vulture",
+      "scientificName": null
+    },
+    {
+      "id": "bird-89",
+      "commonName": "Black-Capped Chickadee",
+      "scientificName": null
+    },
+    {
+      "id": "bird-90",
+      "commonName": "Black-Necked Grebe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-91",
+      "commonName": "Black-Throated Sparrow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-92",
+      "commonName": "Blackburniam Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-93",
+      "commonName": "Blonde Crested Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-94",
+      "commonName": "Blood Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-95",
+      "commonName": "Blue Coau",
+      "scientificName": null
+    },
+    {
+      "id": "bird-96",
+      "commonName": "Blue Dacnis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-97",
+      "commonName": "Blue Gray Gnatcatcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-98",
+      "commonName": "Blue Grosbeak",
+      "scientificName": null
+    },
+    {
+      "id": "bird-99",
+      "commonName": "Blue Grouse",
+      "scientificName": null
+    },
+    {
+      "id": "bird-100",
+      "commonName": "Blue Heron",
+      "scientificName": null
+    },
+    {
+      "id": "bird-101",
+      "commonName": "Blue Malkoha",
+      "scientificName": null
+    },
+    {
+      "id": "bird-102",
+      "commonName": "Blue Throated Piping Guan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-103",
+      "commonName": "Blue Throated Toucanet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-104",
+      "commonName": "Bobolink",
+      "scientificName": null
+    },
+    {
+      "id": "bird-105",
+      "commonName": "Bornean Bristlehead",
+      "scientificName": null
+    },
+    {
+      "id": "bird-106",
+      "commonName": "Bornean Leafbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-107",
+      "commonName": "Bornean Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-108",
+      "commonName": "Brandt Cormarant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-109",
+      "commonName": "Brewers Blackbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-110",
+      "commonName": "Brown Crepper",
+      "scientificName": null
+    },
+    {
+      "id": "bird-111",
+      "commonName": "Brown Headed Cowbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-112",
+      "commonName": "Brown Noody",
+      "scientificName": null
+    },
+    {
+      "id": "bird-113",
+      "commonName": "Brown Thrasher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-114",
+      "commonName": "Bufflehead",
+      "scientificName": null
+    },
+    {
+      "id": "bird-115",
+      "commonName": "Bulwers Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-116",
+      "commonName": "Burchells Courser",
+      "scientificName": null
+    },
+    {
+      "id": "bird-117",
+      "commonName": "Bush Turkey",
+      "scientificName": null
+    },
+    {
+      "id": "bird-118",
+      "commonName": "Caatinga Cacholote",
+      "scientificName": null
+    },
+    {
+      "id": "bird-119",
+      "commonName": "Cabots Tragopan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-120",
+      "commonName": "Cactus Wren",
+      "scientificName": null
+    },
+    {
+      "id": "bird-121",
+      "commonName": "California Condor",
+      "scientificName": null
+    },
+    {
+      "id": "bird-122",
+      "commonName": "California Gull",
+      "scientificName": null
+    },
+    {
+      "id": "bird-123",
+      "commonName": "California Quail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-124",
+      "commonName": "Campo Flicker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-125",
+      "commonName": "Canary",
+      "scientificName": null
+    },
+    {
+      "id": "bird-126",
+      "commonName": "Canvasback",
+      "scientificName": null
+    },
+    {
+      "id": "bird-127",
+      "commonName": "Cape Glossy Starling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-128",
+      "commonName": "Cape Longclaw",
+      "scientificName": null
+    },
+    {
+      "id": "bird-129",
+      "commonName": "Cape May Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-130",
+      "commonName": "Cape Rock Thrush",
+      "scientificName": null
+    },
+    {
+      "id": "bird-131",
+      "commonName": "Capped Heron",
+      "scientificName": null
+    },
+    {
+      "id": "bird-132",
+      "commonName": "Capuchinbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-133",
+      "commonName": "Carmine Bee-Eater",
+      "scientificName": null
+    },
+    {
+      "id": "bird-134",
+      "commonName": "Caspian Tern",
+      "scientificName": null
+    },
+    {
+      "id": "bird-135",
+      "commonName": "Cassowary",
+      "scientificName": null
+    },
+    {
+      "id": "bird-136",
+      "commonName": "Cedar Waxwing",
+      "scientificName": null
+    },
+    {
+      "id": "bird-137",
+      "commonName": "Cerulean Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-138",
+      "commonName": "Chara De Collar",
+      "scientificName": null
+    },
+    {
+      "id": "bird-139",
+      "commonName": "Chattering Lory",
+      "scientificName": null
+    },
+    {
+      "id": "bird-140",
+      "commonName": "Chestnet Bellied Euphonia",
+      "scientificName": null
+    },
+    {
+      "id": "bird-141",
+      "commonName": "Chestnut Winged Cuckoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-142",
+      "commonName": "Chinese Bamboo Partridge",
+      "scientificName": null
+    },
+    {
+      "id": "bird-143",
+      "commonName": "Chinese Pond Heron",
+      "scientificName": null
+    },
+    {
+      "id": "bird-144",
+      "commonName": "Chipping Sparrow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-145",
+      "commonName": "Chucao Tapaculo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-146",
+      "commonName": "Chukar Partridge",
+      "scientificName": null
+    },
+    {
+      "id": "bird-147",
+      "commonName": "Cinnamon Attila",
+      "scientificName": null
+    },
+    {
+      "id": "bird-148",
+      "commonName": "Cinnamon Flycatcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-149",
+      "commonName": "Cinnamon Teal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-150",
+      "commonName": "Clarks Grebe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-151",
+      "commonName": "Clarks Nutcracker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-152",
+      "commonName": "Cock Of The  Rock",
+      "scientificName": null
+    },
+    {
+      "id": "bird-153",
+      "commonName": "Cockatoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-154",
+      "commonName": "Collared Aracari",
+      "scientificName": null
+    },
+    {
+      "id": "bird-155",
+      "commonName": "Collared Crescentchest",
+      "scientificName": null
+    },
+    {
+      "id": "bird-156",
+      "commonName": "Common Firecrest",
+      "scientificName": null
+    },
+    {
+      "id": "bird-157",
+      "commonName": "Common Grackle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-158",
+      "commonName": "Common House Martin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-159",
+      "commonName": "Common Iora",
+      "scientificName": null
+    },
+    {
+      "id": "bird-160",
+      "commonName": "Common Loon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-161",
+      "commonName": "Common Poorwill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-162",
+      "commonName": "Common Starling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-163",
+      "commonName": "Coppersmith Barbet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-164",
+      "commonName": "Coppery Tailed Coucal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-165",
+      "commonName": "Crab Plover",
+      "scientificName": null
+    },
+    {
+      "id": "bird-166",
+      "commonName": "Crane Hawk",
+      "scientificName": null
+    },
+    {
+      "id": "bird-167",
+      "commonName": "Cream Colored Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-168",
+      "commonName": "Crested Auklet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-169",
+      "commonName": "Crested Caracara",
+      "scientificName": null
+    },
+    {
+      "id": "bird-170",
+      "commonName": "Crested Coua",
+      "scientificName": null
+    },
+    {
+      "id": "bird-171",
+      "commonName": "Crested Fireback",
+      "scientificName": null
+    },
+    {
+      "id": "bird-172",
+      "commonName": "Crested Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-173",
+      "commonName": "Crested Nuthatch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-174",
+      "commonName": "Crested Oropendola",
+      "scientificName": null
+    },
+    {
+      "id": "bird-175",
+      "commonName": "Crested Serpent Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-176",
+      "commonName": "Crested Shriketit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-177",
+      "commonName": "Crested Wood Partridge",
+      "scientificName": null
+    },
+    {
+      "id": "bird-178",
+      "commonName": "Crimson Chat",
+      "scientificName": null
+    },
+    {
+      "id": "bird-179",
+      "commonName": "Crimson Sunbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-180",
+      "commonName": "Crow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-181",
+      "commonName": "Cuban Tody",
+      "scientificName": null
+    },
+    {
+      "id": "bird-182",
+      "commonName": "Cuban Trogon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-183",
+      "commonName": "Curl Crested Aracuri",
+      "scientificName": null
+    },
+    {
+      "id": "bird-184",
+      "commonName": "D-Arnauds Barbet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-185",
+      "commonName": "Dalmatian Pelican",
+      "scientificName": null
+    },
+    {
+      "id": "bird-186",
+      "commonName": "Darjeeling Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-187",
+      "commonName": "Dark Eyed Junco",
+      "scientificName": null
+    },
+    {
+      "id": "bird-188",
+      "commonName": "Daurian Redstart",
+      "scientificName": null
+    },
+    {
+      "id": "bird-189",
+      "commonName": "Demoiselle Crane",
+      "scientificName": null
+    },
+    {
+      "id": "bird-190",
+      "commonName": "Double Barred Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-191",
+      "commonName": "Double Brested Cormarant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-192",
+      "commonName": "Double Eyed Fig Parrot",
+      "scientificName": null
+    },
+    {
+      "id": "bird-193",
+      "commonName": "Downy Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-194",
+      "commonName": "Dunlin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-195",
+      "commonName": "Dusky Lory",
+      "scientificName": null
+    },
+    {
+      "id": "bird-196",
+      "commonName": "Dusky Robin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-197",
+      "commonName": "Eared Pita",
+      "scientificName": null
+    },
+    {
+      "id": "bird-198",
+      "commonName": "Eastern Bluebird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-199",
+      "commonName": "Eastern Bluebonnet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-200",
+      "commonName": "Eastern Golden Weaver",
+      "scientificName": null
+    },
+    {
+      "id": "bird-201",
+      "commonName": "Eastern Meadowlark",
+      "scientificName": null
+    },
+    {
+      "id": "bird-202",
+      "commonName": "Eastern Rosella",
+      "scientificName": null
+    },
+    {
+      "id": "bird-203",
+      "commonName": "Eastern Towee",
+      "scientificName": null
+    },
+    {
+      "id": "bird-204",
+      "commonName": "Eastern Wip Poor Will",
+      "scientificName": null
+    },
+    {
+      "id": "bird-205",
+      "commonName": "Eastern Yellow Robin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-206",
+      "commonName": "Ecuadorian Hillstar",
+      "scientificName": null
+    },
+    {
+      "id": "bird-207",
+      "commonName": "Egyptian Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-208",
+      "commonName": "Elegant Trogon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-209",
+      "commonName": "Elliots  Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-210",
+      "commonName": "Emerald Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-211",
+      "commonName": "Emperor Penguin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-212",
+      "commonName": "Emu",
+      "scientificName": null
+    },
+    {
+      "id": "bird-213",
+      "commonName": "Enggano Myna",
+      "scientificName": null
+    },
+    {
+      "id": "bird-214",
+      "commonName": "Eurasian Bullfinch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-215",
+      "commonName": "Eurasian Golden Oriole",
+      "scientificName": null
+    },
+    {
+      "id": "bird-216",
+      "commonName": "Eurasian Magpie",
+      "scientificName": null
+    },
+    {
+      "id": "bird-217",
+      "commonName": "European Goldfinch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-218",
+      "commonName": "European Turtle Dove",
+      "scientificName": null
+    },
+    {
+      "id": "bird-219",
+      "commonName": "Evening Grosbeak",
+      "scientificName": null
+    },
+    {
+      "id": "bird-220",
+      "commonName": "Fairy Bluebird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-221",
+      "commonName": "Fairy Penguin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-222",
+      "commonName": "Fairy Tern",
+      "scientificName": null
+    },
+    {
+      "id": "bird-223",
+      "commonName": "Fan Tailed Widow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-224",
+      "commonName": "Fasciated Wren",
+      "scientificName": null
+    },
+    {
+      "id": "bird-225",
+      "commonName": "Fiery Minivet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-226",
+      "commonName": "Fiordland Penguin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-227",
+      "commonName": "Fire Tailled Myzornis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-228",
+      "commonName": "Flame Bowerbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-229",
+      "commonName": "Flame Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-230",
+      "commonName": "Forest Wagtail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-231",
+      "commonName": "Frigate",
+      "scientificName": null
+    },
+    {
+      "id": "bird-232",
+      "commonName": "Frill Back Pigeon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-233",
+      "commonName": "Gambels Quail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-234",
+      "commonName": "Gang Gang Cockatoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-235",
+      "commonName": "Gila Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-236",
+      "commonName": "Gilded Flicker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-237",
+      "commonName": "Glossy Ibis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-238",
+      "commonName": "Go Away Bird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-239",
+      "commonName": "Gold Wing Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-240",
+      "commonName": "Golden Bower Bird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-241",
+      "commonName": "Golden Cheeked Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-242",
+      "commonName": "Golden Chlorophonia",
+      "scientificName": null
+    },
+    {
+      "id": "bird-243",
+      "commonName": "Golden Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-244",
+      "commonName": "Golden Parakeet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-245",
+      "commonName": "Golden Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-246",
+      "commonName": "Golden Pipit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-247",
+      "commonName": "Gouldian Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-248",
+      "commonName": "Grandala",
+      "scientificName": null
+    },
+    {
+      "id": "bird-249",
+      "commonName": "Gray Catbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-250",
+      "commonName": "Gray Kingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-251",
+      "commonName": "Gray Partridge",
+      "scientificName": null
+    },
+    {
+      "id": "bird-252",
+      "commonName": "Great Argus",
+      "scientificName": null
+    },
+    {
+      "id": "bird-253",
+      "commonName": "Great Gray Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-254",
+      "commonName": "Great Jacamar",
+      "scientificName": null
+    },
+    {
+      "id": "bird-255",
+      "commonName": "Great Kiskadee",
+      "scientificName": null
+    },
+    {
+      "id": "bird-256",
+      "commonName": "Great Potoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-257",
+      "commonName": "Great Tinamou",
+      "scientificName": null
+    },
+    {
+      "id": "bird-258",
+      "commonName": "Great Xenops",
+      "scientificName": null
+    },
+    {
+      "id": "bird-259",
+      "commonName": "Greater Pewee",
+      "scientificName": null
+    },
+    {
+      "id": "bird-260",
+      "commonName": "Greater Prairie Chicken",
+      "scientificName": null
+    },
+    {
+      "id": "bird-261",
+      "commonName": "Greator Sage Grouse",
+      "scientificName": null
+    },
+    {
+      "id": "bird-262",
+      "commonName": "Green Broadbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-263",
+      "commonName": "Green Jay",
+      "scientificName": null
+    },
+    {
+      "id": "bird-264",
+      "commonName": "Green Magpie",
+      "scientificName": null
+    },
+    {
+      "id": "bird-265",
+      "commonName": "Green Winged Dove",
+      "scientificName": null
+    },
+    {
+      "id": "bird-266",
+      "commonName": "Grey Cuckooshrike",
+      "scientificName": null
+    },
+    {
+      "id": "bird-267",
+      "commonName": "Grey Headed Chachalaca",
+      "scientificName": null
+    },
+    {
+      "id": "bird-268",
+      "commonName": "Grey Headed Fish Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-269",
+      "commonName": "Grey Plover",
+      "scientificName": null
+    },
+    {
+      "id": "bird-270",
+      "commonName": "Groved Billed Ani",
+      "scientificName": null
+    },
+    {
+      "id": "bird-271",
+      "commonName": "Guinea Turaco",
+      "scientificName": null
+    },
+    {
+      "id": "bird-272",
+      "commonName": "Guineafowl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-273",
+      "commonName": "Gurneys Pitta",
+      "scientificName": null
+    },
+    {
+      "id": "bird-274",
+      "commonName": "Gyrfalcon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-275",
+      "commonName": "Hamerkop",
+      "scientificName": null
+    },
+    {
+      "id": "bird-276",
+      "commonName": "Harlequin Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-277",
+      "commonName": "Harlequin Quail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-278",
+      "commonName": "Harpy Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-279",
+      "commonName": "Hawaiian Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-280",
+      "commonName": "Hawfinch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-281",
+      "commonName": "Helmet Vanga",
+      "scientificName": null
+    },
+    {
+      "id": "bird-282",
+      "commonName": "Hepatic Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-283",
+      "commonName": "Himalayan Bluetail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-284",
+      "commonName": "Himalayan Monal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-285",
+      "commonName": "Hoatzin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-286",
+      "commonName": "Hooded Merganser",
+      "scientificName": null
+    },
+    {
+      "id": "bird-287",
+      "commonName": "Hoopoes",
+      "scientificName": null
+    },
+    {
+      "id": "bird-288",
+      "commonName": "Horned Guan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-289",
+      "commonName": "Horned Lark",
+      "scientificName": null
+    },
+    {
+      "id": "bird-290",
+      "commonName": "Horned Sungem",
+      "scientificName": null
+    },
+    {
+      "id": "bird-291",
+      "commonName": "House Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-292",
+      "commonName": "House Sparrow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-293",
+      "commonName": "Hyacinth Macaw",
+      "scientificName": null
+    },
+    {
+      "id": "bird-294",
+      "commonName": "Iberian Magpie",
+      "scientificName": null
+    },
+    {
+      "id": "bird-295",
+      "commonName": "Ibisbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-296",
+      "commonName": "Imperial Shaq",
+      "scientificName": null
+    },
+    {
+      "id": "bird-297",
+      "commonName": "Inca Tern",
+      "scientificName": null
+    },
+    {
+      "id": "bird-298",
+      "commonName": "Indian Bustard",
+      "scientificName": null
+    },
+    {
+      "id": "bird-299",
+      "commonName": "Indian Pitta",
+      "scientificName": null
+    },
+    {
+      "id": "bird-300",
+      "commonName": "Indian Roller",
+      "scientificName": null
+    },
+    {
+      "id": "bird-301",
+      "commonName": "Indian Vulture",
+      "scientificName": null
+    },
+    {
+      "id": "bird-302",
+      "commonName": "Indigo Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-303",
+      "commonName": "Indigo Flycatcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-304",
+      "commonName": "Inland Dotterel",
+      "scientificName": null
+    },
+    {
+      "id": "bird-305",
+      "commonName": "Ivory Billed Aracari",
+      "scientificName": null
+    },
+    {
+      "id": "bird-306",
+      "commonName": "Ivory Gull",
+      "scientificName": null
+    },
+    {
+      "id": "bird-307",
+      "commonName": "Iwi",
+      "scientificName": null
+    },
+    {
+      "id": "bird-308",
+      "commonName": "Jabiru",
+      "scientificName": null
+    },
+    {
+      "id": "bird-309",
+      "commonName": "Jack Snipe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-310",
+      "commonName": "Jacobin Pigeon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-311",
+      "commonName": "Jandaya Parakeet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-312",
+      "commonName": "Japanese Robin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-313",
+      "commonName": "Java Sparrow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-314",
+      "commonName": "Jocotoco Antpitta",
+      "scientificName": null
+    },
+    {
+      "id": "bird-315",
+      "commonName": "Kagu",
+      "scientificName": null
+    },
+    {
+      "id": "bird-316",
+      "commonName": "Kakapo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-317",
+      "commonName": "Killdear",
+      "scientificName": null
+    },
+    {
+      "id": "bird-318",
+      "commonName": "King Eider",
+      "scientificName": null
+    },
+    {
+      "id": "bird-319",
+      "commonName": "King Vulture",
+      "scientificName": null
+    },
+    {
+      "id": "bird-320",
+      "commonName": "Kiwi",
+      "scientificName": null
+    },
+    {
+      "id": "bird-321",
+      "commonName": "Knob Billed Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-322",
+      "commonName": "Kookaburra",
+      "scientificName": null
+    },
+    {
+      "id": "bird-323",
+      "commonName": "Lark Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-324",
+      "commonName": "Laughing Gull",
+      "scientificName": null
+    },
+    {
+      "id": "bird-325",
+      "commonName": "Lazuli Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-326",
+      "commonName": "Lesser Adjutant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-327",
+      "commonName": "Lilac Roller",
+      "scientificName": null
+    },
+    {
+      "id": "bird-328",
+      "commonName": "Limpkin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-329",
+      "commonName": "Little Auk",
+      "scientificName": null
+    },
+    {
+      "id": "bird-330",
+      "commonName": "Loggerhead Shrike",
+      "scientificName": null
+    },
+    {
+      "id": "bird-331",
+      "commonName": "Long-Eared Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-332",
+      "commonName": "Looney Birds",
+      "scientificName": null
+    },
+    {
+      "id": "bird-333",
+      "commonName": "Lucifer Hummingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-334",
+      "commonName": "Magpie Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-335",
+      "commonName": "Malabar Hornbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-336",
+      "commonName": "Malachite Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-337",
+      "commonName": "Malagasy White Eye",
+      "scientificName": null
+    },
+    {
+      "id": "bird-338",
+      "commonName": "Maleo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-339",
+      "commonName": "Mallard Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-340",
+      "commonName": "Mandrin Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-341",
+      "commonName": "Mangrove Cuckoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-342",
+      "commonName": "Marabou Stork",
+      "scientificName": null
+    },
+    {
+      "id": "bird-343",
+      "commonName": "Masked Bobwhite",
+      "scientificName": null
+    },
+    {
+      "id": "bird-344",
+      "commonName": "Masked Booby",
+      "scientificName": null
+    },
+    {
+      "id": "bird-345",
+      "commonName": "Masked Lapwing",
+      "scientificName": null
+    },
+    {
+      "id": "bird-346",
+      "commonName": "Mckays Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-347",
+      "commonName": "Merlin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-348",
+      "commonName": "Mikado  Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-349",
+      "commonName": "Military Macaw",
+      "scientificName": null
+    },
+    {
+      "id": "bird-350",
+      "commonName": "Mourning Dove",
+      "scientificName": null
+    },
+    {
+      "id": "bird-351",
+      "commonName": "Myna",
+      "scientificName": null
+    },
+    {
+      "id": "bird-352",
+      "commonName": "Nicobar Pigeon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-353",
+      "commonName": "Noisy Friarbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-354",
+      "commonName": "Northern Beardless Tyrannulet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-355",
+      "commonName": "Northern Cardinal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-356",
+      "commonName": "Northern Flicker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-357",
+      "commonName": "Northern Fulmar",
+      "scientificName": null
+    },
+    {
+      "id": "bird-358",
+      "commonName": "Northern Gannet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-359",
+      "commonName": "Northern Goshawk",
+      "scientificName": null
+    },
+    {
+      "id": "bird-360",
+      "commonName": "Northern Jacana",
+      "scientificName": null
+    },
+    {
+      "id": "bird-361",
+      "commonName": "Northern Mockingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-362",
+      "commonName": "Northern Parula",
+      "scientificName": null
+    },
+    {
+      "id": "bird-363",
+      "commonName": "Northern Red Bishop",
+      "scientificName": null
+    },
+    {
+      "id": "bird-364",
+      "commonName": "Northern Shoveler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-365",
+      "commonName": "Ocellated Turkey",
+      "scientificName": null
+    },
+    {
+      "id": "bird-366",
+      "commonName": "Oilbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-367",
+      "commonName": "Okinawa Rail",
+      "scientificName": null
+    },
+    {
+      "id": "bird-368",
+      "commonName": "Orange Breasted Trogon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-369",
+      "commonName": "Orange Brested Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-370",
+      "commonName": "Oriental Bay Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-371",
+      "commonName": "Ornate Hawk Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-372",
+      "commonName": "Osprey",
+      "scientificName": null
+    },
+    {
+      "id": "bird-373",
+      "commonName": "Ostrich",
+      "scientificName": null
+    },
+    {
+      "id": "bird-374",
+      "commonName": "Ovenbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-375",
+      "commonName": "Oyster Catcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-376",
+      "commonName": "Painted Bunting",
+      "scientificName": null
+    },
+    {
+      "id": "bird-377",
+      "commonName": "Palila",
+      "scientificName": null
+    },
+    {
+      "id": "bird-378",
+      "commonName": "Palm Nut Vulture",
+      "scientificName": null
+    },
+    {
+      "id": "bird-379",
+      "commonName": "Paradise Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-380",
+      "commonName": "Parakett  Auklet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-381",
+      "commonName": "Parus Major",
+      "scientificName": null
+    },
+    {
+      "id": "bird-382",
+      "commonName": "Patagonian Sierra Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-383",
+      "commonName": "Peacock",
+      "scientificName": null
+    },
+    {
+      "id": "bird-384",
+      "commonName": "Peregrine Falcon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-385",
+      "commonName": "Phainopepla",
+      "scientificName": null
+    },
+    {
+      "id": "bird-386",
+      "commonName": "Philippine Eagle",
+      "scientificName": null
+    },
+    {
+      "id": "bird-387",
+      "commonName": "Pink Robin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-388",
+      "commonName": "Plush Crested Jay",
+      "scientificName": null
+    },
+    {
+      "id": "bird-389",
+      "commonName": "Pomarine Jaeger",
+      "scientificName": null
+    },
+    {
+      "id": "bird-390",
+      "commonName": "Puffin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-391",
+      "commonName": "Puna Teal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-392",
+      "commonName": "Purple Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-393",
+      "commonName": "Purple Gallinule",
+      "scientificName": null
+    },
+    {
+      "id": "bird-394",
+      "commonName": "Purple Martin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-395",
+      "commonName": "Purple Swamphen",
+      "scientificName": null
+    },
+    {
+      "id": "bird-396",
+      "commonName": "Pygmy Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-397",
+      "commonName": "Pyrrhuloxia",
+      "scientificName": null
+    },
+    {
+      "id": "bird-398",
+      "commonName": "Quetzal",
+      "scientificName": null
+    },
+    {
+      "id": "bird-399",
+      "commonName": "Rainbow Lorikeet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-400",
+      "commonName": "Razorbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-401",
+      "commonName": "Red Bearded Bee Eater",
+      "scientificName": null
+    },
+    {
+      "id": "bird-402",
+      "commonName": "Red Bellied Pitta",
+      "scientificName": null
+    },
+    {
+      "id": "bird-403",
+      "commonName": "Red Billed Tropicbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-404",
+      "commonName": "Red Browed Finch",
+      "scientificName": null
+    },
+    {
+      "id": "bird-405",
+      "commonName": "Red Crossbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-406",
+      "commonName": "Red Faced Cormorant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-407",
+      "commonName": "Red Faced Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-408",
+      "commonName": "Red Fody",
+      "scientificName": null
+    },
+    {
+      "id": "bird-409",
+      "commonName": "Red Headed Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-410",
+      "commonName": "Red Headed Woodpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-411",
+      "commonName": "Red Knot",
+      "scientificName": null
+    },
+    {
+      "id": "bird-412",
+      "commonName": "Red Legged Honeycreeper",
+      "scientificName": null
+    },
+    {
+      "id": "bird-413",
+      "commonName": "Red Naped Trogon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-414",
+      "commonName": "Red Shouldered Hawk",
+      "scientificName": null
+    },
+    {
+      "id": "bird-415",
+      "commonName": "Red Tailed Hawk",
+      "scientificName": null
+    },
+    {
+      "id": "bird-416",
+      "commonName": "Red Tailed Thrush",
+      "scientificName": null
+    },
+    {
+      "id": "bird-417",
+      "commonName": "Red Winged Blackbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-418",
+      "commonName": "Red Wiskered Bulbul",
+      "scientificName": null
+    },
+    {
+      "id": "bird-419",
+      "commonName": "Regent Bowerbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-420",
+      "commonName": "Ring-Necked Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-421",
+      "commonName": "Roadrunner",
+      "scientificName": null
+    },
+    {
+      "id": "bird-422",
+      "commonName": "Rock Dove",
+      "scientificName": null
+    },
+    {
+      "id": "bird-423",
+      "commonName": "Rose Breasted Cockatoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-424",
+      "commonName": "Rose Breasted Grosbeak",
+      "scientificName": null
+    },
+    {
+      "id": "bird-425",
+      "commonName": "Roseate Spoonbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-426",
+      "commonName": "Rosy Faced Lovebird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-427",
+      "commonName": "Rough Leg Buzzard",
+      "scientificName": null
+    },
+    {
+      "id": "bird-428",
+      "commonName": "Royal Flycatcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-429",
+      "commonName": "Ruby Crowned Kinglet",
+      "scientificName": null
+    },
+    {
+      "id": "bird-430",
+      "commonName": "Ruby Throated Hummingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-431",
+      "commonName": "Ruddy Shelduck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-432",
+      "commonName": "Rudy Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-433",
+      "commonName": "Rufous Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-434",
+      "commonName": "Rufous Trepe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-435",
+      "commonName": "Rufuos Motmot",
+      "scientificName": null
+    },
+    {
+      "id": "bird-436",
+      "commonName": "Samatran Thrush",
+      "scientificName": null
+    },
+    {
+      "id": "bird-437",
+      "commonName": "Sand Martin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-438",
+      "commonName": "Sandhill Crane",
+      "scientificName": null
+    },
+    {
+      "id": "bird-439",
+      "commonName": "Satyr Tragopan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-440",
+      "commonName": "Says Phoebe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-441",
+      "commonName": "Scarlet Crowned Fruit Dove",
+      "scientificName": null
+    },
+    {
+      "id": "bird-442",
+      "commonName": "Scarlet Faced Liocichla",
+      "scientificName": null
+    },
+    {
+      "id": "bird-443",
+      "commonName": "Scarlet Ibis",
+      "scientificName": null
+    },
+    {
+      "id": "bird-444",
+      "commonName": "Scarlet Macaw",
+      "scientificName": null
+    },
+    {
+      "id": "bird-445",
+      "commonName": "Scarlet Tanager",
+      "scientificName": null
+    },
+    {
+      "id": "bird-446",
+      "commonName": "Shoebill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-447",
+      "commonName": "Short Billed Dowitcher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-448",
+      "commonName": "Smiths Longspur",
+      "scientificName": null
+    },
+    {
+      "id": "bird-449",
+      "commonName": "Snow Goose",
+      "scientificName": null
+    },
+    {
+      "id": "bird-450",
+      "commonName": "Snow Partridge",
+      "scientificName": null
+    },
+    {
+      "id": "bird-451",
+      "commonName": "Snowy Egret",
+      "scientificName": null
+    },
+    {
+      "id": "bird-452",
+      "commonName": "Snowy Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-453",
+      "commonName": "Snowy Plover",
+      "scientificName": null
+    },
+    {
+      "id": "bird-454",
+      "commonName": "Snowy Sheathbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-455",
+      "commonName": "Sora",
+      "scientificName": null
+    },
+    {
+      "id": "bird-456",
+      "commonName": "Spangled Cotinga",
+      "scientificName": null
+    },
+    {
+      "id": "bird-457",
+      "commonName": "Splendid Wren",
+      "scientificName": null
+    },
+    {
+      "id": "bird-458",
+      "commonName": "Spoon Biled Sandpiper",
+      "scientificName": null
+    },
+    {
+      "id": "bird-459",
+      "commonName": "Spotted Catbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-460",
+      "commonName": "Spotted Whistling Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-461",
+      "commonName": "Squacco Heron",
+      "scientificName": null
+    },
+    {
+      "id": "bird-462",
+      "commonName": "Sri Lanka Blue Magpie",
+      "scientificName": null
+    },
+    {
+      "id": "bird-463",
+      "commonName": "Steamer Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-464",
+      "commonName": "Stork Billed Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-465",
+      "commonName": "Striated Caracara",
+      "scientificName": null
+    },
+    {
+      "id": "bird-466",
+      "commonName": "Striped Owl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-467",
+      "commonName": "Stripped Manakin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-468",
+      "commonName": "Stripped Swallow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-469",
+      "commonName": "Sunbittern",
+      "scientificName": null
+    },
+    {
+      "id": "bird-470",
+      "commonName": "Superb Starling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-471",
+      "commonName": "Surf Scoter",
+      "scientificName": null
+    },
+    {
+      "id": "bird-472",
+      "commonName": "Swinhoes Pheasant",
+      "scientificName": null
+    },
+    {
+      "id": "bird-473",
+      "commonName": "Tailorbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-474",
+      "commonName": "Taiwan Magpie",
+      "scientificName": null
+    },
+    {
+      "id": "bird-475",
+      "commonName": "Takahe",
+      "scientificName": null
+    },
+    {
+      "id": "bird-476",
+      "commonName": "Tasmanian Hen",
+      "scientificName": null
+    },
+    {
+      "id": "bird-477",
+      "commonName": "Tawny Frogmouth",
+      "scientificName": null
+    },
+    {
+      "id": "bird-478",
+      "commonName": "Teal Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-479",
+      "commonName": "Tit Mouse",
+      "scientificName": null
+    },
+    {
+      "id": "bird-480",
+      "commonName": "Touchan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-481",
+      "commonName": "Townsends Warbler",
+      "scientificName": null
+    },
+    {
+      "id": "bird-482",
+      "commonName": "Tree Swallow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-483",
+      "commonName": "Tricolored Blackbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-484",
+      "commonName": "Tropical Kingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-485",
+      "commonName": "Trumpter Swan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-486",
+      "commonName": "Turkey Vulture",
+      "scientificName": null
+    },
+    {
+      "id": "bird-487",
+      "commonName": "Turquoise Motmot",
+      "scientificName": null
+    },
+    {
+      "id": "bird-488",
+      "commonName": "Umbrella Bird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-489",
+      "commonName": "Varied Thrush",
+      "scientificName": null
+    },
+    {
+      "id": "bird-490",
+      "commonName": "Veery",
+      "scientificName": null
+    },
+    {
+      "id": "bird-491",
+      "commonName": "Venezuelian Troupial",
+      "scientificName": null
+    },
+    {
+      "id": "bird-492",
+      "commonName": "Verdin",
+      "scientificName": null
+    },
+    {
+      "id": "bird-493",
+      "commonName": "Vermilion Flycather",
+      "scientificName": null
+    },
+    {
+      "id": "bird-494",
+      "commonName": "Victoria Crowned Pigeon",
+      "scientificName": null
+    },
+    {
+      "id": "bird-495",
+      "commonName": "Violet Backed Starling",
+      "scientificName": null
+    },
+    {
+      "id": "bird-496",
+      "commonName": "Violet Cuckoo",
+      "scientificName": null
+    },
+    {
+      "id": "bird-497",
+      "commonName": "Violet Green Swallow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-498",
+      "commonName": "Violet Turaco",
+      "scientificName": null
+    },
+    {
+      "id": "bird-499",
+      "commonName": "Visayan Hornbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-500",
+      "commonName": "Vulturine Guineafowl",
+      "scientificName": null
+    },
+    {
+      "id": "bird-501",
+      "commonName": "Wall Creaper",
+      "scientificName": null
+    },
+    {
+      "id": "bird-502",
+      "commonName": "Wattled Curassow",
+      "scientificName": null
+    },
+    {
+      "id": "bird-503",
+      "commonName": "Wattled Lapwing",
+      "scientificName": null
+    },
+    {
+      "id": "bird-504",
+      "commonName": "Whimbrel",
+      "scientificName": null
+    },
+    {
+      "id": "bird-505",
+      "commonName": "White Breasted Waterhen",
+      "scientificName": null
+    },
+    {
+      "id": "bird-506",
+      "commonName": "White Browed Crake",
+      "scientificName": null
+    },
+    {
+      "id": "bird-507",
+      "commonName": "White Cheeked Turaco",
+      "scientificName": null
+    },
+    {
+      "id": "bird-508",
+      "commonName": "White Crested Hornbill",
+      "scientificName": null
+    },
+    {
+      "id": "bird-509",
+      "commonName": "White Eared Hummingbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-510",
+      "commonName": "White Necked Raven",
+      "scientificName": null
+    },
+    {
+      "id": "bird-511",
+      "commonName": "White Tailed Tropic",
+      "scientificName": null
+    },
+    {
+      "id": "bird-512",
+      "commonName": "White Throated Bee Eater",
+      "scientificName": null
+    },
+    {
+      "id": "bird-513",
+      "commonName": "Wild Turkey",
+      "scientificName": null
+    },
+    {
+      "id": "bird-514",
+      "commonName": "Willow Ptarmigan",
+      "scientificName": null
+    },
+    {
+      "id": "bird-515",
+      "commonName": "Wilsons Bird Of Paradise",
+      "scientificName": null
+    },
+    {
+      "id": "bird-516",
+      "commonName": "Wood Duck",
+      "scientificName": null
+    },
+    {
+      "id": "bird-517",
+      "commonName": "Wood Thrush",
+      "scientificName": null
+    },
+    {
+      "id": "bird-518",
+      "commonName": "Woodland Kingfisher",
+      "scientificName": null
+    },
+    {
+      "id": "bird-519",
+      "commonName": "Wrentit",
+      "scientificName": null
+    },
+    {
+      "id": "bird-520",
+      "commonName": "Yellow Bellied Flowerpecker",
+      "scientificName": null
+    },
+    {
+      "id": "bird-521",
+      "commonName": "Yellow Breasted Chat",
+      "scientificName": null
+    },
+    {
+      "id": "bird-522",
+      "commonName": "Yellow Cacique",
+      "scientificName": null
+    },
+    {
+      "id": "bird-523",
+      "commonName": "Yellow Headed Blackbird",
+      "scientificName": null
+    },
+    {
+      "id": "bird-524",
+      "commonName": "Zebra Dove",
+      "scientificName": null
+    }
+  ],
+  "defaultOption": "full",
+  "options": [
+    {
+      "id": "small",
+      "name": "Smaller model",
+      "classifier": {
+        "url": "/assets/models/birds/efficientnet-int8/model.onnx",
+        "sha256": "998447810ae98fb8896fa5a314383cf7b26362b6a52380b74cb3b2c5de193e4c",
+        "bytes": 8971139,
+        "input": "pixel_values",
+        "output": "logits",
+        "size": [
+          260,
+          260
+        ],
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.22899999563551357,
+          0.22400001642496,
+          0.22499998195105692
+        ],
+        "resize": "nearest",
+        "threshold": 0.65,
+        "margin": 0.2,
+        "provider": "wasm"
+      }
+    },
+    {
+      "id": "full",
+      "name": "Full precision",
+      "classifier": {
+        "url": "/assets/models/birds/efficientnet-b2/model.onnx",
+        "sha256": "0e8d91d99a53b7a24d992926868ecc744f0e73433bab9720effb252b2fcc14ed",
+        "bytes": 33741738,
+        "input": "pixel_values",
+        "output": "logits",
+        "size": [
+          260,
+          260
+        ],
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.22899999563551357,
+          0.22400001642496,
+          0.22499998195105692
+        ],
+        "resize": "nearest",
+        "threshold": 0.65,
+        "margin": 0.2
+      }
+    },
+    {
+      "id": "detect",
+      "name": "Detection only",
+      "classifier": null
+    }
+  ]
 }

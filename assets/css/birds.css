@@ -27,3 +27,12 @@ body.birds-running > .site-header, body.birds-running > .site-footer, body.birds
 .birds-box { position: absolute; border: 2px solid #ff343d; outline: 1px solid #000; }
 .birds-label { position: absolute; background: #000; color: #fff; padding: .4rem .55rem; max-width: min(16rem, 85vw); box-sizing: border-box; font: 700 .95rem/1.25 var(--font-ui); overflow-wrap: anywhere; }
 @media (max-width: 720px) { .birds-stage { height: 65dvh; } }
+
+.birds-modelbar { position: absolute; z-index: 2; top: max(.75rem, env(safe-area-inset-top)); left: max(.75rem, env(safe-area-inset-left)); right: max(.75rem, env(safe-area-inset-right)); display: flex; align-items: center; gap: .65rem; }
+.birds-modelbar label { color: #f6f6f6; background: #000; padding: .5rem; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+.birds-modelbar select { min-width: 0; width: min(100%, 19rem); min-height: 44px; border: 1px solid #f6f6f6; border-radius: 0; padding: .6rem .75rem; background: #000; color: #f6f6f6; font: 700 .85rem var(--font-ui); color-scheme: dark; }
+:root[data-keyboard-navigation="on"] .birds-modelbar select:focus-visible { outline: 2px solid #ff343d; outline-offset: 3px; }
+.birds-timing { display: block; margin-top: .2rem; color: #a7a7a7; font-size: .78rem; }
+.birds-timing:empty { display: none; }
+.birds-welcome { padding-top: 5rem; }
+@media (max-height: 480px) { .birds-welcome { gap: .5rem; } .birds-instruction { font-size: 1rem; } .birds-availability { font-size: .78rem; } }

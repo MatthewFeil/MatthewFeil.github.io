@@ -1,99 +1,100 @@
-# Bird Detection — local implementation and release gate
+# Bird Detection — unlisted local model comparison
 
-Status: camera interface and inference integration implemented; real bird identification
-is **not enabled**. No weights, species names, or model accuracy claims are fabricated.
-The page is noindex and unpublished. Its My Work card explicitly says validation is pending.
+Updated 2026-10-06. This page now runs **real local models** in an explicitly
+experimental mode. It is unlisted (removed from My Work and not added to navigation),
+noindex, sitemap:false and has no analytics. No deployment or publication was performed.
+An unlisted URL is not authentication; a visitor with its URL may still open it.
 
-## Candidate review (2026-10-06)
+## Options
 
-- [houlette/birdclass-na](https://huggingface.co/houlette/birdclass-na): North American
-  classifier; model weights explicitly CC-BY-NC-4.0. Excluded from commercial release.
-- [k10z/birdvision-efficientnet-s](https://huggingface.co/k10z/birdvision-efficientnet-s):
-  model card says weights derive from noncommercial iNaturalist data. Excluded.
-- [rkutyna/bird-classifier](https://huggingface.co/rkutyna/bird-classifier): MIT label,
-  but training includes NABirds, Birdsnap and iNaturalist without image-level commercial
-  provenance. Not cleared merely because the model card says MIT.
-- [BioCLIP](https://huggingface.co/imageomics/bioclip): model card advertises MIT;
-  zero-shot encoder and mixed biodiversity training sources require a separate data
-  provenance review and mobile export/performance evaluation. No weights obtained.
-- [Birder](https://github.com/birder-project/birder): code generally Apache-2.0, but
-  its documentation explicitly separates pretrained-weight/dataset permissions.
-  No detector or classifier from this collection is approved by this implementation.
+| Selector | Weights | What it does |
+|---|---|---|
+| Full precision (default) | EfficientNet-B2 FP32, 33.7 MB | Names detected birds using 525 source labels |
+| Smaller | Locally quantized EfficientNet-B2 QUInt8, 9.0 MB | Same label set, smaller download, potentially reduced identification quality |
+| Detection only | YOLOX-Nano, 3.7 MB | Draws bird outlines, no species names |
 
-These are suitability findings, not legal conclusions about all possible uses.
-No candidate was numerically evaluated: no approved weights or independently labeled
-held-out footage are available here. PyTorch/ONNX are not installed in the current
-Python environment. Do not report the 90% precision/70% coverage targets as achieved.
+All options share YOLOX-Nano; full and smaller add a classifier. ONNX Runtime's
+26 MB WASM runtime is loaded locally. Only the selected classifier is downloaded.
+The full-precision model is the default because it named the labeled robin photo in
+our browser smoke test while the quantized model stayed uncertain on the detected crop.
+The options are not three independently trained species classifiers; Smaller is a
+quantized version of Full precision. Speed benefits must be measured on the user's phone.
 
-## Runtime contract
+## Sources and restrictions
 
-`assets/models/birds/manifest.json` is deliberately release-gated. To install an
-approved pair, supply same-origin ONNX files, SHA-256 hashes and the following fields:
+`assets/models/birds/SOURCES.md` and per-model MODEL_CARD.md/LICENSE/SOURCE.md record
+upstream URLs, fixed revisions, transformations and upstream declared licenses.
+YOLOX and the selected EfficientNet source declare Apache-2.0. Training images include
+COCO/Kaggle/ImageNet sources; image-level commercial provenance remains unverified.
+These are user-authorized, unlisted, noncommercial experiments, not commercially cleared
+release models. Source benchmark accuracy is not our camera accuracy.
 
-- Each model: `url`, `sha256`, `input`, `size: [width,height]`, `mean: [r,g,b]`,
-  `std: [r,g,b]`. Input is float32 NCHW; RGB values are divided by 255 then normalized.
-- Detector: `boxes`, `scores`, `labels` output names; `birdClass` integer;
-  `threshold` validated on held-out data. Boxes are Nx4 normalized xyxy, scores Nx1,
-  labels Nx1. Detection inputs are stretched to model size; wrappers must undo their
-  own letterboxing and convert outputs into this normalized source-image contract.
-- Classifier: `output` logits name, `threshold`, `margin` calibrated on held-out data.
-  Output order matches `species: [{id, commonName, scientificName}]` exactly.
-- Release: `approved`, `precision`, `coverage`, `latencyMs` (end-to-end stable
-  suggestion), `realPhonesVerified`, `commercialUseReviewed`. Accuracy thresholds
-  are .9 and .7, latency at most 3000ms. Approval is recorded only after evidence.
+The ozzyonfire checkpoint was tested locally and excluded: nearly uniform predictions
+on a real labeled robin image. Its downloaded weights were moved outside the website.
+Other previously reviewed noncommercial/NABirds-based classifiers remain excluded.
 
-Worker verifies hashes, uses WebGPU when sessions load successfully, otherwise
-single-thread WASM (no cross-origin isolation required). One active frame, no backlog;
-2Hz sampling. Model failures retain the camera with an explicit identification-unavailable
-message. Small crops are rejected. Three agreeing recent classifications stabilize a
-name; overlays clear on absent/stale detections. Scores are not displayed as accuracy.
+## Processing details
 
-## Local evaluation tools
+- Detector: upstream YOLOX 416x416, top-left letterbox with value 114, BGR float32
+  values in 0..255, NCHW. Decode 3549x85 raw head using strides 8/16/32. Bird class 14,
+  objectness times bird-class score, NMS, inverse letterboxing to normalized source boxes.
+- Classifier: 260x260 RGB nearest-neighbor resize, rescale 1/255, source mean and std.
+  Upstream EfficientNet `include_top` normalizes a second time: effective std is
+  source std squared. This detail is essential; do not use the old generic adapter.
+- Classify up to three detections per frame, adding 5% crop context and rejecting tiny
+  crops. Initial uncalibrated experimental thresholds: .30 detector, .65 classifier,
+  .20 top-two margin. Raw model scores are not presented as accuracy percentages.
+- Three agreeing recent classifications yield a tentative name; slow-device tracking
+  tolerates longer inference intervals. Never force a name for an uncertain result.
+- Worker sessions prefer WebGPU for FP32/detection where available, otherwise WASM.
+  Quantized option uses WASM. One active frame, no request backlog; nominal 2Hz cadence.
+- Switching models terminates the previous worker and clears its overlays while
+  retaining the camera. Generation tokens reject old results, timeouts provide recovery,
+  and model-start changes cannot race with pending camera startup.
+- SHA-256 is checked before loading weights; model requests include a hash cache key.
+  Stop, hidden page and pagehide release tracks and workers. Rotation rejects results
+  from previous frame dimensions. Control remains accessible in safe areas.
 
-Create a dedicated Python virtual environment and install `script/birds/requirements.txt`
-when approved weights and labeled evaluation data are available. `export.py` accepts
-trusted local TorchScript wrappers; it does not select or download models. `evaluate.py`
-consumes recorded real logits, ground truth, and measured inference latency. It never
-approves a release itself. Keep unsupported species and non-bird examples in evaluation.
-Split by bird/recording/location, not neighboring frames, and calibrate thresholds on a
-separate validation split. Real camera-to-stable-label latency must be measured separately.
+`release.approved` remains false. `experimental.enabled` and whitelisted options allow
+local testing separately; production approval is not fabricated or silently waived.
+No AI APIs, image uploads, analytics or telemetry. Only same-origin static downloads.
+There is no service worker, so offline availability is not promised.
 
-## Privacy and delivery
+## What was tested
 
-Only the page, scripts, fonts, model manifest, models and ONNX Runtime assets are fetched.
-No third-party runtime URLs, inference services, image uploads, analytics or telemetry.
-Bird page opts out of both analytics paths in shared layouts. Camera is requested only
-on Start, with no microphone. Stop, pagehide and visibility loss release tracks and
-terminate the worker. Manifest changes are revalidated; version model filenames for
-browser HTTP caching. Offline use is not guaranteed; no site-wide service worker added.
+Production Jekyll build, JS/Python syntax and focused geometry/YOLOX/release-gate tests.
+Chromium camera lifecycle at 320x568, 390x844, 844x390 and 1440x900: start/stop/resume,
+permission denial, interrupted camera, no overflow and GET-only same-origin traffic.
+These lifecycle checks use synthetic camera input, not physical phones.
 
-Vendored ONNX Runtime Web 1.30.0 is MIT licensed with LICENSE and VERSION alongside it.
-The 26MB runtime is fetched only after an approved manifest passes the gate, never by
-other site pages. No preview server should be left running by tests.
+Real downloaded model graphs passed Python ONNX validation and local CPU inference.
+A labeled American robin photograph by Pranav Tadepalli (CC BY-SA 4.0) was supplied as a
+synthetic browser camera feed:
+https://commons.wikimedia.org/wiki/File:American_Robin_Closeup.jpg
 
-## Required before publication
+Full precision displayed American Robin, Smaller drew an uncertain bird, and Detection
+only drew Bird. Illustrative last-frame desktop-browser timings were .19s, .16s and
+.03s respectively. These are smoke-test observations, not an accuracy benchmark or
+phone performance guarantee. Test photo stays outside shipped website assets.
+No page errors, remote requests or uploads occurred in that comparison.
 
-- Approved detector/classifier weights and auditable training-data provenance.
-- Independent held-out accuracy, unsupported-species and lookalike tests.
-- Real iPhone Safari and Android Chrome; permissions, rotation, interruption,
-  sustained ten-minute heat/memory/performance and stable identification within 3s.
-- Network inspection demonstrating no camera or result uploads.
+`tests/birds-models-browser.cjs` repeats real inference when BIRDS_ROBIN_PHOTO points to
+that local labeled image. It operates on BIRDS_MODEL_URL (default localhost:4001).
+`tests/birds-browser.cjs` starts and closes a temporary server against a production build
+and tests the failure/recovery lifecycle without repeatedly loading large real models.
 
-No physical phones were available in this task. Desktop browser camera tests use a
-synthetic browser camera **only as lifecycle test input**, never to assert bird detection.
+## How to compare on your phone
 
-## Checks completed in this implementation
+1. Open /birds/, select Full precision, and tap Start camera. Allow the first download.
+2. Use a known bird photo, filling a reasonable part of the frame. Hold steady for
+   several analyses and note the tentative name, outline, uncertainty and duration.
+3. Switch to Smaller without moving the phone. Compare the same bird and framing.
+4. Switch to Detection only if there is no outline. If it cannot find the bird, the
+   problem is detection/framing, rather than species classification.
+5. Repeat with several known species and an empty scene. Report model, expected species,
+   shown name/uncertainty, last-analysis duration, phone/browser and any heating.
 
-Production Jekyll build and focused JavaScript/Python syntax checks passed. Core tests
-cover portrait cropping, suppression, temporal stabilization and model release gating.
-Chromium browser checks passed 320x568, 390x844, 844x390 and 1440x900: start/stop,
-resume, interrupted tracks, denied permission, no horizontal overflow, touch control
-geometry and same-origin GET-only requests. The production bird page has no analytics;
-the existing homepage retains its prior analytics behavior. Independent Impeccable
-review found no material camera-preview finish issues and no design-system change.
-
-Constant numerical ONNX graphs exercised real locally bundled WASM inference, both
-sessions, cropping, classification-score handling, temporal names and overlay rendering.
-These are explicitly named test fixtures outside shipped model assets. They validate
-software plumbing only, not bird detection or species accuracy. No physical-phone
-benchmark, labeled bird evaluation, or model export was run.
+Before a validated commercial/public release: independent held-out accuracy and unknown
+species tests, 90% confident precision / 70% clear-species coverage targets, end-to-end
+stable suggestions within 3s, image-level provenance review and real iPhone/Android
+10-minute heat/memory/performance tests remain required. None are claimed complete.
