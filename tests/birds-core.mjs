@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion} from '../assets/js/birds-core.mjs';
+import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, trackSupported, MOTION_BRIDGE_MS} from '../assets/js/birds-core.mjs';
 // Portrait crop: horizontal source edges are outside view; middle bird remains aligned.
 assert.equal(projectBox([0,0,.1,1],1920,1080,390,844),null);
 const r=projectBox([.4,.3,.6,.6],1920,1080,390,844);
@@ -81,3 +81,22 @@ assert.equal(scopedSpeciesSuggestion([.4,.35,.25],regionLabels,cutoffs,regionAll
 assert.equal(scopedSpeciesSuggestion([.65,.3,.05],regionLabels,cutoffs,regionAllowed),'goldfinch');
 assert.equal(scopedSpeciesSuggestion([.45,.5,.05],regionLabels,cutoffs,regionAllowed),null);
 console.log('Regional filtering preserves global confidence and rejects unsupported winners.');
+
+// Reliable image motion bridges a real detector outage; stale or failed motion cannot.
+const continuous=new BirdTracker(10000);
+continuous.update([detection],0);continuous.update([detection],350);
+const confirmed=continuous.update([detection],700)[0];
+confirmed.motionSeen=2500;confirmed.motionQuality=.75;
+assert.equal(continuous.update([],2500,true,650)[0].id,confirmed.id);
+assert.equal(continuous.tracks[0].speciesId,'robin');
+assert.equal(trackSupported(confirmed,2701),false,'Do not bridge stale motion');
+confirmed.motionSeen=4300;
+assert.equal(trackSupported(confirmed,700+MOTION_BRIDGE_MS+1),false,'Motion cannot keep a ghost indefinitely');
+confirmed.motionLost=true;confirmed.motionLostAt=900;
+assert.equal(trackSupported(confirmed,950),true,'Allow one short flow failure');
+assert.equal(trackSupported(confirmed,1151),false,'Expire a sustained flow failure');
+confirmed.motionLost=false;
+// An absent cached classifier result is not a fresh vote against an established name.
+assert.equal(continuous.update([{...detection,classificationFresh:false,speciesId:null}],2800)[0].speciesId,'robin');
+assert.equal(continuous.update([{...detection,classificationFresh:true,speciesId:null}],2900)[0].speciesId,null);
+console.log('Sustained detector-gap continuity, bounded expiry and cached-name retention passed.');

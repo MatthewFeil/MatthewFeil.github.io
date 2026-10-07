@@ -300,3 +300,44 @@ The final movement regression retained the same named outline in all 80 samples,
 223 successful motion updates over roughly eight seconds (about 28Hz), one fresh
 classification, mean center deviation 7.9px and maximum 33.4px. Motion-worker compute
 averaged 1.0ms on desktop. The camera removal and same-origin traffic assertions passed.
+
+
+## Sustained highlight continuity (2026-10-07)
+
+The model worker now retains the focused search region and classification cache through
+missed detections: up to 600ms unconditionally for search only, or up to 3.5 seconds
+with recent reliable motion evidence from the separate motion worker. These cached
+regions are not emitted as detector results. Real detections still confirm bird presence.
+The page likewise bridges a detector gap up to 3.5 seconds when motion quality is at
+least .4 and the latest accepted motion is no more than 200ms old. Failed motion gets
+only 250ms of grace, within the ordinary detector expiry window. A stable background
+patch therefore cannot keep an outline indefinitely without detector reconfirmation.
+
+Geometry updates and non-fresh classifier replies retain an established name; a fresh
+uncertain classifier result still clears it. Worker cache expiry does not itself vote
+against a species while the same actively tracked identity remains supported. The
+existing classifier cadence and one-active-analysis limit remain unchanged. The changes
+reuse existing motion measurements and add small metadata/cache checks, no models,
+image transfers, servers or uploads.
+
+`tests/birds-continuity-browser.cjs` runs actual local ONNX models on a moving labeled
+robin photograph, deliberately returning no detector results for 2.2 seconds. This
+fault injection only removes predictions in the test; production has no fault code
+and never inserts simulated detections. Use the existing Playwright/model URL/robin
+photo environment variables. BIRDS_TRACKING_BASELINE=1 compares committed HEAD sources;
+BIRDS_CONTINUITY_REPORT optionally writes a JSON report. Unit tests cover stale motion,
+failed motion, the hard bridge expiry and cached versus fresh classification evidence.
+
+Before the fix, the same named outline remained in 6/34 samples across the outage and
+recovery. Afterward it remained in 34/34, with zero fresh classification calls after
+initial identification, maximum center deviation 16.4px on a 960px view, no page errors,
+and removal within 1.7 seconds of taking the bird out of the camera fixture. This is a
+synthetic desktop camera test, not physical-phone or live-bird evidence.
+
+The ordinary eight-second movement regression retained the same outline in 80/80
+samples at about 28 successful motion updates/sec, with about 1ms motion-worker compute.
+A diagnostic run retained its name in 80/80 samples with one fresh identifier check;
+one earlier run retained the name in 76/80 and made four identifier checks, exceeding
+that test's strict three-call expectation. Species confidence/retry behavior is therefore
+not uniform across runs; highlight identity was sustained in both. Real-phone testing
+is still needed before claiming device performance or live-bird tracking reliability.

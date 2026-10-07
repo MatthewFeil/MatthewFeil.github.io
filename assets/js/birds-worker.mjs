@@ -1,4 +1,4 @@
-import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion } from './birds-core.mjs?v=20261007-small2';
+import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261007-sustain1';
 let ort, detector, classifier, manifest, option, allowedSpeciesIds, busy=false,scanIndex=0,detectorMs=60,previous=[],frameSize='',lastFull=-Infinity,lastDiscovery=-Infinity,cacheId=0;
 const inputBuffers=new Map();
 const qualityCanvas=new OffscreenCanvas(64,64),qualityCtx=qualityCanvas.getContext('2d',{willReadFrequently:true});
@@ -104,8 +104,14 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
     const match=previous.filter(p=>!used.has(p.cacheId)&&iou(p.box,d.box)>.25).sort((a,b)=>iou(b.box,d.box)-iou(a.box,d.box))[0];
     if(match) {used.add(match.cacheId);Object.assign(d,{cacheId:match.cacheId,lastClass:match.lastClass,suggestion:match.suggestion,agreements:match.agreements,cropAttempt:match.cropAttempt,retryBaseSide:match.retryBaseSide,bestSharp:match.bestSharp,sharpAt:match.sharpAt,samples:match.samples});}
     else d.cacheId=++cacheId;
+    d.lastDetected=timestamp;
   }
-  previous=detections;
+  // Keep a search/cache entry after a miss; only real detector boxes are emitted.
+  const missing=previous.filter(p=>!used.has(p.cacheId)&&!detections.some(d=>d.cacheId===p.cacheId));
+  previous=[...detections,...missing.filter(p=>{
+    const age=timestamp-p.lastDetected,live=motionTracks.find(t=>t.cacheId===p.cacheId);
+    return age<=600 || (age<=MOTION_BRIDGE_MS && live?.motionReliable);
+  })].slice(0,manifest.experimental.maxBirds || 3);
   let classifiedThisFrame=false;
   const ordered=[...detections].sort((a,b)=>(a.lastClass ?? -Infinity)-(b.lastClass ?? -Infinity));
   for(const d of ordered) {

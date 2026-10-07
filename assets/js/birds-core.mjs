@@ -28,6 +28,13 @@ export function suppress(detections, threshold = .45) {
   }
   return kept;
 }
+// Brief detector gaps may be bridged by recent measured motion, never indefinitely.
+export const MOTION_BRIDGE_MS=3500;
+export function trackSupported(track,timestamp,detectorGrace=650) {
+  const age=Math.max(0,timestamp-track.seen);
+  if(track.motionLost)return age<=detectorGrace && timestamp-(track.motionLostAt ?? -Infinity)<=250;
+  return age<=detectorGrace || (age<=MOTION_BRIDGE_MS && timestamp-(track.motionSeen ?? -Infinity)<=200 && track.motionQuality>=.4);
+}
 export class BirdTracker {
   constructor(maxGapMs = 1200) { this.tracks = []; this.nextId = 1; this.maxGapMs = maxGapMs; }
   update(detections, timestamp, geometryOnly = false, keepMissingMs = 0) {
@@ -38,11 +45,11 @@ export class BirdTracker {
       if (match) used.add(match.id);
       const evidence = !geometryOnly && d.classificationFresh !== false;
       const history = evidence ? [...(match?.history || []), d.speciesId || null].slice(-4) : [...(match?.history || [])];
-      const suggestion = geometryOnly ? match?.speciesId : d.speciesId;
+      const suggestion = evidence ? d.speciesId : match?.speciesId;
       const speciesId = suggestion && history.filter(id => id === suggestion).length >= 3 ? suggestion : null;
-      return { ...d, cacheId:d.cacheId ?? match?.cacheId, flowDx:match?.flowDx||0, flowDy:match?.flowDy||0, motionLost:false, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
+      return { ...d, cacheId:d.cacheId ?? match?.cacheId, flowDx:match?.flowDx||0, flowDy:match?.flowDy||0, motionSeen:match?.motionSeen,motionQuality:match?.motionQuality,motionLostAt:undefined,motionLost:false, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
     });
-    if(keepMissingMs) this.tracks.push(...previous.filter(t=>!used.has(t.id)&&!t.motionLost&&timestamp-t.seen<=keepMissingMs));
+    if(keepMissingMs) this.tracks.push(...previous.filter(t=>!used.has(t.id)&&trackSupported(t,timestamp,keepMissingMs)));
     return this.tracks;
   }
   clear() { this.tracks = []; }

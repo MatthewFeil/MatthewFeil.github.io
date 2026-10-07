@@ -1,5 +1,5 @@
-import { BirdTracker, projectBox, iou as overlap } from './birds-core.mjs?v=20261007-small2';
-import {advanceByMotion} from './birds-motion.mjs?v=20261007-small2';
+import { BirdTracker, projectBox, iou as overlap, trackSupported, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261007-sustain1';
+import {advanceByMotion} from './birds-motion.mjs?v=20261007-sustain1';
 const app=document.querySelector('[data-birds-app]');
 const video=app.querySelector('video'),stage=app.querySelector('.birds-stage'),overlays=app.querySelector('.birds-overlays');
 const welcome=app.querySelector('.birds-welcome'),message=app.querySelector('.birds-message'),toolbar=app.querySelector('.birds-toolbar');
@@ -64,21 +64,22 @@ function halt(text='Camera images stay on your device.',resume=false) {
 }
 function fail(text) {clearAnalysis();setStatus(`Camera only. ${text}`);}
 function startMotion(token) {
-  motionWorker=new Worker(new URL('./birds-motion-worker.mjs?v=20261007-small2',import.meta.url),{type:'module'});
+  motionWorker=new Worker(new URL('./birds-motion-worker.mjs?v=20261007-sustain1',import.meta.url),{type:'module'});
   motionWorker.onmessage=({data})=>{
     if(token!==generation)return;
     motionPending=false;
     if(performance.now()-data.timestamp<200) {
       for(const update of data.updates) {
         const track=tracks.find(t=>t.id===update.id);
-        if(track && !update.lost && performance.now()-track.seen<1200) {
+        if(track && !update.lost && performance.now()-track.seen<MOTION_BRIDGE_MS) {
           track.box=track.box.map((v,i)=>Math.max(0,Math.min(1,v+(i%2?update.dy:update.dx))));
           track.flowDx=(track.flowDx||0)+update.dx;track.flowDy=(track.flowDy||0)+update.dy;
+          track.motionSeen=data.timestamp;track.motionQuality=update.quality;
         }
-        if(track && update.lost)track.motionLost=true;
-        else if(track)track.motionLost=false;
+        if(track && update.lost){if(!track.motionLost)track.motionLostAt=data.timestamp;track.motionLost=true;}
+        else if(track){track.motionLost=false;track.motionLostAt=undefined;}
       }
-      tracks=tracks.filter(t=>performance.now()-t.seen<1200);tracker.tracks=tracks;render();
+      tracks=tracks.filter(t=>trackSupported(t,performance.now(),1200));tracker.tracks=tracks;render();
     }
     motionRate=Math.max(33,Math.min(100,data.latencyMs*2));
     motionTimer=setTimeout(()=>motionFrame(token),Math.max(0,motionRate-data.latencyMs));
@@ -116,7 +117,7 @@ async function frame(token) {
       const capturedAt=performance.now();motionSnapshot=tracks.map(t=>({id:t.id,cacheId:t.cacheId,box:[...t.box],flowDx:t.flowDx||0,flowDy:t.flowDy||0}));
       const bitmap=await createImageBitmap(video);
       if(token!==generation || !worker) {bitmap.close();return;}
-      worker.postMessage({type:'frame',bitmap,timestamp:capturedAt,tracks:motionSnapshot.map(t=>({cacheId:t.cacheId,box:t.box}))},[bitmap]);
+      worker.postMessage({type:'frame',bitmap,timestamp:capturedAt,tracks:motionSnapshot.map(t=>{const live=tracks.find(v=>v.id===t.id);return {cacheId:t.cacheId,box:t.box,motionReliable:!!live&&!live.motionLost&&capturedAt-(live.motionSeen ?? -Infinity)<200&&live.motionQuality>=.4};})},[bitmap]);
       watchdog=setTimeout(()=>fail('Analysis took too long. Switch models or stop and retry.'),45000);
     } catch {pending=false;setStatus('Frame unavailable. Hold steady.');}
   }
@@ -127,7 +128,7 @@ function loadOption() {
   clearAnalysis();const token=generation;
   setLoading(true);
   setStatus('Loading selected local model…');
-  worker=new Worker(new URL('./birds-worker.mjs?v=20261007-small2',import.meta.url),{type:'module'});
+  worker=new Worker(new URL('./birds-worker.mjs?v=20261007-sustain1',import.meta.url),{type:'module'});
   worker.onmessage=({data})=>{
     if(token!==generation) return;
     if(data.type==='progress') setStatus(data.message);

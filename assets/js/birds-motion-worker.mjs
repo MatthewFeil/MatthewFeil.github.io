@@ -1,4 +1,4 @@
-import {grayscale,pyramid,followBox} from './birds-motion.mjs?v=20261007-tracking1';
+import {grayscale,pyramid,followBox} from './birds-motion.mjs?v=20261007-sustain1';
 let previous,previousTime=0;
 self.onmessage=({data})=>{
   if(data.type!=='frame')return;
