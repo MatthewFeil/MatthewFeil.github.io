@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness} from '../assets/js/birds-core.mjs';
+import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion} from '../assets/js/birds-core.mjs';
 // Portrait crop: horizontal source edges are outside view; middle bird remains aligned.
 assert.equal(projectBox([0,0,.1,1],1920,1080,390,844),null);
 const r=projectBox([.4,.3,.6,.6],1920,1080,390,844);
@@ -64,3 +64,20 @@ for(let y=1;y<31;y++)for(let x=1;x<31;x++)for(let c=0;c<3;c++) {
 }
 assert.ok(cropSharpness(blurred,32,32)<cropSharpness(edges,32,32)*.7);
 console.log('Blurred crop falls below the relative sharpness threshold.');
+
+const movingIdentity=new BirdTracker(10000);
+movingIdentity.update([detection],0);movingIdentity.update([detection],350);
+const named=movingIdentity.update([detection],700)[0];named.flowDx=.3;
+const moved=movingIdentity.update([{box:[.65,.3,.95,.6],trackId:named.id}],800,true,650)[0];
+assert.equal(moved.id,named.id);assert.equal(moved.speciesId,'robin');assert.equal(moved.flowDx,.3);
+assert.equal(movingIdentity.update([],1000,true,650).length,1);
+assert.equal(movingIdentity.update([],1600,true,650).length,0);
+console.log('Motion identity, name retention, detector-gap bridging and expiry passed.');
+
+const regionLabels=[{id:'goldfinch'},{id:'foreign'},{id:'robin'}],regionAllowed=new Set(['goldfinch','robin']),cutoffs={threshold:.65,margin:.2};
+assert.equal(scopedSpeciesSuggestion([.8,.15,.05],regionLabels,cutoffs,regionAllowed),'goldfinch');
+assert.equal(scopedSpeciesSuggestion([.05,.9,.05],regionLabels,cutoffs,regionAllowed),null);
+assert.equal(scopedSpeciesSuggestion([.4,.35,.25],regionLabels,cutoffs,regionAllowed),null);
+assert.equal(scopedSpeciesSuggestion([.65,.3,.05],regionLabels,cutoffs,regionAllowed),'goldfinch');
+assert.equal(scopedSpeciesSuggestion([.45,.5,.05],regionLabels,cutoffs,regionAllowed),null);
+console.log('Regional filtering preserves global confidence and rejects unsupported winners.');

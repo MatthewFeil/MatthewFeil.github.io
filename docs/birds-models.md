@@ -168,3 +168,135 @@ Sharpness unit checks distinguish sharp edges, uniform crops and blurred edges. 
 additional camera fixture, mild blur remained usable and was classified; stronger blur
 caused YOLOX to lose the bird before the crop gate could act. The sharpness gate does
 not solve detection under defocus, and phone-level benefit remains unverified.
+
+## Continuous tracking (2026-10-07)
+
+The UI now has a separate, lightweight motion worker. At up to about 30 updates/sec it
+receives a camera image reduced to a maximum 480-pixel dimension, selects corner patches
+inside each bird, matches them through a two-level grayscale pyramid, and rejects
+inconsistent matches with forward/backward checks. This is actual image-motion tracking,
+not an animation toward a stale detection or another species classifier. It estimates
+translation; detection still corrects outlines and sizes. Abrupt motion, low texture,
+rotation, blur and occlusion can still require reacquisition.
+
+The model worker confirms birds about every 220ms when able, with backpressure on slow
+devices. Detector results are advanced by motion measured since their capture time so
+late results do not move outlines backward. Track identity, classification history and
+cached model IDs persist through reliable motion. Missing detections are bridged for at
+most 650ms, with no bridge for failed motion tracks. Motion alone cannot keep a bird
+alive indefinitely: tracks expire after 1.2 seconds without detector confirmation.
+
+New/uncertain birds permit classifier checks at least 350ms apart until three fresh
+results agree. Stable birds wait at least five seconds between species checks, provided
+the crop is sufficiently sharp. Cached stable names expire after 12 seconds; uncertain
+checks clear the stable agreement count. Motion and cached results never add classifier
+confirmations. Stop, switching models, page hiding and leaving the page terminate both
+workers and release the camera. The motion worker downloads no models or dependencies.
+
+`node tests/birds-motion.mjs` checks camera shifts, independent object movement, lost
+objects, low texture and delayed-box transforms. `tests/birds-tracking-browser.cjs`
+uses actual local models and the labeled robin photograph as a synthetic 30fps camera.
+Set BIRDS_ROBIN_PHOTO, PLAYWRIGHT_MODULE_PATH and PLAYWRIGHT_EXECUTABLE_PATH as for the
+existing real-model test. It checks sustained motion, stable outline/name identity,
+limited classifier calls, disappearance and same-origin GET-only traffic.
+
+In the desktop Chrome movement test, one outline and American Robin remained present in
+all 80 samples during roughly eight seconds of movement. There were 224 motion updates,
+averaging about .93ms motion-worker compute, 37 AI frames and one fresh classification.
+Mean outline-center deviation from the known image movement was about 7.7px on a 960px
+wide view; maximum 54px included the abrupt start of motion. The outline disappeared
+when the image was removed. These are one-photo synthetic-camera results, not a general
+tracking benchmark or real iPhone/Android evidence.
+
+## Common North American scope (2026-10-07)
+
+The manifest now limits displayed species suggestions to 52 supported, commonly encountered
+North American birds. This is a practical starter list across backyard, woodland, waterbird
+and raptor groups, not a complete North American checklist. American Goldfinch, American
+Robin, Northern Cardinal, Downy Woodpecker, House Finch, Mourning Dove and Black-capped
+Chickadee are included. See `identificationScope.allowedSpeciesIds` in the manifest for the
+exact list; model class order and model weights are unchanged.
+
+Regional restriction applies after softmax over ALL 525 model classes. A suggestion must
+still meet the original .65 confidence and .20 global top-two margin, and its original
+winning class must be on the allowed list. Unsupported winners become uncertain. We do
+not discard competitors and re-normalize the remaining probabilities, which would inflate
+confidence and force unsupported birds into a local species. Other wrong predictions
+within the allowed set remain possible; this is not regional fine-tuning or an accuracy
+claim. Tracking and detection still operate for birds outside the naming list.
+
+Important missing class: **Blue Jay is absent from the current classifier's 525 labels**.
+There are unrelated jay classes, but none may be relabeled Blue Jay. Other gaps include
+Canada Goose, Song Sparrow, White-breasted Nuthatch and Red-bellied Woodpecker. Supporting
+these requires a different or retrained local classifier. The page states the Blue Jay
+limitation. Cornell sources for intended species and regional context:
+https://www.allaboutbirds.org/guide/American_Goldfinch/overview
+https://www.allaboutbirds.org/guide/Blue_Jay/id
+https://www.allaboutbirds.org/guide/
+
+The restriction changes a small output-selection step; it does not reduce model input
+size, model download size or inference cost, and leaves continuous motion tracking intact.
+
+Photo comparison: three American Goldfinch photos and three Blue Jay photos, both model
+options, before/after scope restriction, using real local ONNX models. The full model
+produced American Goldfinch on all three goldfinch photos at least once; the quantized
+model did so on two. A feeding pose remained uncertain in the smaller model. Incorrect
+Crested Shriketit/Common Iora suggestions from extra detected regions were rejected.
+Blue Jay photos previously produced Chara De Collar/Azure Jay, or no confident result;
+all stayed unnamed after filtering. The first blue jay portrait had intermittent
+bird detection independently of naming. This tiny re-used photo set is not a held-out
+accuracy benchmark, and no improvement rate is claimed.
+
+`tests/birds-region-browser.cjs` repeats the comparison with BIRDS_TEST_IMAGES_DIR
+pointing to the delivered folder. It uses the same Playwright/model URL environment
+variables as the other browser tests. Optional BIRDS_BASELINE_WORKER supplies the
+pre-filter worker and BIRDS_REGION_REPORT saves JSON results.
+
+
+## Small image refinement (2026-10-07)
+
+Search starts with centered windows at 35%, 18%, 10% and 65% of the shorter camera
+frame dimension before rotating through the existing overlapping edge windows.
+These magnifications use original camera pixels; they do not manufacture detail or
+increase the empty-scene limit of one or two tile passes per analysis. Once tracking,
+full-frame searches run at most once per second and one discovery tile at most every
+800ms. Focused detector confirmation and the separate motion worker remain active.
+This trades some secondary-bird discovery speed for less work while following a bird.
+
+The full model uses bilinear canvas resizing and 35% padding for bird boxes no larger
+than 64px on their shorter side. Larger boxes and the quantized model keep 5% padding;
+quantized tiny crops retain nearest resizing because context/smoothing experiments
+introduced confident wrong names. Crop sharpness is measured on the bird rectangle,
+independently of padding. The minimum classification short side is now 16px rather
+than 24px; naming still needs the original global confidence/margin, regional allowlist
+and fresh agreement checks. Tiny classification checks wait at least 800ms, stable
+birds five seconds, and six unsuccessful attempts cause 1.5-second retry spacing.
+Growing a crop by 50% resets that retry count. One classifier run per frame remains
+the maximum. No model weights, services, uploads or dependencies were added.
+
+`tests/birds-small-browser.cjs` uses BIRDS_TEST_IMAGES_DIR and the existing Playwright
+variables. It places six labeled photo-03 scenes at 220px and 110px longest dimensions
+within a 1280x720 gray camera image, runs 16 actual inference frames per case, and
+checks detection, supported recognition and absence of stabilized wrong names. The
+500ms synthetic timestamps exercise scheduling; they are not measured camera FPS.
+The source images include background, so actual bird crops are smaller than those
+scene dimensions. This is a reused development fixture, not a held-out accuracy test.
+
+On desktop Chrome, the Smaller model found birds in 11/12 cases versus 6/12 before.
+The full model found 11/12 both times, but medium goldfinch, small robin/cardinal/dove
+detections persisted through all 16 frames instead of late or intermittent discovery. The full model now stabilized American Goldfinch on the medium
+scene that previously had no correct suggestion. Average worker analysis was roughly
+80ms full / 142ms Smaller, versus 110ms / 146ms before on the same test setup. These
+approximate timings include different numbers of birds actually found, and are not
+phone benchmarks. There were no wrong suggestions in the final 24 fixture cases.
+Small robin/cardinal and some dove crops remain uncertain; the tiniest goldfinch is
+still undetected. Blue Jay naming is still unsupported by the model.
+
+Existing off-center distance checks found all 160/96/72px robin scenes, kept one final
+outline per scene and rejected a blank gray frame, with same-origin GET-only traffic.
+Real-device heat, sustained speed and release accuracy gates remain unverified.
+
+The final movement regression retained the same named outline in all 80 samples, with
+223 successful motion updates over roughly eight seconds (about 28Hz), one fresh
+classification, mean center deviation 7.9px and maximum 33.4px. Motion-worker compute
+averaged 1.0ms on desktop. The camera removal and same-origin traffic assertions passed.

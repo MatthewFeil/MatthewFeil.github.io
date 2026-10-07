@@ -1,15 +1,18 @@
-import { BirdTracker, projectBox } from './birds-core.mjs?v=20261006-responsive1';
+import { BirdTracker, projectBox, iou as overlap } from './birds-core.mjs?v=20261007-small2';
+import {advanceByMotion} from './birds-motion.mjs?v=20261007-small2';
 const app=document.querySelector('[data-birds-app]');
 const video=app.querySelector('video'),stage=app.querySelector('.birds-stage'),overlays=app.querySelector('.birds-overlays');
 const welcome=app.querySelector('.birds-welcome'),message=app.querySelector('.birds-message'),toolbar=app.querySelector('.birds-toolbar');
 const start=app.querySelector('.birds-start'),stop=app.querySelector('.birds-stop'),status=app.querySelector('.birds-status');
 const selector=app.querySelector('#birds-model'),timing=app.querySelector('.birds-timing');
 const tracker=new BirdTracker(10000),overlayNodes=new Map();
+const motionCanvas=document.createElement('canvas'),motionCtx=motionCanvas.getContext('2d',{willReadFrequently:true});
+let motionWorker,motionPending=false,motionTimer,motionSnapshot=[],motionRate=40;
 let stream,worker,generation=0,ready=false,pending=false,timer,watchdog,overlayExpiry,lastResult=0,lastLatency=500,species=new Map(),tracks=[];
 const expiry=()=>Math.min(10000,Math.max(3000,lastLatency*2+500));
 function setStatus(text) {if(status.textContent!==text) status.textContent=text;}
 function clearAnalysis() {
-  generation++;clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
+  generation++;clearTimeout(motionTimer);motionWorker?.terminate();motionWorker=null;motionPending=false;motionSnapshot=[];clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
   ready=false;pending=false;tracker.clear();tracks=[];overlays.replaceChildren();overlayNodes.clear();timing.textContent='';
 }
 function render() {
@@ -48,14 +51,60 @@ function halt(text='Camera images stay on your device.',resume=false) {
   start.disabled=false;start.textContent=resume?'Resume camera':'Start camera';message.textContent=text;
 }
 function fail(text) {clearAnalysis();setStatus(`Camera only. ${text}`);}
+function startMotion(token) {
+  motionWorker=new Worker(new URL('./birds-motion-worker.mjs?v=20261007-small2',import.meta.url),{type:'module'});
+  motionWorker.onmessage=({data})=>{
+    if(token!==generation)return;
+    motionPending=false;
+    if(performance.now()-data.timestamp<200) {
+      for(const update of data.updates) {
+        const track=tracks.find(t=>t.id===update.id);
+        if(track && !update.lost && performance.now()-track.seen<1200) {
+          track.box=track.box.map((v,i)=>Math.max(0,Math.min(1,v+(i%2?update.dy:update.dx))));
+          track.flowDx=(track.flowDx||0)+update.dx;track.flowDy=(track.flowDy||0)+update.dy;
+        }
+        if(track && update.lost)track.motionLost=true;
+        else if(track)track.motionLost=false;
+      }
+      tracks=tracks.filter(t=>performance.now()-t.seen<1200);tracker.tracks=tracks;render();
+    }
+    motionRate=Math.max(33,Math.min(100,data.latencyMs*2));
+    motionTimer=setTimeout(()=>motionFrame(token),Math.max(0,motionRate-data.latencyMs));
+  };
+  motionWorker.onerror=()=>{motionWorker?.terminate();motionWorker=null;motionPending=false;};
+  motionFrame(token);
+}
+function motionFrame(token) {
+  if(token!==generation || !motionWorker || !stream)return;
+  if(video.readyState>=2 && !motionPending) {
+    const ratio=480/Math.max(video.videoWidth,video.videoHeight),width=Math.round(video.videoWidth*ratio),height=Math.round(video.videoHeight*ratio);
+    if(motionCanvas.width!==width)motionCanvas.width=width;if(motionCanvas.height!==height)motionCanvas.height=height;
+    motionCtx.drawImage(video,0,0,width,height);
+    const rgba=motionCtx.getImageData(0,0,width,height).data;
+    motionPending=true;motionWorker.postMessage({type:'frame',rgba,width,height,timestamp:performance.now(),tracks:tracks.map(t=>({id:t.id,box:t.box}))},[rgba.buffer]);
+  } else motionTimer=setTimeout(()=>motionFrame(token),40);
+}
+function reconcile(detections,timestamp,geometryOnly=false) {
+  const adjusted=detections.map(d=>{
+    const anchor=motionSnapshot.filter(t=>!t.used).map(t=>({t,score:overlap(t.box,d.box)})).sort((a,b)=>b.score-a.score)[0];
+    const current=anchor && tracks.find(t=>t.id===anchor.t.id);
+    if(current && !current.motionLost && anchor.score>.2) {
+      anchor.t.used=true;return {...d,trackId:current.id,box:advanceByMotion(d.box,anchor.t,current)};
+    }
+    return d;
+  });
+  motionSnapshot.forEach(t=>t.used=false);
+  tracks=tracker.update(adjusted,timestamp,geometryOnly,650);render();
+}
 async function frame(token) {
   if(token!==generation || !ready || !stream) return;
   if(!pending && video.readyState>=2) {
     pending=true;
     try {
-      const capturedAt=performance.now(),bitmap=await createImageBitmap(video);
+      const capturedAt=performance.now();motionSnapshot=tracks.map(t=>({id:t.id,cacheId:t.cacheId,box:[...t.box],flowDx:t.flowDx||0,flowDy:t.flowDy||0}));
+      const bitmap=await createImageBitmap(video);
       if(token!==generation || !worker) {bitmap.close();return;}
-      worker.postMessage({type:'frame',bitmap,timestamp:capturedAt},[bitmap]);
+      worker.postMessage({type:'frame',bitmap,timestamp:capturedAt,tracks:motionSnapshot.map(t=>({cacheId:t.cacheId,box:t.box}))},[bitmap]);
       watchdog=setTimeout(()=>fail('Analysis took too long. Switch models or stop and retry.'),45000);
     } catch {pending=false;setStatus('Frame unavailable. Hold steady.');}
   }
@@ -65,20 +114,20 @@ async function frame(token) {
 function loadOption() {
   clearAnalysis();const token=generation;
   setStatus('Loading selected local model…');
-  worker=new Worker(new URL('./birds-worker.mjs?v=20261006-responsive1',import.meta.url),{type:'module'});
+  worker=new Worker(new URL('./birds-worker.mjs?v=20261007-small2',import.meta.url),{type:'module'});
   worker.onmessage=({data})=>{
     if(token!==generation) return;
     if(data.type==='progress') setStatus(data.message);
     else if(data.type==='ready') {
       clearTimeout(watchdog);species=new Map(data.species.map(s=>[s.id,s]));ready=true;lastResult=performance.now();lastLatency=500;
-      setStatus(selector.value==='detect'?'Aim at a bird · outlines only':'Aim at a bird');frame(token);
+      setStatus(selector.value==='detect'?'Aim at a bird · outlines only':'Aim at a bird');startMotion(token);frame(token);
     } else if(data.type==='geometry') {
       if(performance.now()-data.timestamp>1500 || data.width!==video.videoWidth || data.height!==video.videoHeight)return;
-      lastResult=performance.now();tracks=tracker.update(data.detections,data.timestamp,true);render();
+      lastResult=performance.now();reconcile(data.detections,data.timestamp,true);
     } else if(data.type==='result') {
-      clearTimeout(watchdog);pending=false;timer=setTimeout(()=>frame(token),Math.max(0,120-data.latencyMs));
+      clearTimeout(watchdog);pending=false;timer=setTimeout(()=>frame(token),Math.max(0,(tracks.length?220:120)-data.latencyMs));
       if(performance.now()-data.timestamp>10000 || data.width!==video.videoWidth || data.height!==video.videoHeight) {tracks=[];tracker.clear();overlays.replaceChildren();return;}
-      lastResult=performance.now();lastLatency=data.latencyMs;tracks=tracker.update(data.detections,data.timestamp);render();
+      lastResult=performance.now();lastLatency=data.latencyMs;reconcile(data.detections,data.timestamp);
       timing.textContent=`Last analysis: ${(data.latencyMs/1000).toFixed(2)} s`;
       const names=[...new Set(tracks.map(t=>species.get(t.speciesId)?.commonName).filter(Boolean))];
       setStatus(names.length?`Tentative: ${names.join(', ')}`:tracks.length?(selector.value==='detect'?'Bird detected · outlines only':'Bird detected · hold steady'):'Aim at a bird');

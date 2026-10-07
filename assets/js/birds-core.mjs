@@ -30,18 +30,19 @@ export function suppress(detections, threshold = .45) {
 }
 export class BirdTracker {
   constructor(maxGapMs = 1200) { this.tracks = []; this.nextId = 1; this.maxGapMs = maxGapMs; }
-  update(detections, timestamp, geometryOnly = false) {
+  update(detections, timestamp, geometryOnly = false, keepMissingMs = 0) {
     const previous = this.tracks.filter(t => timestamp - t.seen <= this.maxGapMs), used = new Set();
     this.tracks = detections.map(d => {
-      let match, overlap = .25;
-      for (const t of previous) if (!used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
+      let match = previous.find(t=>!used.has(t.id)&&t.id===d.trackId), overlap = .25;
+      for (const t of previous) if (!d.trackId && !used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
       if (match) used.add(match.id);
       const evidence = !geometryOnly && d.classificationFresh !== false;
       const history = evidence ? [...(match?.history || []), d.speciesId || null].slice(-4) : [...(match?.history || [])];
       const suggestion = geometryOnly ? match?.speciesId : d.speciesId;
       const speciesId = suggestion && history.filter(id => id === suggestion).length >= 3 ? suggestion : null;
-      return { ...d, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
+      return { ...d, cacheId:d.cacheId ?? match?.cacheId, flowDx:match?.flowDx||0, flowDy:match?.flowDy||0, motionLost:false, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
     });
+    if(keepMissingMs) this.tracks.push(...previous.filter(t=>!used.has(t.id)&&!t.motionLost&&timestamp-t.seen<=keepMissingMs));
     return this.tracks;
   }
   clear() { this.tracks = []; }
@@ -73,6 +74,11 @@ export function experimentOption(manifest, id) {
   }
   if (manifest.detector.format!=='yolox' || manifest.detector.birdClass!==14 || manifest.detector.strides?.join(',')!=='8,16,32') throw new Error('Unsupported experimental detector.');
   if (option.classifier && (!manifest.species.length || manifest.species.some(s=>!s.id||!s.commonName) || new Set(manifest.species.map(s=>s.id)).size!==manifest.species.length || !(option.classifier.margin>=0&&option.classifier.margin<=1))) throw new Error('Invalid experimental species labels.');
+  const scope=manifest.identificationScope;
+  if(scope) {
+    const known=new Set(manifest.species.map(s=>s.id));
+    if(scope.id!=='common-north-america' || !Array.isArray(scope.allowedSpeciesIds) || !scope.allowedSpeciesIds.length || new Set(scope.allowedSpeciesIds).size!==scope.allowedSpeciesIds.length || scope.allowedSpeciesIds.some(id=>!known.has(id)))throw new Error('Invalid regional species list.');
+  }
   return option;
 }
 export function decodeYolox(data, config, sourceWidth, sourceHeight) {
@@ -96,7 +102,11 @@ export function decodeYolox(data, config, sourceWidth, sourceHeight) {
 
 // Square overlapping windows preserve more detector pixels than a full landscape frame.
 export function searchWindows(width, height) {
-  const windows=[];
+  // The camera view crops toward the center; search there at useful magnifications first.
+  const windows=[.35,.18,.10,.65].map(fraction=>{
+    const side=Math.max(1,Math.round(Math.min(width,height)*fraction));
+    return [Math.round((width-side)/2),Math.round((height-side)/2),side,side];
+  });
   for(const fraction of [.65,.35]) {
     const side=Math.max(1,Math.round(Math.min(width,height)*fraction));
     const positions=length=>{
@@ -130,4 +140,16 @@ export function cropSharpness(rgba,width,height) {
     sum+=v;squares+=v*v;count++;
   }
   return count?Math.max(0,squares/count-(sum/count)**2):0;
+}
+
+// Retain competition from all model classes. Masking/renormalizing would inflate confidence.
+export function scopedSpeciesSuggestion(scores,species,config,allowedIds) {
+  if(scores.length!==species.length)throw new Error('Classifier labels do not match its output.');
+  let best=-1,top=-Infinity,second=-Infinity;
+  for(let i=0;i<scores.length;i++) {
+    const value=scores[i];if(!Number.isFinite(value))return null;
+    if(value>top){second=top;top=value;best=i;}else if(value>second)second=value;
+  }
+  const id=species[best]?.id;
+  return id && (!allowedIds || allowedIds.has(id)) && top>=config.threshold && top-second>=config.margin?id:null;
 }
