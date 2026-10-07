@@ -1757,6 +1757,16 @@ table {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  .site-footer-details {
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .site-footer-details .keyboard-navigation-toggle {
+    margin-left: 0;
+    text-align: left;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
