@@ -42,7 +42,7 @@ Other previously reviewed noncommercial/NABirds-based classifiers remain exclude
   Upstream EfficientNet `include_top` normalizes a second time: effective std is
   source std squared. This detail is essential; do not use the old generic adapter.
 - Classify up to three detections per frame, adding 5% crop context and rejecting tiny
-  crops. Initial uncalibrated experimental thresholds: .30 detector, .65 classifier,
+  crops below 24 pixels in their shortest source dimension. Initial uncalibrated experimental thresholds: .30 detector, .65 classifier,
   .20 top-two margin. Raw model scores are not presented as accuracy percentages.
 - Three agreeing recent classifications yield a tentative name; slow-device tracking
   tolerates longer inference intervals. Never force a name for an uncertain result.
@@ -60,6 +60,50 @@ local testing separately; production approval is not fabricated or silently waiv
 No AI APIs, image uploads, analytics or telemetry. Only same-origin static downloads.
 There is no service worker, so offline availability is not promised.
 
+## Distant-bird experiment
+
+Camera capture now requests 3840x2160 at 30fps (ideal, with a 30fps maximum); browsers
+may provide a lower resolution. Full-frame detection runs at most every 500ms while tracking birds; empty scenes
+start with a full-frame scan. Additional square
+windows at 65% and 35% of the frame's shorter dimension, with at least 25% overlap.
+Windows rotate across frames. Previously found birds are re-detected in tighter
+windows on the next frame; old boxes are never returned without fresh detection.
+Tile coordinates map back to the original camera frame before global NMS and species
+cropping. Interior-edge truncated detections are discarded. The detector remains
+416x416, and species crops remain 260x260 from the original capture.
+
+Each analysis advances 1–2 search tiles, chosen from recent detector latency (roughly
+90ms target for search work), plus scans needed to re-detect tracked birds. Geometry
+messages arrive before species analysis. The UI starts the next capture when the
+worker completes, with a minimum 120ms interval and no queued camera frames. Existing
+outlines and labels are reused instead of rebuilding DOM nodes, and position smoothing
+weights current detections more heavily. Tensor input buffers and preprocessing canvases
+are reused to reduce allocation pressure. Camera preview requests 30fps independently.
+Discovery still covers both tile scales, but takes more frames than the earlier seven-pass
+version. Higher capture resolution and sustained analysis may increase battery/heat.
+
+A 64x64 crop's luminance-Laplacian variance measures relative sharpness. After two
+samples, species analysis skips crops below 70% of recent peak sharpness; the baseline
+resets after two seconds so changing scenes do not block identification indefinitely.
+No older camera image is stored or used in place of the current frame. At most one
+bird is classified per frame, selecting the oldest classification first; each bird
+waits at least 800ms between classifications. Suggestions expire after two seconds.
+Cached suggestions and geometry updates do not count as independent confirmations:
+a tentative label still requires three real agreeing classifier results.
+
+Classifier resizing uses high-quality browser smoothing for source crops whose shortest
+dimension is 64–160 pixels. Other sizes keep the source nearest-neighbor preprocessing.
+On the one robin fixture, smooth resizing helped a moderately small crop, but an even
+smaller crop gave an incorrect species; smoothing is therefore restricted. These are
+experimental thresholds, not evidence of an overall accuracy improvement.
+
+`tests/birds-distance-browser.cjs` uses the same labeled photo at 160, 96 and 72 pixels
+wide in a 1920x1080 gray scene and a blank scene, with real local ONNX inference.
+Set BIRDS_ROBIN_PHOTO, PLAYWRIGHT_MODULE_PATH and PLAYWRIGHT_EXECUTABLE_PATH as for the
+model test. Optional BIRDS_BASELINE_WORKER points to a saved pre-change worker for
+comparison; optional BIRDS_DISTANCE_REPORT saves JSON results. These are controlled
+synthetic small-image tests, not measured field distances or broad accuracy validation.
+
 ## What was tested
 
 Production Jekyll build, JS/Python syntax and focused geometry/YOLOX/release-gate tests.
@@ -73,10 +117,17 @@ synthetic browser camera feed:
 https://commons.wikimedia.org/wiki/File:American_Robin_Closeup.jpg
 
 Full precision displayed American Robin, Smaller drew an uncertain bird, and Detection
-only drew Bird. Illustrative last-frame desktop-browser timings were .19s, .16s and
-.03s respectively. These are smoke-test observations, not an accuracy benchmark or
+only drew Bird after distance scanning was added. Illustrative last-frame desktop-browser
+timings were .29s, .44s and .08s respectively. These are smoke-test observations, not an accuracy benchmark or
 phone performance guarantee. Test photo stays outside shipped website assets.
 No page errors, remote requests or uploads occurred in that comparison.
+
+Cold-start distance comparison on the 1920x1080 synthetic scene: the previous full-frame
+pass missed the robin at all three photo sizes (160, 96, 72 pixels). The new detector
+found each: detections on 12/12, 9/12 and 9/12 analyzed frames respectively, with about
+102–107ms mean detection-only work per frame on desktop Chrome. Each final result had
+one aligned outline, and blank frames returned no birds. Species accuracy at those
+sizes was not established. This does not imply a range in meters or phone timing.
 
 `tests/birds-models-browser.cjs` repeats real inference when BIRDS_ROBIN_PHOTO points to
 that local labeled image. It operates on BIRDS_MODEL_URL (default localhost:4001).
@@ -98,3 +149,22 @@ Before a validated commercial/public release: independent held-out accuracy and 
 species tests, 90% confident precision / 70% clear-species coverage targets, end-to-end
 stable suggestions within 3s, image-level provenance review and real iPhone/Android
 10-minute heat/memory/performance tests remain required. None are claimed complete.
+
+## Responsiveness comparison (2026-10-06)
+
+On the same 640x640 synthetic robin camera feed, six-second desktop Chrome samples with
+the Smaller model measured 1.83 outline updates/sec and 447ms average result age in the
+previous distance-scanning version, versus 7.17 updates/sec and 97ms in this revision.
+The responsive version sends outlines before classification and ran seven fresh
+classifications across 42 completed frames. These figures are desktop observations,
+not phone or ten-minute-session evidence. Individual displayed analysis times can
+exclude classification when a recent suggestion is reused.
+
+The revised distance fixture still found all three small images (160, 96, 72 pixels),
+with one final outline apiece; blank scenes remained empty. Detection-only work averaged
+48–51ms per frame in that run. No uploads or remote inference requests occurred.
+
+Sharpness unit checks distinguish sharp edges, uniform crops and blurred edges. In an
+additional camera fixture, mild blur remained usable and was classified; stronger blur
+caused YOLOX to lose the bird before the crop gate could act. The sharpness gate does
+not solve detection under defocus, and phone-level benefit remains unverified.

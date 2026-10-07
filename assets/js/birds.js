@@ -1,34 +1,45 @@
-import { BirdTracker, projectBox } from './birds-core.mjs?v=20261006-models3';
+import { BirdTracker, projectBox } from './birds-core.mjs?v=20261006-responsive1';
 const app=document.querySelector('[data-birds-app]');
 const video=app.querySelector('video'),stage=app.querySelector('.birds-stage'),overlays=app.querySelector('.birds-overlays');
 const welcome=app.querySelector('.birds-welcome'),message=app.querySelector('.birds-message'),toolbar=app.querySelector('.birds-toolbar');
 const start=app.querySelector('.birds-start'),stop=app.querySelector('.birds-stop'),status=app.querySelector('.birds-status');
 const selector=app.querySelector('#birds-model'),timing=app.querySelector('.birds-timing');
-const tracker=new BirdTracker(10000);
-let stream,worker,generation=0,ready=false,pending=false,timer,watchdog,lastResult=0,lastLatency=500,species=new Map(),tracks=[];
+const tracker=new BirdTracker(10000),overlayNodes=new Map();
+let stream,worker,generation=0,ready=false,pending=false,timer,watchdog,overlayExpiry,lastResult=0,lastLatency=500,species=new Map(),tracks=[];
 const expiry=()=>Math.min(10000,Math.max(3000,lastLatency*2+500));
 function setStatus(text) {if(status.textContent!==text) status.textContent=text;}
 function clearAnalysis() {
-  generation++;clearTimeout(timer);clearTimeout(watchdog);worker?.terminate();worker=null;
-  ready=false;pending=false;tracker.clear();tracks=[];overlays.replaceChildren();timing.textContent='';
+  generation++;clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
+  ready=false;pending=false;tracker.clear();tracks=[];overlays.replaceChildren();overlayNodes.clear();timing.textContent='';
 }
 function render() {
-  overlays.replaceChildren();
-  if(!video.videoWidth || performance.now()-lastResult>expiry()) return;
+  if(!video.videoWidth || performance.now()-lastResult>expiry()) {overlays.replaceChildren();overlayNodes.clear();return;}
+  clearTimeout(overlayExpiry);overlayExpiry=setTimeout(render,Math.max(16,expiry()-(performance.now()-lastResult)+20));
+  const active=new Set();
   const width=stage.clientWidth,height=stage.clientHeight,bottom=height-toolbar.offsetHeight;
   const top=app.querySelector('.birds-modelbar').getBoundingClientRect().bottom-stage.getBoundingClientRect().top;
   for(const track of tracks) {
     const rect=projectBox(track.box,video.videoWidth,video.videoHeight,width,height);
     if(!rect || rect.y>=bottom) continue;
-    const box=document.createElement('div');box.className='birds-box';
+    active.add(track.id);
+    let nodes=overlayNodes.get(track.id);
+    if(!nodes || !nodes.box.isConnected) {
+      const box=document.createElement('div'),label=document.createElement('span');
+      box.className='birds-box';label.className='birds-label';overlays.append(box,label);
+      nodes={box,label,text:null,width:0,height:0,viewport:0};overlayNodes.set(track.id,nodes);
+    }
+    const {box,label}=nodes;
     Object.assign(box.style,{left:`${rect.x}px`,top:`${rect.y}px`,width:`${rect.width}px`,height:`${Math.min(rect.height,bottom-rect.y)}px`});
-    const label=document.createElement('span');label.className='birds-label';
     const name=species.get(track.speciesId)?.commonName;
-    label.textContent=name?`${name} · tentative`:selector.value==='detect'?'Bird':track.speciesId===null && track.history.some(Boolean)?'Bird · identifying':'Bird · uncertain';
-    overlays.append(box,label);label.style.maxWidth=`${Math.min(256,width)}px`;
-    label.style.left=`${Math.max(0,Math.min(rect.x,width-label.offsetWidth))}px`;
-    label.style.top=`${Math.max(top,Math.min(rect.y-label.offsetHeight,bottom-label.offsetHeight))}px`;
+    const text=name?`${name} · tentative`:selector.value==='detect'?'Bird':track.speciesId===null && track.history.some(Boolean)?'Bird · identifying':'Bird · uncertain';
+    if(nodes.text!==text || nodes.viewport!==width) {
+      label.textContent=text;label.style.maxWidth=`${Math.min(256,width)}px`;
+      nodes.text=text;nodes.viewport=width;nodes.width=label.offsetWidth;nodes.height=label.offsetHeight;
+    }
+    label.style.left=`${Math.max(0,Math.min(rect.x,width-nodes.width))}px`;
+    label.style.top=`${Math.max(top,Math.min(rect.y-nodes.height,bottom-nodes.height))}px`;
   }
+  for(const [id,nodes] of overlayNodes)if(!active.has(id)){nodes.box.remove();nodes.label.remove();overlayNodes.delete(id);}
 }
 function halt(text='Camera images stay on your device.',resume=false) {
   clearAnalysis();
@@ -42,27 +53,30 @@ async function frame(token) {
   if(!pending && video.readyState>=2) {
     pending=true;
     try {
-      const bitmap=await createImageBitmap(video);
+      const capturedAt=performance.now(),bitmap=await createImageBitmap(video);
       if(token!==generation || !worker) {bitmap.close();return;}
-      worker.postMessage({type:'frame',bitmap,timestamp:performance.now()},[bitmap]);
+      worker.postMessage({type:'frame',bitmap,timestamp:capturedAt},[bitmap]);
       watchdog=setTimeout(()=>fail('Analysis took too long. Switch models or stop and retry.'),45000);
     } catch {pending=false;setStatus('Frame unavailable. Hold steady.');}
   }
   if(performance.now()-lastResult>expiry()) {tracks=[];overlays.replaceChildren();}
-  timer=setTimeout(()=>frame(token),500);
+  if(!pending) timer=setTimeout(()=>frame(token),120);
 }
 function loadOption() {
   clearAnalysis();const token=generation;
   setStatus('Loading selected local model…');
-  worker=new Worker(new URL('./birds-worker.mjs?v=20261006-models3',import.meta.url),{type:'module'});
+  worker=new Worker(new URL('./birds-worker.mjs?v=20261006-responsive1',import.meta.url),{type:'module'});
   worker.onmessage=({data})=>{
     if(token!==generation) return;
     if(data.type==='progress') setStatus(data.message);
     else if(data.type==='ready') {
       clearTimeout(watchdog);species=new Map(data.species.map(s=>[s.id,s]));ready=true;lastResult=performance.now();lastLatency=500;
       setStatus(selector.value==='detect'?'Aim at a bird · outlines only':'Aim at a bird');frame(token);
+    } else if(data.type==='geometry') {
+      if(performance.now()-data.timestamp>1500 || data.width!==video.videoWidth || data.height!==video.videoHeight)return;
+      lastResult=performance.now();tracks=tracker.update(data.detections,data.timestamp,true);render();
     } else if(data.type==='result') {
-      clearTimeout(watchdog);pending=false;
+      clearTimeout(watchdog);pending=false;timer=setTimeout(()=>frame(token),Math.max(0,120-data.latencyMs));
       if(performance.now()-data.timestamp>10000 || data.width!==video.videoWidth || data.height!==video.videoHeight) {tracks=[];tracker.clear();overlays.replaceChildren();return;}
       lastResult=performance.now();lastLatency=data.latencyMs;tracks=tracker.update(data.detections,data.timestamp);render();
       timing.textContent=`Last analysis: ${(data.latencyMs/1000).toFixed(2)} s`;
@@ -78,7 +92,7 @@ async function begin() {
   halt();const token=generation;start.disabled=true;message.textContent='Starting camera…';
   if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {halt('Camera access needs HTTPS and a supported browser.');return;}
   try {
-    const camera=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+    const camera=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160},frameRate:{ideal:30,max:30}}});
     if(token!==generation) {camera.getTracks().forEach(t=>t.stop());return;}
     stream=camera;video.srcObject=camera;await video.play();
     if(token!==generation) return;

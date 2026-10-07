@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox} from '../assets/js/birds-core.mjs';
+import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness} from '../assets/js/birds-core.mjs';
 // Portrait crop: horizontal source edges are outside view; middle bird remains aligned.
 assert.equal(projectBox([0,0,.1,1],1920,1080,390,844),null);
 const r=projectBox([.4,.3,.6,.6],1920,1080,390,844);
@@ -29,3 +29,38 @@ const decoded=decodeYolox(raw,yolox,832,416);
 assert.equal(decoded.length,1);assert.ok(Math.abs(decoded[0].box[0]-40/416)<1e-6);
 assert.throws(()=>experimentOption({experimental:{enabled:false}},'small'),/disabled/);
 console.log('YOLOX decoding and slower-device stabilization passed.');
+
+for(const [width,height] of [[3840,2160],[2160,3840],[640,640]]) {
+ const windows=searchWindows(width,height);
+ for(const [x,y,w,h] of windows) {assert.ok(x>=0&&y>=0&&x+w<=width&&y+h<=height);assert.equal(w,h);}
+ for(let y=0;y<=height;y+=height/20) for(let x=0;x<=width;x+=width/20) {
+   assert.ok(windows.some(([a,b,w,h])=>x>=a&&x<=a+w&&y>=b&&y<=b+h),'Every scene position must be searched');
+ }
+ const win=trackingWindow([.95,.95,1,1],width,height);
+ assert.ok(win[0]+win[2]<=width&&win[1]+win[3]<=height);
+}
+assert.deepEqual(mapWindowDetection({box:[.2,.3,.8,.9],score:.9},[100,200,400,400],1000,1000).box,[.18,.32,.42,.56]);
+assert.equal(mapWindowDetection({box:[0,.3,.8,.9]},[100,200,400,400],1000,1000),null);
+assert.ok(mapWindowDetection({box:[0,.3,.8,.9]},[0,0,400,400],1000,1000));
+assert.equal(suppress([{box:[.18,.32,.42,.56],score:.8},mapWindowDetection({box:[.2,.3,.8,.9],score:.9},[100,200,400,400],1000,1000)]).length,1);
+console.log('Distance scan coverage, tile-edge handling, tracking crops and duplicate suppression passed.');
+
+const evidenceTracker=new BirdTracker(10000);
+evidenceTracker.update([detection],0);
+for(let i=1;i<5;i++)assert.equal(evidenceTracker.update([{...detection,classificationFresh:false}],i*100)[0].speciesId,null);
+evidenceTracker.update([detection],800);
+assert.equal(evidenceTracker.update([detection],1600)[0].speciesId,'robin');
+assert.equal(evidenceTracker.update([{box:detection.box}],1700,true)[0].speciesId,'robin');
+const flat=new Uint8ClampedArray(32*32*4).fill(128),edges=flat.slice();
+for(let y=0;y<32;y++)for(let x=0;x<32;x++)for(let c=0;c<3;c++)edges[(y*32+x)*4+c]=((x>>2)+(y>>2))%2?255:0;
+assert.equal(cropSharpness(flat,32,32),0);
+assert.ok(cropSharpness(edges,32,32)>1000);
+console.log('Sharpness signal and fresh-classification-only stabilization passed.');
+
+const blurred=edges.slice();
+for(let y=1;y<31;y++)for(let x=1;x<31;x++)for(let c=0;c<3;c++) {
+ let sum=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)sum+=edges[((y+dy)*32+x+dx)*4+c];
+ blurred[(y*32+x)*4+c]=sum/9;
+}
+assert.ok(cropSharpness(blurred,32,32)<cropSharpness(edges,32,32)*.7);
+console.log('Blurred crop falls below the relative sharpness threshold.');

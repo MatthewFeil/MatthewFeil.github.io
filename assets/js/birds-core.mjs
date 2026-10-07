@@ -30,15 +30,17 @@ export function suppress(detections, threshold = .45) {
 }
 export class BirdTracker {
   constructor(maxGapMs = 1200) { this.tracks = []; this.nextId = 1; this.maxGapMs = maxGapMs; }
-  update(detections, timestamp) {
+  update(detections, timestamp, geometryOnly = false) {
     const previous = this.tracks.filter(t => timestamp - t.seen <= this.maxGapMs), used = new Set();
     this.tracks = detections.map(d => {
       let match, overlap = .25;
       for (const t of previous) if (!used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
       if (match) used.add(match.id);
-      const history = [...(match?.history || []), d.speciesId || null].slice(-4);
-      const speciesId = d.speciesId && history.filter(id => id === d.speciesId).length >= 3 ? d.speciesId : null;
-      return { ...d, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .65*v + .35*match.box[i]) : d.box };
+      const evidence = !geometryOnly && d.classificationFresh !== false;
+      const history = evidence ? [...(match?.history || []), d.speciesId || null].slice(-4) : [...(match?.history || [])];
+      const suggestion = geometryOnly ? match?.speciesId : d.speciesId;
+      const speciesId = suggestion && history.filter(id => id === suggestion).length >= 3 ? suggestion : null;
+      return { ...d, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
     });
     return this.tracks;
   }
@@ -90,4 +92,42 @@ export function decodeYolox(data, config, sourceWidth, sourceHeight) {
   }
   if(row*85!==data.length) throw new Error('Unexpected detector output shape.');
   return suppress(found);
+}
+
+// Square overlapping windows preserve more detector pixels than a full landscape frame.
+export function searchWindows(width, height) {
+  const windows=[];
+  for(const fraction of [.65,.35]) {
+    const side=Math.max(1,Math.round(Math.min(width,height)*fraction));
+    const positions=length=>{
+      const count=Math.max(1,Math.ceil((length-side)/(side*.75)));
+      return Array.from({length:count+1},(_,i)=>Math.round((length-side)*i/count));
+    };
+    for(const y of positions(height)) for(const x of positions(width)) windows.push([x,y,side,side]);
+  }
+  return windows;
+}
+export function mapWindowDetection(detection, window, width, height) {
+  const [x,y,w,h]=window,b=detection.box;
+  // Reject cut-off birds at interior tile edges; overlapping windows cover those edges.
+  if((x>0&&b[0]<.015)||(y>0&&b[1]<.015)||(x+w<width&&b[2]>.985)||(y+h<height&&b[3]>.985)) return null;
+  return {...detection,box:[(x+b[0]*w)/width,(y+b[1]*h)/height,(x+b[2]*w)/width,(y+b[3]*h)/height]};
+}
+export function trackingWindow(box,width,height) {
+  const side=Math.min(Math.min(width,height),Math.max(Math.min(width,height)*.18,(box[2]-box[0])*width*2,(box[3]-box[1])*height*2));
+  const x=Math.max(0,Math.min(width-side,(box[0]+box[2])*width/2-side/2));
+  const y=Math.max(0,Math.min(height-side,(box[1]+box[3])*height/2-side/2));
+  return [Math.round(x),Math.round(y),Math.round(side),Math.round(side)];
+}
+
+// Variance of the luminance Laplacian on a small crop: relative blur signal, not accuracy.
+export function cropSharpness(rgba,width,height) {
+  const gray=new Float32Array(width*height);
+  for(let i=0;i<gray.length;i++)gray[i]=.299*rgba[i*4]+.587*rgba[i*4+1]+.114*rgba[i*4+2];
+  let sum=0,squares=0,count=0;
+  for(let y=1;y<height-1;y++)for(let x=1;x<width-1;x++) {
+    const i=y*width+x,v=gray[i-1]+gray[i+1]+gray[i-width]+gray[i+width]-4*gray[i];
+    sum+=v;squares+=v*v;count++;
+  }
+  return count?Math.max(0,squares/count-(sum/count)**2):0;
 }
