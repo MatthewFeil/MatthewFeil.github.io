@@ -39,13 +39,20 @@ function render() {
     const {box,label}=nodes;
     Object.assign(box.style,{left:`${rect.x}px`,top:`${rect.y}px`,width:`${rect.width}px`,height:`${Math.min(rect.height,bottom-rect.y)}px`});
     const name=species.get(track.speciesId)?.commonName;
-    const text=name?`${name} · tentative`:selector.value==='detect'?'Bird':track.speciesId===null && track.history.some(Boolean)?'Bird · identifying':'Bird · uncertain';
+    // Geometry-only updates retain history: a missing result is still identifying,
+    // while an explicit null classification means the last attempt was inconclusive.
+    const state=selector.value==='detect'?'detected':name?'identified':track.history.length && track.history.at(-1)===null?'uncertain':'identifying';
+    if(box.dataset.state!==state) box.dataset.state=state;
+    const text=state==='identified'?name:'';
+    label.hidden=!text;
     if(nodes.text!==text || nodes.viewport!==width) {
       label.textContent=text;label.style.maxWidth=`${Math.min(256,width)}px`;
       nodes.text=text;nodes.viewport=width;nodes.width=label.offsetWidth;nodes.height=label.offsetHeight;
     }
-    label.style.left=`${Math.max(0,Math.min(rect.x,width-nodes.width))}px`;
-    label.style.top=`${Math.max(top,Math.min(rect.y-nodes.height,bottom-nodes.height))}px`;
+    if(text) {
+      label.style.left=`${Math.max(0,Math.min(rect.x,width-nodes.width))}px`;
+      label.style.top=`${Math.max(top,Math.min(rect.y-nodes.height,bottom-nodes.height))}px`;
+    }
   }
   for(const [id,nodes] of overlayNodes)if(!active.has(id)){nodes.box.remove();nodes.label.remove();overlayNodes.delete(id);}
 }

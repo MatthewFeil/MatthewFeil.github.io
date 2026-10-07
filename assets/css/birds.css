@@ -33,6 +33,10 @@ body.birds-running > .site-header, body.birds-running > .site-footer, body.birds
 .birds-running .birds-app > h1 { display: none; }
 .birds-running .birds-stage { position: fixed; inset: 0; z-index: 1000; height: 100dvh; min-height: 0; border: 0; }
 .birds-box { position: absolute; border: 2px solid #ff343d; outline: 1px solid #000; }
+.birds-box[data-state="identifying"] { animation: birds-identifying-pulse 1.4s ease-in-out infinite; }
+.birds-box[data-state="uncertain"] { border-color: #a7a7a7; }
+@keyframes birds-identifying-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .birds-box[data-state="identifying"] { animation: none; border-style: dashed; } }
 .birds-label { position: absolute; background: #000; color: #fff; padding: .4rem .55rem; max-width: min(16rem, 85vw); box-sizing: border-box; font: 700 .95rem/1.25 var(--font-ui); overflow-wrap: anywhere; }
 @media (max-width: 720px) { .birds-stage { height: 65dvh; } }
 
