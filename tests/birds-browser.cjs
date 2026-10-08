@@ -61,7 +61,7 @@ const server = http.createServer((req,res) => {
     assert.ok(requests.every(r=>r.url.startsWith(origin+'/') && r.method==='GET' && !r.body));
     const html=fs.readFileSync(path.join(root,'birds/index.html'),'utf8');
     assert.ok(!html.includes('cloudflareinsights') && !html.includes('googletagmanager'));
-    assert.ok(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('cloudflareinsights'));
+    assert.ok(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('analytics-consent.js'));
     assert.ok(!fs.readFileSync(path.join(root,'work/index.html'),'utf8').includes('href="/birds/"'));
     console.log(JSON.stringify({viewports:4, camera:'synthetic Chromium camera', lifecycle:'start/stop/resume/interruption/permission denial', network:'only same-origin GETs, no uploads', errors},null,2));
   } finally {await browser?.close();await new Promise(resolve=>server.close(resolve));}

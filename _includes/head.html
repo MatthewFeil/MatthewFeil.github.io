@@ -31,9 +31,7 @@
     {% endfor %}
   {% endif %}
   {% feed_meta %}
-  {%- if jekyll.environment == 'production' and site.google_analytics and page.no_analytics != true -%}
-    {%- include google-analytics.html -%}
-  {%- endif -%}
+  {%- include google-analytics.html -%}
 
   {%- include custom-head.html -%}
   
