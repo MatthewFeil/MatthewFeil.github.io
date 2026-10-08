@@ -637,6 +637,11 @@ table {
   flex: 1 0 auto;
 }
 
+.page-content:has(.home) {
+  // Keep full-bleed dividers within the page when a scrollbar narrows it.
+  overflow-x: clip;
+}
+
 .site-main {
   min-width: 0;
   padding-top: clamp(1.15rem, 2.5vw, 2rem);
