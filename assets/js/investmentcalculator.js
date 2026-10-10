@@ -290,7 +290,10 @@
     event.preventDefault();
 
     clearFieldErrors();
-    if (!validateDates(true)) return;
+    if (!validateDates(true)) {
+      window.siteAnalytics?.track('tool_error', 'investment_calculator', 'dates_invalid');
+      return;
+    }
 
     const amount = Number(amountInput.value);
     const startDate = parseInputDate(dateInput.value);
@@ -304,11 +307,13 @@
         !endDate ? endDateInput : null,
         !symbol ? symbolInput : null
       ].filter(Boolean);
+      window.siteAnalytics?.track('tool_error', 'investment_calculator', 'inputs_invalid');
       showValidationError('Enter an amount, dates, and ticker.', invalidInputs);
       return;
     }
 
     symbolInput.value = symbol;
+    window.siteAnalytics?.track('tool_interaction', 'investment_calculator', 'calculation_requested');
     setLoading(true);
 
     try {
@@ -330,8 +335,11 @@
         inflation: prices.inflation
       });
 
+      window.siteAnalytics?.track('tool_complete', 'investment_calculator', 'calculation');
+      if (!prices.inflation) window.siteAnalytics?.track('tool_interaction', 'investment_calculator', 'inflation_unavailable');
       setStatus(prices.inflation ? 'Return calculated.' : 'Return calculated. Inflation data is unavailable.', prices.inflation ? 'success' : 'warning');
     } catch (error) {
+      window.siteAnalytics?.track('tool_error', 'investment_calculator', 'calculation_failed');
       results.hidden = true;
       delete results.dataset.state;
       delete app.dataset.calculationState;
@@ -353,10 +361,30 @@
   initDefaults();
   setDetailsOpen(false);
   detailsToggle.addEventListener('click', () => {
+    if (detailsPanel.hidden) window.siteAnalytics?.track('tool_action', 'investment_calculator', 'details_opened');
+    window.siteAnalytics?.track('tool_interaction', 'investment_calculator', detailsPanel.hidden ? 'details_opened' : 'details_closed');
     setDetailsOpen(detailsPanel.hidden);
   });
   [amountInput, symbolInput].forEach((input) => {
     input.addEventListener('input', () => setFieldInvalid(input, false));
   });
+  // Count committed edits, never keystrokes or field values. Native invalid events
+  // also cover rejected submissions that never reach the submit handler.
+  for (const [input, field] of [[amountInput, 'amount'], [symbolInput, 'ticker'], [dateInput, 'start_date'], [endDateInput, 'end_date']]) {
+    let committedValue = input.value;
+    const commit = () => {
+      if (input.value === committedValue) return;
+      committedValue = input.value;
+      const filled = input === dateInput || input === endDateInput
+        ? /\d/.test(input.value) : Boolean(input.value.trim());
+      window.siteAnalytics?.track('tool_interaction', 'investment_calculator', `${field}_${filled ? 'changed' : 'cleared'}`);
+    };
+    input.addEventListener('change', commit);
+    // The date mask manages values itself, so native change is not guaranteed.
+    if (input === dateInput || input === endDateInput) input.addEventListener('blur', commit);
+    input.addEventListener('invalid', () => {
+      window.siteAnalytics?.track('tool_error', 'investment_calculator', `${field}_invalid`);
+    });
+  }
   form.addEventListener('submit', handleSubmit);
 })();

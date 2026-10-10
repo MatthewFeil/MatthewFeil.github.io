@@ -19,6 +19,151 @@
   let returnFocus;
   window[disabledKey] = true;
 
+  // Fixed vocabulary only: never accept tool inputs, filenames, or raw errors.
+  const toolEvents = {
+    transcribe: {
+      tool_action: ['audio_loaded', 'playback_started', 'loop_enabled', 'speed_changed', 'pitch_changed', 'config_imported', 'stems_started'],
+      tool_interaction: [
+        'playback_started', 'playback_paused', 'return_to_start', 'seek_backward',
+        'seek_forward', 'seek_committed', 'waveform_seek', 'overview_navigated',
+        'preset_speed_changed', 'custom_speed_changed', 'pitch_changed', 'pitch_lock_enabled',
+        'pitch_lock_disabled', 'volume_changed', 'channel_changed', 'zoom_changed',
+        'loop_enabled', 'loop_disabled', 'selection_changed', 'selection_cleared',
+        'selection_only_enabled', 'selection_only_disabled', 'selection_analysis_enabled', 'selection_analysis_disabled',
+        'chords_enabled', 'chords_disabled', 'detection_balanced_selected', 'detection_bass_selected',
+        'detection_chordal_selected', 'detection_melody_selected', 'detection_range_changed', 'timeline_view',
+        'analysis_view', 'controls_opened', 'controls_closed', 'shortcuts_opened',
+        'shortcuts_closed', 'sound_reset', 'analysis_reset', 'stems_reset',
+        'eq_reset', 'eq_changed', 'spectrum_shown', 'spectrum_hidden',
+        'measure_marked', 'section_marked', 'marker_removed', 'marker_moved',
+        'marker_section_changed', 'measures_deleted', 'markers_undone', 'markers_redone',
+        'marker_navigated', 'measure_navigated', 'marked_passage_looped', 'numbering_changed',
+        'stems_requested', 'stems_canceled', 'stems_enabled', 'stems_disabled',
+        'stem_muted', 'stem_unmuted', 'piano_note_played'
+      ],
+      tool_complete: ['audio_loaded', 'config_imported', 'stems_separated', 'saved_data_cleared'],
+      tool_export: ['json'],
+      tool_error: ['audio_load_failed', 'config_import_failed', 'stems_failed', 'playback_failed', 'detection_range_invalid', 'saved_data_clear_failed']
+    },
+    investment_calculator: {
+      tool_action: ['stock_view', 'interest_view', 'details_opened'],
+      tool_interaction: ['stock_view', 'interest_view', 'details_opened', 'details_closed',
+        'amount_changed', 'amount_cleared', 'ticker_changed', 'ticker_cleared',
+        'start_date_changed', 'start_date_cleared', 'end_date_changed', 'end_date_cleared',
+        'calculation_requested', 'inflation_unavailable'],
+      tool_complete: ['calculation'],
+      tool_error: ['calculation_failed', 'dates_invalid', 'inputs_invalid',
+        'amount_invalid', 'ticker_invalid', 'start_date_invalid', 'end_date_invalid']
+    },
+    interest_calculator: {
+      tool_action: ['details_opened'],
+      tool_interaction: ['details_opened', 'details_closed', 'amount_changed', 'amount_cleared',
+        'rate_changed', 'rate_cleared', 'start_date_changed', 'start_date_cleared',
+        'end_date_changed', 'end_date_cleared', 'compound_selected', 'simple_selected',
+        'calculation_requested', 'inflation_unavailable'],
+      tool_complete: ['calculation', 'compound_historical', 'simple_historical',
+        'compound_projection', 'simple_projection'],
+      tool_error: ['calculation_failed', 'dates_invalid', 'inputs_invalid',
+        'amount_invalid', 'rate_invalid', 'start_date_invalid', 'end_date_invalid', 'method_invalid']
+    },
+    grade_calculator: {
+      tool_action: ['rounding_changed', 'scale_saved', 'weight_saved'],
+      tool_interaction: ['current_grade_cleared', 'final_score_cleared',
+        'mobile_settings_opened', 'mobile_settings_closed',
+        'rounding_opened', 'rounding_dismissed', 'scale_opened', 'scale_dismissed',
+        'weight_opened', 'weight_dismissed', 'rounding_enabled', 'rounding_disabled',
+        'rounding_reset', 'scale_reset', 'weight_reset'],
+      tool_complete: ['calculation', 'final_score_preview', 'rounding_saved', 'scale_saved', 'weight_saved'],
+      tool_error: ['current_grade_invalid', 'final_score_invalid', 'rounding_invalid', 'scale_invalid', 'weight_invalid']
+    }
+  };
+  const startedTools = new Set();
+  const usedFeatures = new Set();
+  const siteEvents = {
+    navigation_click: ['home', 'about', 'posts', 'playlists', 'work', 'personal_space', 'privacy',
+      'transcribe', 'cta_l_live_art', 'grade_calculator', 'investment_calculator', 'post'],
+    navigation_menu: ['open', 'close'],
+    theme_change: ['system', 'light', 'dark'],
+    keyboard_navigation_change: ['on', 'off']
+  };
+  function canTrack() {
+    return eligible && !browserOptOut && choice?.choice === 'yes' &&
+      choice.expiresAt > Date.now() && !window[disabledKey] && configured;
+  }
+  window.siteAnalytics = Object.freeze({
+    trackSite(event, value, placement) {
+      if (!canTrack() || !Object.prototype.hasOwnProperty.call(siteEvents, event) ||
+          !siteEvents[event].includes(value)) return false;
+      let parameters;
+      if (event === 'navigation_click') {
+        if (!['header', 'footer', 'work', 'home', 'posts'].includes(placement)) return false;
+        parameters = {destination: value, placement};
+      } else {
+        if (placement !== undefined) return false;
+        const parameter = event === 'theme_change' ? 'theme' : 'state';
+        parameters = {[parameter]: value};
+      }
+      window.gtag('event', event, parameters);
+      return true;
+    },
+    track(event, tool, value) {
+      if (!canTrack()) return false;
+      const vocabulary = Object.prototype.hasOwnProperty.call(toolEvents, tool) && toolEvents[tool];
+      if (!vocabulary) return false;
+      if (event !== 'tool_start' && (!Object.prototype.hasOwnProperty.call(vocabulary, event) ||
+          !vocabulary[event].includes(value))) return false;
+      if (event === 'tool_start' && value !== undefined) return false;
+      // Feature adoption counts once per feature per page; outcomes count per operation.
+      const feature = `${tool}:${value}`;
+      if (event === 'tool_action' && usedFeatures.has(feature)) return false;
+      if (!startedTools.has(tool)) {
+        window.gtag('event', 'tool_start', {tool_name: tool});
+        startedTools.add(tool);
+      } else if (event === 'tool_start') return false;
+      if (event !== 'tool_start') {
+        const parameter = event === 'tool_export' ? 'format' : event === 'tool_error' ? 'error_code' : 'action';
+        window.gtag('event', event, {tool_name: tool, [parameter]: value});
+        if (event === 'tool_action') usedFeatures.add(feature);
+      }
+      return true;
+    }
+  });
+
+  // Only shared navigation and public entry links; never read text or raw URLs
+  // from tool controls. GA4's enhanced measurement already covers outbound clicks.
+  const entryRoutes = new Map([
+    ['/transcribe/', 'transcribe'], ['/cta-l-live-art/', 'cta_l_live_art'],
+    ['/gradecalculatorv2/', 'grade_calculator'], ['/investmentcalculator/', 'investment_calculator'],
+    ['/work/', 'work']
+  ]);
+  const headerRoutes = new Map([
+    ['/playlists.html/', 'playlists'], ['/work/', 'work'], ['/personal/', 'personal_space']
+  ]);
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('a[href]');
+    if (!link) return;
+    let url;
+    try { url = new URL(link.href, location.href); } catch { return; }
+    if (url.origin !== location.origin) return;
+    let destination;
+    let placement;
+    if (link.closest('.site-header')) {
+      placement = 'header';
+      if (link.matches('.site-title') && url.pathname === '/') destination = 'home';
+      else if (url.pathname === '/' && ['#about', '#posts'].includes(url.hash)) destination = url.hash.slice(1);
+      else destination = headerRoutes.get(url.pathname);
+    } else if (link.closest('.site-footer') && url.pathname === '/privacy/') {
+      placement = 'footer'; destination = 'privacy';
+    } else if (link.matches('.work-card')) {
+      placement = 'work'; destination = entryRoutes.get(url.pathname);
+    } else if (link.closest('.home-featured-project, .home-project-index')) {
+      placement = 'home'; destination = entryRoutes.get(url.pathname);
+    } else if (link.matches('.post-card')) {
+      placement = 'posts'; destination = 'post';
+    }
+    if (destination) window.siteAnalytics.trackSite('navigation_click', destination, placement);
+  });
+
   function readChoice() {
     try {
       const record = JSON.parse(localStorage.getItem(storageKey));
@@ -174,6 +319,7 @@
   function open(trigger) {
     returnFocus = trigger || null;
     status.textContent = browserOptOut ? 'Your browser requests no tracking. Analytics stays off.' :
+      !eligible ? 'This page does not collect analytics. Your choice applies to public pages where analytics is enabled.' :
       choice ? `Analytics is ${choice.choice === 'yes' ? 'on' : 'off'}. You can change your choice.` : '';
     status.hidden = !status.textContent;
     revealNotice(true);
@@ -211,12 +357,14 @@
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'analytics-preferences';
+    button.dataset.analyticsPreferences = '';
     button.textContent = 'Analytics preferences';
-    button.addEventListener('click', () => open(button));
     return button;
   }
   const footer = document.querySelector('.site-footer-privacy');
-  if (footer) footer.append(preferenceButton());
+  if (footer) {
+    if (!footer.querySelector('[data-analytics-preferences]')) footer.append(preferenceButton());
+  }
   else {
     const links = document.createElement('div');
     links.className = 'analytics-links';

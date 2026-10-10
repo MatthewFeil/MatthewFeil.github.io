@@ -13,7 +13,7 @@ const play = {
   classList: { toggle(name, active) { active ? classes.add(name) : classes.delete(name); } },
   setAttribute(name, value) { attributes.set(name, value); }, dataset: {}
 };
-const context = vm.createContext({
+const context = vm.createContext({ interaction() {}, window: {},
   elements: { audio, play }, state: { animationFrame: 7, smoothRevision: 0 },
   syncSmoothPlayback() {}, cancelAnimationFrame() { canceled++; },
   requestAnimationFrame() { scheduled++; return 8; }, updatePlaybackFrame() {},

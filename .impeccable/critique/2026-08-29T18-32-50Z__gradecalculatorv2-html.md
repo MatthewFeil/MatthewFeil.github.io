@@ -5,6 +5,7 @@ p0_count: 0
 p1_count: 2
 timestamp: 2026-08-29T18-32-50Z
 slug: gradecalculatorv2-html
+closed: true
 ---
 ## Heuristic scores
 

@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setTheme(getSavedTheme());
   themeToggle?.addEventListener("click", () => {
     setTheme(nextTheme[themeToggle.dataset.theme || "system"], true);
+    window.siteAnalytics?.trackSite('theme_change', themeToggle.dataset.theme);
   });
 
   const nav = document.querySelector(".site-nav");
@@ -329,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
     nav.classList.toggle("is-open", shouldOpen);
     navToggle.setAttribute("aria-expanded", String(shouldOpen));
     syncNavPanelAccessibility();
+    window.siteAnalytics?.trackSite('navigation_menu', shouldOpen ? 'open' : 'close');
 
     if (!shouldOpen) {
       closeGroups();

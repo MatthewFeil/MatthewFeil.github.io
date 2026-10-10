@@ -20,6 +20,7 @@
     enabled = !enabled;
     try { localStorage.setItem(storageKey, enabled ? 'on' : 'off'); } catch { /* Storage is optional. */ }
     apply(true);
+    window.siteAnalytics?.trackSite('keyboard_navigation_change', enabled ? 'on' : 'off');
   }
 
   apply();
@@ -51,7 +52,7 @@
     const altLabel = /Mac|iPhone|iPad|iPod/i.test(platform) ? 'Option' : 'Alt';
     toggle.title = `Toggle keyboard navigation (${altLabel}+Shift+K)`;
     toggle.addEventListener('click', change);
-    const destination = document.querySelector('.site-footer-details') || document.querySelector('.site-footer-inner, .transcribe-shortcuts');
+    const destination = document.querySelector('.site-footer-controls') || document.querySelector('.site-footer-details') || document.querySelector('.site-footer-inner, .transcribe-shortcuts');
     if (!destination) toggle.classList.add('keyboard-navigation-toggle--standalone');
     (destination || document.body).append(toggle);
     status = document.createElement('span');

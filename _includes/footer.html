@@ -3,7 +3,12 @@
     <p>{{ site.title | escape }}</p>
     <div class="site-footer-details">
       <p>The website of a highschooler with a passion for music, technology, and learning.</p>
-      <div class="site-footer-privacy"><a href="{{ '/privacy/' | relative_url }}">Privacy</a></div>
+      <div class="site-footer-controls">
+        <div class="site-footer-privacy">
+          <a href="{{ '/privacy/' | relative_url }}">Privacy</a>
+          <button type="button" class="analytics-preferences" data-analytics-preferences hidden>Analytics preferences</button>
+        </div>
+      </div>
     </div>
   </div>
 </footer>

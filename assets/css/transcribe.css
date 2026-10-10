@@ -4415,39 +4415,73 @@ body.transcribe-shell {
 }
 .transcribe-loading small { color: var(--tr-muted); font-size: 0.75rem; }
 .transcribe-loading-signal {
+  --signal-unit: 6px;
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 5px;
-  height: 48px;
+  gap: var(--signal-unit);
+  width: calc(var(--signal-unit) * 20);
+  height: calc(var(--signal-unit) * 12);
   margin-bottom: 4px;
+  border-bottom: 1px solid var(--tr-border);
 }
-.transcribe-loading-signal i { width: 3px; height: 40%; background: var(--tr-accent); }
-.transcribe-loading-signal i:nth-child(2n) { height: 70%; }
-.transcribe-loading-signal i:nth-child(3n) { height: 100%; }
+.transcribe-loading-signal i {
+  width: calc(var(--signal-unit) * 2);
+  height: calc(var(--signal-unit) * 10);
+  background: var(--tr-text);
+  opacity: 0.65;
+  transform: scaleY(0.5);
+  transform-origin: bottom;
+}
+.transcribe-loading-signal i:nth-child(2n) { transform: scaleY(0.75); }
+.transcribe-loading-signal i:nth-child(3n) { transform: scaleY(1); }
+/* A discrete scan echoes the timeline playhead over blocky spectrum energy. */
+.transcribe-loading-signal::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 calc(var(--signal-unit) * 2 / 3);
+  width: calc(var(--signal-unit) * 2 / 3);
+  background: var(--tr-accent);
+}
 .transcribe-loading:not([hidden]) .transcribe-loading-signal i {
-  animation: transcribe-loading-signal 1100ms ease-in-out infinite alternate;
+  animation: transcribe-loading-signal 1400ms steps(1, end) var(--signal-delay, 0ms) infinite;
 }
-.transcribe-loading-signal i:nth-child(2n) { animation-delay: -350ms; }
-.transcribe-loading-signal i:nth-child(3n) { animation-delay: -700ms; }
+.transcribe-loading:not([hidden]) .transcribe-loading-signal::after {
+  animation: transcribe-loading-scan 1400ms steps(7, end) infinite;
+}
+.transcribe-loading-signal i:nth-child(2n) { --signal-delay: -560ms; }
+.transcribe-loading-signal i:nth-child(3n) { --signal-delay: -1120ms; }
+.transcribe-loading-signal i:nth-child(5) { --signal-delay: -840ms; }
+.transcribe-loading-signal i:nth-child(7) { --signal-delay: -280ms; }
 @keyframes transcribe-loading-signal {
-  from { transform: scaleY(0.35); opacity: 0.5; }
-  to { transform: scaleY(1); opacity: 1; }
+  0%, 100% { transform: scaleY(0.25); }
+  20% { transform: scaleY(0.75); }
+  40% { transform: scaleY(0.5); }
+  60% { transform: scaleY(1); }
+  80% { transform: scaleY(0.375); }
+}
+@keyframes transcribe-loading-scan {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(var(--signal-unit) * 21)); }
 }
 @media (max-height: 500px) {
   .transcribe-loading {
-    grid-template-columns: 48px minmax(0, 22rem);
+    grid-template-columns: 60px minmax(0, 22rem);
     justify-content: center;
     justify-items: start;
     gap: 0 12px;
     padding: 4px 12px;
   }
-  .transcribe-loading-signal { grid-column: 1; grid-row: 1 / 3; height: 28px; margin: 0; align-self: center; }
+  .transcribe-loading-signal { --signal-unit: 3px; grid-column: 1; grid-row: 1 / 3; height: 28px; margin: 0; align-self: center; }
+  .transcribe-loading-signal i { height: 24px; }
   .transcribe-loading strong, .transcribe-loading > span { grid-column: 2; line-height: 1.2; }
   .transcribe-loading small { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .transcribe-loading:not([hidden]) .transcribe-loading-signal i { animation: none; }
+  .transcribe-loading:not([hidden]) .transcribe-loading-signal i,
+  .transcribe-loading:not([hidden]) .transcribe-loading-signal::after { animation: none; }
+  .transcribe-loading-signal::after { transform: translateX(calc(var(--signal-unit) * 9)); }
 }
 
 /* Labels sit above matched slider/value rows, with a shared field inset. */

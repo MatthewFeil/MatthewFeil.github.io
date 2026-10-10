@@ -45,6 +45,15 @@
         ],
         "createdAt": "2026-10-04T00:22:35.020Z",
         "reason": "Agent reviewed: personal-widget.is-loading::before is a two-pixel indeterminate loading indicator shown only while fetching data; no text or content scrolls."
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "gradecalculatorv2.html"
+        ],
+        "createdAt": "2026-10-10T03:24:28.391Z",
+        "reason": "Agent: uppercase text is confined to form labels, short headings, table headings, and result labels; body prose remains sentence case, matching DESIGN.md compact uppercase label style."
       }
     ]
   }

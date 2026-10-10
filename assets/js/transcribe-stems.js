@@ -85,13 +85,14 @@
       });
 
       this.master.addEventListener('click', () => {
-        if (this.job) { this.stop(); this.setStatus('Separation canceled.'); return; }
+        if (this.job) { window.siteAnalytics?.track('tool_interaction', 'transcribe', 'stems_canceled'); this.stop(); this.setStatus('Separation canceled.'); return; }
         if (!this.result) { this.separate(); return; }
-        this.enabled = !this.enabled; this.applyMix(); this.refresh(); this.changed();
+        this.enabled = !this.enabled; window.siteAnalytics?.track('tool_interaction', 'transcribe', this.enabled ? 'stems_enabled' : 'stems_disabled'); this.applyMix(); this.refresh(); this.changed();
       });
       this.rows.forEach(row => row.querySelector('button').addEventListener('click', () => {
         const i = core.names.indexOf(row.dataset.stem);
         this.flags[i] = !this.flags[i];
+        window.siteAnalytics?.track('tool_interaction', 'transcribe', this.flags[i] ? 'stem_unmuted' : 'stem_muted');
         if (row.dataset.stem === 'guitar') this.flags[core.names.indexOf('piano')] = this.flags[i];
         if (this.enabled) this.applyMix();
         this.refresh(); this.changed();
@@ -160,6 +161,8 @@
     async separate() {
       const buffer = this.buffer(), range = this.selection();
       if (!buffer || !range || !Number.isFinite(range.end - range.start) || range.end <= range.start || range.end - range.start > core.maxSeconds || this.job) return;
+      window.siteAnalytics?.track('tool_action', 'transcribe', 'stems_started');
+      window.siteAnalytics?.track('tool_interaction', 'transcribe', 'stems_requested');
       const flags = this.flags.slice();
       this.reset(); this.flags = flags; this.range = { ...range };
       const generation = ++this.generation;
@@ -182,6 +185,7 @@
         this.job = worker;
         const failed = text => {
           if (generation !== this.generation) return;
+          window.siteAnalytics?.track('tool_error', 'transcribe', 'stems_failed');
           this.stop(); this.setStatus(text);
         };
         worker.onerror = event => { event.preventDefault(); failed('Separation could not start. Try again in a desktop browser.'); };
@@ -191,6 +195,7 @@
             this.reportProgress(data.text, data.value);
           } else if (data.type === 'error') failed(data.text);
           else if (data.type === 'complete') {
+            window.siteAnalytics?.track('tool_complete', 'transcribe', 'stems_separated');
             this.result = { stems: data.stems, activity: data.activity }; this.job = null;
             this.enabled = true; this.applyMix(); this.refresh(); this.changed();
             this.setStatus('Ready. Stems play only this highlight. Turn Stems off for the original recording.');
@@ -202,6 +207,7 @@
         worker.postMessage({ type: 'separate', channels }, channels.map(c => c.buffer));
       } catch (error) {
         if (generation !== this.generation) return;
+        window.siteAnalytics?.track('tool_error', 'transcribe', 'stems_failed');
         this.stop(); this.setStatus(`Could not prepare this highlight. ${error.message}`);
       }
     }

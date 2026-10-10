@@ -5,6 +5,11 @@
     return;
   }
 
+  let resettingControls = false;
+  const interaction = action => {
+    if (!resettingControls) window.siteAnalytics?.track('tool_interaction', 'transcribe', action);
+  };
+
   const scriptUrl = document.currentScript?.src || `${window.location.origin}/assets/js/transcribe.js`;
 
   const elements = {
@@ -214,7 +219,10 @@
     }
     const percent = clamp(Number(elements.customSpeedInput.value), 25, 200);
     if (!Number.isFinite(percent)) return;
+    const changed = elements.audio.playbackRate !== percent / 100;
     setPlaybackSpeed(percent / 100);
+    if (changed && state.duration) interaction('custom_speed_changed');
+    if (state.duration) window.siteAnalytics?.track('tool_action', 'transcribe', 'speed_changed');
     elements.customSpeedInput.value = String(percent);
     closeCustomSpeedControl();
   }
@@ -438,6 +446,7 @@
     gain.connect(context.destination);
     oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
     oscillator.start(now);
+    interaction('piano_note_played');
   }
 
   function stopKeyboardNote(pointerId) {
@@ -825,6 +834,7 @@
   let chordsEnabled = false;
   chordToggle.addEventListener('click', () => {
     chordsEnabled = !chordsEnabled;
+    interaction(chordsEnabled ? 'chords_enabled' : 'chords_disabled');
     chordToggle.setAttribute('aria-pressed', String(chordsEnabled));
     chordToggle.classList.toggle('is-active', chordsEnabled);
     chordToggle.querySelector('strong').textContent = chordsEnabled ? 'On' : 'Off';
@@ -1191,6 +1201,8 @@
   function toggleLoop() {
     if (!state.duration) return;
     setLoopEnabled(!state.loopEnabled);
+    interaction(state.loopEnabled ? 'loop_enabled' : 'loop_disabled');
+    if (state.loopEnabled) window.siteAnalytics?.track('tool_action', 'transcribe', 'loop_enabled');
   }
 
   async function togglePlayback() {
@@ -1211,9 +1223,15 @@
           elements.audio.addEventListener('seeked', done, {once:true});
         });
       }
-      await elements.audio.play();
+      try {
+        await elements.audio.play();
+        interaction('playback_started');
+      } catch {
+        window.siteAnalytics?.track('tool_error', 'transcribe', 'playback_failed');
+      }
     } else {
       elements.audio.pause();
+      interaction('playback_paused');
     }
   }
 
@@ -1549,6 +1567,7 @@
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     showConfigStatus('Config exported. Audio is not included.');
+    window.siteAnalytics?.track('tool_export', 'transcribe', 'json');
   });
   document.getElementById('transcribe-config-import').addEventListener('click', () => configFile.click());
   async function importConfig(file) {
@@ -1564,7 +1583,10 @@
       if (generation !== marks.generation) return;
       applyConfig(validateConfig(JSON.parse(text)));
       showConfigStatus('Config loaded. Markers and settings restored.');
+      window.siteAnalytics?.track('tool_action', 'transcribe', 'config_imported');
+      window.siteAnalytics?.track('tool_complete', 'transcribe', 'config_imported');
     } catch (error) {
+      if (generation === marks.generation) window.siteAnalytics?.track('tool_error', 'transcribe', 'config_import_failed');
       if (generation === marks.generation) showConfigStatus(error instanceof SyntaxError ? 'This file is not valid JSON. Nothing was imported.' : error.message);
     }
   }
@@ -1709,6 +1731,10 @@
           try { applyConfig(validateConfig(restoredConfig)); }
           catch { showConfigStatus('Saved settings could not be restored. The audio is available.'); }
         }
+        if (!restoredConfig) {
+          window.siteAnalytics?.track('tool_action', 'transcribe', 'audio_loaded');
+          window.siteAnalytics?.track('tool_complete', 'transcribe', 'audio_loaded');
+        }
         sessionFile = file;
         savedSessionJSON = null;
         sessionAudioSaved = Boolean(restoredConfig);
@@ -1717,6 +1743,7 @@
     } catch (error) {
       if (loadGeneration !== marks.generation) return;
       finishLoading(loadGeneration);
+      window.siteAnalytics?.track('tool_error', 'transcribe', 'audio_load_failed');
       marks.reset();
       console.error(error);
       showConfigStatus('Not saved · export config');
@@ -1956,6 +1983,8 @@
 
     if (pending || (!state.dragMoved && moved < 4)) {
       const time = xToTime(x, width);
+      interaction('waveform_seek');
+      if (hasSelection()) interaction('selection_cleared');
       transport.currentTime = time;
       state.loopStart = null;
       state.loopEnd = null;
@@ -1967,6 +1996,7 @@
 
     setSelection(state.loopStart, state.loopEnd);
     setLoopEnabled(true);
+    if (event.type !== 'pointercancel') interaction('selection_changed');
   }
 
   function updateOverviewDrag(event) {
@@ -2005,6 +2035,7 @@
     if (!state.overviewDrag) return;
     if (elements.overview.hasPointerCapture(event.pointerId)) elements.overview.releasePointerCapture(event.pointerId);
     state.overviewDrag = null;
+    if (event.type === 'pointerup') interaction('overview_navigated');
   }
 
   function handleSpectrogramPointer(event) {
@@ -2131,7 +2162,12 @@
   elements.fileName.addEventListener('click', () => elements.file.click());
   elements.file.addEventListener('change', () => loadFile(elements.file.files?.[0]));
   elements.speedButtons.forEach((button) => {
-    button.addEventListener('click', () => setPlaybackSpeed(Number(button.dataset.speed)));
+    button.addEventListener('click', () => {
+      const changed = elements.audio.playbackRate !== Number(button.dataset.speed);
+      setPlaybackSpeed(Number(button.dataset.speed));
+      if (changed && state.duration) interaction('preset_speed_changed');
+      if (state.duration) window.siteAnalytics?.track('tool_action', 'transcribe', 'speed_changed');
+    });
   });
   elements.customSpeedToggle.addEventListener('click', toggleCustomSpeedControl);
   elements.customSpeedInput.addEventListener('keydown', (event) => {
@@ -2153,13 +2189,23 @@
     elements.pitchLock.classList.toggle('is-active', enabled);
     elements.pitchLock.querySelector('strong').textContent = enabled ? 'On' : 'Off';
     updatePitchPreservation();
+    interaction(enabled ? 'pitch_lock_enabled' : 'pitch_lock_disabled');
   });
+  for (const input of [elements.semitones, elements.semitonesNumber, elements.cents, elements.centsNumber]) {
+    input.addEventListener('change', () => {
+      if (state.duration) {
+        window.siteAnalytics?.track('tool_action', 'transcribe', 'pitch_changed');
+        interaction('pitch_changed');
+      }
+    });
+  }
   connectPitchControl(elements.semitones, elements.semitonesNumber);
   connectPitchControl(elements.cents, elements.centsNumber);
   elements.loopBottom.addEventListener('click', toggleLoop);
   elements.selectionOnly.addEventListener('click', () => {
     if (!hasSelection()) return;
     state.selectionOnly = !state.selectionOnly;
+    interaction(state.selectionOnly ? 'selection_only_enabled' : 'selection_only_disabled');
     updateLoopControls();
     if (state.selectionOnly && (transport.currentTime < state.loopStart || transport.currentTime >= state.loopEnd)) returnToStart();
   });
@@ -2176,6 +2222,7 @@
   elements.analyzeSelection.checked = false;
   elements.analyzeSelection.addEventListener('click', () => {
     elements.analyzeSelection.checked = !elements.analyzeSelection.checked;
+    interaction(elements.analyzeSelection.checked ? 'selection_analysis_enabled' : 'selection_analysis_disabled');
     updateAnalyzeSelectionToggle();
     requestSpectrumAt(transport.currentTime, true);
   });
@@ -2208,6 +2255,7 @@
   elements.detectionMode.addEventListener('change', () => {
     const mode = elements.detectionMode.value;
     detectionSettings.mode = mode;
+    interaction(`detection_${mode}_selected`);
     detectionSettings.ranges[mode] = {...TranscribeNotes.defaults().ranges[mode]};
     syncDetectionControls(); refreshDetection();
   });
@@ -2217,11 +2265,14 @@
       if (midi === null || midi < minimumSpectrumMidi || midi >= maximumSpectrumMidi) {
         input.setCustomValidity('Use a note from C1 to B6, such as C#6.');
         input.setAttribute('aria-invalid', 'true');
+        window.siteAnalytics?.track('tool_error', 'transcribe', 'detection_range_invalid');
         if (report) input.reportValidity();
         return;
       }
       const range = detectionSettings.ranges[detectionSettings.mode];
+      const changed = range[endpoint] !== midi;
       range[endpoint] = midi;
+      if (changed) interaction('detection_range_changed');
       if (endpoint === 'low') range.high = Math.max(range.high, midi);
       else range.low = Math.min(range.low, midi);
       syncDetectionControls(); refreshDetection();
@@ -2233,15 +2284,18 @@
       else if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); syncDetectionControls(); }
     });
   }
-  elements.start.addEventListener('click', returnToStart);
-  elements.rewind.addEventListener('click', () => seekBy(-5));
+  elements.start.addEventListener('click', () => { returnToStart(); if (state.duration) interaction('return_to_start'); });
+  elements.rewind.addEventListener('click', () => { seekBy(-5); if (state.duration) interaction('seek_backward'); });
   elements.play.addEventListener('click', togglePlayback);
-  elements.forward.addEventListener('click', () => seekBy(5));
+  elements.forward.addEventListener('click', () => { seekBy(5); if (state.duration) interaction('seek_forward'); });
   elements.seek.addEventListener('input', () => {
     seekBy(Number(elements.seek.value) - transport.currentTime);
     requestSpectrumAt(transport.currentTime);
   });
   elements.volume.addEventListener('input', updateVolume);
+  for (const [input, action] of [[elements.seek, 'seek_committed'], [elements.volume, 'volume_changed'], [elements.zoom, 'zoom_changed'], [elements.channel, 'channel_changed']]) {
+    input.addEventListener('change', () => interaction(action));
+  }
   elements.zoom.addEventListener('input', () => {
     const position = Number(elements.zoom.value);
     const zoom = position <= 50
@@ -2447,6 +2501,7 @@
   elements.audio.addEventListener('play', () => {
     syncSmoothPlayback();
     if (!syncPlaybackButton()) return;
+    window.siteAnalytics?.track('tool_action', 'transcribe', 'playback_started');
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = requestAnimationFrame(updatePlaybackFrame);
   });
@@ -2476,6 +2531,7 @@
   elements.viewButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const mode = button.dataset.viewMode;
+      if (app.dataset.viewMode !== mode) interaction(`${mode}_view`);
       app.dataset.viewMode = mode;
       elements.viewButtons.forEach((candidate) => {
         const active = candidate === button;
@@ -2504,9 +2560,11 @@
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault();
       seekBy(event.shiftKey ? -5 : -2);
+      if (!event.repeat && state.duration) interaction('seek_backward');
     } else if (event.key === 'ArrowRight') {
       event.preventDefault();
       seekBy(event.shiftKey ? 5 : 2);
+      if (!event.repeat && state.duration) interaction('seek_forward');
     } else if (event.key === ',' || event.key === '.') {
       event.preventDefault();
       if (event.repeat) return;
@@ -2515,13 +2573,14 @@
       const next = event.key === '.'
         ? speeds.find((speed) => speed > current)
         : speeds.reverse().find((speed) => speed < current);
-      if (next !== undefined) setPlaybackSpeed(next);
+      if (next !== undefined) { setPlaybackSpeed(next); interaction('preset_speed_changed'); }
     } else if (['-', '=', '+'].includes(event.key)) {
       event.preventDefault();
       if (elements.zoom.disabled) return;
       const direction = event.key === '-' ? -1 : 1;
       elements.zoom.value = String(clamp(Number(elements.zoom.value) + direction * 5, Number(elements.zoom.min), Number(elements.zoom.max)));
       elements.zoom.dispatchEvent(new Event('input', { bubbles: true }));
+      if (!event.repeat) interaction('zoom_changed');
     } else if (event.key.toLowerCase() === 'c') {
       event.preventDefault();
       if (!event.repeat) toggleSection('settings');
@@ -2542,8 +2601,10 @@
       if (!event.repeat) elements.selectionOnly.click();
     } else if (event.key === '[' && state.duration) {
       setSelection(transport.currentTime, state.loopEnd ?? clamp(transport.currentTime + 2, 0, state.duration));
+      if (!event.repeat) interaction('selection_changed');
     } else if (event.key === ']' && state.duration) {
       setSelection(state.loopStart ?? clamp(transport.currentTime - 2, 0, state.duration), transport.currentTime);
+      if (!event.repeat) interaction('selection_changed');
     }
   });
 
@@ -2619,6 +2680,7 @@
     });
   }
   function resetSection(id) {
+    resettingControls = true;
     if (id === 'sound') {
       resetInputs(['channel','semitones','cents']);
       elements.semitonesNumber.value = elements.semitones.value;
@@ -2636,6 +2698,8 @@
       updateSpectrumVisibility();
       requestSpectrumAt(transport.currentTime, true);
     } else if (id === 'stems') stems.reset();
+    resettingControls = false;
+    interaction(`${id}_reset`);
     renderAll(); saveSession();
     showConfigStatus('Section settings reset to default.');
   }
@@ -2656,10 +2720,11 @@
         marks.storage('readwrite', store => store.clear())
       ]);
       for (const key of ['transcribe-sections','transcribe-sidebar-groups','transcribe-spectrum-visible']) localStorage.removeItem(key);
+      window.siteAnalytics?.track('tool_complete', 'transcribe', 'saved_data_cleared');
       sessionAudioSaved = false;savedSessionJSON = null;
       elements.localStatus.textContent = 'Not autosaving';
       showConfigStatus('Saved Transcribe data cleared. Current work stays open; open audio again to resume autosave.');
-    } catch { showConfigStatus('Could not clear all saved data. Autosave is paused; try again.'); }
+    } catch { window.siteAnalytics?.track('tool_error', 'transcribe', 'saved_data_clear_failed'); showConfigStatus('Could not clear all saved data. Autosave is paused; try again.'); }
     finally { button.disabled = false; }
   }
   const deleteMeasures = document.createElement('button');
@@ -2740,7 +2805,7 @@
     if (spectrumCheckbox.checked) requestSpectrumAt(transport.currentTime, true);
     else state.pendingSpectrumTime = null;
   }
-  spectrumCheckbox.addEventListener('click', () => { spectrumCheckbox.checked = !spectrumCheckbox.checked; updateSpectrumVisibility(); });
+  spectrumCheckbox.addEventListener('click', () => { spectrumCheckbox.checked = !spectrumCheckbox.checked; interaction(spectrumCheckbox.checked ? 'spectrum_shown' : 'spectrum_hidden'); updateSpectrumVisibility(); });
   updateSpectrumVisibility();
   controlsPanel.replaceChildren();
   controlsPanel.hidden = true;
@@ -2808,6 +2873,10 @@
   function setSidebarView(view) {
     const previous = activeSidebar;
     const restoreFocus = sidebar.contains(document.activeElement);
+    if (previous !== view) {
+      if (previous) interaction(previous === 'shortcuts' ? 'shortcuts_closed' : 'controls_closed');
+      if (view) interaction(view === 'shortcuts' ? 'shortcuts_opened' : 'controls_opened');
+    }
     activeSidebar = view;
     updateSections();
     if (view && mobileWorkspace.matches) {

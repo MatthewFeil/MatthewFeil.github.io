@@ -15,7 +15,7 @@ const context = {
   },
   createGain() { return {gain: {setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {}}, connect() {}, disconnect() {}}; }
 };
-const ctx = vm.createContext({window: {AudioContext: function() { return context; }}});
+const ctx = vm.createContext({interaction() {}, window: {AudioContext: function() { return context; }}});
 vm.runInContext(source.slice(source.indexOf('  let keyboardAudioContext'), source.indexOf('  function configureCanvas')), ctx);
 (async () => {
   await ctx.playKeyboardNote(69, 1);

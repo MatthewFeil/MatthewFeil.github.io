@@ -18,9 +18,21 @@ Use **Analytics preferences** in the footer to change your choice. In Transcribe
 
 The site also honors browser Do Not Track and Global Privacy Control signals by keeping analytics off.
 
+Analytics preferences remain available on pages that do not collect analytics and in local development previews. Changing your choice there applies to public pages where analytics is enabled; it does not enable collection on excluded pages or in development previews.
+
 ## What analytics collects
 
 With your permission, Google Analytics 4 measures page visits, basic engagement, deep scrolling, and clicks on external links. Information may include the page path, referring page, external link URL, browser and device details, approximate location, and timestamps. Page and referrer URLs sent by the site's initial configuration omit query strings and fragments.
+
+Analytics also records clicks on shared navigation, homepage project and post links, and My Work cards, along with use of the navigation menu and changes to theme and keyboard navigation. These events use fixed destination names and settings, without sending link text, query strings, or fragments.
+
+Analytics also records fixed tool names and feature actions, successful calculations and processing, config exports, and general error categories on public tool pages. Feature use is counted once per feature per page visit; completed operations can be counted more than once. Actions before consent are not saved for later collection.
+
+For Transcribe, this includes repeated playback, seeking, looping and passage selection; committed sound, detection, and EQ edits; marker actions and undo/redo; controls and shortcuts opened or closed; audio and config loads; config exports; and stem requests, cancellation, and mix toggles. These events use fixed action labels and do not include audio, filenames, marker positions or labels, detected notes or chords, or numeric settings. Automatic playback changes and session restoration do not count as detailed user interactions.
+
+For the finals grade calculator, this includes settings opened, dismissed, saved, or reset; rounding enabled or disabled; completed calculations and final-score previews; cleared inputs; and fixed validation-error categories. These events do not include entered grades, final scores, grade-scale cutoffs, rounding amounts, final weights, or calculated results.
+
+For the investment calculator, this includes switches between stock and interest views, committed field edits or clears, growth-type choices, calculation requests and completions, opening or closing details, and fixed validation or data-error categories. Interest completions distinguish simple or compound growth and historical calculations or future projections. These events do not include tickers, amounts, dates, interest rates, or calculated values.
 
 Reports help me understand which pages people use and where the site could improve. I do not send your name, email address, local audio, uploaded filenames, calculator inputs, or private tracker contents to analytics. The Personal Space dashboard, portfolio and lifting trackers, Birds page, and this privacy page do not load the Google Analytics tag, even if you have accepted analytics elsewhere.
 

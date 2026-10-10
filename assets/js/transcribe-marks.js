@@ -1,5 +1,6 @@
 /* Local measure annotations. All times are original recording seconds. */
 (() => {
+  const interaction = action => globalThis.siteAnalytics?.track('tool_interaction', 'transcribe', action);
   const blank = () => ({ markers: [], numbering: 'section' });
   function rows(doc) {
     let section = -1, measure = 0;
@@ -66,13 +67,13 @@
         const actions = { measure: () => this.mark(false), section: () => this.mark(true), remove: () => this.remove(), undo: () => this.history(false), redo: () => this.history(true), previous: () => this.navigate(-1, true), next: () => this.navigate(1, true), loop: () => this.loop(false), 'loop-section': () => this.loop(true), export: () => this.export(), import: () => this.root.querySelector('[data-file]').click(), apply: () => this.importPending(), cancel: () => this.clearImport() };
         actions[button.dataset.action]?.();
       });
-      this.numbering.addEventListener('change', () => this.change(() => { this.doc.numbering = this.numbering.value; }));
+      this.numbering.addEventListener('change', () => this.change(() => { this.doc.numbering = this.numbering.value; interaction('numbering_changed'); }));
       this.time?.addEventListener('change', () => {
         const time = Number(this.time.value);
         if (!this.time.value || !Number.isFinite(time) || time < 0 || time > host.duration() || this.doc.markers.some(m => m.id !== this.selected && Math.abs(m.time-time) < 0.001)) { this.say('Enter a distinct time within this recording.'); this.edit(); return; }
-        this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected), old = m.time; m.time = time; this.promote(m, old); });
+        this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected), old = m.time; m.time = time; this.promote(m, old); interaction('marker_moved'); });
       });
-      this.section?.addEventListener('change', () => this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected); m.section = this.section.checked; this.promote(m); }));
+      this.section?.addEventListener('change', () => this.change(() => { const m = this.doc.markers.find(m => m.id === this.selected); m.section = this.section.checked; this.promote(m); interaction('marker_section_changed'); }));
       this.root.querySelector('[data-file]')?.addEventListener('change', async e => {
         const file = e.target.files[0], generation = this.generation; e.target.value = ''; if (!file) return;
         try {
@@ -112,7 +113,7 @@
         if (!this.drag) return;
         const before = this.drag.before; this.drag = null;
         if (e.type === 'pointercancel') this.doc = before;
-        else if (JSON.stringify(before) !== JSON.stringify(this.doc)) { const m = this.doc.markers.find(m => m.id === this.selected); this.promote(m, before.markers.find(old => old.id === m.id).time); this.undoStack.push(before); this.redoStack = []; this.host.changed?.(); this.save(); }
+        else if (JSON.stringify(before) !== JSON.stringify(this.doc)) { const m = this.doc.markers.find(m => m.id === this.selected); this.promote(m, before.markers.find(old => old.id === m.id).time); interaction('marker_moved'); this.undoStack.push(before); this.redoStack = []; this.host.changed?.(); this.save(); }
         this.refresh();
       };
       this.ruler.addEventListener('pointerup', end); this.ruler.addEventListener('pointercancel', end);
@@ -132,6 +133,7 @@
         if (near) { near.section = true; this.promote(near); this.selected = near.id; }
         else { const m = { id: crypto.randomUUID(), time, section: section || !this.doc.markers.length }; this.doc.markers.push(m); this.promote(m); this.selected = m.id; }
       });
+      interaction(section ? 'section_marked' : 'measure_marked');
       this.say(`${section ? 'Section' : 'Measure'} ${rows(this.doc).find(m => m.id === this.selected).label} marked.`);
     }
     remove() {
@@ -142,6 +144,7 @@
         this.doc.markers.splice(index, 1);
         this.selected = (this.doc.markers[index - 1] || this.doc.markers[index])?.id ?? null;
       });
+      interaction('marker_removed');
     }
     deleteMeasures() {
       if (!this.ready) return;
@@ -149,16 +152,17 @@
       if (sections.size === this.doc.markers.length) { this.say('No measure markers to delete. Section starts are kept.'); return; }
       this.rangeAnchor = null;
       this.change(() => { this.doc.markers = this.doc.markers.filter(m => sections.has(m.id)); this.selected = null; });
+      interaction('measures_deleted');
       this.say('Measure markers deleted. Section starts kept. Undo to restore them.');
     }
     history(redo) {
       const from = redo ? this.redoStack : this.undoStack, to = redo ? this.undoStack : this.redoStack;
-      if (!from.length) return; to.push(structuredClone(this.doc)); this.doc = from.pop(); this.host.changed?.(); this.refresh(); this.save();
+      if (!from.length) return; interaction(redo ? 'markers_redone' : 'markers_undone'); to.push(structuredClone(this.doc)); this.doc = from.pop(); this.host.changed?.(); this.refresh(); this.save();
     }
     navigate(direction, section = false) {
       const candidates = rows(this.doc).filter(m => !section || m.section), now = this.host.current();
       const m = direction > 0 ? candidates.find(m => m.time > now + 0.001) : candidates.reverse().find(m => m.time < now - 0.001);
-      if (m) { this.host.seek(m.time); this.select(m.id); } else this.say('No further marker in that direction.');
+      if (m) { interaction('marker_navigated'); this.host.seek(m.time); this.select(m.id); } else this.say('No further marker in that direction.');
     }
     loop(section) {
       const candidates = rows(this.doc).filter(m => !section || m.section), now = this.host.current();
@@ -166,6 +170,7 @@
       const start = candidates[index]?.time, end = candidates[index+1]?.time ?? (section ? this.host.duration() : null);
       if (start == null || end == null || end-start < 0.04) { this.say('A complete marked passage is needed to loop.'); return; }
       this.host.loop(start, end);
+      interaction('marked_passage_looped');
     }
     openMeasures(go) {
       if (!this.ready) return;
@@ -203,6 +208,7 @@
       const all = rows(this.doc), current = all.findLast(m => m.time <= this.host.current()) || all[0];
       const found = this.resolveMeasure(value, all, current);
       if (!found) { this.say('Measure not found.'); return false; }
+      interaction('measure_navigated');
       this.host.seek(found.time); this.select(found.id); this.say(`At ${found.label}.`); return true;
     }
     loopInputs(repeat = true) {
@@ -218,6 +224,7 @@
       this.loopStartInput.value = first.label; this.loopEndInput.value = last.label;
       if (repeat) this.host.loop(first.time, end);
       else this.host.selectRange(first.time, end);
+      interaction('marked_passage_looped');
       this.say(`${repeat ? 'Repeating' : 'Selected'} ${first.label} through ${last.label}.`);
       return true;
     }
@@ -239,6 +246,7 @@
       if (end-ordered[0].time < 0.04) { this.say('Choose a different end point.'); return; }
       this.rangeAnchor = null;
       this.host.loop(ordered[0].time, end);
+      interaction('selection_changed');
       this.say('Selected passage is looping. Shift-click to begin a new range.');
     }
     key(e) {
