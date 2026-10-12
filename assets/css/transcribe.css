@@ -1947,6 +1947,20 @@ body.transcribe-shell {
 }
 
 .transcribe-navbar-row .transcribe-file-name { padding-right: 0.75rem; }
+.transcribe-navbar-row .transcribe-restore-status {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  color: var(--tr-muted);
+  font-size: 0.625rem;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.transcribe-navbar-row .transcribe-file-summary.has-restore-status .transcribe-file-name {
+  padding-right: 6rem;
+}
 .transcribe-navbar-row .transcribe-file-control { flex-basis: 13rem; align-self: flex-end; }
 .transcribe-navbar-row #transcribe-config-actions { flex-direction: column; }
 .transcribe-navbar-row #transcribe-config-actions button {

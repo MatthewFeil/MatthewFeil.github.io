@@ -5,7 +5,7 @@ description: A local audio playback workbench for transcribing music by ear.
 permalink: /transcribe/
 noindex: true
 extra_css:
-  - /assets/css/transcribe.css?v=20261009-stepped-loader-large
+  - /assets/css/transcribe.css?v=20261011-config-restored
 ---
 
 <main class="transcribe-app" id="transcribe-main" data-transcribe-app data-loading>
@@ -37,6 +37,7 @@ extra_css:
 
       <div class="transcribe-file-control">
         <div class="transcribe-file-summary"><button type="button" class="transcribe-file-name" id="transcribe-file-name" title="Open a new audio file">Open audio</button>
+          <span class="transcribe-restore-status" id="transcribe-restore-status" role="status" aria-live="polite" aria-atomic="true" hidden></span>
         </div>
         <span id="transcribe-config-actions"><button type="button" id="transcribe-config-import" disabled>Load config</button><button type="button" id="transcribe-config-export" disabled>Save config</button></span>
         <input id="transcribe-config-file" type="file" accept=".json,application/json" hidden>
@@ -315,5 +316,5 @@ extra_css:
 <script src="{{ "/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-stems.js?v=20261009-detailed-events" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-eq.js?v=20261009-detailed-events" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/transcribe.js?v=20261009-detailed-events" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/transcribe.js?v=20261011-config-restored" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/transcribe-tooltips.js?v=20260922-controls" | relative_url }}" defer></script>

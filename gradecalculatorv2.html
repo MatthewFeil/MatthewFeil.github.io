@@ -1181,13 +1181,15 @@ permalink: /gradecalculatorv2/
     ];
     const maxCurrentGrade = 150;
     const maxFinalScore = 100;
+    const storageKey = 'finals-grade-calculator-v1';
 
     const state = {
       scale: defaultScale.map((grade) => ({ ...grade })),
       roundingEnabled: true,
       roundingWindow: 0.5,
       finalWeight: 20,
-      currentGrade: null
+      currentGrade: null,
+      finalScore: null
     };
 
     const currentInput = document.getElementById('current-grade');
@@ -1217,6 +1219,42 @@ permalink: /gradecalculatorv2/
       'weight-dialog': 'weight'
     };
     const trackGrade = (event, action) => window.siteAnalytics?.track(event, 'grade_calculator', action);
+
+    function isStoredNumber(value, maximum) {
+      return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= maximum;
+    }
+
+    function restoreCalculator() {
+      try {
+        const saved = JSON.parse(window.localStorage.getItem(storageKey));
+        if (!saved || saved.version !== 1) return;
+
+        if (typeof saved.roundingEnabled === 'boolean') state.roundingEnabled = saved.roundingEnabled;
+        if (isStoredNumber(saved.roundingWindow, 10)) state.roundingWindow = saved.roundingWindow;
+        if (isStoredNumber(saved.finalWeight, 100)) state.finalWeight = saved.finalWeight;
+        if (isStoredNumber(saved.currentGrade, maxCurrentGrade)) state.currentGrade = saved.currentGrade;
+        if (isStoredNumber(saved.finalScore, maxFinalScore)) state.finalScore = saved.finalScore;
+
+        if (Array.isArray(saved.scale) && saved.scale.length === defaultScale.length &&
+            saved.scale.every((grade, index) => grade && grade.name === defaultScale[index].name &&
+              isStoredNumber(grade.low, 100) && (index === 0 || grade.low <= saved.scale[index - 1].low))) {
+          state.scale = saved.scale.map((grade, index) => ({ name: defaultScale[index].name, low: grade.low }));
+        }
+      } catch {
+        // Defaults remain available when storage is blocked or saved data is unreadable.
+      }
+
+      currentInput.value = state.currentGrade ?? '';
+      exampleInput.value = state.finalScore ?? '';
+    }
+
+    function saveCalculator() {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify({ version: 1, ...state }));
+      } catch {
+        // Storage restrictions must not interrupt calculation.
+      }
+    }
 
     function replayAnimation(element, className, duration) {
       if (reducedMotionMedia.matches) return;
@@ -1412,7 +1450,10 @@ permalink: /gradecalculatorv2/
       const result = readCurrentGrade();
       setFieldError(currentInput, currentGradeMessage, result.error);
 
-      if (!result.error) state.currentGrade = result.value;
+      if (!result.error) {
+        state.currentGrade = result.value;
+        saveCalculator();
+      }
       renderResults();
     }
 
@@ -1532,6 +1573,7 @@ permalink: /gradecalculatorv2/
 
     roundingToggle.addEventListener('click', () => {
       state.roundingEnabled = !state.roundingEnabled;
+      saveCalculator();
       window.siteAnalytics?.track('tool_action', 'grade_calculator', 'rounding_changed');
       trackGrade('tool_interaction', state.roundingEnabled ? 'rounding_enabled' : 'rounding_disabled');
       updateSummary();
@@ -1550,6 +1592,7 @@ permalink: /gradecalculatorv2/
 
       setFieldError(roundingWindowInput, roundingMessage, '');
       state.roundingWindow = nextWindow;
+      saveCalculator();
       updateSummary();
       renderResults();
       trackGrade('tool_complete', 'rounding_saved');
@@ -1559,6 +1602,7 @@ permalink: /gradecalculatorv2/
     document.getElementById('reset-rounding').addEventListener('click', () => {
       setFieldError(roundingWindowInput, roundingMessage, '');
       state.roundingWindow = 0.5;
+      saveCalculator();
       roundingWindowInput.value = state.roundingWindow;
       trackGrade('tool_interaction', 'rounding_reset');
       updateSummary();
@@ -1575,6 +1619,7 @@ permalink: /gradecalculatorv2/
       }
 
       state.scale = result.scale;
+      saveCalculator();
       window.siteAnalytics?.track('tool_action', 'grade_calculator', 'scale_saved');
       scaleMessage.textContent = '';
       renderResults();
@@ -1584,6 +1629,7 @@ permalink: /gradecalculatorv2/
 
     document.getElementById('reset-scale').addEventListener('click', () => {
       state.scale = defaultScale.map((grade) => ({ ...grade }));
+      saveCalculator();
       trackGrade('tool_interaction', 'scale_reset');
       scaleMessage.textContent = '';
       buildScaleEditor();
@@ -1602,6 +1648,7 @@ permalink: /gradecalculatorv2/
 
       setFieldError(finalWeightInput, weightMessage, '');
       state.finalWeight = nextWeight;
+      saveCalculator();
       window.siteAnalytics?.track('tool_action', 'grade_calculator', 'weight_saved');
       updateSummary();
       renderResults();
@@ -1612,6 +1659,7 @@ permalink: /gradecalculatorv2/
     document.getElementById('reset-weight').addEventListener('click', () => {
       setFieldError(finalWeightInput, weightMessage, '');
       state.finalWeight = 20;
+      saveCalculator();
       finalWeightInput.value = state.finalWeight;
       trackGrade('tool_interaction', 'weight_reset');
       updateSummary();
@@ -1624,6 +1672,7 @@ permalink: /gradecalculatorv2/
       weightHelp.textContent = `Your current grade counts for ${formatNumber(Math.max(0, Math.min(100, semesterWeight)))}% of the semester grade.`;
     });
 
+    currentInput.addEventListener('click', () => currentInput.select());
     currentInput.addEventListener('input', updateFromCurrentGrade);
     currentInput.addEventListener('change', () => {
       const result = readCurrentGrade();
@@ -1631,7 +1680,15 @@ permalink: /gradecalculatorv2/
       else if (result.value !== null) trackGrade('tool_complete', 'calculation');
       else trackGrade('tool_interaction', 'current_grade_cleared');
     });
-    exampleInput.addEventListener('input', updateExample);
+    exampleInput.addEventListener('input', () => {
+      const rawValue = exampleInput.value.trim();
+      const score = Number(rawValue);
+      if (!exampleInput.validity.badInput && (!rawValue || isStoredNumber(score, maxFinalScore))) {
+        state.finalScore = rawValue ? score : null;
+        saveCalculator();
+      }
+      updateExample();
+    });
     exampleInput.addEventListener('change', () => {
       if (exampleInput.validity.badInput) {
         trackGrade('tool_error', 'final_score_invalid');
@@ -1650,7 +1707,9 @@ permalink: /gradecalculatorv2/
       }
     });
 
+    restoreCalculator();
     setMobileSettingsOpen(false);
     updateSummary();
+    renderResults();
   })();
 </script>

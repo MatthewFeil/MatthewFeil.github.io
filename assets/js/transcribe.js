@@ -1354,6 +1354,15 @@
     if (message) configStatusTimer = setTimeout(() => showConfigStatus(''), 4500);
   }
   document.getElementById('transcribe-config-dismiss').addEventListener('click', () => showConfigStatus(''));
+  const restoreStatus = document.getElementById('transcribe-restore-status');
+  let restoreStatusTimer;
+  function showRestoreStatus(message = '') {
+    clearTimeout(restoreStatusTimer);
+    restoreStatus.textContent = message;
+    restoreStatus.hidden = !message;
+    restoreStatus.parentElement.classList.toggle('has-restore-status', Boolean(message));
+    if (message) restoreStatusTimer = setTimeout(() => showRestoreStatus(), 3500);
+  }
   const configFields = ['channel', 'highpass', 'lowpass', 'semitones', 'cents', 'volume'];
 
 
@@ -1652,6 +1661,7 @@
 
     configActions.querySelectorAll('button').forEach(button => { button.disabled = true; });
     showConfigStatus('');
+    showRestoreStatus();
     marks.reset();
     const loadGeneration = marks.generation;
     elements.audio.pause();
@@ -1728,7 +1738,10 @@
       if (loadGeneration === marks.generation) {
         configActions.querySelectorAll('button').forEach(button => { button.disabled = !marks.identity; });
         if (restoredConfig) {
-          try { applyConfig(validateConfig(restoredConfig)); }
+          try {
+            applyConfig(validateConfig(restoredConfig));
+            showRestoreStatus('Config restored');
+          }
           catch { showConfigStatus('Saved settings could not be restored. The audio is available.'); }
         }
         if (!restoredConfig) {
