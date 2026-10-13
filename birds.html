@@ -6,7 +6,7 @@ no_analytics: true
 noindex: true
 sitemap: false
 extra_css:
-  - /assets/css/birds.css?v=20261013-scopes1
+  - /assets/css/birds.css?v=20261013-controls1
 ---
 <section class="birds-app" aria-labelledby="birds-title" data-birds-app>
   <div class="birds-stage">
@@ -47,13 +47,11 @@ extra_css:
         </div>
       </div>
       <div class="birds-controls">
-        <label class="birds-scope-control" for="birds-scope">Species scope
-          <select id="birds-scope" class="birds-scope" aria-describedby="birds-availability">
-            <option value="common-north-america">Current · 52</option>
-            <option value="north-america">NA · 181</option>
-            <option value="worldwide">Worldwide · 525</option>
-          </select>
-        </label>
+        <select id="birds-scope" class="birds-scope" aria-label="Species scope" aria-describedby="birds-availability">
+          <option value="common-north-america">Common birds</option>
+          <option value="north-america">North America</option>
+          <option value="worldwide">Worldwide</option>
+        </select>
         <button class="birds-stop" type="button" aria-pressed="false">Start camera</button>
       </div>
     </div>

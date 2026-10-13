@@ -353,11 +353,11 @@ The **Species scope** selector remains available before and during camera use:
 
 | Selection | Allowed model labels |
 | --- | ---: |
-| Current | 52 |
+| Common birds | 52 |
 | North America | 181 |
 | Worldwide | 525 |
 
-Current remains the initial default. The selection is saved locally when browser
+Common birds remains the initial default. The selection is saved locally when browser
 storage is available. North America contains every original label plus a curated
 US/Canada-oriented expansion, including regional, migratory and introduced birds.
 It is not a complete North American checklist or an accuracy claim. Labels retain
