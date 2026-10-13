@@ -40,8 +40,8 @@ export class BirdTracker {
   update(detections, timestamp, geometryOnly = false, keepMissingMs = 0) {
     const previous = this.tracks.filter(t => timestamp - t.seen <= this.maxGapMs), used = new Set();
     this.tracks = detections.map(d => {
-      let match = previous.find(t=>!used.has(t.id)&&t.id===d.trackId), overlap = .25;
-      for (const t of previous) if (!d.trackId && !used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
+      let match = previous.find(t=>!used.has(t.id)&&(d.trackId?t.id===d.trackId:d.cacheId!=null&&t.cacheId===d.cacheId)), overlap = .25;
+      if (!match && !d.trackId) for (const t of previous) if (!used.has(t.id) && iou(t.box, d.box) > overlap) { match=t; overlap=iou(t.box,d.box); }
       if (match) used.add(match.id);
       const evidence = !geometryOnly && d.classificationFresh !== false;
       const history = evidence ? [...(match?.history || []), d.speciesId || null].slice(-4) : [...(match?.history || [])];

@@ -1,4 +1,4 @@
-import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261012-confidence1';
+import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261012-tracking-polish1';
 let ort, detector, classifier, manifest, option, allowedSpeciesIds, busy=false,scanIndex=0,detectorMs=60,previous=[],frameSize='',lastFull=-Infinity,lastDiscovery=-Infinity,cacheId=0;
 const inputBuffers=new Map();
 const qualityCanvas=new OffscreenCanvas(64,64),qualityCtx=qualityCanvas.getContext('2d',{willReadFrequently:true});

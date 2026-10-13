@@ -85,3 +85,12 @@ export function smoothTrackingBox(previous,target,elapsedMs) {
   const box=[x-width/2,y-height/2,x+width/2,y+height/2];
   return Math.max(...box.map((v,i)=>Math.abs(v-target[i])))<.0002?[...target]:box;
 }
+
+// Only integrate the portion of a motion interval newer than the track's position.
+export function motionFraction(track,fromTimestamp,timestamp) {
+  const applied=Math.max(track.seen ?? -Infinity,track.motionSeen ?? -Infinity);
+  if(!Number.isFinite(timestamp) || timestamp<=applied)return 0;
+  if(!Number.isFinite(fromTimestamp))return 1;
+  if(timestamp<=fromTimestamp)return 0;
+  return Math.min(1,(timestamp-Math.max(applied,fromTimestamp))/(timestamp-fromTimestamp));
+}

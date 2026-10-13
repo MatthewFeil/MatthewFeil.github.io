@@ -1,38 +1,41 @@
 /* Uses the existing site tokens; camera content always has a black field. */
-.birds-app { margin: 1rem 0 2rem; }
-.birds-app h1 { margin: 0 0 1rem; font-size: clamp(2.15rem, 4.8vw, 4.6rem); line-height: .95; }
-.birds-stage { position: relative; width: 100%; height: min(65dvh, 48rem); min-height: 20rem; overflow: hidden; border: 1px solid var(--site-border); background: #000; color: #f6f6f6; }
+.birds-app { margin: 0; }
+.birds-app h1 { margin: 0; font: 600 1.5rem/1.2 var(--font-ui); }
+.birds-stage { position: fixed; inset: 0; z-index: 1000; width: 100%; height: 100dvh; min-height: 0; overflow: hidden; border: 0; background: #000; color: #f6f6f6; }
 .birds-video, .birds-overlays { position: absolute; inset: 0; width: 100%; height: 100%; }
 .birds-video { object-fit: cover; }
 .birds-model-loading .birds-video, .birds-model-loading .birds-overlays { visibility: hidden; }
-.birds-loading { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; padding: 5rem 1.5rem 7rem; text-align: center; background: #000; }
-.birds-loading p { margin: 0; max-width: 38rem; }
+.birds-loading { position: absolute; inset: 0 0 var(--birds-toolbar-height, 4.5rem); display: grid; align-content: safe center; justify-items: center; gap: 1rem; overflow-y: auto; padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) 1.5rem max(1.5rem, env(safe-area-inset-left)); text-align: center; background: #000; }
+.birds-loading p { margin: 0; max-width: min(38rem, 100%); overflow-wrap: anywhere; }
+.birds-loading .birds-instruction { font-size: 1rem; font-weight: 600; line-height: 1.5; }
 .birds-loading-note { font-size: .9rem; color: #bdbdbd; }
 .birds-loading-spinner { width: 2rem; height: 2rem; flex-shrink: 0; border: 3px solid #424242; border-top-color: #ff343d; border-radius: 50%; animation: birds-loading-spin 1s linear infinite; }
 @keyframes birds-loading-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .birds-loading-spinner { animation: none; } }
-@media (max-height: 480px) { .birds-loading { gap: .5rem; padding-top: 4rem; padding-bottom: 5rem; } .birds-loading .birds-instruction { font-size: 1rem; } }
-.birds-overlays { pointer-events: none; overflow: hidden; }
-.birds-welcome { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem; padding: 1.5rem; text-align: center; background: #000; }
-.birds-welcome p { margin: 0; max-width: 38rem; }
-.birds-instruction { font-size: 1.4rem; font-weight: 700; }
-.birds-message { color: #f6f6f6; }
-.birds-availability { font-size: .9rem; color: #bdbdbd; }
-.birds-app button { min-height: 44px; padding: .7rem 1rem; border: 1px solid #f6f6f6; border-radius: 0; font: 700 .85rem var(--font-ui); letter-spacing: .04em; cursor: pointer; }
-.birds-start { color: #fff; background: #b90f17; }
-.birds-start:hover { background: #8f0c12; }
+@media (max-height: 480px) { .birds-loading { gap: .5rem; } }
+.birds-overlays { pointer-events: none; overflow: hidden; padding: max(.5rem, env(safe-area-inset-top)) max(.5rem, env(safe-area-inset-right)) .5rem max(.5rem, env(safe-area-inset-left)); }
+.birds-welcome { position: absolute; inset: 0 0 var(--birds-toolbar-height, 4.5rem); display: grid; grid-template-rows: auto auto auto; justify-items: center; align-items: center; align-content: safe center; gap: 1.25rem; padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) 1.25rem max(1.25rem, env(safe-area-inset-left)); text-align: center; background: #000; overflow-y: auto; }
+.birds-welcome p { margin: 0; overflow-wrap: anywhere; }
+.birds-welcome > * { min-width: 0; max-width: 100%; }
+.birds-launch-intro { max-width: 36rem; }
+.birds-welcome .birds-instruction { max-width: 36ch; margin-top: .6rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #f6f6f6; }
+.birds-launch-action { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.birds-launch-action .birds-start { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; width: min(100%, 14rem); min-height: 72px; padding: 1rem 1.5rem; color: #f6f6f6; background: #141414; border-color: #a7a7a7; font-size: 1rem; font-weight: 600; letter-spacing: 0; }
+.birds-launch-action .birds-start svg { flex: 0 0 auto; }
+.birds-launch-action .birds-message { max-width: 48ch; margin-top: .75rem; color: #bdbdbd; font-size: .85rem; line-height: 1.5; }
+.birds-launch-notes { width: min(100%, 46ch); }
+.birds-launch-notes .birds-availability { max-width: 62ch; font-size: .78rem; line-height: 1.5; }
+.birds-launch-notes .birds-first-load { margin-top: .45rem; color: #bdbdbd; font-size: .78rem; line-height: 1.5; }
+.birds-app button { min-height: 44px; padding: .7rem 1rem; border: 1px solid #f6f6f6; border-radius: 0; font: 700 .85rem var(--font-ui); letter-spacing: .04em; cursor: pointer; transition: background-color .12s ease-out, border-color .12s ease-out; }
 .birds-app button:disabled { opacity: .55; cursor: wait; }
-.birds-stop { color: #f6f6f6; background: #141414; white-space: nowrap; }
-.birds-stop:hover { background: #303030; }
+.birds-stop { color: #f6f6f6; background: #141414; flex: 0 0 auto; max-width: 45%; white-space: normal; overflow-wrap: anywhere; }
 :root[data-keyboard-navigation="on"] .birds-app button:focus-visible { outline: 2px solid #ff343d; outline-offset: 3px; }
 .birds-toolbar { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem max(.75rem, env(safe-area-inset-right)) max(.75rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left)); background: #000; border-top: 1px solid #5c5c5c; }
-.birds-readout { min-width: 0; flex: 1; display: flex; align-items: center; gap: 1rem; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; scrollbar-color: #626262 #000; }
-.birds-status { flex: 0 0 auto; margin: 0; font-size: .9rem; line-height: 1.3; }
+.birds-readout { min-width: 0; flex: 1; min-height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: .2rem; }
+.birds-status { flex: 0 0 auto; margin: 0; white-space: normal; overflow-wrap: anywhere; font-size: .9rem; line-height: 1.3; }
 .birds-app [hidden] { display: none !important; }
-body.birds-running { overflow: hidden; }
-body.birds-running > .site-header, body.birds-running > .site-footer, body.birds-running > .skip-link { display: none; }
-.birds-running .birds-app > h1 { display: none; }
-.birds-running .birds-stage { position: fixed; inset: 0; z-index: 1000; height: 100dvh; min-height: 0; border: 0; }
+body:has([data-birds-app]) { min-width: 0; overflow: hidden; }
+body:has([data-birds-app]) > .site-header, body:has([data-birds-app]) > .site-footer, body:has([data-birds-app]) > .skip-link { display: none; }
 /* Effects live on state changes; tracked bounds and size smoothing stay independent. */
 .birds-box { position: absolute; box-sizing: border-box; border: 3px solid #bdbdbd; }
 .birds-box[data-state="identifying"] { border-color: #ff343d; animation: birds-identifying-glow 1.6s ease-in-out infinite; }
@@ -59,12 +62,27 @@ body.birds-running > .site-header, body.birds-running > .site-footer, body.birds
 @media (prefers-reduced-motion: reduce) {
   .birds-box[data-state], .birds-label[data-state] { animation: none; }
 }
-.birds-label { position: absolute; background: #000; color: #f6f6f6; padding: .3rem .5rem; max-width: min(16rem, 85vw); box-sizing: border-box; font: 700 .85rem/1.3 var(--font-ui); overflow-wrap: anywhere; }
-.birds-confidence { color: #bdbdbd; font-weight: 500; font-variant-numeric: tabular-nums; }
-@media (max-width: 720px) { .birds-stage { height: 65dvh; } }
+.birds-label { position: absolute; background: #000; color: #f6f6f6; padding: .3rem .5rem; width: max-content; max-width: min(16rem, 85vw); box-sizing: border-box; font: 700 .85rem/1.35 var(--font-ui); overflow-wrap: anywhere; }
+.birds-confidence { white-space: nowrap; color: #bdbdbd; font-weight: 500; font-variant-numeric: tabular-nums; }
 
-.birds-stats { display: flex; flex: 0 0 auto; align-items: center; gap: 1rem; color: #bdbdbd; font-size: .78rem; font-variant-numeric: tabular-nums; }
+.birds-stats { display: flex; flex: 0 0 auto; align-items: center; gap: .75rem; min-height: 1.25em; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; scrollbar-color: #5c5c5c transparent; color: #bdbdbd; font-size: .78rem; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.birds-stats::-webkit-scrollbar { height: 3px; }
+.birds-stats::-webkit-scrollbar-thumb { background: #5c5c5c; }
+.birds-stats > span { flex: 0 0 auto; }
+.birds-stats:not(:has(span:not(:empty))) { display: none; }
 .birds-timing { display: inline; }
 .birds-timing:empty { display: none; }
-.birds-welcome { padding-top: 5rem; }
-@media (max-height: 480px) { .birds-welcome { gap: .5rem; } .birds-instruction { font-size: 1rem; } .birds-availability { font-size: .78rem; } }
+@media (max-height: 480px) { .birds-welcome { gap: .75rem; padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 1rem max(1rem, env(safe-area-inset-left)); } }
+
+/* Recovery copy wraps above the compact readout instead of being truncated in it. */
+.birds-warning { position: absolute; left: max(.75rem, env(safe-area-inset-left)); right: max(.75rem, env(safe-area-inset-right)); bottom: calc(var(--birds-toolbar-height, 4.5rem) + .75rem); margin-inline: auto; max-width: 34rem; max-height: calc(100% - var(--birds-toolbar-height, 4.5rem) - max(.75rem, env(safe-area-inset-top)) - .75rem); overflow-y: auto; padding: 1rem; background: #000; border: 1px solid #a7a7a7; }
+.birds-warning-text { margin: 0 0 .75rem; font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
+.birds-retry { background: #141414; color: #f6f6f6; }
+@media (hover: hover) {
+  .birds-launch-action .birds-start:hover:not(:disabled) { border-color: #f6f6f6; }
+  .birds-stop:hover, .birds-retry:hover { background: #303030; }
+}
+.birds-app button:active:not(:disabled) { background: #202020; border-color: #f6f6f6; }
+@media (prefers-reduced-motion: reduce) { .birds-app button { transition: none; } }
+
+@media (max-width: 360px) { .birds-toolbar { gap: .5rem; } .birds-stop { padding-inline: .75rem; } .birds-stats { gap: .5rem; } }

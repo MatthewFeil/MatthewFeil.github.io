@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {pyramid,followBox,advanceByMotion,smoothTrackingBox} from '../assets/js/birds-motion.mjs';
+import {pyramid,followBox,advanceByMotion,smoothTrackingBox,motionFraction} from '../assets/js/birds-motion.mjs';
 let seed=1234567;
 const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)|0;return(seed>>>24)&255;};
 const width=240,height=160,data=Uint8Array.from({length:width*height},random),base={data,width,height},box=[.25,.3,.55,.7];
@@ -52,3 +52,13 @@ assert.ok(Math.abs((resized100[0]+resized100[2])/2-.4)<1e-10,'Resizing should pr
 const moved100=smoothTrackingBox(box,[.3,.35,.6,.75],100);
 assert.ok((moved100[0]+moved100[2])/2>.448,'Position must remain responsive while size settles slowly');
 console.log('Controlled size corrections preserve responsive center movement.');
+
+assert.equal(motionFraction({seen:120,motionSeen:100},100,110),0);
+assert.equal(motionFraction({seen:120,motionSeen:100},100,140),.5);
+assert.equal(motionFraction({seen:80,motionSeen:100},100,140),1);
+assert.equal(motionFraction({seen:80,motionSeen:130},100,140),.25);
+assert.equal(motionFraction({seen:80,motionSeen:140},100,140),0);
+assert.equal(motionFraction({seen:80},undefined,140),1);
+console.log('Delayed, duplicate and overlapping motion intervals do not double-advance tracks.');
+assert.equal(motionFraction({seen:80},140,140),0);
+assert.equal(motionFraction({seen:80},160,140),0);

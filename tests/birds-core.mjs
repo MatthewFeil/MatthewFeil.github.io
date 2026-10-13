@@ -121,3 +121,11 @@ assert.equal(confidenceTracker.update([{...detection,confidence:.98}],1100)[0].c
 assert.equal(confidenceTracker.update([{box:detection.box,speciesId:'sparrow',confidence:.99}],1200)[0].confidence,null);
 assert.equal(confidenceTracker.update([{box:detection.box,speciesId:null,confidence:null}],1300)[0].confidence,null);
 console.log('Confidence rating bands, tracking retention, updates and identity reset passed.');
+
+const identities=new BirdTracker();
+const first=identities.update([{...detection,cacheId:11},{box:[.65,.3,.85,.6],speciesId:'sparrow',cacheId:22}],0);
+const remembered=first.map(t=>t.id);
+const crossed=identities.update([{box:[.65,.3,.85,.6],cacheId:11,classificationFresh:false},{box:detection.box,cacheId:22,classificationFresh:false}],100,true);
+assert.deepEqual(crossed.map(t=>t.id),remembered,'Worker cache IDs take precedence over proximity');
+assert.deepEqual(crossed.map(t=>t.cacheId),[11,22]);
+console.log('Stable worker identities survive overlap changes without swapping outline nodes.');

@@ -1,4 +1,4 @@
-import {grayscale,pyramid,followBox} from './birds-motion.mjs?v=20261007-sustain1';
+import {grayscale,pyramid,followBox} from './birds-motion.mjs?v=20261012-tracking-polish1';
 let previous,previousTime=0;
 self.onmessage=({data})=>{
   if(data.type!=='frame')return;
@@ -9,6 +9,7 @@ self.onmessage=({data})=>{
       updates.push({id:track.id,...(result||{}),lost:!result});
     }
   }
+  const fromTimestamp=previousTime;
   previous=current;previousTime=data.timestamp;
-  postMessage({type:'motion',timestamp:data.timestamp,updates,latencyMs:performance.now()-started});
+  postMessage({type:'motion',fromTimestamp,timestamp:data.timestamp,updates,latencyMs:performance.now()-started});
 };

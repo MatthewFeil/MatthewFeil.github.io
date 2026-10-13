@@ -28,11 +28,19 @@ const server = http.createServer((req,res) => {
       await page.goto(origin+'/birds/');
       await page.locator('.birds-start').waitFor();
       assert.match(await page.locator('.birds-availability').textContent(),/Experimental/);
+      assert.equal(await page.locator('.birds-toolbar').isVisible(),true);
+      assert.equal(await page.locator('.birds-stop').textContent(),'Start camera');
+      assert.equal(await page.locator('.birds-stop').getAttribute('aria-pressed'),'false');
+      assert.equal(await page.locator('.site-header').isVisible(),false);
+      assert.equal(await page.locator('.site-footer').isVisible(),false);
+      const idleDimensions=await page.locator('.birds-stage').boundingBox();
+      assert.equal(idleDimensions.x,0);assert.equal(idleDimensions.y,0);
+      assert.equal(idleDimensions.width,width);assert.equal(idleDimensions.height,height);
       assert.equal(await page.evaluate(()=>document.body.scrollWidth>innerWidth),false);
       if(screenshots){fs.mkdirSync(screenshots,{recursive:true});await page.screenshot({path:path.join(screenshots,`idle-${width}.png`),fullPage:true});}
       await page.locator('.birds-start').click();
       await page.waitForFunction(()=>document.body.classList.contains('birds-running'));
-      await page.waitForFunction(()=>document.querySelector('.birds-status').textContent.includes('disabled'));
+      await page.waitForFunction(()=>document.querySelector('.birds-warning-text').textContent.includes('disabled'));
       assert.equal(await page.locator('.birds-overlays').locator('*').count(),0);
       assert.equal(await page.locator('.site-header').isVisible(),false);
       const dimensions=await page.locator('.birds-stage').boundingBox();
@@ -41,12 +49,19 @@ const server = http.createServer((req,res) => {
       if(screenshots)await page.screenshot({path:path.join(screenshots,`camera-${width}.png`)});
       await page.locator('.birds-stop').click();
       assert.equal(await page.evaluate(()=>document.querySelector('video').srcObject),null);
-      assert.equal(await page.locator('.site-header').isVisible(),true);
-      await page.locator('.birds-start').click();
+      assert.equal(await page.locator('.site-header').isVisible(),false);
+      assert.equal(await page.locator('.site-footer').isVisible(),false);
+      assert.equal(await page.locator('.birds-start').isVisible(),true);
+      assert.equal(await page.locator('.birds-stop').textContent(),'Start camera');
+      await page.locator('.birds-stop').click();
       await page.waitForFunction(()=>document.body.classList.contains('birds-running'));
+      assert.equal(await page.locator('.birds-stop').textContent(),'Stop camera');
+      assert.equal(await page.locator('.birds-stop').getAttribute('aria-pressed'),'true');
       await page.evaluate(()=>document.querySelector('video').srcObject.getVideoTracks()[0].dispatchEvent(new Event('ended')));
       await page.waitForFunction(()=>document.querySelector('.birds-start').textContent==='Resume camera');
       assert.equal(await page.evaluate(()=>document.querySelector('video').srcObject),null);
+      assert.equal(await page.locator('.birds-stop').textContent(),'Start camera');
+      assert.equal(await page.locator('.birds-toolbar').isVisible(),true);
       await context.close();
     }
     // Permission refusal is a recoverable state, not an immersive screen with no camera.
@@ -56,13 +71,31 @@ const server = http.createServer((req,res) => {
     await page.waitForFunction(()=>document.querySelector('.birds-message').textContent.includes('denied'));
     assert.equal(await page.locator('.birds-start').isEnabled(),true);
     assert.equal(await page.evaluate(()=>document.body.classList.contains('birds-running')),false);
+    assert.equal(await page.locator('.site-header').isVisible(),false);
+    assert.equal(await page.locator('.site-footer').isVisible(),false);
     await denied.close();
+    // Stopping a pending start must discard and close a late camera stream.
+    const cancelled=await browser.newContext();const cancelPage=await cancelled.newPage();
+    await cancelPage.addInitScript(()=>{
+      navigator.mediaDevices.getUserMedia=()=>new Promise(resolve=>{
+        window.finishCameraRequest=()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=64;window.lateCamera=canvas.captureStream();resolve(window.lateCamera);};
+      });
+    });
+    await cancelPage.goto(origin+'/birds/');await cancelPage.locator('.birds-stop').click();
+    await cancelPage.waitForFunction(()=>typeof finishCameraRequest==='function');
+    assert.equal(await cancelPage.locator('.birds-stop').textContent(),'Stop camera');
+    await cancelPage.locator('.birds-stop').click();await cancelPage.evaluate(()=>finishCameraRequest());
+    await cancelPage.waitForFunction(()=>lateCamera.getTracks().every(track=>track.readyState==='ended'));
+    assert.equal(await cancelPage.evaluate(()=>document.querySelector('video').srcObject),null);
+    assert.equal(await cancelPage.locator('.birds-start').isEnabled(),true);
+    assert.equal(await cancelPage.locator('.birds-stop').textContent(),'Start camera');
+    await cancelled.close();
     assert.deepEqual(errors,[]);
     assert.ok(requests.every(r=>r.url.startsWith(origin+'/') && r.method==='GET' && !r.body));
     const html=fs.readFileSync(path.join(root,'birds/index.html'),'utf8');
     assert.ok(!html.includes('cloudflareinsights') && !html.includes('googletagmanager'));
     assert.ok(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('analytics-consent.js'));
     assert.ok(!fs.readFileSync(path.join(root,'work/index.html'),'utf8').includes('href="/birds/"'));
-    console.log(JSON.stringify({viewports:4, camera:'synthetic Chromium camera', lifecycle:'start/stop/resume/interruption/permission denial', network:'only same-origin GETs, no uploads', errors},null,2));
+    console.log(JSON.stringify({viewports:4, camera:'synthetic Chromium camera', lifecycle:'central start, toolbar start/stop, resume/interruption, permission denial, pending-start cancellation', network:'only same-origin GETs, no uploads', errors},null,2));
   } finally {await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
