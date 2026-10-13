@@ -1,5 +1,7 @@
 import { BirdTracker, projectBox, iou as overlap, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating } from './birds-core.mjs?v=20261013-responsive1';
 import {advanceByMotion,smoothTrackingBox,motionFraction} from './birds-motion.mjs?v=20261013-responsive1';
+import {BirdScheduler} from './birds-scheduler.mjs?v=20261013-scheduling1';
+const scheduler=new BirdScheduler();
 const app=document.querySelector('[data-birds-app]');
 const video=app.querySelector('video'),stage=app.querySelector('.birds-stage'),overlays=app.querySelector('.birds-overlays');
 const welcome=app.querySelector('.birds-welcome'),message=app.querySelector('.birds-message'),toolbar=app.querySelector('.birds-toolbar');
@@ -19,7 +21,7 @@ const labelObserver=new ResizeObserver(entries=>{
   if(changed)render();
 });
 const motionCanvas=document.createElement('canvas'),motionCtx=motionCanvas.getContext('2d',{willReadFrequently:true});
-let motionWorker,motionPending=false,motionTimer,motionSnapshot=[],motionRate=40,renderFrame,motionWatchdog,motionFailures=0;
+let motionWorker,motionPending=false,motionTimer,motionSnapshot=[],motionVideoFrame=null,nextMotionCapture=-Infinity,lastMotionMediaTime=-1,renderFrame,motionWatchdog,motionFailures=0;
 let stream,worker,generation=0,ready=false,pending=false,timer,watchdog,overlayExpiry,lastResult=0,lastLatency=500,species=new Map(),tracks=[],captureFailures=0,frameUnavailableSince=0;
 const expiry=()=>Math.min(10000,Math.max(3000,lastLatency*2+500));
 function setStatus(text) {if(status.textContent!==text) status.textContent=text;if(!loading.hidden) loadingMessage.textContent=text;}
@@ -39,7 +41,7 @@ function setLoading(active) {
   loading.hidden=!active;stage.classList.toggle('birds-model-loading',active);stage.setAttribute('aria-busy',String(active));
 }
 function clearAnalysis() {
-  generation++;clearTimeout(motionWatchdog);motionFailures=0;captureFailures=0;frameUnavailableSince=0;clearWarning();cancelAnimationFrame(renderFrame);renderFrame=null;clearTimeout(motionTimer);motionWorker?.terminate();motionWorker=null;motionPending=false;motionSnapshot=[];clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
+  generation++;scheduler.reset();if(motionVideoFrame!==null)video.cancelVideoFrameCallback?.(motionVideoFrame);motionVideoFrame=null;nextMotionCapture=-Infinity;lastMotionMediaTime=-1;clearTimeout(motionWatchdog);motionFailures=0;captureFailures=0;frameUnavailableSince=0;clearWarning();cancelAnimationFrame(renderFrame);renderFrame=null;clearTimeout(motionTimer);motionWorker?.terminate();motionWorker=null;motionPending=false;motionSnapshot=[];clearTimeout(timer);clearTimeout(watchdog);clearTimeout(overlayExpiry);worker?.terminate();worker=null;
   labelObserver.disconnect();ready=false;pending=false;tracker.clear();tracks=[];overlays.replaceChildren();overlayNodes.clear();timing.textContent='';rates.textContent='';device.textContent='';analysisTimes=[];motionTimes=[];metricsStarted=0;lastMetrics=0;modelProvider='';
   setLoading(false);
 }
@@ -109,7 +111,8 @@ function startMotion(token) {
   motionWorker.onmessage=({data})=>{
     if(token!==generation || motionWorker!==activeWorker)return;
     clearTimeout(motionWatchdog);motionPending=false;motionFailures=0;clearWarning('motion');
-    motionTimes.push(performance.now());updateDiagnostics();
+    const now=performance.now();
+    motionTimes.push(now);scheduler.observeMotion(now-data.timestamp,now,tracks);updateDiagnostics();
     if(performance.now()-data.timestamp<200) {
       for(const update of data.updates) {
         const track=tracks.find(t=>t.id===update.id);
@@ -125,14 +128,26 @@ function startMotion(token) {
       }
       tracks=tracks.filter(t=>trackSupported(t,performance.now(),1200));tracker.tracks=tracks;render();
     }
-    motionRate=Math.max(33,Math.min(100,data.latencyMs*2));
-    motionTimer=setTimeout(()=>motionFrame(token),Math.max(0,motionRate-data.latencyMs));
+    // A lost motion track gets detector attention as soon as the current job ends.
+    if(data.updates.some(t=>t.lost || t.quality<.4) && !pending)scheduleAnalysis(token);
+    scheduleMotion(token);
   };
   motionWorker.onerror=event=>{event.preventDefault();if(token===generation && motionWorker===activeWorker)recoverMotion(token);};
   motionFrame(token);
 }
+function scheduleMotion(token) {
+  if(token!==generation || !motionWorker || !stream)return;
+  if(video.requestVideoFrameCallback) {
+    motionVideoFrame=video.requestVideoFrameCallback(()=>{motionVideoFrame=null;motionFrame(token);});
+  } else motionTimer=setTimeout(()=>motionFrame(token),tracks.length?Math.max(4,nextMotionCapture-performance.now()):120);
+}
+function scheduleAnalysis(token) {
+  clearTimeout(timer);
+  timer=setTimeout(()=>frame(token),scheduler.analysisDelay(tracks,performance.now()));
+}
 function recoverMotion(token) {
   if(token!==generation)return;
+  if(motionVideoFrame!==null)video.cancelVideoFrameCallback?.(motionVideoFrame);motionVideoFrame=null;
   clearTimeout(motionTimer);clearTimeout(motionWatchdog);motionWorker?.terminate();motionWorker=null;motionPending=false;
   for(const track of tracks){track.motionSeen=undefined;track.motionQuality=0;track.motionLost=true;track.motionLostAt=performance.now();}
   motionFailures++;
@@ -143,13 +158,20 @@ function recoverMotion(token) {
 }
 function motionFrame(token) {
   if(token!==generation || !motionWorker || !stream)return;
-  if(video.readyState>=2 && video.videoWidth && video.videoHeight && !motionPending) {
+  if(motionPending)return;
+  const now=performance.now();
+  // No full-frame motion processing while searching, and no duplicate frames.
+  if(!tracks.length || now<nextMotionCapture-2 || video.currentTime===lastMotionMediaTime) {scheduleMotion(token);return;}
+  if(video.readyState>=2 && video.videoWidth && video.videoHeight) {
     try {
       const ratio=480/Math.max(video.videoWidth,video.videoHeight),width=Math.round(video.videoWidth*ratio),height=Math.round(video.videoHeight*ratio);
       if(motionCanvas.width!==width)motionCanvas.width=width;if(motionCanvas.height!==height)motionCanvas.height=height;
       motionCtx.drawImage(video,0,0,width,height);
       const rgba=motionCtx.getImageData(0,0,width,height).data;
-      motionPending=true;motionWorker.postMessage({type:'frame',rgba,width,height,timestamp:performance.now(),tracks:tracks.map(t=>({id:t.id,box:t.box}))},[rgba.buffer]);
+      const period=1000/scheduler.motionFps;
+      nextMotionCapture=Number.isFinite(nextMotionCapture)?Math.max(nextMotionCapture+period,now):now+period;
+      lastMotionMediaTime=video.currentTime;
+      motionPending=true;motionWorker.postMessage({type:'frame',rgba,width,height,timestamp:now,tracks:tracks.map(t=>({id:t.id,box:t.box}))},[rgba.buffer]);
       motionWatchdog=setTimeout(()=>recoverMotion(token),2000);
     } catch {recoverMotion(token);}
   } else motionTimer=setTimeout(()=>motionFrame(token),40);
@@ -176,7 +198,7 @@ async function frame(token) {
     pending=true;
     let bitmap;
     try {
-      const capturedAt=performance.now();motionSnapshot=tracks.map(t=>({id:t.id,cacheId:t.cacheId,box:[...t.box],flowDx:t.flowDx||0,flowDy:t.flowDy||0}));
+      const capturedAt=performance.now();scheduler.lastAnalysis=capturedAt;motionSnapshot=tracks.map(t=>({id:t.id,cacheId:t.cacheId,box:[...t.box],flowDx:t.flowDx||0,flowDy:t.flowDy||0}));
       watchdog=setTimeout(()=>{if(token===generation)fail('Analysis took too long.');},45000);
       bitmap=await createImageBitmap(video);
       if(token!==generation || !worker) {bitmap.close();return;}
@@ -208,10 +230,11 @@ function loadModel() {
       if(performance.now()-data.timestamp>1500 || data.width!==video.videoWidth || data.height!==video.videoHeight)return;
       lastResult=performance.now();reconcile(data.detections,data.timestamp,true);
     } else if(data.type==='result') {
-      clearTimeout(watchdog);pending=false;timer=setTimeout(()=>frame(token),Math.max(0,(tracks.length?220:120)-data.latencyMs));
-      if(performance.now()-data.timestamp>10000 || data.width!==video.videoWidth || data.height!==video.videoHeight) {tracks=[];tracker.clear();overlays.replaceChildren();return;}
+      clearTimeout(watchdog);pending=false;
+      scheduler.observeAnalysis(performance.now()-data.timestamp);
+      if(performance.now()-data.timestamp>10000 || data.width!==video.videoWidth || data.height!==video.videoHeight) {tracks=[];tracker.clear();overlays.replaceChildren();scheduleAnalysis(token);return;}
       lastResult=performance.now();lastLatency=data.latencyMs;reconcile(data.detections,data.timestamp);
-      analysisTimes.push(performance.now());updateDiagnostics();
+      analysisTimes.push(performance.now());updateDiagnostics();scheduleAnalysis(token);
       const names=[...new Set(tracks.map(t=>species.get(t.speciesId)?.commonName).filter(Boolean))];
       const uncertain=tracks.length && tracks.every(t=>t.history.length && t.history.at(-1)===null);
       setStatus(names.length?'Species matched':uncertain?'Try a clearer view':tracks.length?'Hold steady · Identifying':'Aim at a bird');
