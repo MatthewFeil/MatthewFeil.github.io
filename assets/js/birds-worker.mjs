@@ -1,4 +1,4 @@
-import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261007-sustain1';
+import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261012-confidence1';
 let ort, detector, classifier, manifest, option, allowedSpeciesIds, busy=false,scanIndex=0,detectorMs=60,previous=[],frameSize='',lastFull=-Infinity,lastDiscovery=-Infinity,cacheId=0;
 const inputBuffers=new Map();
 const qualityCanvas=new OffscreenCanvas(64,64),qualityCtx=qualityCanvas.getContext('2d',{willReadFrequently:true});
@@ -11,10 +11,10 @@ async function modelBytes(model) {
   if(digest!==model.sha256) throw new Error('Model integrity check failed. Reload the page and retry.');
   return bytes;
 }
-async function initialize(id) {
+async function initialize() {
   const response=await fetch(new URL('../models/birds/manifest.json',import.meta.url),{cache:'no-cache'});
   if(!response.ok) throw new Error('Local model configuration could not be loaded.');
-  manifest=await response.json();option=experimentOption(manifest,id);
+  manifest=await response.json();option=experimentOption(manifest,'full');
   allowedSpeciesIds=manifest.identificationScope?new Set(manifest.identificationScope.allowedSpeciesIds):null;
   postMessage({type:'progress',message:'Loading local bird detector…'});
   ort=await import('./vendor/onnxruntime/ort.webgpu.bundle.min.mjs');
@@ -49,7 +49,7 @@ function tensor(bitmap,model,crop) {
   const area=width*height;
   // Smooth small crops; preserve upstream nearest resizing for larger source crops.
   const shortSide=crop?Math.min(crop[2],crop[3]):Infinity;
-  ctx.imageSmoothingEnabled=model.resize!=='nearest' || (shortSide<=160 && (option.id!=='small' || shortSide>=64));ctx.imageSmoothingQuality='low';
+  ctx.imageSmoothingEnabled=model.resize!=='nearest' || (shortSide<=160);ctx.imageSmoothingQuality='low';
   if(model.resize==='letterbox-bgr') {
     ctx.fillStyle='rgb(114,114,114)';ctx.fillRect(0,0,width,height);
     const source=crop || [0,0,bitmap.width,bitmap.height];
@@ -102,7 +102,7 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
   sendGeometry();
   for(const d of detections) {
     const match=previous.filter(p=>!used.has(p.cacheId)&&iou(p.box,d.box)>.25).sort((a,b)=>iou(b.box,d.box)-iou(a.box,d.box))[0];
-    if(match) {used.add(match.cacheId);Object.assign(d,{cacheId:match.cacheId,lastClass:match.lastClass,suggestion:match.suggestion,agreements:match.agreements,cropAttempt:match.cropAttempt,retryBaseSide:match.retryBaseSide,bestSharp:match.bestSharp,sharpAt:match.sharpAt,samples:match.samples});}
+    if(match) {used.add(match.cacheId);Object.assign(d,{cacheId:match.cacheId,lastClass:match.lastClass,suggestion:match.suggestion,confidence:match.confidence,agreements:match.agreements,cropAttempt:match.cropAttempt,retryBaseSide:match.retryBaseSide,bestSharp:match.bestSharp,sharpAt:match.sharpAt,samples:match.samples});}
     else d.cacheId=++cacheId;
     d.lastDetected=timestamp;
   }
@@ -122,8 +122,8 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
     if(shortSide<16) continue;
     if(d.retryBaseSide && shortSide>d.retryBaseSide*1.5){d.cropAttempt=0;d.retryBaseSide=shortSide;}
     if(!d.retryBaseSide)d.retryBaseSide=shortSide;
-    // Tiny full-model crops gain context; the quantized model keeps its tighter crop.
-    const padding=shortSide<=64 && option.id!=='small'?.35:.05;
+    // Tiny crops gain context.
+    const padding=shortSide<=64?.35:.05;
     const px=(x2-x1)*padding,py=(y2-y1)*padding;
     const left=Math.max(0,x1-px),top=Math.max(0,y1-py),right=Math.min(1,x2+px),bottom=Math.min(1,y2+py);
     const crop=[left*bitmap.width,top*bitmap.height,(right-left)*bitmap.width,(bottom-top)*bitmap.height];
@@ -135,11 +135,15 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
     // Collect a second sample; skip blurred frames while keeping detector geometry live.
     if(d.samples<2 || sharp<Math.max(1,d.bestSharp*.7) || timestamp-(d.lastClass ?? -Infinity)<(d.agreements>=3?5000:!d.suggestion && d.cropAttempt>=6?1500:shortSide<=160?800:350) || classifiedThisFrame) continue;
     const output=await run(classifier,option.classifier,bitmap,crop);classifiedThisFrame=true;d.cropAttempt=(d.cropAttempt||0)+1;
-    let suggestion;
-    try { suggestion=scopedSpeciesSuggestion(probabilities(output[option.classifier.output].data),manifest.species,option.classifier,allowedSpeciesIds); }
+    let suggestion,confidence=null;
+    try {
+      const scores=probabilities(output[option.classifier.output].data);
+      suggestion=scopedSpeciesSuggestion(scores,manifest.species,option.classifier,allowedSpeciesIds);
+      if(suggestion)confidence=scores[manifest.species.findIndex(s=>s.id===suggestion)];
+    }
     finally { Object.values(output).forEach(t=>t.dispose()); }
     d.classified=true;d.classificationFresh=true;d.speciesId=null;d.lastClass=timestamp;
-    d.speciesId=suggestion;
+    d.speciesId=suggestion;d.confidence=confidence;
     d.agreements=d.speciesId?(d.speciesId===d.suggestion?(d.agreements||0)+1:1):0;
     d.suggestion=d.speciesId;
   }
@@ -147,7 +151,7 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
 }
 self.onmessage=async({data})=>{
   if(data.type==='init') {
-    try { await initialize(data.option); } catch(error) { postMessage({type:'error',message:error.message}); }
+    try { await initialize(); } catch(error) { postMessage({type:'error',message:error.message}); }
   } else if(data.type==='frame') {
     if(busy || !detector) {data.bitmap.close();return;}
     busy=true;

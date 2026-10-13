@@ -34,7 +34,7 @@ const baseline=process.env.BIRDS_TRACKING_BASELINE==='1';
     stream.getTracks().forEach(track=>{const stop=track.stop.bind(track);track.stop=()=>{clearInterval(tick);stop();};});return stream;
    };
   },fs.readFileSync(process.env.BIRDS_ROBIN_PHOTO).toString('base64'));
-  await page.goto(base+'/birds/');await page.selectOption('#birds-model','small');await page.click('.birds-start');
+  await page.goto(base+'/birds/');await page.click('.birds-start');
   await page.waitForFunction(()=>[...document.querySelectorAll('.birds-label')].some(n=>n.textContent.includes('American Robin')),null,{timeout:90000});
   await page.evaluate(()=>{firstBox=document.querySelector('.birds-box');const r=firstBox.getBoundingClientRect();initialCenter=[r.x+r.width/2,r.y+r.height/2];moving=true;freshIDs=0;});
   await page.waitForTimeout(500);

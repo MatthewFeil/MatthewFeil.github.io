@@ -47,7 +47,8 @@ export class BirdTracker {
       const history = evidence ? [...(match?.history || []), d.speciesId || null].slice(-4) : [...(match?.history || [])];
       const suggestion = evidence ? d.speciesId : match?.speciesId;
       const speciesId = suggestion && history.filter(id => id === suggestion).length >= 3 ? suggestion : null;
-      return { ...d, cacheId:d.cacheId ?? match?.cacheId, flowDx:match?.flowDx||0, flowDy:match?.flowDy||0, motionSeen:match?.motionSeen,motionQuality:match?.motionQuality,motionLostAt:undefined,motionLost:false, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
+      const confidence=speciesId?(evidence?d.confidence:match?.confidence):null;
+      return { ...d, confidence, cacheId:d.cacheId ?? match?.cacheId, flowDx:match?.flowDx||0, flowDy:match?.flowDy||0, motionSeen:match?.motionSeen,motionQuality:match?.motionQuality,motionLostAt:undefined,motionLost:false, id: match?.id || this.nextId++, seen: timestamp, history, speciesId, box: match ? d.box.map((v,i) => .9*v + .1*match.box[i]) : d.box };
     });
     if(keepMissingMs) this.tracks.push(...previous.filter(t=>!used.has(t.id)&&trackSupported(t,timestamp,keepMissingMs)));
     return this.tracks;
@@ -159,4 +160,11 @@ export function scopedSpeciesSuggestion(scores,species,config,allowedIds) {
   }
   const id=species[best]?.id;
   return id && (!allowedIds || allowedIds.has(id)) && top>=config.threshold && top-second>=config.margin?id:null;
+}
+
+// Relative model certainty, not a calibrated probability of a correct identification.
+// The lowest band includes accepted predictions below 70%; the highest starts at 97%.
+export function speciesConfidenceRating(confidence) {
+  if(!Number.isFinite(confidence) || confidence<0 || confidence>1)return null;
+  return 1+[.7,.8,.9,.97].filter(threshold=>confidence>=threshold).length;
 }

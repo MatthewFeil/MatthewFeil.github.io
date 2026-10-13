@@ -24,8 +24,8 @@ if(!process.env.BIRDS_ROBIN_PHOTO) throw new Error('Set BIRDS_ROBIN_PHOTO to a l
   await page.locator('.birds-start').click();
   await page.waitForFunction(()=>document.body.classList.contains('birds-running'));
   const results=[];
-  for(const id of ['small','full','detect']) {
-    await page.locator('#birds-model').selectOption(id);
+  for(const id of ['full']) {
+    assert.equal(await page.locator('#birds-model').count(),0);
     await page.waitForFunction(()=>document.querySelector('.birds-timing').textContent.includes('analysis') || document.querySelector('.birds-status').textContent.startsWith('Camera only'),{},{timeout:90000});
     await page.waitForTimeout(2000);
     const status=await page.locator('.birds-status').textContent();
@@ -34,7 +34,7 @@ if(!process.env.BIRDS_ROBIN_PHOTO) throw new Error('Set BIRDS_ROBIN_PHOTO to a l
     if(process.env.BIRDS_SCREENSHOT_DIR) {fs.mkdirSync(process.env.BIRDS_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:process.env.BIRDS_SCREENSHOT_DIR+'/'+id+'-390.png'});}
     assert.ok(!status.startsWith('Camera only'),'Model session must run real inference');
     if(id==='full') assert.ok(labels.some(label=>label.includes('American Robin')));
-    if(id==='detect') assert.ok(labels.includes('Bird'));
+
   }
   await page.locator('.birds-stop').click();
   assert.equal(await page.evaluate(()=>document.querySelector('video').srcObject),null);

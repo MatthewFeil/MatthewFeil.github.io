@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, trackSupported, MOTION_BRIDGE_MS} from '../assets/js/birds-core.mjs';
+import {readFileSync} from 'node:fs';
+import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating} from '../assets/js/birds-core.mjs';
 // Portrait crop: horizontal source edges are outside view; middle bird remains aligned.
 assert.equal(projectBox([0,0,.1,1],1920,1080,390,844),null);
 const r=projectBox([.4,.3,.6,.6],1920,1080,390,844);
@@ -100,3 +101,23 @@ confirmed.motionLost=false;
 assert.equal(continuous.update([{...detection,classificationFresh:false,speciesId:null}],2800)[0].speciesId,'robin');
 assert.equal(continuous.update([{...detection,classificationFresh:true,speciesId:null}],2900)[0].speciesId,null);
 console.log('Sustained detector-gap continuity, bounded expiry and cached-name retention passed.');
+
+const currentManifest=JSON.parse(readFileSync(new URL('../assets/models/birds/manifest.json',import.meta.url)));
+assert.deepEqual(currentManifest.options.map(option=>option.id),['full']);
+assert.equal(currentManifest.defaultOption,'full');
+assert.equal(experimentOption(currentManifest,'full').classifier.url,'/assets/models/birds/efficientnet-b2/model.onnx');
+for(const removed of ['small','detect'])assert.throws(()=>experimentOption(currentManifest,removed),/unavailable/);
+console.log('Only full precision species classification is available.');
+
+for(const [probability,rating] of [[.65,1],[.699,1],[.7,2],[.799,2],[.8,3],[.899,3],[.9,4],[.969,4],[.97,5],[1,5]])assert.equal(speciesConfidenceRating(probability),rating);
+for(const invalid of [null,undefined,NaN,-.1,1.1])assert.equal(speciesConfidenceRating(invalid),null);
+const confidenceTracker=new BirdTracker();
+const confident={...detection,confidence:.94};
+confidenceTracker.update([confident],0);confidenceTracker.update([confident],400);
+assert.equal(confidenceTracker.update([confident],800)[0].confidence,.94);
+assert.equal(confidenceTracker.update([{box:detection.box}],900,true)[0].confidence,.94);
+assert.equal(confidenceTracker.update([{...detection,confidence:.7,classificationFresh:false}],1000)[0].confidence,.94);
+assert.equal(confidenceTracker.update([{...detection,confidence:.98}],1100)[0].confidence,.98);
+assert.equal(confidenceTracker.update([{box:detection.box,speciesId:'sparrow',confidence:.99}],1200)[0].confidence,null);
+assert.equal(confidenceTracker.update([{box:detection.box,speciesId:null,confidence:null}],1300)[0].confidence,null);
+console.log('Confidence rating bands, tracking retention, updates and identity reset passed.');

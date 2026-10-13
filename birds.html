@@ -6,7 +6,7 @@ no_analytics: true
 noindex: true
 sitemap: false
 extra_css:
-  - /assets/css/birds.css?v=20261007-highlights
+  - /assets/css/birds.css?v=20261012-toolbar-row1
 ---
 <section class="birds-app" aria-labelledby="birds-title" data-birds-app>
   <h1 id="birds-title">Bird Detection</h1>
@@ -16,16 +16,8 @@ extra_css:
     <div class="birds-loading" hidden>
       <span class="birds-loading-spinner" aria-hidden="true"></span>
       <p class="birds-instruction">Preparing bird identification</p>
-      <p class="birds-loading-message" aria-hidden="true">Loading selected local model…</p>
+      <p class="birds-loading-message" aria-hidden="true">Loading full precision model…</p>
       <p class="birds-loading-note">The camera view will appear when the model is ready.</p>
-    </div>
-    <div class="birds-modelbar">
-      <label for="birds-model">Model</label>
-      <select id="birds-model" aria-label="Local model option">
-        <option value="small">Smaller · 9 MB</option>
-        <option value="full" selected>Full precision · 34 MB</option>
-        <option value="detect">Detection only · 4 MB</option>
-      </select>
     </div>
     <div class="birds-welcome">
       <p class="birds-instruction">Point your camera at a bird</p>
@@ -37,10 +29,14 @@ extra_css:
     <div class="birds-toolbar" hidden>
       <div class="birds-readout">
         <p class="birds-status" role="status" aria-live="polite" aria-atomic="true">Starting camera…</p>
-        <span class="birds-timing" aria-label="Last analysis duration"></span>
+        <div class="birds-stats" aria-label="Local performance statistics">
+          <span class="birds-timing"></span>
+          <span class="birds-rates"></span>
+          <span class="birds-device"></span>
+        </div>
       </div>
       <button class="birds-stop" type="button">Stop camera</button>
     </div>
   </div>
 </section>
-<script type="module" src="{{ '/assets/js/birds.js?v=20261007-sustain2' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/birds.js?v=20261012-toolbar-row1' | relative_url }}"></script>

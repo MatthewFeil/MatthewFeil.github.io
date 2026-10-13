@@ -21,7 +21,7 @@ if(!process.env.BIRDS_ROBIN_PHOTO)throw new Error('Set BIRDS_ROBIN_PHOTO to the 
     worker.onmessage=({data})=>{if(data.type==='error') {clearTimeout(timeout);reject(new Error(data.message));}else if(data.type===type){clearTimeout(timeout);resolve(data);}};
     worker.onerror=e=>{clearTimeout(timeout);reject(new Error(e.message));};
    });
-   let promise=next('ready');worker.postMessage({type:'init',option:'detect'});await promise;
+   let promise=next('ready');worker.postMessage({type:'init',option:'full'});await promise;
     const canvas=document.createElement('canvas');canvas.width=1920;canvas.height=1080;const ctx=canvas.getContext('2d');ctx.fillStyle='#888';ctx.fillRect(0,0,1920,1080);
     if(fixture.size)ctx.drawImage(image,fixture.x,fixture.y,fixture.size,fixture.size);
     let hits=0,latencies=[],boxes=[];

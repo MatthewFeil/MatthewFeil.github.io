@@ -2668,35 +2668,6 @@
   "defaultOption": "full",
   "options": [
     {
-      "id": "small",
-      "name": "Smaller model",
-      "classifier": {
-        "url": "/assets/models/birds/efficientnet-int8/model.onnx",
-        "sha256": "998447810ae98fb8896fa5a314383cf7b26362b6a52380b74cb3b2c5de193e4c",
-        "bytes": 8971139,
-        "input": "pixel_values",
-        "output": "logits",
-        "size": [
-          260,
-          260
-        ],
-        "mean": [
-          0.485,
-          0.456,
-          0.406
-        ],
-        "std": [
-          0.22899999563551357,
-          0.22400001642496,
-          0.22499998195105692
-        ],
-        "resize": "nearest",
-        "threshold": 0.65,
-        "margin": 0.2,
-        "provider": "wasm"
-      }
-    },
-    {
       "id": "full",
       "name": "Full precision",
       "classifier": {
@@ -2723,11 +2694,6 @@
         "threshold": 0.65,
         "margin": 0.2
       }
-    },
-    {
-      "id": "detect",
-      "name": "Detection only",
-      "classifier": null
     }
   ],
   "identificationScope": {

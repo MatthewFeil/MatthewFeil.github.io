@@ -68,3 +68,20 @@ export function advanceByMotion(box,anchor,current) {
   const dx=(current.flowDx||0)-(anchor.flowDx||0),dy=(current.flowDy||0)-(anchor.flowDy||0);
   return box.map((v,i)=>Math.max(0,Math.min(1,v+(i%2?dy:dx))));
 }
+
+// Display-only smoothing: detection/tracking boxes remain the source of truth.
+export function smoothTrackingBox(previous,target,elapsedMs) {
+  if(!previous || elapsedMs>=200)return [...target];
+  const center=box=>[(box[0]+box[2])/2,(box[1]+box[3])/2];
+  const before=center(previous),after=center(target),distance=Math.hypot(after[0]-before[0],after[1]-before[1]);
+  // Reacquisition and large jumps should land immediately, never drift across the view.
+  if(distance>.18)return [...target];
+  if(elapsedMs<=0)return [...previous];
+  // Size settles more slowly than position to damp rapid detector crop fluctuations.
+  const dt=elapsedMs,position=1-Math.exp(-dt/(distance>.02?28:45)),size=1-Math.exp(-dt/240);
+  const x=before[0]+(after[0]-before[0])*position,y=before[1]+(after[1]-before[1])*position;
+  const width=(previous[2]-previous[0])+((target[2]-target[0])-(previous[2]-previous[0]))*size;
+  const height=(previous[3]-previous[1])+((target[3]-target[1])-(previous[3]-previous[1]))*size;
+  const box=[x-width/2,y-height/2,x+width/2,y+height/2];
+  return Math.max(...box.map((v,i)=>Math.abs(v-target[i])))<.0002?[...target]:box;
+}

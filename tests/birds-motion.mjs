@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {pyramid,followBox,advanceByMotion} from '../assets/js/birds-motion.mjs';
+import {pyramid,followBox,advanceByMotion,smoothTrackingBox} from '../assets/js/birds-motion.mjs';
 let seed=1234567;
 const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)|0;return(seed>>>24)&255;};
 const width=240,height=160,data=Uint8Array.from({length:width*height},random),base={data,width,height},box=[.25,.3,.55,.7];
@@ -28,3 +28,27 @@ assert.ok(Math.abs(advanced[0]-.3)<1e-10&&Math.abs(advanced[1]-.4)<1e-10);
 assert.deepEqual(advanceByMotion([.2,.2,.4,.4],anchor,{...current,box:advanced}),advanced);
 
 console.log('Motion tracking: camera movement, independent object movement, disappearance, low texture and delayed-box alignment passed.');
+
+const target=[.3,.35,.6,.75];
+assert.deepEqual(smoothTrackingBox(null,box,16),box);
+assert.deepEqual(smoothTrackingBox(box,target,0),box);
+const halfway=smoothTrackingBox(box,target,16);
+assert.ok(halfway[0]>box[0]&&halfway[0]<target[0]);
+const twice=smoothTrackingBox(smoothTrackingBox(box,target,16),target,16),once=smoothTrackingBox(box,target,32);
+for(let i=0;i<4;i++)assert.ok(Math.abs(twice[i]-once[i])<1e-10,'Smoothing must use elapsed time, not frame count');
+let settled=box;for(let i=0;i<120;i++)settled=smoothTrackingBox(settled,target,16);
+assert.deepEqual(settled,target);
+assert.deepEqual(smoothTrackingBox(box,[.7,.3,1,.7],16),[.7,.3,1,.7]);
+assert.deepEqual(smoothTrackingBox(box,target,250),target);
+const resized=smoothTrackingBox(box,[.2,.25,.6,.75],16);
+assert.ok(resized[2]-resized[0]>.3&&resized[2]-resized[0]<.4);
+assert.deepEqual(box,[.25,.3,.55,.7]);
+assert.deepEqual(target,[.3,.35,.6,.75]);
+console.log('Display smoothing: time-based interpolation, convergence, size settling, jump reset and unchanged tracking geometry passed.');
+
+const resized100=smoothTrackingBox(box,[.2,.25,.6,.75],100);
+assert.ok((resized100[2]-resized100[0]-.3)/.1<.4,'Size should cover less than 40 percent of a correction in the first 100ms');
+assert.ok(Math.abs((resized100[0]+resized100[2])/2-.4)<1e-10,'Resizing should preserve the tracked center');
+const moved100=smoothTrackingBox(box,[.3,.35,.6,.75],100);
+assert.ok((moved100[0]+moved100[2])/2>.448,'Position must remain responsive while size settles slowly');
+console.log('Controlled size corrections preserve responsive center movement.');

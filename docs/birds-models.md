@@ -5,20 +5,24 @@ experimental mode. It is unlisted (removed from My Work and not added to navigat
 noindex, sitemap:false and has no analytics. No deployment or publication was performed.
 An unlisted URL is not authentication; a visitor with its URL may still open it.
 
-## Options
+## Current model
 
-| Selector | Weights | What it does |
-|---|---|---|
-| Full precision (default) | EfficientNet-B2 FP32, 33.7 MB | Names detected birds using 525 source labels |
-| Smaller | Locally quantized EfficientNet-B2 QUInt8, 9.0 MB | Same label set, smaller download, potentially reduced identification quality |
-| Detection only | YOLOX-Nano, 3.7 MB | Draws bird outlines, no species names |
+The identifier exclusively uses EfficientNet-B2 FP32 (33.7 MB) for species
+classification, alongside YOLOX-Nano (3.7 MB) to locate birds. ONNX Runtime's
+26 MB WASM runtime is loaded locally. There is no model selector, quantized
+classifier, or detection-only mode. Processing stays on the device.
 
-All options share YOLOX-Nano; full and smaller add a classifier. ONNX Runtime's
-26 MB WASM runtime is loaded locally. Only the selected classifier is downloaded.
-The full-precision model is the default because it named the labeled robin photo in
-our browser smoke test while the quantized model stayed uncertain on the detected crop.
-The options are not three independently trained species classifiers; Smaller is a
-quantized version of Full precision. Speed benefits must be measured on the user's phone.
+The comparison notes below document earlier experiments; Smaller and Detection
+only were removed from the site on 2026-10-12.
+
+## Displayed confidence
+
+Identified labels include a 1–5 relative confidence rating from the latest accepted
+species probability. Bands are: 1 below 70%, 2 at 70–79%, 3 at 80–89%, 4 at
+90–96%, and 5 at 97% or above. Existing acceptance thresholds and three-sample
+stabilization still apply. Scores use the full classifier output without regional
+renormalization, stay with the track during geometry-only updates, and clear when
+identity is lost. This is model certainty, not calibrated identification accuracy.
 
 ## Sources and restrictions
 
@@ -136,7 +140,7 @@ and tests the failure/recovery lifecycle without repeatedly loading large real m
 
 ## How to compare on your phone
 
-1. Open /birds/, select Full precision, and tap Start camera. Allow the first download.
+1. Open /birds/ and tap Start camera. Allow the first download.
 2. Use a known bird photo, filling a reasonable part of the frame. Hold steady for
    several analyses and note the tentative name, outline, uncertainty and duration.
 3. Switch to Smaller without moving the phone. Compare the same bird and framing.
