@@ -18,7 +18,7 @@ const scopeNotes={
 };
 let scopeRevision=0;
 try {const saved=localStorage.getItem('birds-species-scope');if(Object.hasOwn(scopeNotes,saved))scopeControl.value=saved;} catch { /* Storage is optional. */ }
-function updateScopeNote() {availability.textContent=`${scopeNotes[scopeControl.value]} Blue Jay naming is not supported yet.`;}
+function updateScopeNote() {availability.textContent=scopeNotes[scopeControl.value];}
 updateScopeNote();
 const tracker=new BirdTracker(10000),overlayNodes=new Map();
 // Text can reflow after a font, orientation, or viewport change. Keep cached bounds current.
