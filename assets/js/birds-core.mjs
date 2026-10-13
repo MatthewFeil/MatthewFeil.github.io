@@ -87,7 +87,16 @@ export function experimentOption(manifest, id) {
     const known=new Set(manifest.species.map(s=>s.id));
     if(scope.id!=='common-north-america' || !Array.isArray(scope.allowedSpeciesIds) || !scope.allowedSpeciesIds.length || new Set(scope.allowedSpeciesIds).size!==scope.allowedSpeciesIds.length || scope.allowedSpeciesIds.some(id=>!known.has(id)))throw new Error('Invalid regional species list.');
   }
+  for(const scope of manifest.identificationScopes || []) speciesScope(manifest,scope.id);
   return option;
+}
+// Scope changes only permit names; the full model still supplies confidence/margin.
+export function speciesScope(manifest,id='common-north-america') {
+  if(id==='worldwide') return null;
+  const scope=id===manifest.identificationScope?.id?manifest.identificationScope:manifest.identificationScopes?.find(s=>s.id===id);
+  const known=new Set(manifest.species.map(s=>s.id)),ids=scope?.allowedSpeciesIds;
+  if(!ids?.length || !Array.isArray(ids) || new Set(ids).size!==ids.length || ids.some(value=>!known.has(value)))throw new Error('Invalid species scope.');
+  return new Set(ids);
 }
 export function decodeYolox(data, config, sourceWidth, sourceHeight) {
   const [width,height]=config.size, ratio=Math.min(width/sourceWidth,height/sourceHeight), found=[];

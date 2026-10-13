@@ -42,9 +42,12 @@ const motion=`self.onmessage=({data})=>{if(data.type==='frame')postMessage({type
   await page.waitForFunction(()=>document.querySelector('.birds-timing').textContent.startsWith('analysis:'));
   const normalHeight=(await page.locator('.birds-toolbar').boundingBox()).height;
   if(width===320 || width===568){
+   // Keep the target in the remaining camera area when text enlarges the toolbar.
+   await page.evaluate(()=>qaModel.postMessage({type:'qa-box',box:[.4,.25,.6,.4]}));await page.waitForTimeout(700);
    await page.addStyleTag({content:':root {font-size:32px!important;}'});
    await page.waitForTimeout(200);label=await checkLabel();assert.ok(label.left>=15 && label.right<=width-15 && label.bottom<=label.toolbarTop-15,JSON.stringify(label));assert.equal(label.overflow,false);
    const stats=await page.locator('.birds-stats').evaluate(n=>({height:n.clientHeight,scrollHeight:n.scrollHeight}));assert.ok(stats.height>=stats.scrollHeight-1,JSON.stringify(stats));
+   const scope=await page.locator('.birds-scope').boundingBox();assert.ok(scope.x>=0 && scope.x+scope.width<=width && scope.y+scope.height<=height,'Scope stays inside the viewport at large text sizes');
    await page.addStyleTag({content:':root {font-size:16px!important;}'});
   }
   // Insets emulate the geometry of a landscape notch and home indicator.

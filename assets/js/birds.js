@@ -1,4 +1,4 @@
-import { BirdTracker, projectBox, iou as overlap, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating } from './birds-core.mjs?v=20261013-responsive1';
+import { BirdTracker, projectBox, iou as overlap, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating } from './birds-core.mjs?v=20261013-scopes1';
 import {advanceByMotion,smoothTrackingBox,motionFraction} from './birds-motion.mjs?v=20261013-responsive1';
 import {BirdScheduler} from './birds-scheduler.mjs?v=20261013-scheduling1';
 const scheduler=new BirdScheduler();
@@ -10,6 +10,16 @@ const timing=app.querySelector('.birds-timing'),rates=app.querySelector('.birds-
 let analysisTimes=[],motionTimes=[],metricsStarted=0,lastMetrics=0,modelProvider='';
 const warning=app.querySelector('.birds-warning'),warningText=app.querySelector('.birds-warning-text'),retry=app.querySelector('.birds-retry');
 const loading=app.querySelector('.birds-loading'),loadingMessage=app.querySelector('.birds-loading-message');
+const scopeControl=app.querySelector('.birds-scope'),availability=app.querySelector('.birds-availability');
+const scopeNotes={
+  'common-north-america':'Experimental identification of 52 common North American species.',
+  'north-america':'Experimental identification of 181 North American species, including regional and migratory birds.',
+  worldwide:'Experimental identification of all 525 worldwide model classes.'
+};
+let scopeRevision=0;
+try {const saved=localStorage.getItem('birds-species-scope');if(Object.hasOwn(scopeNotes,saved))scopeControl.value=saved;} catch { /* Storage is optional. */ }
+function updateScopeNote() {availability.textContent=`${scopeNotes[scopeControl.value]} Blue Jay naming is not supported yet.`;}
+updateScopeNote();
 const tracker=new BirdTracker(10000),overlayNodes=new Map();
 // Text can reflow after a font, orientation, or viewport change. Keep cached bounds current.
 const labelObserver=new ResizeObserver(entries=>{
@@ -217,7 +227,7 @@ function loadModel() {
   clearAnalysis();const token=generation;
   setLoading(true);
   setStatus('Loading full precision model…');
-  try {worker=new Worker(new URL('./birds-worker.mjs?v=20261013-responsive1',import.meta.url),{type:'module'});} catch {fail('Local analysis could not start.');return;}
+  try {worker=new Worker(new URL('./birds-worker.mjs?v=20261013-scopes1',import.meta.url),{type:'module'});} catch {fail('Local analysis could not start.');return;}
   worker.onmessage=({data})=>{
     if(token!==generation) return;
     if(data.type==='progress') setStatus(data.message);
@@ -227,10 +237,12 @@ function loadModel() {
       setLoading(false);
       setStatus('Aim at a bird');startMotion(token);frame(token);
     } else if(data.type==='geometry') {
+      if((data.scopeRevision ?? 0)!==scopeRevision)return;
       if(performance.now()-data.timestamp>1500 || data.width!==video.videoWidth || data.height!==video.videoHeight)return;
       lastResult=performance.now();reconcile(data.detections,data.timestamp,true);
     } else if(data.type==='result') {
       clearTimeout(watchdog);pending=false;
+      if((data.scopeRevision ?? 0)!==scopeRevision){scheduleAnalysis(token);return;}
       scheduler.observeAnalysis(performance.now()-data.timestamp);
       if(performance.now()-data.timestamp>10000 || data.width!==video.videoWidth || data.height!==video.videoHeight) {tracks=[];tracker.clear();overlays.replaceChildren();scheduleAnalysis(token);return;}
       lastResult=performance.now();lastLatency=data.latencyMs;reconcile(data.detections,data.timestamp);
@@ -242,7 +254,7 @@ function loadModel() {
   };
   worker.onerror=event=>{event.preventDefault();if(token===generation) fail('Local analysis stopped unexpectedly.');};
   watchdog=setTimeout(()=>{if(token===generation&&!ready) fail('Model loading took too long. Check your connection if this is the first start.');},90000);
-  try {worker.postMessage({type:'init'});} catch {fail('Local analysis could not start.');}
+  try {worker.postMessage({type:'init',scope:scopeControl.value,scopeRevision});} catch {fail('Local analysis could not start.');}
 }
 async function begin() {
   halt();const token=generation;start.disabled=true;message.textContent='Starting camera…';
@@ -262,6 +274,15 @@ async function begin() {
   }
 }
 retry.addEventListener('click',()=>{if(stream && stream.getVideoTracks().some(t=>t.readyState==='live'))loadModel();else halt('Camera disconnected. Start the camera to retry.',true);});
+scopeControl.addEventListener('change',()=>{
+  updateScopeNote();scopeRevision++;
+  try {localStorage.setItem('birds-species-scope',scopeControl.value);} catch { /* Keep working without persistence. */ }
+  // Keep geometry and camera motion; require fresh naming evidence in the new scope.
+  for(const track of tracks){track.history=[];track.speciesId=null;track.confidence=null;}
+  render();
+  worker?.postMessage({type:'scope',scope:scopeControl.value,scopeRevision});
+  if(ready)setStatus('Scope changed · Hold steady');
+});
 start.addEventListener('click',begin);
 stop.addEventListener('click',()=>{if(stream || start.disabled){halt();stop.focus({preventScroll:true});}else begin();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden && (stream || start.disabled)) halt('Camera paused. Resume when ready.',true);});

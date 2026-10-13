@@ -345,3 +345,29 @@ one earlier run retained the name in 76/80 and made four identifier checks, exce
 that test's strict three-call expectation. Species confidence/retry behavior is therefore
 not uniform across runs; highlight identity was sustained in both. Real-phone testing
 is still needed before claiming device performance or live-bird tracking reliability.
+
+
+## Selectable species scope (2026-10-13)
+
+The **Species scope** selector remains available before and during camera use:
+
+| Selection | Allowed model labels |
+| --- | ---: |
+| Current | 52 |
+| North America | 181 |
+| Worldwide | 525 |
+
+Current remains the initial default. The selection is saved locally when browser
+storage is available. North America contains every original label plus a curated
+US/Canada-oriented expansion, including regional, migratory and introduced birds.
+It is not a complete North American checklist or an accuracy claim. Labels retain
+upstream spelling and taxonomy; ambiguous additions such as Crow, Blue Heron,
+Albatross and Puffin are excluded. Regional context: [AOS checklist](https://checklist.americanornithology.org/taxa/).
+The exact expansion is `identificationScopes` in the model manifest.
+
+All scopes run the same 525-output model, with the same global confidence and margin
+thresholds. Worldwide removes only the naming allowlist. Changing scope keeps the
+camera and loaded sessions, clears cached naming evidence, and requires fresh
+agreements. Results from inference started under an older scope cannot restore old
+names. Blue Jay and the other missing classes listed above remain unsupported in
+all modes. Worldwide can display exotic incorrect guesses that regional modes reject.

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating} from '../assets/js/birds-core.mjs';
+import {projectBox, iou, suppress, BirdTracker, assertRelease, probabilities, experimentOption, decodeYolox, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, trackSupported, MOTION_BRIDGE_MS, speciesConfidenceRating, speciesScope} from '../assets/js/birds-core.mjs';
 // Portrait crop: horizontal source edges are outside view; middle bird remains aligned.
 assert.equal(projectBox([0,0,.1,1],1920,1080,390,844),null);
 const r=projectBox([.4,.3,.6,.6],1920,1080,390,844);
@@ -129,3 +129,19 @@ const crossed=identities.update([{box:[.65,.3,.85,.6],cacheId:11,classificationF
 assert.deepEqual(crossed.map(t=>t.id),remembered,'Worker cache IDs take precedence over proximity');
 assert.deepEqual(crossed.map(t=>t.cacheId),[11,22]);
 console.log('Stable worker identities survive overlap changes without swapping outline nodes.');
+
+const commonScope=speciesScope(currentManifest),expandedScope=speciesScope(currentManifest,'north-america');
+assert.equal(commonScope.size,52);
+assert.equal(expandedScope.size,181);
+assert.ok([...commonScope].every(id=>expandedScope.has(id)));
+assert.equal(speciesScope(currentManifest,'worldwide'),null);
+assert.throws(()=>speciesScope(currentManifest,'unknown'),/Invalid species scope/);
+const scored=new Float32Array(currentManifest.species.length),config=currentManifest.options[0].classifier;
+for(const [name,expected] of [['American Robin',[true,true,true]],['American Kestrel',[false,true,true]],['African Crowned Crane',[false,false,true]]]){
+ scored.fill(0);const index=currentManifest.species.findIndex(s=>s.commonName===name);scored[index]=.9;
+ for(const [i,scope] of [commonScope,expandedScope,null].entries())assert.equal(!!scopedSpeciesSuggestion(scored,currentManifest.species,config,scope),expected[i]);
+ scored[index]=.64;assert.equal(scopedSpeciesSuggestion(scored,currentManifest.species,config,null),null,'Worldwide retains the confidence threshold');
+}
+const malformed=structuredClone(currentManifest);malformed.identificationScopes[0].allowedSpeciesIds.push('unknown');
+assert.throws(()=>experimentOption(malformed,'full'),/Invalid species scope/);
+console.log('52/181/525 scope membership, inclusion, confidence and manifest validation passed.');

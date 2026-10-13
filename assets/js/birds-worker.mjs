@@ -1,8 +1,14 @@
-import { experimentOption, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261012-tracking-polish1';
+import { experimentOption, speciesScope, probabilities, decodeYolox, suppress, iou, searchWindows, mapWindowDetection, trackingWindow, cropSharpness, scopedSpeciesSuggestion, MOTION_BRIDGE_MS } from './birds-core.mjs?v=20261013-scopes1';
 let ort, detector, classifier, manifest, option, allowedSpeciesIds, busy=false,scanIndex=0,detectorMs=60,previous=[],frameSize='',lastFull=-Infinity,lastDiscovery=-Infinity,cacheId=0;
 const inputBuffers=new Map();
 const qualityCanvas=new OffscreenCanvas(64,64),qualityCtx=qualityCanvas.getContext('2d',{willReadFrequently:true});
 const canvas=new OffscreenCanvas(1,1),ctx=canvas.getContext('2d',{willReadFrequently:true});
+let requestedScope='common-north-america',requestedRevision=0,scopeRevision=-1;
+function applyScope() {
+  if(!manifest || scopeRevision===requestedRevision)return;
+  allowedSpeciesIds=speciesScope(manifest,requestedScope);scopeRevision=requestedRevision;
+  previous=previous.map(({box,cacheId,lastDetected})=>({box,cacheId,lastDetected}));
+}
 async function modelBytes(model) {
   const response=await fetch(`${model.url}?v=${model.sha256.slice(0,12)}`,{cache:'force-cache'});
   if(!response.ok) throw new Error('A local model could not be downloaded.');
@@ -15,7 +21,6 @@ async function initialize() {
   const response=await fetch(new URL('../models/birds/manifest.json',import.meta.url),{cache:'no-cache'});
   if(!response.ok) throw new Error('Local model configuration could not be loaded.');
   manifest=await response.json();option=experimentOption(manifest,'full');
-  allowedSpeciesIds=manifest.identificationScope?new Set(manifest.identificationScope.allowedSpeciesIds):null;
   postMessage({type:'progress',message:'Loading local bird detector…'});
   ort=await import('./vendor/onnxruntime/ort.webgpu.bundle.min.mjs');
   ort.env.wasm.wasmPaths=new URL('./vendor/onnxruntime/',import.meta.url).href;ort.env.wasm.numThreads=1;
@@ -42,7 +47,8 @@ async function initialize() {
     detector=await ort.InferenceSession.create(detectorBytes,{executionProviders:['wasm']});
     if(classifierBytes) classifier=await ort.InferenceSession.create(classifierBytes,{executionProviders:['wasm']});
   }
-  postMessage({type:'ready',species:manifest.species,provider,option:option.id});
+  applyScope();
+  postMessage({type:'ready',species:manifest.species,provider,option:option.id,scopeRevision});
 }
 function tensor(bitmap,model,crop) {
   const [width,height]=model.size;if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
@@ -91,7 +97,7 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
     if(found.some(d=>iou(d.box,bird.box)>.35)) continue;
     found.push(...await detect(bitmap,trackingWindow(bird.box,bitmap.width,bitmap.height)));passes++;
   }
-  const sendGeometry=()=>postMessage({type:'geometry',timestamp,detections:suppress(found).slice(0,manifest.experimental.maxBirds || 3),width:bitmap.width,height:bitmap.height,latencyMs:performance.now()-started});
+  const sendGeometry=()=>postMessage({type:'geometry',scopeRevision,timestamp,detections:suppress(found).slice(0,manifest.experimental.maxBirds || 3),width:bitmap.width,height:bitmap.height,latencyMs:performance.now()-started});
   sendGeometry();
   const discoveryBudget=previous.length?(timestamp-lastDiscovery>=800?1:0):budget;
   for(let i=0;i<discoveryBudget;i++) {
@@ -147,16 +153,21 @@ async function analyze(bitmap,timestamp,motionTracks=[]) {
     d.agreements=d.speciesId?(d.speciesId===d.suggestion?(d.agreements||0)+1:1):0;
     d.suggestion=d.speciesId;
   }
-  postMessage({type:'result',timestamp,detections,width:bitmap.width,height:bitmap.height,scanPasses:passes,latencyMs:performance.now()-started});
+  postMessage({type:'result',scopeRevision,timestamp,detections,width:bitmap.width,height:bitmap.height,scanPasses:passes,latencyMs:performance.now()-started});
 }
 self.onmessage=async({data})=>{
   if(data.type==='init') {
+    requestedScope=data.scope || 'common-north-america';requestedRevision=data.scopeRevision || 0;
     try { await initialize(); } catch(error) { postMessage({type:'error',message:error.message}); }
+  } else if(data.type==='scope') {
+    requestedScope=data.scope;requestedRevision=data.scopeRevision;
+    // Finish any active inference with its original scope, then discard old naming evidence.
+    if(!busy)try {applyScope();} catch(error) {postMessage({type:'error',message:error.message});}
   } else if(data.type==='frame') {
     if(busy || !detector) {data.bitmap.close();return;}
     busy=true;
     try { await analyze(data.bitmap,data.timestamp,data.tracks); }
     catch(error) { postMessage({type:'error',message:`Local analysis stopped: ${error.message}`}); }
-    finally {data.bitmap.close();busy=false;}
+    finally {data.bitmap.close();busy=false;try {applyScope();} catch(error) {postMessage({type:'error',message:error.message});}}
   }
 };

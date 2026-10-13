@@ -29,9 +29,25 @@
 .birds-app button { min-height: 44px; padding: .7rem 1rem; border: 1px solid #f6f6f6; border-radius: 0; font: 700 .85rem var(--font-ui); letter-spacing: .04em; cursor: pointer; transition: background-color .12s ease-out, border-color .12s ease-out; }
 .birds-app button:disabled { opacity: .55; cursor: wait; }
 .birds-stop { color: #f6f6f6; background: #141414; flex: 0 0 auto; max-width: 45%; white-space: normal; overflow-wrap: anywhere; }
+.birds-controls { display: flex; align-items: end; gap: .75rem; min-width: 0; flex: 0 1 auto; }
+.birds-controls .birds-stop { padding-inline: .5rem; }
+.birds-scope-control { display: grid; flex: 1; gap: .3rem; min-width: 0; color: #bdbdbd; font: 400 .75rem/1.2 var(--font-ui); }
+.birds-scope { width: 100%; min-width: 0; min-height: 44px; padding: .6rem .5rem; border: 1px solid #a7a7a7; border-radius: 0; color: #f6f6f6; background: #141414; color-scheme: dark; font: 500 .85rem var(--font-ui); cursor: pointer; }
+:root[data-keyboard-navigation="on"] .birds-scope:focus-visible { outline: 2px solid #ff343d; outline-offset: 3px; }
+@media (max-width: 560px) {
+  .birds-toolbar { flex-wrap: wrap; }
+  .birds-readout { flex-basis: 100%; }
+  .birds-controls { width: 100%; }
+  .birds-scope-control { flex: 1; }
+}
 :root[data-keyboard-navigation="on"] .birds-app button:focus-visible { outline: 2px solid #ff343d; outline-offset: 3px; }
-.birds-toolbar { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem max(.75rem, env(safe-area-inset-right)) max(.75rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left)); background: #000; border-top: 1px solid #5c5c5c; }
-.birds-readout { min-width: 0; flex: 1; min-height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: .2rem; }
+.birds-toolbar { position: absolute; inset: auto 0 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem max(.75rem, env(safe-area-inset-right)) max(.75rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left)); background: #000; border-top: 1px solid #5c5c5c; }
+.birds-readout { min-width: 0; flex: 1 1 12rem; min-height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: .2rem; }
+@media (max-width: 560px) { .birds-readout { flex-basis: 100%; } }
+@media (max-height: 480px) and (min-width: 561px) {
+  .birds-readout { flex-basis: 5rem; }
+  .birds-controls { flex: 1 1 9rem; }
+}
 .birds-status { flex: 0 0 auto; margin: 0; white-space: normal; overflow-wrap: anywhere; font-size: .9rem; line-height: 1.3; }
 .birds-app [hidden] { display: none !important; }
 body:has([data-birds-app]) { min-width: 0; overflow: hidden; }
