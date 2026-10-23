@@ -34,7 +34,7 @@ For the finals grade calculator, this includes settings opened, dismissed, saved
 
 For the investment calculator, this includes switches between stock and interest views, committed field edits or clears, growth-type choices, calculation requests and completions, opening or closing details, and fixed validation or data-error categories. Interest completions distinguish simple or compound growth and historical calculations or future projections. These events do not include tickers, amounts, dates, interest rates, or calculated values.
 
-Reports help me understand which pages people use and where the site could improve. I do not send your name, email address, local audio, uploaded filenames, calculator inputs, or private tracker contents to analytics. The Personal Space dashboard, portfolio and lifting trackers, Birds page, and this privacy page do not load the Google Analytics tag, even if you have accepted analytics elsewhere.
+Reports help me understand which pages people use and where the site could improve. I do not send your name, email address, local audio, uploaded filenames, calculator inputs, or private tracker contents to analytics. The Personal Space dashboard, portfolio and lifting trackers, and this privacy page do not load the Google Analytics tag, even if you have accepted analytics elsewhere.
 
 **The data is not fully anonymous.** Google Analytics uses cookies with pseudonymous identifiers to distinguish browsers and sessions. Reports commonly show grouped statistics, but the underlying identifiers can link visits from the same browser. This site does not use advertising personalization or Google Signals in its analytics tag.
 

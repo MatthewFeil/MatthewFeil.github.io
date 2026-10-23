@@ -55,7 +55,7 @@ const fakeTag = `(() => {
     browser = await chromium.launch({headless:true, executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH});
     // Development builds expose the same controls without ever loading Google.
     if (process.env.ANALYTICS_EXPECT_DISABLED === '1') {
-      for (const route of ['/', '/work/', '/privacy/', '/birds/', '/personal/', '/portfolio/', '/lifting/', '/transcribe/', '/cta-l-live-art/']) {
+      for (const route of ['/', '/work/', '/privacy/', '/personal/', '/portfolio/', '/lifting/', '/transcribe/', '/cta-l-live-art/']) {
         const dev = await setup();
         await visit(dev.page, route);
         async function revealPreferences() {
@@ -153,7 +153,7 @@ const fakeTag = `(() => {
     assert.equal((await tabs.context.cookies()).some(c => c.name.startsWith('_ga')), false);
     await tabs.context.close();
     // Eligible standalone pages share the controller; excluded pages never request Google.
-    for (const route of ['/privacy/', '/birds/', '/personal/', '/portfolio/', '/lifting/']) {
+    for (const route of ['/privacy/', '/personal/', '/portfolio/', '/lifting/']) {
       const excluded = await setup();
       await excluded.context.addInitScript(({key, ttl}) => localStorage.setItem(key, JSON.stringify({version:1, choice:'yes', expiresAt:Date.now() + ttl})), {key, ttl});
       await visit(excluded.page, route);
