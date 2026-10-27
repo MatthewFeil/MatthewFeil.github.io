@@ -5,7 +5,7 @@ const source = fs.readFileSync('assets/js/transcribe.js', 'utf8');
 const messages = [];
 const state = {audioBuffer: {}, duration: 10, loopStart: 2, loopEnd: 6, lastSpectrumTime: null, analysisId: 0};
 const elements = {analyzeSelection: {checked: false}, analysisProgress: {}, frequencyReadout: {}, noteTolerance: {value: '0.45'}, audio: {paused: false}};
-const ctx = vm.createContext({state, elements, noteTracker: {reset() {}}, detectionSettings: {mode: 'balanced'}, hasSelection: () => state.loopStart !== null && state.loopEnd - state.loopStart >= .04,
+const ctx = vm.createContext({ interaction() {}, window: {},state, elements, noteTracker: {reset() {}}, detectionSettings: {mode: 'balanced'}, hasSelection: () => state.loopStart !== null && state.loopEnd - state.loopStart >= .04,
   clamp: (v,a,b) => Math.max(a,Math.min(b,v)), spectrumWindowSeconds: .4, spectrumUpdateIntervalMs: 1000 / 30, performance: {now: () => state.clock || 1000}, document: {hidden: false, getElementById: () => ({hidden: false})},
   chordTracker: {reset() {}}, pitchShiftCents: () => 0, formatTime: String, worker: {postMessage: m => messages.push(m)}});
 vm.runInContext(source.slice(source.indexOf('  function requestSpectrumAt('),source.indexOf('  function setSelection(')), ctx);

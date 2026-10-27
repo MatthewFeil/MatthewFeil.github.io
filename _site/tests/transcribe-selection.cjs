@@ -4,13 +4,14 @@ const vm = require('node:vm');
 const source = fs.readFileSync('assets/js/transcribe.js','utf8');
 const state = {duration:100,dragOriginX:20,dragging:'pending',dragMoved:false,loopStart:null,loopEnd:null};
 const transport = {currentTime:9};
-const ctx = vm.createContext({
+const ctx = vm.createContext({ interaction() {}, window: {},
   formatTime:String,
   state,transport,marks:{rangeAnchor:null},stems:null,
   elements:{waveform:{getBoundingClientRect:()=>({left:0,width:100})},selectionStatus:{}},
   clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),xToTime:x=>x/10,
   cancelAnimationFrame(){},drawWaveform(){},drawOverview(){},updateLoopControls(){},renderAll(){},requestSpectrumAt(){},setLoopEnabled(value){state.loopEnabled=value;}
 });
+vm.runInContext(source.slice(source.indexOf('  function hasSelection('),source.indexOf('  function selectionPlayback(')),ctx);
 vm.runInContext(source.slice(source.indexOf('  function setSelection('),source.indexOf('  const configActions')),ctx);
 vm.runInContext(source.slice(source.indexOf('  function waveformPointerPosition('),source.indexOf('  function updateOverviewDrag(')),ctx);
 function reset(origin) {Object.assign(state,{dragOriginX:origin,dragging:'pending',dragMoved:false,loopStart:null,loopEnd:null});transport.currentTime=9;}

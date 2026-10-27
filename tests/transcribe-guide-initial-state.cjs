@@ -1,0 +1,12 @@
+const{assert,base,launch,ready}=require('./transcribe-guide-test-helpers.cjs');
+(async()=>{const browser=await launch();try{const page=await browser.newPage({reducedMotion:'reduce'});await page.goto(base+'quick-start/#loop/play');await ready(page);
+ assert.equal(await page.locator('#transcribe-selection-only').getAttribute('aria-pressed'),'true');
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.locator('[data-guide-section="loop"] [data-guide-jump="highlight"]').click();
+ await page.waitForFunction(()=>document.getElementById('guide-camera').dataset.step==='highlight'&&document.getElementById('guide-camera').dataset.demoPhase==='pointing');
+ assert.equal(await page.locator('#transcribe-selection-only').getAttribute('aria-pressed'),'false');assert.equal(await page.locator('#transcribe-loop-bottom').getAttribute('aria-pressed'),'false');
+ await page.locator('[data-guide-playback]').click();
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto(base+'#highlight');await ready(page);assert.equal(await page.locator('[data-guide-section]:visible').getAttribute('data-guide-section'),'timeline');assert.equal(await page.locator('[aria-current="step"]').getAttribute('data-guide-jump'),'highlight');
+ await page.goto(base+'quick-start/#speed/normal');await ready(page);assert.equal(await page.locator('[data-speed="1"]').getAttribute('aria-pressed'),'true');assert.equal(await page.locator('[aria-current="step"]').getAttribute('data-guide-jump'),'normal');assert.equal(await page.locator('[data-guide-step-label],[data-step-status]').count(),0);
+ console.log('Correct reconstructed step states, legacy links, direct step links and current instructions passed');await page.close();}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

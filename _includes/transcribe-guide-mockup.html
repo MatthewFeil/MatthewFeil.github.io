@@ -1,0 +1,782 @@
+<!-- Static copy of the initialized Transcribe layout. No app scripts run here.
+     Refresh this markup when the app layout changes; preserve IDs used by guide topics. -->
+<div class="transcribe-app" id="transcribe-main" data-view-mode="timeline" data-guide-mockup="" inert="" aria-hidden="true">
+
+  <section class="transcribe-workspace" id="transcribe-workspace" aria-label="Music transcription playback workspace">
+    
+    
+    <header class="transcribe-control-bar">
+      <div class="transcribe-navbar-row">
+      <div class="transcribe-identity">
+        <a href="/" aria-label="Return to matthewfeil.com">Matthew Feil</a>
+        <span class="transcribe-identity-suffix">
+<span aria-hidden="true">/</span>
+        <strong>Transcribe</strong>
+</span>
+          <button class="theme-toggle" type="button" data-theme-toggle="" data-theme="system" aria-label="Theme: System. Activate to switch to light mode.">
+            <span class="theme-toggle-icon" aria-hidden="true">
+              <svg data-theme-icon="system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter">
+<rect x="3.5" y="4" width="17" height="12" rx="0">
+</rect>
+<path d="M8 20h8M12 16v4">
+</path>
+</svg>
+              <svg data-theme-icon="light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square">
+<circle cx="12" cy="12" r="4">
+</circle>
+<path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12">
+</path>
+</svg>
+              <svg data-theme-icon="dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter">
+<path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z">
+</path>
+</svg>
+            </span>
+          </button>
+      </div>
+
+      <div class="transcribe-file-control">
+        <div class="transcribe-file-summary">
+<button type="button" class="transcribe-file-name" id="transcribe-file-name" title="Open a new audio file">Open audio</button>
+          <span class="transcribe-restore-status" id="transcribe-restore-status" role="status" aria-live="polite" aria-atomic="true" hidden="">
+</span>
+        </div>
+        
+        <span id="transcribe-config-actions">
+<button type="button" id="transcribe-config-import">Load config</button>
+<button type="button" id="transcribe-config-export">Save config</button>
+</span>
+        <span class="transcribe-local-status" id="transcribe-local-status" hidden="">Local</span>
+        
+      </div>
+
+      <div class="transcribe-navbar-controls">
+      <div class="transcribe-playback-settings" aria-label="Playback settings">
+        <div class="transcribe-speed-modes">
+        <fieldset class="transcribe-speed-control">
+          <legend>Speed</legend>
+          <div class="transcribe-speed-buttons" id="transcribe-speed" aria-label="Playback speed">
+            <button type="button" data-speed="0.5" aria-pressed="false">50%</button>
+            <button type="button" data-speed="0.6" aria-pressed="false">60%</button>
+            <button type="button" data-speed="0.7" aria-pressed="false">70%</button>
+            <button type="button" data-speed="0.8" aria-pressed="false">80%</button>
+            <button type="button" data-speed="0.9" aria-pressed="false">90%</button>
+            <button type="button" class="is-active" data-speed="1" aria-pressed="true">100%</button>
+            <button type="button" data-speed="1.25" aria-pressed="false">125%</button>
+            <span class="transcribe-custom-speed-slot">
+              <button class="transcribe-custom-speed-toggle" id="transcribe-custom-speed-toggle" type="button" aria-expanded="false" aria-controls="transcribe-custom-speed-input">Other</button>
+              <input id="transcribe-custom-speed-input" type="number" min="25" max="200" step="1" value="100" inputmode="numeric" aria-label="Custom playback speed, 25 to 200 percent" hidden="">
+            </span>
+          </div>
+        </fieldset>
+        </div>
+        
+        
+      </div>
+      <div class="transcribe-panel-buttons">
+      <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel" hidden="">Stems <strong>Off</strong>
+<span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden="" style="width: 0%;">
+</span>
+</button>
+      <button type="button" id="transcribe-controls-toggle" title="Controls (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-content" aria-label="Controls">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M3 6h18M3 12h18M3 18h18M8 3v6M16 9v6M10 15v6">
+</path>
+</svg>
+</button>
+<button id="transcribe-shortcuts-toggle" type="button" aria-label="Keyboard shortcuts" aria-keyshortcuts="Shift+/" aria-controls="transcribe-shortcuts-content" aria-expanded="false">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<rect x="3" y="5" width="18" height="14">
+</rect>
+<path d="M6 9h2m2 0h2m2 0h2m2 0h1M6 13h2m2 0h2m2 0h2m2 0h1M8 16h8">
+</path>
+</svg>
+</button>
+{% include transcribe-guide-link.html %}
+      </div>
+      </div>
+      </div>
+      
+      
+      <section id="transcribe-controls-panel" class="transcribe-controls-panel" aria-label="Transcription controls" hidden="">
+</section>
+    </header>
+
+    <section class="transcribe-timeline" aria-label="Audio timeline">
+      <div class="transcribe-timeline-status" aria-live="polite">
+        <span id="transcribe-selection-status">
+</span>
+
+
+
+        <span id="transcribe-audio-format" hidden="">No file loaded</span>
+        <output id="transcribe-frequency-readout" hidden="">
+</output>
+
+      </div>
+      <div class="transcribe-overview-wrap" id="transcribe-overview-navigator" role="scrollbar" aria-label="Timeline overview and visible range" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" tabindex="0" aria-valuetext="00:00.000 to 00:00.000">
+        <canvas id="transcribe-overview" class="transcribe-overview" aria-label="Complete recording overview" width="1440" height="55">
+</canvas>
+      </div>
+      <canvas id="transcribe-mark-ruler" tabindex="0" aria-label="Measure and section ruler. Swipe vertically to scroll the timeline; drag marks horizontally to move them. Shift-click to anchor a range, then move and click to place its other endpoint." width="1440" height="31">
+</canvas>
+      <div class="transcribe-waveform-wrap" id="transcribe-waveform-wrap">
+        <canvas id="transcribe-waveform" class="transcribe-waveform" tabindex="0" aria-label="Zoomed audio waveform. Click to seek, drag or use one finger to select; swipe with two fingers to pan the timeline. Shift-click anchors a loop range." width="1440" height="323">
+</canvas>
+        
+        
+        
+
+      </div>
+    </section>
+
+    <section class="transcribe-analysis" id="transcribe-analysis" aria-label="Pitch-aligned frequency monitor">
+        <div class="transcribe-view-switcher" aria-label="Mobile workspace emphasis">
+          <button class="is-active" type="button" data-view-mode="timeline" aria-pressed="true">Timeline</button>
+          <button type="button" data-view-mode="analysis" aria-pressed="false">Analysis</button>
+        </div>
+      <div id="transcribe-chords" role="status" aria-label="Chord guesses" hidden="">
+</div>
+      <div class="transcribe-analysis-grid" id="transcribe-analysis-grid" tabindex="0" aria-label="Pitch spectrum, visible range C1 to C7." data-scrollable="false">
+        <div class="transcribe-spectrum-scroll">
+          <canvas id="transcribe-spectrogram" class="transcribe-spectrogram" tabindex="0" aria-label="EQ-style pitch spectrum. Tap or use left and right arrow keys to inspect pitch; swipe with one finger to pan on mobile." width="1440" height="286">
+</canvas>
+          <canvas id="transcribe-keyboard" class="transcribe-keyboard" tabindex="0" role="slider" aria-orientation="horizontal" aria-label="Horizontal piano keyboard from C1 to B6." aria-valuemin="24" aria-valuemax="95" aria-valuenow="60" aria-valuetext="C4" aria-describedby="transcribe-piano-help" width="1440" height="86" style="touch-action: none;">
+</canvas>
+          <span id="transcribe-piano-help" class="transcribe-piano-help">Left/right: semitone. Up/down: octave. Home/End: first/last note. Hold Space or Enter to play; release to stop.</span>
+        </div>
+      </div>
+      <div class="transcribe-analysis-progress" id="transcribe-analysis-progress" hidden="">
+        <span>Analyzing selected passage</span>
+      </div>
+    </section>
+
+    <footer class="transcribe-transport" aria-label="Playback controls">
+      <button type="button" id="transcribe-start" aria-keyshortcuts="B" aria-label="Return to track start">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M5 5h2v14H5zM19 6l-10 6 10 6z">
+</path>
+</svg>
+      </button>
+      <button type="button" id="transcribe-rewind" aria-label="Rewind 5 seconds">
+        <svg class="transcribe-skip-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M4 8a9 9 0 1 1-1 8M4 3v5h5">
+</path>
+<text x="12" y="16">5</text>
+</svg>
+      </button>
+      <button class="transcribe-play" type="button" id="transcribe-play" aria-label="Play">
+        <svg class="transcribe-play-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M7 4l13 8-13 8z">
+</path>
+</svg>
+        <svg class="transcribe-pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M6 4h4v16H6zM14 4h4v16h-4z">
+</path>
+</svg>
+      </button>
+      <button type="button" id="transcribe-forward" aria-label="Forward 5 seconds">
+        <svg class="transcribe-skip-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M20 8a9 9 0 1 0 1 8M20 3v5h-5">
+</path>
+<text x="12" y="16">5</text>
+</svg>
+      </button>
+
+      <button class="transcribe-loop-control transcribe-selection-control" type="button" id="transcribe-selection-only" aria-keyshortcuts="H" aria-label="Selection only" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+<rect x="3" y="5" width="18" height="14" fill="currentColor" opacity="0.18">
+</rect>
+<path d="M7 4H3v16h4m10-16h4v16h-4" fill="none" stroke="currentColor" stroke-width="1.75">
+</path>
+<path d="m9 8 7 4-7 4z" fill="currentColor">
+</path>
+</svg>
+      </button>
+      <button class="transcribe-loop-control" type="button" id="transcribe-loop-bottom" aria-keyshortcuts="R L" aria-label="Loop whole track" aria-pressed="false">
+        <svg class="transcribe-repeat-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-3v4a3 3 0 0 1-3 3H3">
+</path>
+</svg>
+      </button>
+
+      <button type="button" id="transcribe-measures" aria-expanded="false" aria-controls="transcribe-measure-panel" aria-label="Measure navigation and loop (G)">mm.</button>
+      <div id="transcribe-measure-panel" role="region" aria-label="Measure navigation and loop" hidden>
+        <form id="transcribe-go-form">
+          <label>Go to <input id="transcribe-go-measure" type="text" placeholder="12 or B3" autocomplete="off" aria-label="Go to measure or section">
+</label>
+        </form>
+        <form id="transcribe-range-form">
+          <label>Loop start <input data-loop-start="" type="text" placeholder="A2 or A" autocomplete="off">
+</label>
+          <label>Loop end <input data-loop-end="" type="text" placeholder="B3 or B" autocomplete="off">
+</label>
+        </form>
+        <div id="transcribe-marks" class="transcribe-numbering-control">
+          <fieldset>
+            <label>
+<span>Measure numbering</span>
+<select data-numbering="">
+<option value="section">Per section</option>
+<option value="continuous">Continuous</option>
+</select>
+</label>
+          <button id="transcribe-delete-measures" type="button" aria-label="Delete measure markers">Delete measures</button>
+</fieldset>
+          <output data-status="" data-measure-status="" role="status" aria-live="polite">
+</output>
+        </div>
+      </div>
+
+      <div class="transcribe-playback-progress">
+        <input id="transcribe-seek" type="range" min="0" max="0" step="0.01" value="0" aria-label="Playback position" aria-valuetext="00:00.00 of 00:00.00">
+        <div class="transcribe-playback-times">
+          <output class="transcribe-timecode" id="transcribe-timecode" aria-label="Elapsed time">00:00</output>
+          <output class="transcribe-timecode" id="transcribe-time-remaining" aria-label="Time remaining">-00:00</output>
+        </div>
+      </div>
+
+      <div class="transcribe-transport-sliders">
+      <label class="transcribe-volume">
+        <span>Volume</span>
+        <input id="transcribe-volume" type="range" min="0" max="1" step="0.01" value="0.9">
+      </label>
+        <label class="transcribe-timeline-zoom" for="transcribe-zoom">
+          <span>Timeline zoom</span>
+          <input id="transcribe-zoom" type="range" min="0" max="100" step="1" value="50" aria-valuetext="1600%">
+        </label>
+      </div>
+
+    </footer>
+
+    
+  <aside id="transcribe-sidebar" class="transcribe-sidebar transcribe-flat-sidebar" aria-label="Controls" hidden="">
+<div class="transcribe-sidebar-header">
+<h2>Controls</h2>
+<button type="button" aria-label="Close controls">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="m6 6 12 12M18 6 6 18">
+</path>
+</svg>
+</button>
+</div>
+<div class="transcribe-sidebar-scroll transcribe-controls-grid" id="transcribe-controls-content" hidden="">
+<section id="transcribe-section-sound" class="transcribe-sidebar-section">
+<h3>
+<span>Sound</span>
+<button type="button" class="transcribe-section-reset" aria-label="Reset Sound to default">Reset</button>
+</h3>
+<div id="transcribe-sound-contents" class="transcribe-group-content">
+<button class="transcribe-tool-toggle is-active" id="transcribe-pitch-lock" type="button" aria-pressed="true">
+          <span>Pitch lock</span>
+          <strong>On</strong>
+        </button>
+<div class="transcribe-sound-controls" role="group" aria-label="Sound controls">
+        <label class="transcribe-tool-field">
+          <span>Channel</span>
+          <select id="transcribe-channel">
+            <option value="stereo">Stereo</option>
+            <option value="mono">Mono</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </label>
+        </div>
+<div class="transcribe-audio-pitch" role="group" aria-label="Audio pitch">
+        <div class="transcribe-pitch-controls" aria-label="Pitch adjustment controls">
+          <label class="transcribe-pitch-adjustment" for="transcribe-semitones">
+            <span>Transpose</span>
+            <span class="transcribe-pitch-entry">
+              <input id="transcribe-semitones" type="range" min="-12" max="12" step="1" value="0" aria-valuetext="0 semitones">
+              <input id="transcribe-semitones-number" type="number" min="-12" max="12" step="1" value="0" inputmode="numeric" aria-label="Transpose in semitones">
+            </span>
+          </label>
+          <label class="transcribe-pitch-adjustment" for="transcribe-cents">
+            <span>Pitch correction</span>
+            <span class="transcribe-pitch-entry">
+              <input id="transcribe-cents" type="range" min="-100" max="100" step="1" value="0" aria-valuetext="0 cents">
+              <input id="transcribe-cents-number" type="number" min="-100" max="100" step="1" value="0" inputmode="numeric" aria-label="Pitch correction in cents">
+            </span>
+          </label>
+        </div>
+      </div>
+</div>
+</section>
+<section id="transcribe-section-analysis" class="transcribe-sidebar-section">
+<h3>
+<span>Analysis</span>
+<button type="button" class="transcribe-section-reset" aria-label="Reset Analysis to default">Reset</button>
+</h3>
+<div id="transcribe-analysis-contents" class="transcribe-group-content">
+<button type="button" id="transcribe-spectrum-visible" class="transcribe-tool-toggle is-active" aria-label="Spectrum and keyboard" aria-controls="transcribe-analysis" aria-keyshortcuts="F" aria-pressed="true">
+<span>Spectrum</span>
+<strong>On</strong>
+</button>
+<button class="transcribe-tool-toggle" id="transcribe-chords-toggle" type="button" aria-pressed="false" aria-controls="transcribe-chords" aria-label="Chord guesses">
+          <span>Chords</span>
+<strong>Off</strong>
+        </button>
+<button class="transcribe-tool-toggle" id="transcribe-analyze-selection" type="button" aria-pressed="false">
+<span>Whole highlight</span>
+<strong>Off</strong>
+</button>
+<div class="transcribe-detection-controls" id="transcribe-detection-controls">
+          <label class="transcribe-tolerance-control" for="transcribe-detection-mode">
+            <span>Detection</span>
+            <select id="transcribe-detection-mode">
+              <option value="balanced" selected="">Balanced</option>
+              <option value="bass">Bass</option>
+              <option value="chordal">Chordal</option>
+              <option value="melody">Melody</option>
+            </select>
+          </label>
+          <label class="transcribe-tolerance-control" for="transcribe-detection-low">
+<span>Low note</span>
+<input type="text" spellcheck="false" autocomplete="off" autocapitalize="characters" enterkeyhint="done" id="transcribe-detection-low" aria-label="Preferred lowest note">
+</label>
+          <label class="transcribe-tolerance-control" for="transcribe-detection-high">
+<span>High note</span>
+<input type="text" spellcheck="false" autocomplete="off" autocapitalize="characters" enterkeyhint="done" id="transcribe-detection-high" aria-label="Preferred highest note">
+</label>
+        </div>
+</div>
+</section>
+<section id="transcribe-section-eq" class="transcribe-sidebar-section">
+<h3>
+<span>EQ</span>
+<button type="button" id="transcribe-eq-reset" class="transcribe-section-reset" aria-label="Reset EQ to default">Reset</button>
+<button type="button" class="transcribe-info-button" aria-label="Using the equalizer">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<circle cx="12" cy="12" r="9">
+</circle>
+<path d="M12 11v6M12 7v1">
+</path>
+</svg>
+</button>
+</h3>
+<div id="transcribe-eq-contents" class="transcribe-group-content">
+<div id="transcribe-eq-panel">
+        <div class="transcribe-eq-actions">
+<span>4-band parametric EQ</span>
+</div>
+        <svg id="transcribe-eq-graph" viewBox="0 0 1344 882" role="group" aria-label="Equalizer. Drag bands to adjust frequency and gain; scroll over a band to adjust Q. Drag or scroll the cut handles to adjust low and high cuts." preserveAspectRatio="none">
+<line class="eq-grid" x1="30" x2="1334" y1="858" y2="858">
+</line>
+<text text-anchor="end" x="24" y="861">-30</text>
+<line class="eq-grid" x1="30" x2="1334" y1="648" y2="648">
+</line>
+<text text-anchor="end" x="24" y="651">-15</text>
+<line class="eq-grid" x1="30" x2="1334" y1="438" y2="438">
+</line>
+<text text-anchor="end" x="24" y="441">0</text>
+<line class="eq-grid" x1="30" x2="1334" y1="228" y2="228">
+</line>
+<text text-anchor="end" x="24" y="231">+15</text>
+<line class="eq-grid" x1="30" x2="1334" y1="18" y2="18">
+</line>
+<text text-anchor="end" x="24" y="21">+30</text>
+<line class="eq-grid" x1="30" x2="30" y1="18" y2="858">
+</line>
+<text text-anchor="start" x="30" y="877">20 Hz</text>
+<line class="eq-grid" x1="333.81896188472285" x2="333.81896188472285" y1="18" y2="858">
+</line>
+<text text-anchor="middle" x="333.81896188472285" y="877">100 Hz</text>
+<line class="eq-grid" x1="768.4856285513895" x2="768.4856285513895" y1="18" y2="858">
+</line>
+<text text-anchor="middle" x="768.4856285513895" y="877">1k Hz</text>
+<line class="eq-grid" x1="1203.1522952180562" x2="1203.1522952180562" y1="18" y2="858">
+</line>
+<text text-anchor="middle" x="1203.1522952180562" y="877">10k Hz</text>
+<line class="eq-grid" x1="1334" x2="1334" y1="18" y2="858">
+</line>
+<text text-anchor="end" x="1334" y="877">20k Hz</text>
+<text x="2" y="10">dB</text>
+<path fill="none" stroke="currentColor" stroke-width="2" d="M30,438 L34.72463768115942,438 L39.44927536231884,438 L44.17391304347826,438 L48.89855072463768,438 L53.6231884057971,438 L58.347826086956516,438 L63.072463768115945,438 L67.79710144927536,438 L72.52173913043478,438 L77.2463768115942,438 L81.97101449275362,438 L86.69565217391303,438 L91.42028985507247,438 L96.14492753623189,438 L100.8695652173913,438 L105.59420289855072,438 L110.31884057971016,438 L115.04347826086956,438 L119.76811594202898,438 L124.4927536231884,438 L129.2173913043478,438 L133.94202898550725,438 L138.66666666666666,438 L143.39130434782606,438 L148.1159420289855,438 L152.84057971014494,438 L157.56521739130437,438 L162.28985507246378,438 L167.0144927536232,438 L171.7391304347826,438 L176.46376811594203,438 L181.18840579710144,438 L185.91304347826087,438 L190.6376811594203,438 L195.36231884057972,438 L200.08695652173913,438 L204.81159420289856,438 L209.53623188405797,438 L214.26086956521738,438 L218.9855072463768,438 L223.71014492753622,438 L228.43478260869566,438 L233.15942028985506,438 L237.88405797101447,438 L242.6086956521739,438 L247.33333333333331,438 L252.05797101449275,438 L256.78260869565213,438 L261.5072463768116,438 L266.231884057971,438 L270.9565217391304,438 L275.6811594202899,438 L280.40579710144925,438 L285.13043478260875,438 L289.8550724637681,438 L294.57971014492756,438 L299.30434782608694,438 L304.0289855072464,438 L308.7536231884058,438 L313.4782608695652,438 L318.2028985507246,438 L322.92753623188406,438 L327.65217391304344,438 L332.3768115942029,438 L337.1014492753623,438 L341.82608695652175,438 L346.5507246376811,438 L351.2753623188406,438 L356,438 L360.72463768115944,438 L365.4492753623188,438 L370.17391304347825,438 L374.8985507246377,438 L379.6231884057971,438 L384.3478260869565,438 L389.07246376811594,438 L393.7971014492754,438 L398.52173913043475,438 L403.2463768115942,438 L407.9710144927536,438 L412.69565217391306,438 L417.42028985507244,438 L422.1449275362319,438 L426.8695652173913,438 L431.5942028985507,438 L436.3188405797101,438 L441.04347826086956,438 L445.76811594202894,438 L450.4927536231884,438 L455.2173913043478,438 L459.94202898550725,438 L464.66666666666663,438 L469.39130434782606,438 L474.1159420289855,438 L478.8405797101449,438 L483.5652173913043,438 L488.28985507246375,438 L493.01449275362324,438 L497.73913043478257,438 L502.463768115942,438 L507.1884057971015,438 L511.9130434782608,438 L516.6376811594203,438 L521.3623188405797,438 L526.0869565217392,438 L530.8115942028985,438 L535.536231884058,438 L540.2608695652175,438 L544.9855072463768,438 L549.7101449275362,438 L554.4347826086956,438 L559.1594202898551,438 L563.8840579710145,438 L568.6086956521739,438 L573.3333333333334,438 L578.0579710144928,438 L582.7826086956521,438 L587.5072463768116,438 L592.231884057971,438 L596.9565217391304,438 L601.6811594202899,438 L606.4057971014493,438 L611.1304347826086,438 L615.8550724637681,438 L620.5797101449275,438 L625.3043478260869,438 L630.0289855072464,438 L634.7536231884058,438 L639.4782608695652,438 L644.2028985507246,438 L648.927536231884,438 L653.6521739130435,438 L658.3768115942029,438 L663.1014492753623,438 L667.8260869565217,438 L672.5507246376812,438 L677.2753623188405,438 L682,438 L686.7246376811595,438 L691.4492753623189,438 L696.1739130434784,438 L700.8985507246376,438 L705.623188405797,438 L710.3478260869565,438 L715.072463768116,438 L719.7971014492754,438 L724.5217391304349,438 L729.2463768115942,438 L733.9710144927535,438 L738.695652173913,438 L743.4202898550725,438 L748.1449275362319,438 L752.8695652173914,438 L757.5942028985507,438 L762.3188405797102,438 L767.0434782608695,438 L771.768115942029,438 L776.4927536231884,438 L781.2173913043479,438 L785.9420289855072,438 L790.6666666666667,438 L795.3913043478261,438 L800.1159420289855,438 L804.8405797101449,438 L809.5652173913044,438 L814.2898550724638,438 L819.0144927536232,438 L823.7391304347826,438 L828.4637681159421,438 L833.1884057971014,438 L837.9130434782609,438 L842.6376811594203,438 L847.3623188405797,438 L852.0869565217391,438 L856.8115942028986,438 L861.5362318840579,438 L866.2608695652174,438 L870.9855072463768,438 L875.7101449275362,438 L880.4347826086956,438 L885.1594202898551,438 L889.8840579710145,438 L894.6086956521739,438 L899.3333333333333,438 L904.0579710144928,438 L908.7826086956521,438 L913.5072463768116,438 L918.231884057971,438 L922.9565217391305,438 L927.6811594202898,438 L932.4057971014493,438 L937.1304347826086,438 L941.8550724637681,438 L946.5797101449275,438 L951.304347826087,438 L956.0289855072465,438 L960.7536231884058,438 L965.4782608695651,438 L970.2028985507246,438 L974.927536231884,438 L979.6521739130435,438 L984.376811594203,438 L989.1014492753624,438 L993.8260869565216,438 L998.5507246376811,438 L1003.2753623188405,438 L1008,438 L1012.7246376811595,438 L1017.4492753623189,438 L1022.1739130434784,438 L1026.8985507246375,438 L1031.623188405797,438 L1036.3478260869565,438 L1041.072463768116,438 L1045.7971014492755,438 L1050.521739130435,438 L1055.2463768115942,438 L1059.9710144927535,438 L1064.695652173913,438 L1069.4202898550725,438 L1074.144927536232,438 L1078.8695652173913,438 L1083.5942028985507,438 L1088.3188405797102,438 L1093.0434782608695,438 L1097.768115942029,438 L1102.4927536231885,438 L1107.2173913043478,438 L1111.9420289855072,438 L1116.6666666666667,438 L1121.3913043478262,438 L1126.1159420289855,438 L1130.840579710145,438 L1135.5652173913043,438 L1140.2898550724638,438 L1145.0144927536232,438 L1149.7391304347827,438 L1154.463768115942,438 L1159.1884057971015,438 L1163.9130434782608,438 L1168.6376811594203,438 L1173.3623188405797,438 L1178.0869565217392,438 L1182.8115942028985,438 L1187.536231884058,438 L1192.2608695652173,438 L1196.9855072463768,438 L1201.7101449275362,438 L1206.4347826086957,438 L1211.159420289855,438 L1215.8840579710145,438 L1220.6086956521738,438 L1225.3333333333333,438 L1230.0579710144928,438 L1234.7826086956522,438 L1239.5072463768115,438 L1244.231884057971,438 L1248.9565217391305,438 L1253.6811594202898,438 L1258.4057971014493,438 L1263.1304347826087,438 L1267.855072463768,438 L1272.5797101449275,438 L1277.304347826087,438 L1282.0289855072465,438 L1286.7536231884058,438 L1291.4782608695652,438 L1296.2028985507245,438 L1300.927536231884,438 L1305.6521739130435,438 L1310.376811594203,438 L1315.1014492753625,438 L1319.8260869565217,438 L1324.550724637681,438 L1329.2753623188405,438 L1334,438">
+</path>
+<g tabindex="0" role="button" aria-label="Band 1: 100 Hz, 0 dB, Q 1. Arrow keys adjust frequency and gain." class="eq-point" transform="translate(333.81896188472285 438)">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<ellipse fill="#d97706" rx="5" ry="5">
+</ellipse>
+</g>
+<g tabindex="0" role="button" aria-label="Band 2: 400 Hz, 0 dB, Q 1. Arrow keys adjust frequency and gain." class="eq-point" transform="translate(595.5143714486105 438)">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<ellipse fill="#16a370" rx="5" ry="5">
+</ellipse>
+</g>
+<g tabindex="0" role="button" aria-label="Band 3: 1600 Hz, 0 dB, Q 1. Arrow keys adjust frequency and gain." class="eq-point" transform="translate(857.2097810124981 438)">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<ellipse fill="#3988ef" rx="5" ry="5">
+</ellipse>
+</g>
+<g tabindex="0" role="button" aria-label="Band 4: 6400 Hz, 0 dB, Q 1. Arrow keys adjust frequency and gain." class="eq-point" transform="translate(1118.9051905763856 438)">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<ellipse fill="#b65cda" rx="5" ry="5">
+</ellipse>
+</g>
+<line y1="18" y2="858" class="eq-cut-guide" x1="30" x2="30" style="visibility: hidden;">
+</line>
+<g tabindex="0" role="slider" aria-label="Low cut" aria-valuemin="20" aria-valuemax="20000" aria-orientation="horizontal" class="eq-point eq-cut-point is-off" transform="translate(30 858)" aria-valuenow="20" aria-valuetext="Off">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<rect x="-5" y="-8" width="10" height="16">
+</rect>
+</g>
+<line y1="18" y2="858" class="eq-cut-guide" x1="1334" x2="1334" style="visibility: hidden;">
+</line>
+<g tabindex="0" role="slider" aria-label="High cut" aria-valuemin="20" aria-valuemax="20000" aria-orientation="horizontal" class="eq-point eq-cut-point is-off" transform="translate(1334 858)" aria-valuenow="20000" aria-valuetext="Off">
+<ellipse class="eq-hit" rx="14" ry="14">
+</ellipse>
+<rect x="-5" y="-8" width="10" height="16">
+</rect>
+</g>
+</svg>
+        
+        
+        <div class="transcribe-eq-cuts">
+          <label>Low cut · Hz<input id="transcribe-highpass" type="number" min="20" max="20000" step="1" value="20">
+</label>
+          <label>High cut · Hz<input id="transcribe-lowpass" type="number" min="20" max="20000" step="1" value="20000">
+</label>
+        </div>
+        <div id="transcribe-eq-bands">
+<table class="transcribe-eq-table" aria-label="EQ bands">
+<thead>
+<tr>
+<th scope="col" aria-label="Band">
+</th>
+<th scope="col">Hz</th>
+<th scope="col">dB</th>
+<th scope="col">Q</th>
+</tr>
+</thead>
+<tbody>
+<tr style="--eq-band-color: #d97706;">
+<th scope="row" aria-label="Band 1">
+<span class="transcribe-eq-swatch" aria-hidden="true">
+</span>
+</th>
+<td>
+<input type="number" min="20" max="20000" step="1" aria-label="Band 1 frequency">
+</td>
+<td>
+<input type="number" min="-30" max="30" step="0.1" aria-label="Band 1 gain">
+</td>
+<td>
+<input type="number" min="0.1" max="18" step="0.01" aria-label="Band 1 Q">
+</td>
+</tr>
+<tr style="--eq-band-color: #16a370;">
+<th scope="row" aria-label="Band 2">
+<span class="transcribe-eq-swatch" aria-hidden="true">
+</span>
+</th>
+<td>
+<input type="number" min="20" max="20000" step="1" aria-label="Band 2 frequency">
+</td>
+<td>
+<input type="number" min="-30" max="30" step="0.1" aria-label="Band 2 gain">
+</td>
+<td>
+<input type="number" min="0.1" max="18" step="0.01" aria-label="Band 2 Q">
+</td>
+</tr>
+<tr style="--eq-band-color: #3988ef;">
+<th scope="row" aria-label="Band 3">
+<span class="transcribe-eq-swatch" aria-hidden="true">
+</span>
+</th>
+<td>
+<input type="number" min="20" max="20000" step="1" aria-label="Band 3 frequency">
+</td>
+<td>
+<input type="number" min="-30" max="30" step="0.1" aria-label="Band 3 gain">
+</td>
+<td>
+<input type="number" min="0.1" max="18" step="0.01" aria-label="Band 3 Q">
+</td>
+</tr>
+<tr style="--eq-band-color: #b65cda;">
+<th scope="row" aria-label="Band 4">
+<span class="transcribe-eq-swatch" aria-hidden="true">
+</span>
+</th>
+<td>
+<input type="number" min="20" max="20000" step="1" aria-label="Band 4 frequency">
+</td>
+<td>
+<input type="number" min="-30" max="30" step="0.1" aria-label="Band 4 gain">
+</td>
+<td>
+<input type="number" min="0.1" max="18" step="0.01" aria-label="Band 4 Q">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+      </div>
+</div>
+</section>
+<section id="transcribe-section-stems" class="transcribe-sidebar-section">
+<h3>
+<span>Stems</span>
+<button type="button" class="transcribe-section-reset" aria-label="Reset Stems to default">Reset</button>
+<button type="button" class="transcribe-info-button" aria-label="About stem separation">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<circle cx="12" cy="12" r="9">
+</circle>
+<path d="M12 11v6M12 7v1">
+</path>
+</svg>
+</button>
+</h3>
+<div id="transcribe-stems-contents" class="transcribe-group-content">
+<section id="transcribe-stems-panel" class="transcribe-controls-panel transcribe-stems-panel" aria-label="Stem separation">
+<div class="transcribe-stems-actions">
+<button type="button" id="transcribe-stems-enabled" class="transcribe-tool-toggle" aria-label="Separate highlighted segment">Separate</button>
+</div>
+        <div class="transcribe-stems-heading">
+          <h2>Highlight stems <span>Experimental</span>
+</h2>
+          
+        </div>
+        <p id="transcribe-stems-range" hidden="">
+</p>
+        <progress id="transcribe-stems-progress" max="1" aria-label="Stem separation progress" hidden="">
+</progress>
+        <p id="transcribe-stems-status" role="status" aria-live="polite">
+</p>
+        <ul class="transcribe-stem-list" aria-label="Individual stems" hidden="">
+          <li data-stem="vocals">
+<span>Vocals<small data-stem-activity="" hidden="">
+</small>
+</span>
+<button type="button" aria-label="Vocals stem" aria-pressed="true">On</button>
+</li>
+          <li data-stem="drums">
+<span>Drums<small data-stem-activity="" hidden="">
+</small>
+</span>
+<button type="button" aria-label="Drums stem" aria-pressed="true">On</button>
+</li>
+          <li data-stem="bass">
+<span>Bass<small data-stem-activity="" hidden="">
+</small>
+</span>
+<button type="button" aria-label="Bass stem" aria-pressed="true">On</button>
+</li>
+          <li data-stem="guitar">
+<span>Guitar/piano<small data-stem-activity="" hidden="">
+</small>
+</span>
+<button type="button" aria-label="Guitar/piano stem" aria-pressed="true">On</button>
+</li>
+          <li data-stem="other">
+<span>Other / horns<small data-stem-activity="" hidden="">
+</small>
+</span>
+<button type="button" aria-label="Other / horns stem" aria-pressed="true">On</button>
+</li>
+        </ul>
+        
+        
+      <div id="transcribe-stems-info" role="note" aria-label="About stem separation" class="transcribe-anchored-info" hidden>
+<p class="transcribe-stems-help">Drag on the waveform or use [ and ] to highlight up to 60 seconds. Highlight stems play only that passage and clear when it changes.</p>
+<p class="transcribe-stems-help">Six-stem Demucs downloads a 136 MB model on first use and caches it when storage allows. Processing stays on your device. Guitar and piano play together; horns usually remain in Other. Dimmer names indicate quieter output, not proof an instrument is absent.</p>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="transcribe-shortcuts-content" class="transcribe-shortcuts-pane" hidden="">
+<section class="transcribe-shortcuts" id="transcribe-shortcuts" aria-labelledby="transcribe-shortcuts-title">
+          <h2 id="transcribe-shortcuts-title" tabindex="-1" hidden="">Keyboard shortcuts <kbd>?</kbd>
+</h2>
+          <h3>Playback &amp; selection</h3>
+          <dl>
+            <div>
+<dt>
+<kbd>Space</kbd>
+</dt>
+<dd>Play / pause</dd>
+</div>
+            <div>
+<dt>
+<kbd>←</kbd> / <kbd>→</kbd>
+</dt>
+<dd>Seek 2s; hold Shift for 5s</dd>
+</div>
+            <div>
+<dt>
+<kbd>[</kbd> / <kbd>]</kbd>
+</dt>
+<dd>Set selection start / end</dd>
+</div>
+            <div>
+<dt>
+<kbd>B</kbd>
+</dt>
+<dd>Restart track or selection</dd>
+</div>
+            <div>
+<dt>
+<kbd>H</kbd>
+</dt>
+<dd>Selection only on / off</dd>
+</div>
+            <div>
+<dt>
+<kbd>R</kbd> or <kbd>L</kbd>
+</dt>
+<dd>Repeat on / off</dd>
+</div>
+            <div>
+<dt>
+<kbd>,</kbd> / <kbd>.</kbd>
+</dt>
+<dd>Speed down / up</dd>
+</div>
+            <div>
+<dt>
+<kbd>−</kbd> / <kbd>=</kbd>
+</dt>
+<dd>Zoom out / in</dd>
+</div>
+            <div>
+<dt>
+<kbd>C</kbd>
+</dt>
+<dd>Show / hide Controls</dd>
+</div>
+            <div>
+<dt>
+<kbd>?</kbd>
+</dt>
+<dd>Open keyboard shortcuts</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd data-platform-alt="">Option</kbd>
+<span>+</span>
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>K</kbd>
+</span>
+</dt>
+<dd>Toggle keyboard navigation</dd>
+</div>
+            <div>
+<dt>
+<kbd>T</kbd>
+</dt>
+<dd>Open Stems</dd>
+</div>
+            <div>
+<dt>
+<kbd>F</kbd>
+</dt>
+<dd>Show / hide spectrum &amp; keyboard</dd>
+</div>
+          </dl>
+          <h3>Measures &amp; sections</h3>
+          <dl>
+            <div>
+<dt>
+<kbd>M</kbd> / <kbd>S</kbd>
+</dt>
+<dd>Add measure / section at playhead</dd>
+</div>
+            <div>
+<dt>
+<kbd>N</kbd> / <span class="transcribe-key-combo">
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>N</kbd>
+</span>
+</dt>
+<dd>Next / previous marker</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>S</kbd>
+</span>
+</dt>
+<dd>Next section</dd>
+</div>
+            <div>
+<dt>
+<kbd>G</kbd> then number then <kbd>Enter</kbd>
+</dt>
+<dd>Go to measure (12 or B3)</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>L</kbd>
+</span>
+</dt>
+<dd>Loop measure</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd data-platform-alt="">Option</kbd>
+<span>+</span>
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>L</kbd>
+</span>
+</dt>
+<dd>Loop section</dd>
+</div>
+            <div>
+<dt>
+<kbd>Delete</kbd> / <kbd>Backspace</kbd>
+</dt>
+<dd>Delete selected marker</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd data-platform-modifier="">Cmd</kbd>
+<span>+</span>
+<kbd>Z</kbd>
+</span>
+</dt>
+<dd>Undo marker edit</dd>
+</div>
+            <div>
+<dt>
+<span class="transcribe-key-combo">
+<kbd data-platform-modifier="">Cmd</kbd>
+<span>+</span>
+<kbd>Shift</kbd>
+<span>+</span>
+<kbd>Z</kbd>
+</span>
+</dt>
+<dd>Redo marker edit</dd>
+</div>
+          </dl>
+        <div class="analytics-links">
+<a href="/privacy/">Privacy</a>
+<button type="button" class="analytics-preferences" data-analytics-preferences="">Analytics preferences</button>
+</div>
+</section>
+</div>
+<div id="transcribe-eq-info" role="note" aria-label="Using the equalizer" class="transcribe-anchored-info" hidden>
+<p class="transcribe-eq-hint">Drag bands: frequency / gain · Scroll: Q</p>
+<p class="transcribe-eq-hint">Cut handles: drag or scroll cutoff</p>
+</div>
+</aside>
+</section>
+</div>

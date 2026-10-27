@@ -4,7 +4,8 @@ no_analytics: true
 title: Lifting Tracker
 permalink: /lifting/
 extra_css:
-  - /assets/css/lifting.css?v=20261005-motion
+  - /assets/css/lifting.css?v=20261026-desktop-headings
+  - /assets/css/tracker-log.css?v=20261026-lift-workspace
 ---
 
 <section
@@ -19,7 +20,6 @@ extra_css:
         <h2>Lift progress</h2>
       </div>
       <div class="lifting-toolbar-actions">
-        <button id="log-set-open" class="lifting-secondary" type="button">Log set</button>
         <button id="add-lift-open" class="lifting-secondary" type="button">Add lift</button>
         <button id="lifting-lock-button" class="lifting-secondary lock-control" type="button" aria-label="Lock Lifting Tracker and return to sign in" title="Lock Lifting Tracker">
           <svg class="lock-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -41,58 +41,50 @@ extra_css:
     <p id="lifting-status" class="lifting-status" role="status"></p>
   </div>
 
-  <dialog class="lifting-modal" id="add-lift-modal" aria-labelledby="add-lift-title">
+  <dialog class="lifting-modal tracker-dialog" id="add-lift-modal" aria-labelledby="add-lift-title">
+    <div class="lifting-modal-head">
+      <h3 id="add-lift-title">Add lift type</h3>
+      <button id="add-lift-close" class="lifting-icon-button tracker-dialog-close" type="button" aria-label="Close">&times;</button>
+    </div>
     <form id="add-lift-form" class="lifting-form" method="dialog">
-      <div class="lifting-modal-head">
-        <h3 id="add-lift-title">Add lift type</h3>
-        <button id="add-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
+      <div class="tracker-log-field">
+        <label for="lift-name">Lift name</label>
+        <input id="lift-name" name="name" type="text" placeholder="Incline bench press" required>
       </div>
-      <label for="lift-name">Lift name</label>
-      <input id="lift-name" name="name" type="text" placeholder="Incline bench press" required>
-      <label for="lift-equipment-type">Equipment type</label>
-      <select id="lift-equipment-type" name="equipment_type" required>
-        <option value="dumbbell">Dumbbell</option>
-        <option value="machine">Machine</option>
-        <option value="barbell">Barbell</option>
-        <option value="other" selected>Other</option>
-      </select>
+      <div class="tracker-log-field">
+        <label for="lift-equipment-type">Equipment type</label>
+        <select id="lift-equipment-type" name="equipment_type" required>
+          <option value="dumbbell">Dumbbell</option>
+          <option value="machine">Machine</option>
+          <option value="barbell">Barbell</option>
+          <option value="other" selected>Other</option>
+        </select>
+      </div>
       <p class="lifting-form-error" id="add-lift-error" role="alert"></p>
       <button type="submit" disabled>Create lift</button>
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-log-modal" id="log-set-modal" aria-labelledby="log-set-title">
-    <form id="log-form" class="lifting-form" method="dialog">
-      <div class="lifting-modal-head">
-        <h3 id="log-set-title">Log a set</h3>
-        <button id="log-set-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
+  <div id="log-set-home" hidden>
+  <section class="lifting-inline-log tracker-log-dialog" id="log-set-panel" aria-labelledby="log-set-title" hidden>
+    <div class="lifting-modal-head">
+      <div class="lifting-workspace-tabs" id="lift-workspace-tabs" role="tablist" aria-label="Lift workspace">
+        <button id="lift-tab-log" type="button" role="tab" aria-selected="true" aria-controls="lift-log-pane" tabindex="0">Log set</button>
+        <button id="lift-tab-targets" type="button" role="tab" aria-selected="false" aria-controls="lift-targets-pane" tabindex="-1">Rep targets</button>
       </div>
-      <label for="log-date">Date</label>
-      <div class="lifting-date-control">
-        <input id="log-date" name="lifted_at" type="date" required>
-      </div>
-      <label for="log-lift-search">Lift</label>
-      <div class="lifting-lift-picker" id="log-lift-picker">
-        <div class="lifting-combobox-control">
-          <input id="log-lift-search" type="search" placeholder="Search or choose a lift" autocomplete="off" role="combobox" aria-controls="log-lift-options" aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list" required>
-          <button class="lifting-combobox-toggle" id="log-lift-toggle" type="button" aria-label="Show lifts" aria-controls="log-lift-menu" aria-expanded="false">
-            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4"/></svg>
-          </button>
-        </div>
-        <div class="lifting-combobox-menu" id="log-lift-menu" hidden>
-          <div class="lifting-equipment-filters" aria-label="Filter lifts by equipment">
-            <span>Equipment</span>
-            <button type="button" data-log-equipment-filter="all" aria-pressed="true">All</button>
-            <button type="button" data-log-equipment-filter="dumbbell" aria-pressed="false">Dumbbell</button>
-            <button type="button" data-log-equipment-filter="machine" aria-pressed="false">Machine</button>
-            <button type="button" data-log-equipment-filter="barbell" aria-pressed="false">Barbell</button>
-            <button type="button" data-log-equipment-filter="other" aria-pressed="false">Other</button>
-          </div>
-          <div class="lifting-combobox-results" id="log-lift-options" role="listbox" aria-label="Lifts"></div>
+      <button id="log-set-close" class="lifting-icon-button tracker-dialog-close" type="button" aria-label="Close log set form">&times;</button>
+    </div>
+    <div class="lifting-workspace-body">
+    <section id="lift-log-pane" class="lifting-entry-pane" aria-labelledby="log-set-title">
+      <h3 id="log-set-title">Log a set</h3>
+    <form id="log-form" class="lifting-form">
+      <div class="lifting-log-field">
+        <label for="log-date">Date</label>
+        <div class="lifting-date-control">
+          <input id="log-date" name="lifted_at" type="text" inputmode="numeric" placeholder="MM-DD-YYYY" aria-label="Date (MM-DD-YYYY)" autocomplete="off" spellcheck="false" required>
         </div>
       </div>
       <input id="log-lift" name="lift_id" type="hidden" data-required-value>
-      <p class="lifting-select-status" id="log-lift-search-status" role="status"></p>
       <div class="lifting-log-measurements">
         <div class="lifting-log-field">
           <label for="log-weight">Weight</label>
@@ -130,36 +122,52 @@ extra_css:
           </div>
         </div>
       </div>
+      <p id="log-set-feedback" class="lifting-log-feedback" role="status"></p>
       <button type="submit" disabled>Add log</button>
     </form>
-  </dialog>
+    </section>
+    <section id="lift-targets-pane" class="lifting-targets-pane" aria-labelledby="rep-targets-title">
+      <h3 id="rep-targets-title">Estimated rep targets</h3>
+      <div id="lift-rep-targets"></div>
+    </section>
+    </div>
+    <div class="lifting-workspace-actions">
+      <button class="lifting-action" id="workspace-view-logs" type="button" data-open-logs="">View logs</button>
+      <button class="lifting-action" id="workspace-edit-lift" type="button" data-rename-lift="">Edit lift</button>
+    </div>
+  </section>
+  </div>
 
-  <dialog class="lifting-modal" id="rename-lift-modal" aria-labelledby="rename-lift-title">
+  <dialog class="lifting-modal tracker-dialog" id="rename-lift-modal" aria-labelledby="rename-lift-title">
+    <div class="lifting-modal-head">
+      <h3 id="rename-lift-title">Edit lift</h3>
+      <button id="rename-lift-close" class="lifting-icon-button tracker-dialog-close" type="button" aria-label="Close">&times;</button>
+    </div>
     <form id="rename-lift-form" class="lifting-form" method="dialog">
-      <div class="lifting-modal-head">
-        <h3 id="rename-lift-title">Edit lift</h3>
-        <button id="rename-lift-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
-      </div>
       <input id="rename-lift-id" name="id" type="hidden">
-      <label for="rename-lift-name">Lift name</label>
-      <input id="rename-lift-name" name="name" type="text" required>
-      <label for="rename-lift-equipment-type">Equipment type</label>
-      <select id="rename-lift-equipment-type" name="equipment_type" required>
-        <option value="dumbbell">Dumbbell</option>
-        <option value="machine">Machine</option>
-        <option value="barbell">Barbell</option>
-        <option value="other">Other</option>
-      </select>
+      <div class="tracker-log-field">
+        <label for="rename-lift-name">Lift name</label>
+        <input id="rename-lift-name" name="name" type="text" required>
+      </div>
+      <div class="tracker-log-field">
+        <label for="rename-lift-equipment-type">Equipment type</label>
+        <select id="rename-lift-equipment-type" name="equipment_type" required>
+          <option value="dumbbell">Dumbbell</option>
+          <option value="machine">Machine</option>
+          <option value="barbell">Barbell</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
       <button type="submit" disabled>Save lift</button>
     </form>
   </dialog>
 
-  <dialog class="lifting-modal lifting-logs-modal" id="lift-logs-modal" aria-labelledby="lift-logs-title">
+  <dialog class="lifting-modal lifting-logs-modal tracker-dialog" id="lift-logs-modal" aria-labelledby="lift-logs-title">
     <div class="lifting-modal-head">
       <h3 id="lift-logs-title">Logs</h3>
       <div class="lifting-modal-head-actions">
         <button class="lifting-action" id="lift-logs-delete" type="button">Delete lift</button>
-        <button id="lift-logs-close" class="lifting-icon-button" type="button" aria-label="Close">&times;</button>
+        <button id="lift-logs-close" class="lifting-icon-button tracker-dialog-close" type="button" aria-label="Close">&times;</button>
       </div>
     </div>
     <div id="lift-logs-content"></div>
@@ -168,4 +176,5 @@ extra_css:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.3/dist/umd/supabase.js" defer></script>
 <script src="{{ "/assets/js/personal-auth.js" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/lifting.js" | relative_url }}?v=20261005-motion" defer></script>
+<script src="{{ "/assets/js/calculator-dates.js" | relative_url }}?v=20261026-log-dates" defer></script>
+<script src="{{ "/assets/js/lifting.js" | relative_url }}?v=20261026-lift-workspace" defer></script>

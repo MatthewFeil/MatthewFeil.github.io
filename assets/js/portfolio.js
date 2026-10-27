@@ -675,8 +675,10 @@
     setStatus(successMessage || `Updated ${new Date().toLocaleTimeString()}.`);
   }
 
-  els.logDate.valueAsDate = new Date();
-  els.logDate.max = dateKey(new Date());
+  const logDateInput = window.CalculatorDates.bindInput(els.logDate, {
+    allowFuture: false,
+    onEdit: () => syncSubmitButton(els.logForm)
+  });
   els.performancePeriod.value = state.performancePeriod;
   [els.stockForm, els.logForm].forEach(watchFormCompletion);
 
@@ -761,7 +763,7 @@
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!formIsComplete(els.logForm)) {
+    if (!logDateInput.toISO() || !formIsComplete(els.logForm)) {
       syncSubmitButton(els.logForm);
       return;
     }
@@ -772,13 +774,13 @@
     try {
       await api('addLog', {
         stock_id: form.get('stock_id'),
-        logged_at: form.get('logged_at'),
+        logged_at: logDateInput.toISO(),
         entry_type: form.get('entry_type'),
         purchase_price: Number(form.get('purchase_price')),
         total_purchase_amount: Number(form.get('total_purchase_amount'))
       });
       els.logForm.reset();
-      els.logDate.valueAsDate = new Date();
+      logDateInput.reset();
       closeDialog(els.logDialog);
       await loadPortfolio('Investment log added.');
     } catch (error) {

@@ -263,7 +263,10 @@
     event.preventDefault();
 
     clearFieldErrors();
-    if (!validateDates(true)) return;
+    if (!validateDates(true)) {
+      window.siteAnalytics?.track('tool_error', 'interest_calculator', 'dates_invalid');
+      return;
+    }
 
     const principal = Number(principalInput.value);
     const startDate = parseInputDate(dateInput.value);
@@ -278,10 +281,12 @@
         !endDate ? endDateInput : null,
         !Number.isFinite(annualRate) ? rateInput : null
       ].filter(Boolean);
+      window.siteAnalytics?.track('tool_error', 'interest_calculator', 'inputs_invalid');
       showValidationError('Enter an amount, dates, and interest rate.', invalidInputs);
       return;
     }
 
+    window.siteAnalytics?.track('tool_interaction', 'interest_calculator', 'calculation_requested');
     setLoading(true);
 
     try {
@@ -307,8 +312,12 @@
         inflation
       });
 
+      window.siteAnalytics?.track('tool_complete', 'interest_calculator', 'calculation');
+      window.siteAnalytics?.track('tool_complete', 'interest_calculator', `${method}_${isProjection ? 'projection' : 'historical'}`);
+      if (!isProjection && !inflation) window.siteAnalytics?.track('tool_interaction', 'interest_calculator', 'inflation_unavailable');
       setStatus(isProjection ? 'Projected interest calculated. Future inflation is unknown, so inflation-adjusted values are unavailable.' : inflation ? 'Interest calculated.' : 'Interest calculated. Inflation data is unavailable.', inflation ? 'success' : 'warning');
     } catch (error) {
+      window.siteAnalytics?.track('tool_error', 'interest_calculator', 'calculation_failed');
       results.hidden = true;
       delete results.dataset.state;
       delete app.dataset.calculationState;
@@ -330,11 +339,37 @@
   initDefaults();
   setDetailsOpen(false);
   detailsToggle.addEventListener('click', () => {
+    if (detailsPanel.hidden) window.siteAnalytics?.track('tool_action', 'interest_calculator', 'details_opened');
+    window.siteAnalytics?.track('tool_interaction', 'interest_calculator', detailsPanel.hidden ? 'details_opened' : 'details_closed');
     setDetailsOpen(detailsPanel.hidden);
   });
   [principalInput, rateInput].forEach((input) => {
     input.addEventListener('input', () => setFieldInvalid(input, false));
   });
-  methodInput.addEventListener('change', () => setFieldInvalid(methodInput, false));
+  methodInput.addEventListener('change', () => {
+    setFieldInvalid(methodInput, false);
+    window.siteAnalytics?.track('tool_interaction', 'interest_calculator', `${methodInput.value}_selected`);
+  });
+  methodInput.addEventListener('invalid', () => {
+    window.siteAnalytics?.track('tool_error', 'interest_calculator', 'method_invalid');
+  });
+  // Count committed edits, never keystrokes or field values. Native invalid events
+  // also cover rejected submissions that never reach the submit handler.
+  for (const [input, field] of [[principalInput, 'amount'], [rateInput, 'rate'], [dateInput, 'start_date'], [endDateInput, 'end_date']]) {
+    let committedValue = input.value;
+    const commit = () => {
+      if (input.value === committedValue) return;
+      committedValue = input.value;
+      const filled = input === dateInput || input === endDateInput
+        ? /\d/.test(input.value) : Boolean(input.value.trim());
+      window.siteAnalytics?.track('tool_interaction', 'interest_calculator', `${field}_${filled ? 'changed' : 'cleared'}`);
+    };
+    input.addEventListener('change', commit);
+    // The date mask manages values itself, so native change is not guaranteed.
+    if (input === dateInput || input === endDateInput) input.addEventListener('blur', commit);
+    input.addEventListener('invalid', () => {
+      window.siteAnalytics?.track('tool_error', 'interest_calculator', `${field}_invalid`);
+    });
+  }
   form.addEventListener('submit', handleSubmit);
 })();

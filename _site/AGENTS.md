@@ -9,3 +9,7 @@
 # Local previews
 
 Identify the active preview server's port and exact destination directory first. Rebuild that exact directory, not just `_site`, and verify the live URL serves the changed markup or asset before claiming the preview is updated.
+
+# Transcribe guide animations
+
+Before adding or changing guide cursor demonstrations, read [the cursor-animation authoring guide](docs/transcribe-guide-animations.md). It records the required lesson sequencing, section-specific states, camera framing, cursor styling, pause/replay behavior, and validation approach.

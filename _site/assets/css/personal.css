@@ -369,7 +369,7 @@
 
 .personal-dashboard-status {
   min-height: 1.25rem;
-  margin: var(--tool-gap) 0 0;
+  margin: 0 0 var(--tool-section-gap);
   color: var(--personal-muted);
   font-size: 0.85rem;
   font-weight: 700;
@@ -426,8 +426,8 @@
 }
 
 .personal-widget.is-empty {
-  align-content: start;
-  grid-template-rows: auto;
+  align-content: stretch;
+  grid-template-rows: auto 1fr;
 }
 
 .personal-widget-calendar {
@@ -440,7 +440,7 @@
 
 .personal-widget-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
@@ -451,6 +451,8 @@
 }
 
 .personal-widget h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-family: var(--font-display);
   font-size: clamp(1.08rem, 2vw, 1.45rem);
   font-weight: 900;
@@ -520,8 +522,12 @@
   justify-content: center;
   min-width: 2.05rem;
   min-height: 2.05rem;
+  flex-shrink: 0;
   border: 1px solid var(--personal-border);
+  background: var(--personal-surface);
   color: var(--site-text);
+  padding: 0.25rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .personal-widget-note {
@@ -559,6 +565,11 @@
 .personal-task-list li:first-child {
   border-top: 0;
   padding-top: 0;
+}
+
+.personal-agenda-list li:last-child,
+.personal-task-list li:last-child {
+  padding-bottom: 0;
 }
 
 .personal-agenda-list strong,
@@ -603,6 +614,8 @@
   padding: 0.24rem 0.34rem;
   text-transform: uppercase;
   vertical-align: baseline;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .personal-agenda-list .personal-empty-message,
@@ -637,8 +650,6 @@
 
 .personal-widget.is-empty .personal-agenda-list,
 .personal-widget.is-empty .personal-task-list {
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
   block-size: auto;
@@ -654,7 +665,7 @@
   align-self: center;
   inline-size: 100%;
   min-height: 0;
-  padding: var(--tool-panel-padding);
+  padding: var(--tool-gap) 0;
   border-top: 0;
 }
 
@@ -670,10 +681,11 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+  min-height: var(--touch-target);
   font: inherit;
   font-family: var(--font-ui);
   line-height: inherit;
-  padding: 0.15rem 0;
+  padding: var(--tool-gap) var(--tool-panel-padding);
   text-align: inherit;
   transition: color 0.15s ease, transform 0.12s var(--personal-ease-out);
 }
@@ -696,6 +708,7 @@
   display: grid;
   gap: 0.16rem;
   min-width: 0;
+  overflow-wrap: anywhere;
   color: inherit;
   text-decoration: none;
   transition: color 0.15s ease;
@@ -704,6 +717,18 @@
 .personal-agenda-list a:visited,
 .personal-task-list a:visited {
   color: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .personal-agenda-list a:hover strong,
+  .personal-task-list li:not(.is-complete) a:hover strong {
+    color: var(--site-accent);
+  }
+}
+
+:root[data-keyboard-navigation="on"] .personal-agenda-list a:focus-visible strong,
+:root[data-keyboard-navigation="on"] .personal-task-list li:not(.is-complete) a:focus-visible strong {
+  color: var(--site-accent);
 }
 
 .personal-agenda-list a:hover,
@@ -715,10 +740,9 @@
 
 .personal-task-list li {
   position: relative;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: 2.75rem minmax(0, 1fr);
   column-gap: 0.55rem;
-  align-items: start;
-  max-height: var(--task-row-height, 14rem);
+  align-items: center;
   overflow: hidden;
   transition:
     background 0.2s ease,
@@ -748,7 +772,7 @@
   max-height: 2.75rem;
   box-sizing: border-box;
   flex: 0 0 2.75rem;
-  margin: -0.55rem -0.55rem 0 -0.55rem;
+  margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;

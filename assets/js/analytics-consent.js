@@ -361,20 +361,9 @@
     button.textContent = 'Analytics preferences';
     return button;
   }
-  const footer = document.querySelector('.site-footer-privacy');
+  const footer = document.querySelector('.site-footer .site-footer-privacy');
   if (footer) {
     if (!footer.querySelector('[data-analytics-preferences]')) footer.append(preferenceButton());
-  }
-  else {
-    const links = document.createElement('div');
-    links.className = 'analytics-links';
-    const link = document.createElement('a');
-    link.href = privacyUrl;
-    link.textContent = 'Privacy';
-    links.append(link, preferenceButton());
-    const destination = document.querySelector('.transcribe-shortcuts');
-    if (!destination) links.classList.add('analytics-links--standalone');
-    (destination || document.body).append(links);
   }
   document.querySelectorAll('[data-analytics-preferences]').forEach(button => {
     button.hidden = false;

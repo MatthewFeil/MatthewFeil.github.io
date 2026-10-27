@@ -19,17 +19,23 @@
   const template = 'MM-DD-YYYY';
   const slots = [0, 1, 3, 4, 6, 7, 8, 9];
 
-  function mask(input, onEdit) {
+  function mask(input, onEdit, decorate = true) {
+    // The template already fills maxlength. WebKit can truncate a keypad digit
+    // to empty before beforeinput runs; the mask's eight slots limit entry.
+    input.removeAttribute('maxlength');
     let previousValue = input.value || template;
     const wrapper = document.createElement('span');
     wrapper.className = 'investment-date-mask';
     const ink = document.createElement('span');
     ink.className = 'investment-date-ink';
     ink.setAttribute('aria-hidden', 'true');
-    input.before(wrapper);
-    wrapper.append(input, ink);
+    if (decorate) {
+      input.before(wrapper);
+      wrapper.append(input, ink);
+    }
 
     function syncInk() {
+      if (!decorate) return;
       ink.replaceChildren(...Array.from(input.value, character => {
         const span = document.createElement('span');
         span.textContent = character;
@@ -193,5 +199,34 @@
     return validate;
   }
 
-  window.CalculatorDates = { parse, formatLocal, bind };
+  // Single log dates use the same editor and calendar validation as calculators.
+  function bindInput(input, { allowFuture = true, onEdit = () => {} } = {}) {
+    function validate() {
+      const date = parse(input.value);
+      const future = date && !allowFuture && date > parse(formatLocal(new Date()));
+      const message = !date ? 'Enter a real date in MM-DD-YYYY format.'
+        : future ? 'Enter a date that is today or earlier.' : '';
+      input.setCustomValidity(message);
+      input.setAttribute('aria-invalid', String(Boolean(message)));
+      return !message;
+    }
+
+    function reset() {
+      input.value = formatLocal(new Date());
+      validate();
+      onEdit();
+    }
+
+    input.value = formatLocal(new Date());
+    mask(input, () => { validate(); onEdit(); }, false);
+    input.addEventListener('change', () => { validate(); onEdit(); });
+    input.addEventListener('blur', validate);
+    validate();
+    return {
+      reset,
+      toISO: () => validate() ? parse(input.value).toISOString().slice(0, 10) : null
+    };
+  }
+
+  window.CalculatorDates = { parse, formatLocal, bind, bindInput };
 })();

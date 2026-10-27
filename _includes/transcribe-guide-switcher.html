@@ -1,0 +1,10 @@
+<div class="guide-mode-links" role="group" aria-label="Guide pages">
+  <a href="{{ '/transcribe/guide/quick-start/' | relative_url }}"{% if include.current == 'quick-start' %} aria-current="page"{% endif %}>
+    <strong>Quick Start</strong>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+  </a>
+  <a href="{{ '/transcribe/guide/' | relative_url }}"{% if include.current == 'reference' %} aria-current="page"{% endif %}>
+    <strong>User Guide</strong>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+  </a>
+</div>

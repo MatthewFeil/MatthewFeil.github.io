@@ -1,0 +1,17 @@
+<aside class="guide-viewer" aria-label="Animated Transcribe reference">
+  <div class="guide-camera" id="guide-camera">
+    <div class="guide-stage" id="guide-stage">{% include transcribe-guide-mockup.html %}</div>
+  </div>
+  <div class="guide-demo-controls" role="group" aria-label="Demonstration playback">
+    <div class="guide-demo-timeline" data-guide-timeline role="group" aria-label="Walkthrough steps"></div>
+    <button type="button" class="guide-demo-playback" data-guide-playback aria-label="Pause demonstration" hidden></button>
+  </div>
+  <div class="guide-current-instruction" data-guide-current-instruction aria-hidden="true"><strong data-guide-current-title></strong><p data-guide-current-detail></p></div>
+  {% if page.permalink == '/transcribe/guide/quick-start/' %}
+  <div class="guide-animation-settings" role="group" aria-label="Walkthrough animation settings">
+    <label><input type="checkbox" data-guide-autoplay checked> Autoplay</label>
+    <label>Animation speed <select data-guide-rate aria-label="Animation speed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+  </div>
+  {% endif %}
+  <noscript><p>Enable JavaScript to watch the walkthrough. The instructions below remain readable.</p></noscript>
+</aside>

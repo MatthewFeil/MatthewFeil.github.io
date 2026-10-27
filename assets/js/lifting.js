@@ -41,17 +41,25 @@
     lifts: [],
     logs: [],
     query: '',
-    logLiftQuery: '',
-    logEquipmentFilter: 'all',
-    logActiveOptionIndex: -1
+    logExpanded: false,
+    activeLogLiftId: '',
+    workspaceView: 'log'
   };
 
   const els = {
     workspace: document.getElementById('lifting-workspace'),
     lockButton: document.getElementById('lifting-lock-button'),
-    logSetOpen: document.getElementById('log-set-open'),
     logSetClose: document.getElementById('log-set-close'),
-    logSetModal: document.getElementById('log-set-modal'),
+    logSetPanel: document.getElementById('log-set-panel'),
+    logSetHome: document.getElementById('log-set-home'),
+    logSetTitle: document.getElementById('log-set-title'),
+    logSetFeedback: document.getElementById('log-set-feedback'),
+    workspaceTabs: document.getElementById('lift-workspace-tabs'),
+    logPane: document.getElementById('lift-log-pane'),
+    targetsPane: document.getElementById('lift-targets-pane'),
+    repTargets: document.getElementById('lift-rep-targets'),
+    viewLogs: document.getElementById('workspace-view-logs'),
+    editLift: document.getElementById('workspace-edit-lift'),
     liftLogsModal: document.getElementById('lift-logs-modal'),
     liftLogsClose: document.getElementById('lift-logs-close'),
     liftLogsTitle: document.getElementById('lift-logs-title'),
@@ -70,13 +78,6 @@
     renameLiftName: document.getElementById('rename-lift-name'),
     renameLiftEquipmentType: document.getElementById('rename-lift-equipment-type'),
     logForm: document.getElementById('log-form'),
-    logLiftPicker: document.getElementById('log-lift-picker'),
-    logLiftSearch: document.getElementById('log-lift-search'),
-    logLiftToggle: document.getElementById('log-lift-toggle'),
-    logLiftMenu: document.getElementById('log-lift-menu'),
-    logLiftOptions: document.getElementById('log-lift-options'),
-    logEquipmentFilters: [...document.querySelectorAll('[data-log-equipment-filter]')],
-    logLiftSearchStatus: document.getElementById('log-lift-search-status'),
     logLift: document.getElementById('log-lift'),
     logEquipmentNote: document.getElementById('log-equipment-note'),
     logEquipmentBadge: document.getElementById('log-equipment-badge'),
@@ -95,6 +96,8 @@
   const logDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const motionAnimations = new Map();
+  const logDrafts = new Map();
+  const mobileWorkspace = window.matchMedia('(max-width: 760px)');
 
   function animateFeedback(element, keyframes, duration) {
     motionAnimations.get(element)?.cancel();
@@ -257,7 +260,7 @@
     els.barbellTotals.forEach((total) => {
       const changed = total.textContent !== `${totalWeight} lb total`;
       total.textContent = `${totalWeight} lb total`;
-      if (changed && els.logSetModal.open && !els.barbellCalculator.hidden) {
+      if (changed && !els.logSetPanel.hidden && !els.barbellCalculator.hidden) {
         animateFeedback(total, [{ opacity: 0.55 }, { opacity: 1 }], reducedMotion.matches ? 100 : 180);
       }
     });
@@ -306,102 +309,63 @@
     }
   }
 
-  function renderLiftOptions() {
-    const submitButton = els.logForm.querySelector('button[type="submit"]');
-
-    if (!state.lifts.length) {
-      els.logLiftSearch.value = '';
-      els.logLiftSearch.disabled = true;
-      els.logLiftToggle.disabled = true;
-      els.logLift.value = '';
-      els.logLiftOptions.innerHTML = '<div class="lifting-combobox-empty" role="option" aria-disabled="true">Add a lift first.</div>';
-      els.logLiftSearchStatus.textContent = '';
-      els.logEquipmentNote.hidden = true;
-      els.barbellCalculator.hidden = true;
-      submitButton.disabled = true;
-      els.logSetOpen.disabled = true;
-      return;
-    }
-
-    els.logLiftSearch.disabled = false;
-    els.logLiftToggle.disabled = false;
-    els.logSetOpen.disabled = false;
-    renderLogLiftResults();
-    const selectedLift = state.lifts.find((lift) => lift.id === els.logLift.value);
-    if (selectedLift) {
-      els.logLiftSearch.value = selectedLift.name;
-      updateLogEquipmentInterface();
-    } else {
-      els.logLift.value = '';
-      updateLogEquipmentInterface();
-    }
-    syncSubmitButton(els.logForm);
-  }
-
-  function filteredLogLifts() {
-    const query = state.logLiftQuery.toLowerCase();
-    return state.lifts.filter((lift) => (
-      (!query || lift.name.toLowerCase().includes(query))
-      && (state.logEquipmentFilter === 'all' || equipmentTypeForLift(lift) === state.logEquipmentFilter)
-    ));
-  }
-
-  function renderLogLiftResults() {
-    const filteredLifts = filteredLogLifts();
-    state.logActiveOptionIndex = Math.min(state.logActiveOptionIndex, filteredLifts.length - 1);
-    const selectedLiftId = els.logLift.value;
-    els.logEquipmentFilters.forEach((button) => {
-      button.setAttribute('aria-pressed', String(button.dataset.logEquipmentFilter === state.logEquipmentFilter));
+  function rememberLogDraft() {
+    if (!state.activeLogLiftId) return;
+    logDrafts.set(state.activeLogLiftId, {
+      date: els.logDate.value,
+      weight: els.logWeight.value,
+      reps: document.getElementById('log-reps').value,
+      plates: els.plateInputs.map((input) => input.value),
+      platesOpen: els.plateCalculatorToggle.getAttribute('aria-expanded') === 'true',
+      feedback: els.logSetFeedback.textContent
     });
-    els.logLiftOptions.innerHTML = filteredLifts.length
-      ? filteredLifts.map((lift, index) => `
-        <button
-          class="lifting-combobox-option${index === state.logActiveOptionIndex ? ' is-active' : ''}"
-          id="log-lift-option-${index}"
-          type="button"
-          role="option"
-          aria-selected="${String(lift.id === selectedLiftId)}"
-          data-log-lift-option="${escapeHtml(lift.id)}"
-        >
-          <span>${escapeHtml(lift.name)}</span>
-          <span class="lifting-equipment-badge">${escapeHtml(equipmentForLift(lift).badge)}</span>
-        </button>
-      `).join('')
-      : '<div class="lifting-combobox-empty" role="option" aria-disabled="true">No matching lifts.</div>';
-    if (state.logActiveOptionIndex >= 0) {
-      els.logLiftSearch.setAttribute('aria-activedescendant', `log-lift-option-${state.logActiveOptionIndex}`);
-    } else {
-      els.logLiftSearch.removeAttribute('aria-activedescendant');
-    }
   }
 
-  function setLogLiftMenuOpen(isOpen) {
-    els.logLiftMenu.hidden = !isOpen;
-    els.logLiftSearch.setAttribute('aria-expanded', String(isOpen));
-    els.logLiftToggle.setAttribute('aria-expanded', String(isOpen));
-    els.logLiftPicker.classList.toggle('is-open', isOpen);
-    els.logSetModal.classList.toggle('is-lift-menu-open', isOpen);
-    if (isOpen) {
-      els.logSetModal.scrollTop = 0;
-      renderLogLiftResults();
-    }
-    if (!isOpen) {
-      state.logActiveOptionIndex = -1;
-      els.logLiftSearch.removeAttribute('aria-activedescendant');
-    }
+  function restoreLogDraft(liftId) {
+    const draft = logDrafts.get(liftId);
+    els.logLift.value = liftId;
+    resetPlateCalculator();
+    els.plateInputs.forEach((input, index) => { input.value = draft?.plates[index] || '0'; });
+    updateLogEquipmentInterface();
+    if (draft) els.logWeight.value = draft.weight;
+    else if (els.barbellCalculator.hidden) els.logWeight.value = '';
+    document.getElementById('log-reps').value = draft?.reps || '';
+    els.logDate.value = draft?.date || window.CalculatorDates.formatLocal(new Date());
+    els.logSetFeedback.textContent = draft?.feedback || '';
+    setPlateCalculatorOpen(Boolean(draft?.platesOpen && !els.barbellCalculator.hidden));
+    logDateInput.toISO();
+    syncSubmitButton(els.logForm);
   }
 
   function selectLogLift(liftId) {
-    const selectedLift = state.lifts.find((lift) => lift.id === liftId);
-    if (!selectedLift) return;
-    els.logLift.value = selectedLift.id;
-    els.logLiftSearch.value = selectedLift.name;
-    els.logLiftSearchStatus.textContent = '';
-    state.logLiftQuery = '';
-    state.logActiveOptionIndex = -1;
-    updateLogEquipmentInterface();
-    syncSubmitButton(els.logForm);
-    setLogLiftMenuOpen(false);
+    if (state.activeLogLiftId !== liftId) {
+      rememberLogDraft();
+      state.activeLogLiftId = liftId;
+      restoreLogDraft(liftId);
+    }
+    state.workspaceView = 'log';
+    mountInlineLog();
+  }
+
+  function syncWorkspaceView() {
+    const mobile = mobileWorkspace.matches;
+    const showTargets = state.workspaceView === 'targets';
+    els.workspaceTabs.hidden = !mobile;
+    els.logPane.hidden = mobile && showTargets;
+    els.targetsPane.hidden = mobile && !showTargets;
+    for (const [pane, tabId, desktopLabel] of [
+      [els.logPane, 'lift-tab-log', 'log-set-title'],
+      [els.targetsPane, 'lift-tab-targets', 'rep-targets-title']
+    ]) {
+      if (mobile) pane.setAttribute('role', 'tabpanel');
+      else pane.removeAttribute('role');
+      pane.setAttribute('aria-labelledby', mobile ? tabId : desktopLabel);
+    }
+    els.workspaceTabs.querySelectorAll('[role="tab"]').forEach((tab) => {
+      const selected = (tab.id === 'lift-tab-targets') === showTargets;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
   }
 
   function renderRepGrid(theoreticalOneRep) {
@@ -466,30 +430,59 @@
     els.renameLiftName.select();
   }
 
-  function openLogSetModal(liftId = '') {
-    state.logLiftQuery = '';
-    state.logEquipmentFilter = 'all';
-    state.logActiveOptionIndex = -1;
-    els.logLiftSearch.value = '';
-    els.logLift.value = '';
-    els.logLiftSearchStatus.textContent = '';
-    setLogLiftMenuOpen(false);
-    resetPlateCalculator();
-    renderLiftOptions();
-
-    const hasLift = liftId && state.lifts.some((lift) => lift.id === liftId);
-    if (hasLift) {
-      selectLogLift(liftId);
+  function mountInlineLog() {
+    const card = [...els.list.querySelectorAll('[data-lift-card]')]
+      .find((item) => item.dataset.liftCard === state.activeLogLiftId);
+    const visible = state.logExpanded && Boolean(card);
+    if (visible) card.querySelector('.lifting-card-summary').after(els.logSetPanel);
+    else els.logSetHome.append(els.logSetPanel);
+    els.logSetPanel.hidden = !visible;
+    if (visible) {
+      const lift = state.lifts.find((item) => item.id === state.activeLogLiftId);
+      els.repTargets.innerHTML = renderRepGrid(metricsForLift(lift).theoreticalOneRep);
+      els.viewLogs.dataset.openLogs = lift.id;
+      els.editLift.dataset.renameLift = lift.id;
     }
+    syncWorkspaceView();
+    els.list.querySelectorAll('[data-toggle-lift]').forEach((button) => {
+      const expanded = visible && button.dataset.toggleLift === state.activeLogLiftId;
+      button.setAttribute('aria-expanded', String(expanded));
+      button.closest('.lifting-card').classList.toggle('is-active', expanded);
+    });
+  }
 
-    updateLogEquipmentInterface();
-    syncSubmitButton(els.logForm);
+  function closeInlineLog() {
+    const liftId = state.activeLogLiftId;
+    state.logExpanded = false;
+    mountInlineLog();
+    const button = [...els.list.querySelectorAll('[data-toggle-lift]')]
+      .find((item) => item.dataset.toggleLift === liftId);
+    (button || els.search).focus({ preventScroll: true });
+  }
 
-    els.logSetModal.showModal();
-    (hasLift ? document.getElementById('log-weight') : els.logLiftSearch).focus();
+  function openInlineLog(liftId = '') {
+    if (els.logForm.querySelector('button[type="submit"]').classList.contains('is-loading')) return;
+    const visibleIds = [...els.list.querySelectorAll('[data-lift-card]')].map((card) => card.dataset.liftCard);
+    const selectedId = liftId || (visibleIds.includes(state.activeLogLiftId) ? state.activeLogLiftId : visibleIds[0]);
+    if (!selectedId) {
+      setStatus(state.lifts.length ? 'Clear the search to choose a lift.' : 'Add a lift before logging a set.');
+      return;
+    }
+    state.logExpanded = true;
+    selectLogLift(selectedId);
+    mountInlineLog();
+    if (!mobileWorkspace.matches) {
+      els.logSetPanel.scrollIntoView({ block: 'nearest', behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+      els.logWeight.focus({ preventScroll: true });
+      els.logWeight.select();
+    }
+    if (!reducedMotion.matches) animateFeedback(els.logSetPanel, [{ opacity: 0.75 }, { opacity: 1 }], 160);
   }
 
   function renderList() {
+    // Preserve the live editor and its draft when search or saved metrics replace rows.
+    els.logSetHome.append(els.logSetPanel);
+    els.logSetPanel.hidden = true;
     // A search or refresh replaces the rows; discard effects on old content.
     motionAnimations.forEach((animation, element) => {
       if (els.list.contains(element)) {
@@ -505,13 +498,14 @@
 
     if (!filtered.length) {
       els.list.innerHTML = `<p class="lifting-empty">${state.lifts.length ? 'No lifts match your search.' : 'No lift types yet. Add a lift to start logging sets and tracking progress.'}</p>`;
+      mountInlineLog();
       return;
     }
 
     els.list.innerHTML = filtered.map((item) => `
-      <article class="lifting-card">
+      <article class="lifting-card" data-lift-card="${escapeHtml(item.lift.id)}">
         <div class="lifting-card-summary">
-          <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-controls="details-${escapeHtml(item.lift.id)}" aria-expanded="false">
+          <button class="lifting-row" type="button" data-toggle-lift="${escapeHtml(item.lift.id)}" aria-controls="log-set-panel" aria-expanded="false">
             <div class="lifting-card-title">
               <h3>${escapeHtml(item.lift.name)}</h3>
               <div class="lifting-card-meta">
@@ -526,24 +520,23 @@
               <span>Est. 1RM</span>
               <strong>${formatWeight(item.theoreticalOneRep)}</strong>
             </div>
+            <svg class="lifting-workspace-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
           </button>
-          <button class="lifting-action lifting-card-log" type="button" data-log-lift="${escapeHtml(item.lift.id)}">Log</button>
-        </div>
-        <div class="lifting-details" id="details-${escapeHtml(item.lift.id)}" hidden>
-          <section>
-            ${renderRepGrid(item.theoreticalOneRep)}
-            <div class="lifting-detail-actions">
-              <button class="lifting-action" type="button" data-open-logs="${escapeHtml(item.lift.id)}">View logs</button>
-              <button class="lifting-action" type="button" data-rename-lift="${escapeHtml(item.lift.id)}">Edit</button>
-            </div>
-          </section>
         </div>
       </article>
     `).join('');
+    mountInlineLog();
   }
 
   function render() {
-    renderLiftOptions();
+    rememberLogDraft();
+    if (state.lifts.some((lift) => lift.id === state.activeLogLiftId)) {
+      restoreLogDraft(state.activeLogLiftId);
+    } else {
+      state.logExpanded = false;
+      state.activeLogLiftId = '';
+      els.logLift.value = '';
+    }
     renderList();
   }
 
@@ -561,7 +554,9 @@
     setStatus(`Updated ${new Date().toLocaleTimeString()}.`);
   }
 
-  els.logDate.valueAsDate = new Date();
+  const logDateInput = window.CalculatorDates.bindInput(els.logDate, {
+    onEdit: () => syncSubmitButton(els.logForm)
+  });
   [els.addLiftForm, els.logForm, els.renameLiftForm].forEach(watchFormCompletion);
 
   els.lockButton.addEventListener('click', async () => {
@@ -589,12 +584,8 @@
     els.addLiftModal.close();
   });
 
-  els.logSetOpen.addEventListener('click', () => {
-    openLogSetModal();
-  });
-
   els.logSetClose.addEventListener('click', () => {
-    els.logSetModal.close();
+    closeInlineLog();
   });
 
   els.liftLogsClose.addEventListener('click', () => {
@@ -613,7 +604,7 @@
     els.renameLiftForm.reset();
   });
 
-  [els.addLiftModal, els.logSetModal, els.renameLiftModal, els.liftLogsModal].forEach((modal) => {
+  [els.addLiftModal, els.renameLiftModal, els.liftLogsModal].forEach((modal) => {
     modal.addEventListener('click', (event) => {
       if (event.target === modal) {
         modal.close();
@@ -650,10 +641,12 @@
 
   els.logForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!formIsComplete(els.logForm)) {
+    if (!logDateInput.toISO() || !formIsComplete(els.logForm)) {
       syncSubmitButton(els.logForm);
       return;
     }
+    if (els.logForm.querySelector('button[type="submit"]').classList.contains('is-loading')) return;
+    els.logSetFeedback.textContent = '';
     const form = new FormData(els.logForm);
     const submitButton = els.logForm.querySelector('button[type="submit"]');
     setButtonLoading(submitButton, true, 'Adding...');
@@ -661,18 +654,19 @@
     try {
       await api('addLog', {
         lift_id: form.get('lift_id'),
-        lifted_at: form.get('lifted_at'),
+        lifted_at: logDateInput.toISO(),
         weight: Number(form.get('weight')),
         reps: Number(form.get('reps'))
       });
-      const selectedLift = els.logLift.value;
-      els.logForm.reset();
-      els.logLiftSearch.value = '';
-      els.logDate.valueAsDate = new Date();
-      els.logLift.value = selectedLift;
-      els.logSetModal.close();
+      const selectedLift = String(form.get('lift_id'));
       await loadLifts(selectedLift);
+      els.logSetFeedback.textContent = 'Set logged.';
+      if (!els.logSetPanel.hidden && !mobileWorkspace.matches) {
+        els.logWeight.focus({ preventScroll: true });
+        els.logWeight.select();
+      }
     } catch (error) {
+      els.logSetFeedback.textContent = error.message;
       setStatus(error.message, true);
     } finally {
       setButtonLoading(submitButton, false);
@@ -710,78 +704,21 @@
     renderList();
   });
 
-  els.logLiftSearch.addEventListener('click', () => {
-    setLogLiftMenuOpen(true);
+  els.workspaceTabs.addEventListener('click', (event) => {
+    const tab = event.target.closest('[role="tab"]');
+    if (!tab) return;
+    state.workspaceView = tab.id === 'lift-tab-targets' ? 'targets' : 'log';
+    syncWorkspaceView();
   });
-
-  els.logLiftSearch.addEventListener('input', () => {
-    state.logLiftQuery = els.logLiftSearch.value.trim();
-    state.logActiveOptionIndex = -1;
-    els.logLift.value = '';
-    els.logLiftSearchStatus.textContent = '';
-    updateLogEquipmentInterface();
-    syncSubmitButton(els.logForm);
-    setLogLiftMenuOpen(true);
+  els.workspaceTabs.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    state.workspaceView = event.key === 'Home' ? 'log' : event.key === 'End' ? 'targets'
+      : state.workspaceView === 'log' ? 'targets' : 'log';
+    syncWorkspaceView();
+    els.workspaceTabs.querySelector('[aria-selected="true"]').focus();
   });
-
-  els.logLiftSearch.addEventListener('keydown', (event) => {
-    const filteredLifts = filteredLogLifts();
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      setLogLiftMenuOpen(true);
-      if (!filteredLifts.length) return;
-      const direction = event.key === 'ArrowDown' ? 1 : -1;
-      if (state.logActiveOptionIndex < 0) {
-        state.logActiveOptionIndex = direction > 0 ? 0 : filteredLifts.length - 1;
-      } else {
-        state.logActiveOptionIndex = (state.logActiveOptionIndex + direction + filteredLifts.length) % filteredLifts.length;
-      }
-      renderLogLiftResults();
-      document.getElementById(`log-lift-option-${state.logActiveOptionIndex}`)?.scrollIntoView({ block: 'nearest' });
-    }
-    if (event.key === 'Enter' && !els.logLiftMenu.hidden && filteredLifts.length) {
-      event.preventDefault();
-      const index = state.logActiveOptionIndex >= 0 ? state.logActiveOptionIndex : 0;
-      selectLogLift(filteredLifts[index].id);
-    }
-    if (event.key === 'Escape' && !els.logLiftMenu.hidden) {
-      event.preventDefault();
-      event.stopPropagation();
-      setLogLiftMenuOpen(false);
-    }
-  });
-
-  els.logLiftToggle.addEventListener('click', () => {
-    const shouldOpen = els.logLiftMenu.hidden;
-    setLogLiftMenuOpen(shouldOpen);
-    if (shouldOpen) els.logLiftSearch.focus();
-  });
-
-  els.logLiftPicker.addEventListener('click', (event) => {
-    const filterButton = event.target.closest('[data-log-equipment-filter]');
-    const optionButton = event.target.closest('[data-log-lift-option]');
-    if (filterButton) {
-      state.logEquipmentFilter = filterButton.dataset.logEquipmentFilter;
-      state.logActiveOptionIndex = -1;
-      renderLogLiftResults();
-      els.logLiftSearch.focus();
-    }
-    if (optionButton) {
-      selectLogLift(optionButton.dataset.logLiftOption);
-      els.logLiftSearch.focus();
-      setLogLiftMenuOpen(false);
-    }
-  });
-
-  els.logLiftPicker.addEventListener('focusout', () => {
-    setTimeout(() => {
-      if (els.logLiftPicker.contains(document.activeElement)) return;
-      setLogLiftMenuOpen(false);
-      els.logLiftSearchStatus.textContent = els.logLiftSearch.value.trim() && !els.logLift.value
-        ? 'Choose a lift from the results.'
-        : '';
-    }, 0);
-  });
+  mobileWorkspace.addEventListener('change', syncWorkspaceView);
 
   els.plateInputs.forEach((input) => input.addEventListener('input', updatePlateCalculator));
   els.plateCalculatorToggle.addEventListener('click', () => {
@@ -803,40 +740,21 @@
   });
 
   document.addEventListener('click', async (event) => {
-    if (!event.target.closest('.lifting-lift-picker')) {
-      setLogLiftMenuOpen(false);
-    }
     const toggleButton = event.target.closest('[data-toggle-lift]');
     const logsButton = event.target.closest('[data-open-logs]');
-    const logLiftButton = event.target.closest('[data-log-lift]');
     const renameLiftButton = event.target.closest('[data-rename-lift]');
     const deleteLogButton = event.target.closest('[data-delete-log]');
     const deleteLiftButton = event.target.closest('[data-delete-lift]');
 
     try {
       if (toggleButton) {
-        const toggleLiftId = toggleButton.dataset.toggleLift;
-        const details = document.getElementById(`details-${toggleLiftId}`);
-        const isHidden = details.hidden;
-        details.hidden = !isHidden;
-        toggleButton.setAttribute('aria-expanded', String(isHidden));
-        const targets = details.querySelector('section');
-        if (isHidden) {
-          animateFeedback(targets, reducedMotion.matches
-            ? [{ opacity: 0.75 }, { opacity: 1 }]
-            : [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }],
-          reducedMotion.matches ? 100 : 260);
-        } else {
-          motionAnimations.get(targets)?.cancel();
-        }
+        const liftId = toggleButton.dataset.toggleLift;
+        if (state.logExpanded && !els.logSetPanel.hidden && state.activeLogLiftId === liftId) closeInlineLog();
+        else openInlineLog(liftId);
       }
 
       if (logsButton) {
         openLogsModal(logsButton.dataset.openLogs);
-      }
-
-      if (logLiftButton) {
-        openLogSetModal(logLiftButton.dataset.logLift);
       }
 
       if (renameLiftButton) {

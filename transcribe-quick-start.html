@@ -1,0 +1,124 @@
+---
+layout: transcribe-guide
+title: Transcribe Quick Start
+description: Basic file loading, playback, timeline navigation, looping, and speed controls in Transcribe.
+permalink: /transcribe/guide/quick-start/
+noindex: true
+extra_css:
+  - /assets/css/transcribe.css?v=20261026-guide-link
+  - /assets/css/transcribe-guide.css?v=20261026-mobile-viewer
+---
+{% include transcribe-guide-header.html %}
+<div class="guide-layout" data-guide-kind="quick-start">
+  <nav class="guide-topics" aria-label="Guide sections">
+    {% include transcribe-guide-switcher.html current='quick-start' %}
+    <details class="guide-contents" open>
+      {% include transcribe-guide-contents.html %}
+      <div class="guide-topic-links">
+        <h2 class="guide-topic-label">Steps</h2>
+        <a href="#open" data-guide-lesson="open"><span class="guide-lesson-number">01</span>Opening an MP3 File</a>
+        <a href="#playback" data-guide-lesson="playback"><span class="guide-lesson-number">02</span>Playback Controls</a>
+        <a href="#find" data-guide-lesson="find"><span class="guide-lesson-number">03</span>Timeline Navigation</a>
+        <a href="#loop" data-guide-lesson="loop"><span class="guide-lesson-number">04</span>Selection and Looping</a>
+        <a href="#speed" data-guide-lesson="speed"><span class="guide-lesson-number">05</span>Playback Speed</a>
+      </div>
+    </details>
+  </nav>
+  {% include transcribe-guide-viewer.html %}
+  <main class="guide-article" id="guide-article">
+    <section id="open" data-guide-section="open">
+      <h1>Opening an MP3 File</h1>
+      <p>Open an MP3 file stored on your device. Transcribe processes audio locally.</p>
+      <ol class="guide-steps">
+        <li data-guide-step="open">
+          <button type="button" data-guide-jump="open" aria-label="View step 1: Select Open audio"><span class="guide-step-number" aria-hidden="true">1</span><span data-step-title>Select Open audio</span></button>
+          <p>Select Open audio at the top of Transcribe and choose an MP3 file from your device. The demonstration shows the loaded file without opening the system file dialog.</p>
+        </li>
+      </ol>
+      <div class="guide-details"><p><strong>Alternative:</strong> Drop an MP3 file onto the waveform area to open it.</p></div>
+      <div class="guide-details"><p>The guide uses <a href="{{ '/assets/audio/transcribe-guide/example.mp3' | relative_url }}" download="example.mp3">example.mp3</a>: “<a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2000019">On Hold for You</a>” by Kevin MacLeod (incompetech.com), licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. The recording is unchanged; the guide displays waveform and spectrum data derived from it. Download it to follow along in Transcribe.</p></div>
+      <a class="guide-next" href="#playback" data-guide-lesson="playback">Next: Playback Controls <span aria-hidden="true">→</span></a>
+    </section>
+    <section id="playback" data-guide-section="playback">
+      <h1>Playback Controls</h1>
+      <p>Use the playback button in the bottom transport row to start and pause the recording.</p>
+      <p class="guide-step-hint">Select an instruction to start the demonstration at that step.</p>
+      <ol class="guide-steps">
+        <li data-guide-step="play">
+          <button type="button" data-guide-jump="play" aria-label="View step 1: Start playback"><span class="guide-step-number" aria-hidden="true">1</span><span data-step-title>Start playback</span></button>
+          <p>Select Play in the bottom transport row. The playhead indicates the current position in the waveform.</p>
+        </li>
+        <li data-guide-step="pause">
+          <button type="button" data-guide-jump="pause" aria-label="View step 2: Pause playback"><span class="guide-step-number" aria-hidden="true">2</span><span data-step-title>Pause playback</span></button>
+          <p>Select Pause to hold the current position. Select Play again to resume.</p>
+        </li>
+      </ol>
+      <div class="guide-details"><p><strong>Shortcuts:</strong> In Transcribe, press <kbd>Space</kbd> to play or pause when you are not editing a field. Use <kbd>←</kbd> / <kbd>→</kbd> to seek two seconds, or hold Shift to seek five seconds.</p></div>
+      <a class="guide-next" href="#find" data-guide-lesson="find">Next: Timeline Navigation <span aria-hidden="true">→</span></a>
+    </section>
+    <section id="find" data-guide-section="find">
+      <h1>Timeline Navigation</h1>
+      <p>Use the overview to navigate the recording, then select a playback position in the detailed waveform.</p>
+      <p class="guide-step-hint">Select an instruction to start the demonstration at that step.</p>
+      <ol class="guide-steps">
+        <li data-guide-step="pan">
+          <button type="button" data-guide-jump="pan" aria-label="View step 1: Pan the timeline"><span class="guide-step-number" aria-hidden="true">1</span><span data-step-title>Pan the timeline</span></button>
+          <p>Drag the visible-range window in the overview horizontally. The detailed waveform scrolls without changing the playback position.</p>
+        </li>
+        <li data-guide-step="seek">
+          <button type="button" data-guide-jump="seek" aria-label="View step 2: Set the playback position"><span class="guide-step-number" aria-hidden="true">2</span><span data-step-title>Set the playback position</span></button>
+          <p>Click or tap a position in the waveform to move the playhead. A click without dragging does not create a selection.</p>
+        </li>
+        <li data-guide-step="play">
+          <button type="button" data-guide-jump="play" aria-label="View step 3: Start playback"><span class="guide-step-number" aria-hidden="true">3</span><span data-step-title>Start playback</span></button>
+          <p>Select Play to start playback from the selected position.</p>
+        </li>
+      </ol>
+      <div class="guide-details"><p><strong>Other navigation methods:</strong> While zoomed in, keep the mouse pointer near the left or right edge of the waveform to scroll. On touchscreens, drag the waveform with two fingers to pan.</p></div>
+      <a class="guide-next" href="#loop" data-guide-lesson="loop">Next: Selection and Looping <span aria-hidden="true">→</span></a>
+    </section>
+    <section id="loop" data-guide-section="loop">
+      <h1>Selection and Looping</h1>
+      <p>Select a passage in the waveform to define a playback range. Selection only limits playback to this range, and Repeat enables continuous looping. You can create a selection during playback.</p>
+      <p class="guide-step-hint">Select an instruction to start the demonstration at that step.</p>
+      <ol class="guide-steps">
+        <li data-guide-step="highlight">
+          <button type="button" data-guide-jump="highlight" aria-label="View step 1: Select a passage"><span class="guide-step-number" aria-hidden="true">1</span><span data-step-title>Select a passage</span></button>
+          <p>Drag across the waveform from the start to the end of the passage. Release to set the highlighted range.</p>
+        </li>
+        <li data-guide-step="repeat">
+          <button type="button" data-guide-jump="repeat" aria-label="View step 2: Check the loop settings"><span class="guide-step-number" aria-hidden="true">2</span><span data-step-title>Check the loop settings</span></button>
+          <p>Dragging a selection automatically enables Selection only and Repeat. Keep both enabled to loop the selected passage.</p>
+        </li>
+        <li data-guide-step="play">
+          <button type="button" data-guide-jump="play" aria-label="View step 3: Review loop playback"><span class="guide-step-number" aria-hidden="true">3</span><span data-step-title>Review loop playback</span></button>
+          <p>If playback is paused, select Play. During playback, the playhead returns to the selection start each time it reaches the end of the range.</p>
+        </li>
+      </ol>
+      <div class="guide-details"><p><strong>Adjusting the range:</strong> Drag either highlight boundary to change it. You can also set the start and end at the playhead with <kbd>[</kbd> and <kbd>]</kbd>; enable Repeat separately when using these keys to create a loop. Press <kbd>B</kbd> to return to the selection start when Selection only is enabled.</p></div>
+      <a class="guide-next" href="#speed" data-guide-lesson="speed">Next: Playback Speed <span aria-hidden="true">→</span></a>
+    </section>
+    <section id="speed" data-guide-section="speed">
+      <h1>Playback Speed</h1>
+      <p>Adjust playback speed while the selected passage loops. Playback does not need to be paused.</p>
+      <p class="guide-step-hint">Select an instruction to start the demonstration at that step.</p>
+      <ol class="guide-steps">
+        <li data-guide-step="speed">
+          <button type="button" data-guide-jump="speed" aria-label="View step 1: Adjust playback speed"><span class="guide-step-number" aria-hidden="true">1</span><span data-step-title>Adjust playback speed</span></button>
+          <p>Select a playback speed. Values below 100% slow the recording while the loop continues. Keep Pitch lock enabled in Controls → Sound to preserve the original pitch.</p>
+        </li>
+        <li data-guide-step="normal">
+          <button type="button" data-guide-jump="normal" aria-label="View step 2: Restore original speed"><span class="guide-step-number" aria-hidden="true">2</span><span data-step-title>Restore original speed</span></button>
+          <p>Select 100% to restore the recording’s original playback speed.</p>
+        </li>
+      </ol>
+      <div class="guide-details"><p><strong>Alternatives:</strong> Use <strong>Other</strong> to enter a custom speed, then press Enter to apply it. Press <kbd>,</kbd> or <kbd>.</kbd> to move to a lower or higher speed preset.</p></div>
+      <div class="guide-details"><p>For Pitch lock and other sound settings, see <a href="{{ "/transcribe/guide/#sound" | relative_url }}">Sound settings in the user guide</a>.</p></div>
+      <p class="guide-next">Continue in Transcribe: <a href="{{ "/transcribe/" | relative_url }}">Open Transcribe</a>, or refer to the <a href="{{ "/transcribe/guide/" | relative_url }}">user guide</a>.</p>
+    </section>
+  </main>
+</div>
+<script src="{{ "/assets/js/site.js?v=20261009-site-events" | relative_url }}" defer></script>
+<script type="module" src="{{ "/assets/js/transcribe-guide.js?v=20261026-mobile-viewer" | relative_url }}" defer></script>
+
+<script type="module" src="{{ "/assets/js/transcribe-guide-contents.js?v=20261026-polish-final" | relative_url }}" defer></script>

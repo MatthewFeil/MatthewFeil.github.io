@@ -1,6 +1,12 @@
 /* Four parametric bands shared by the response editor and playback graph. */
 (() => {
   'use strict';
+  const interaction = action => window.siteAnalytics?.track('tool_interaction', 'transcribe', action);
+  let lastWheelEvent = -Infinity;
+  const wheelInteraction = () => {
+    if (performance.now() - lastWheelEvent < 300) return;
+    lastWheelEvent = performance.now(); interaction('eq_changed');
+  };
   const defaults = () => [100, 400, 1600, 6400].map(frequency => ({frequency, gain: 0, q: 1}));
   let bands = defaults(), nodes = [], context = null;
   const graph = document.getElementById('transcribe-eq-graph');
@@ -55,9 +61,10 @@
       event.preventDefault(); dragging = true; point.focus(); point.setPointerCapture(event.pointerId); move(event);
     });
     point.addEventListener('pointermove', event => { if (dragging) move(event); });
-    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) point.addEventListener(name, () => { dragging = false; });
+    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) point.addEventListener(name, event => { if (dragging && event.type === 'pointerup') interaction('eq_changed'); dragging = false; });
     point.addEventListener('wheel', event => {
       event.preventDefault();
+      wheelInteraction();
       bands[index].q = Math.round(clamp(bands[index].q * (event.deltaY < 0 ? 1.1 : 1 / 1.1), .1, 18) * 100) / 100;
       update();
     }, {passive: false});
@@ -66,7 +73,7 @@
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') b.frequency = Math.round(clamp(b.frequency * (event.key === 'ArrowRight' ? 1.05 : 1 / 1.05), 20, 20000));
       else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') b.gain = clamp(b.gain + (event.key === 'ArrowUp' ? .5 : -.5), ...ranges.gain);
       else return;
-      event.preventDefault(); update();
+      event.preventDefault(); update(); if (!event.repeat) interaction('eq_changed');
     });
     return point;
   });
@@ -97,9 +104,9 @@
       event.preventDefault(); dragging = true; point.focus(); point.setPointerCapture(event.pointerId); move(event);
     });
     point.addEventListener('pointermove', event => { if (dragging) move(event); });
-    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) point.addEventListener(name, () => { dragging = false; });
+    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) point.addEventListener(name, event => { if (dragging && event.type === 'pointerup') interaction('eq_changed'); dragging = false; });
     point.addEventListener('wheel', event => {
-      event.preventDefault(); setFrequency(Number(input.value) * (event.deltaY < 0 ? 1.1 : 1 / 1.1));
+      event.preventDefault(); wheelInteraction(); setFrequency(Number(input.value) * (event.deltaY < 0 ? 1.1 : 1 / 1.1));
     }, {passive: false});
     point.addEventListener('keydown', event => {
       if (event.key === 'Home') setFrequency(20);
@@ -107,7 +114,7 @@
       else if (['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp'].includes(event.key)) {
         setFrequency(Number(input.value) * (['ArrowRight', 'ArrowUp'].includes(event.key) ? 1.05 : 1 / 1.05));
       } else return;
-      event.preventDefault();
+      event.preventDefault(); if (!event.repeat) interaction('eq_changed');
     });
     return {point, guide};
   });
@@ -167,6 +174,7 @@
       input.addEventListener('change', () => {
         if (input.value !== '' && Number.isFinite(Number(input.value))) bands[index][key] = clamp(Number(input.value), ...ranges[key]);
         update();
+        interaction('eq_changed');
       });
       cell.append(input); fields[key] = input;
     }
@@ -212,7 +220,8 @@
     });
     response.setAttribute('d', Array.from(total, (gain, i) => `${i ? 'L' : 'M'}${plotLeft + i / 276 * plotWidth},${y(clamp(gain, -displayGain, displayGain))}`).join(' '));
   }
-  cuts.forEach(input => input.addEventListener('change', () => {
+  cuts.forEach(input => input.addEventListener('change', event => {
+    if (event.isTrusted) interaction('eq_changed');
     input.value = Math.round(clamp(Number(input.value) || Number(input.defaultValue), 20, 20000)); update();
   }));
   window.TranscribeEQ = {
@@ -228,6 +237,7 @@
     }
   };
   document.getElementById('transcribe-eq-reset').addEventListener('click', () => {
+    interaction('eq_reset');
     bands = defaults(); cuts.forEach(input => { input.value = input.defaultValue; input.dispatchEvent(new Event('change')); }); update();
   });
   update();

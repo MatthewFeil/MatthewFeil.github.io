@@ -53,16 +53,25 @@ const fakeTag = `(() => {
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     origin = `http://127.0.0.1:${server.address().port}`;
     browser = await chromium.launch({headless:true, executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH});
-    // Development builds expose the same controls without ever loading Google.
+    // Development builds expose footer controls without ever loading Google.
     if (process.env.ANALYTICS_EXPECT_DISABLED === '1') {
       for (const route of ['/', '/work/', '/privacy/', '/personal/', '/portfolio/', '/lifting/', '/transcribe/', '/cta-l-live-art/']) {
         const dev = await setup();
         await visit(dev.page, route);
+        const hasFooter = await dev.page.locator('.site-footer').count() > 0;
+        assert.equal(await dev.page.locator('.analytics-links').count(), 0);
+        assert.equal(await dev.page.locator('.keyboard-navigation-toggle').count(), hasFooter ? 1 : 0);
+        if (!hasFooter) {
+          assert.equal(await dev.page.locator('.analytics-preferences').count(), 0);
+          await dev.page.keyboard.press('Alt+Shift+KeyK');
+          assert.equal(await dev.page.locator('html').getAttribute('data-keyboard-navigation'), 'on');
+          await dev.page.keyboard.press('Alt+Shift+KeyK');
+          assert.equal(await dev.page.locator('html').getAttribute('data-keyboard-navigation'), 'off');
+          assert.deepEqual(dev.google, []);
+          await dev.context.close();
+          continue;
+        }
         async function revealPreferences() {
-          if (route === '/transcribe/') {
-            await dev.page.waitForFunction(() => !document.querySelector('[data-transcribe-app]').hasAttribute('data-loading'));
-            await dev.page.locator('#transcribe-shortcuts-toggle').click();
-          }
           await dev.page.locator('.analytics-preferences').last().waitFor({state:'visible'});
         }
         await revealPreferences();
@@ -80,7 +89,7 @@ const fakeTag = `(() => {
         await dev.context.close();
       }
       assert.deepEqual(errors, []);
-      console.log('Development preferences: shared and standalone controls, acceptance, persistence, withdrawal, and zero Google requests passed.');
+      console.log('Development preferences: footer controls, absent standalone controls, acceptance, persistence, withdrawal, and zero Google requests passed.');
       return;
     }
     // First visit, rejection, persistence across routes, opt-in, configuration, withdrawal.
@@ -160,10 +169,11 @@ const fakeTag = `(() => {
       assert.equal(await excluded.page.locator('.analytics-notice').isVisible(), false);
       assert.deepEqual(excluded.google, []);
       assert.equal(await excluded.page.evaluate(() => window.siteAnalytics.track('tool_start', 'transcribe')), false);
-      await excluded.page.locator('.keyboard-navigation-toggle').click();
+      await excluded.page.keyboard.press('Alt+Shift+KeyK');
       assert.equal(await excluded.page.evaluate(() => window.siteAnalytics.trackSite('theme_change', 'dark')), false);
       assert.equal(await excluded.page.evaluate(() => window.dataLayer?.length || 0), 0);
-      assert.ok(await excluded.page.locator('.analytics-preferences').count());
+      const hasFooter = await excluded.page.locator('.site-footer').count() > 0;
+      assert.equal(await excluded.page.locator('.analytics-preferences').count() > 0, hasFooter);
       await excluded.context.close();
     }
     // Privacy preferences work from a page that does not itself collect analytics.
@@ -543,9 +553,14 @@ const fakeTag = `(() => {
 
     // Real local audio decoding and feature controls; no audio or filename in events.
     const audio = await setup();
-    async function openTranscribePreferences() {
+    const audioPreferences = await audio.context.newPage();
+    async function setTranscribeConsent(value) {
       if (!await audio.page.locator('.transcribe-shortcuts').isVisible()) await audio.page.locator('#transcribe-shortcuts-toggle').click();
-      await audio.page.locator('.analytics-preferences').click();
+      await visit(audioPreferences, '/privacy/');
+      await open(audioPreferences);
+      await choose(audioPreferences, value);
+      await audio.page.waitForFunction(({key, value}) => JSON.parse(localStorage.getItem(key))?.choice === value, {key, value});
+      await audio.page.waitForFunction(({id, value}) => window['ga-disable-' + id] === (value !== 'yes'), {id, value});
     }
     await visit(audio.page, '/transcribe/'); await choose(audio.page, 'no');
     await audio.page.locator('#transcribe-controls-toggle').click();
@@ -554,7 +569,7 @@ const fakeTag = `(() => {
     await audio.page.locator('#transcribe-eq-reset').click();
     await audio.page.locator('#transcribe-controls-toggle').click();
     assert.deepEqual(await eventCommands(audio.page), []);
-    await openTranscribePreferences(); await choose(audio.page, 'yes');
+    await setTranscribeConsent('yes');
     assert.deepEqual(await eventCommands(audio.page), []);
     await audio.page.locator('#transcribe-shortcuts-toggle').click();
     const wav = Buffer.alloc(44 + 128000);
@@ -663,7 +678,7 @@ const fakeTag = `(() => {
       window.siteAnalytics.track('tool_complete', 'transcribe', '73'),
       window.siteAnalytics.track('tool_error', 'transcribe', 'invalid-private-note')
     ]), [false, false, false]);
-    await openTranscribePreferences(); await choose(audio.page, 'no');
+    await setTranscribeConsent('no');
     const eventsAtWithdrawal = await transcribeEvents();
     await audio.page.locator('#transcribe-controls-toggle').click();
     await audio.page.locator('#transcribe-loop-bottom').click();
@@ -672,7 +687,7 @@ const fakeTag = `(() => {
     assert.deepEqual(await transcribeEvents(), eventsAtWithdrawal);
     await audio.page.reload();
     await audio.page.waitForFunction(() => !document.querySelector('[data-transcribe-app]').hasAttribute('data-loading'));
-    await openTranscribePreferences(); await choose(audio.page, 'yes');
+    await setTranscribeConsent('yes');
     assert.deepEqual(await transcribeEvents(), []); // Auto-restored audio/settings are not usage.
     await audio.context.close();
     console.log('Detailed Transcribe events: repeated audio/playback/looping, transport and keyboard controls, speed/pitch, analysis, EQ, markers/history, config export/import/error, fixed labels, withdrawal, and silent session restoration passed.');

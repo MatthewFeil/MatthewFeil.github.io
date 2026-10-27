@@ -21,7 +21,7 @@ const context = vm.createContext({ interaction() {}, window: {},
   selectionPlayback: () => false, transport: { currentTime: 0, reset() {} },
   stopSelectionScroll() {}, clearWaveformHoverGuide() {}, stems: null,
   worker: { postMessage() {} }, marks: { generation: 0, reset() { this.generation++; } },
-  configActions: { querySelectorAll: () => [] }, showConfigStatus() {}, sessionRevision: 0
+  configActions: { querySelectorAll: () => [] }, showConfigStatus() {}, showRestoreStatus() {}, sessionRevision: 0
 });
 const playbackStart = source.indexOf('  function syncPlaybackButton()');
 vm.runInContext(source.slice(playbackStart, source.indexOf("  elements.audio.addEventListener('seeked'", playbackStart)), context);

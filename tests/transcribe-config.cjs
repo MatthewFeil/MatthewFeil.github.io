@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const html = fs.readFileSync('transcribe.html', 'utf8');
+const html = fs.readFileSync('_includes/transcribe-app.html', 'utf8');
 const source = fs.readFileSync('assets/js/transcribe.js', 'utf8');
 const fields = ['channel','highpass','lowpass','semitones','cents','volume'];
 const elements = {analyzeSelection: {checked: false}};

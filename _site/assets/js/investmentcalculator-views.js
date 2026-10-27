@@ -14,8 +14,11 @@
   }
   function restore() { select(location.hash === '#interest' ? 'interest' : 'stock'); }
   for (const button of buttons) button.addEventListener('click', () => {
+    if (button.getAttribute('aria-pressed') === 'true') return;
     const view = button.dataset.investmentSwitch;
     select(view);
+    window.siteAnalytics?.track('tool_action', 'investment_calculator', `${view}_view`);
+    window.siteAnalytics?.track('tool_interaction', 'investment_calculator', `${view}_view`);
     const url = new URL(location.href);
     url.hash = view;
     history.replaceState(history.state, '', url);

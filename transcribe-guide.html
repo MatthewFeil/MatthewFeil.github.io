@@ -1,0 +1,191 @@
+---
+layout: transcribe-guide
+title: Transcribe User Guide
+description: Reference documentation for Transcribe audio files, playback, timeline, analysis, and sound controls.
+permalink: /transcribe/guide/
+noindex: true
+extra_css:
+  - /assets/css/transcribe.css?v=20261026-guide-link
+  - /assets/css/transcribe-guide.css?v=20261026-mobile-viewer
+---
+{% include transcribe-guide-header.html %}
+<div class="guide-reference-layout" data-guide-kind="reference">
+<nav class="guide-topics" aria-label="Guide sections">
+  {% include transcribe-guide-switcher.html current='reference' %}
+    <details class="guide-contents" open>
+      {% include transcribe-guide-contents.html %}
+      <div class="guide-topic-links">
+        <div class="guide-topic-group" role="group" aria-labelledby="guide-nav-workspace">
+          <h2 class="guide-topic-label" id="guide-nav-workspace">Workspace</h2>
+          <a href="#recording">Audio Files and Configurations</a>
+          <a href="#timeline">Timeline and Waveform</a>
+          <a href="#notes">Spectrum and Piano Keyboard</a>
+          <a href="#measures">Measure and Section Markers</a>
+        </div>
+        <div class="guide-topic-group" role="group" aria-labelledby="guide-nav-playback">
+          <h2 class="guide-topic-label" id="guide-nav-playback">Playback</h2>
+          <a href="#transport">Playback and Looping</a>
+          <a href="#speed">Playback Speed</a>
+        </div>
+        <div class="guide-topic-group" role="group" aria-labelledby="guide-nav-controls">
+          <h2 class="guide-topic-label" id="guide-nav-controls">Controls</h2>
+          <a href="#sound">Sound Settings</a>
+          <a href="#analysis">Analysis Settings</a>
+          <a href="#eq">Equalizer (EQ)</a>
+          <a href="#stems">Stem Separation</a>
+        </div>
+        <div class="guide-topic-group" role="group" aria-labelledby="guide-nav-reference">
+          <h2 class="guide-topic-label" id="guide-nav-reference">Reference</h2>
+          <a href="#shortcuts">Keyboard Shortcuts and Saved Data</a>
+        </div>
+      </div>
+    </details>
+  </nav>
+<main class="guide-article guide-reference-article" id="guide-article">
+  <header class="guide-reference-intro">
+  <h1>Transcribe User Guide</h1>
+  <p>This guide is organized by section of the app. Click the underlined examples to see how the controls work. For basic setup and playback, see the <a href="{{ '/transcribe/guide/quick-start/' | relative_url }}">Quick Start</a>.</p>
+  </header>
+<section id="recording" aria-labelledby="guide-heading-recording"><h2 id="guide-heading-recording"><a class="guide-section-link" href="#recording">Audio Files and Configurations</a></h2>
+<div class="guide-reference-copy">
+<p>Open a recording from your device with <strong>Open audio</strong>, click the empty waveform, or drop a file onto it. The filename replaces Open audio after loading. Audio is processed locally; it is not uploaded.</p>
+<p>Supported formats include MP3, WAV, M4A/AAC, FLAC, and OGG, depending on browser decoding support. If loading fails, try another file or convert it to MP3 or WAV.</p>
+<p><a href="#recording/open" data-guide-demo="recording/open">View the file loading example</a></p>
+<h3>Saving and Restoring Configurations</h3>
+<p><strong>Save config</strong> downloads a JSON file containing markers and settings, without the audio. To restore a configuration, open the matching original recording, then select <strong>Load config</strong>. Loading a config replaces the current markers and settings.</p>
+<p><strong>Alternative:</strong> After opening the matching audio file, you can drop a saved JSON config onto the timeline instead of using Load config. Drop one file at a time.</p>
+<p>Transcribe also attempts to restore your last session from browser storage. Storage limits, private browsing, or cleared site data can prevent restoration. Retain the original recording and export a config to preserve markers and settings independently of browser storage.</p>
+</div>
+</section>
+<section id="speed" aria-labelledby="guide-heading-speed"><h2 id="guide-heading-speed"><a class="guide-section-link" href="#speed">Playback Speed</a></h2>
+<div class="guide-reference-copy">
+<p>Choose a percentage to change playback speed: <strong>100%</strong> is the original, <strong>70%</strong> is slower, and <strong>125%</strong> is faster. Use <strong>Other</strong> for a custom speed from 25% to 200%. Press Enter or leave the field to apply it; Escape cancels the edit. You can adjust speed while listening.</p>
+<p><a href="#speed/speed" data-guide-demo="speed/speed">View the playback speed example</a></p>
+<p>To preserve the original pitch at reduced playback speeds, leave <strong>Pitch lock</strong> on in Controls → Sound. Large slowdowns can introduce audible artifacts. <kbd>,</kbd> and <kbd>.</kbd> step through speed presets.</p>
+</div>
+</section>
+<section id="timeline" aria-labelledby="guide-heading-timeline"><h2 id="guide-heading-timeline"><a class="guide-section-link" href="#timeline">Timeline and Waveform</a></h2>
+<div class="guide-reference-copy">
+<h3>Timeline Navigation</h3>
+<p>The <strong>overview</strong> shows the whole recording. Drag inside its visible-range window to move the detailed waveform without changing the playhead. Clicking outside that window also moves the playhead to the clicked position. Click the <strong>waveform</strong> to seek. Use <strong>Timeline zoom</strong> to see a shorter or longer span of audio.</p>
+<p>On a phone, drag the overview window or pan the waveform with two fingers. A one-finger drag on the waveform makes a highlight.</p>
+<ul>
+<li><strong>Edge scrolling:</strong> While zoomed in, keep the mouse pointer near the left or right edge of the waveform or measure ruler to scroll. Scrolling is faster closer to the edge. Move the pointer away from the edge to stop.</li>
+<li><strong>Wheel and trackpad:</strong> Scroll horizontally over the waveform, or hold Shift while using a vertical mouse wheel. Over the overview, either horizontal or vertical wheel scrolling pans the timeline.</li>
+<li><strong>Keyboard:</strong> Use <kbd>−</kbd> / <kbd>=</kbd> to zoom out or in. With keyboard navigation enabled and the overview focused, use the arrow keys to pan, Page Up / Page Down for larger movements, or Home / End to reach the beginning or end.</li>
+</ul>
+<p><a href="#timeline/pan" data-guide-demo="timeline/pan">View the timeline navigation example</a> · <a href="#timeline/pan" data-guide-demo="timeline/zoom">View the timeline zoom example</a></p>
+<h3>Creating and Adjusting a Selection</h3>
+<p>Press and drag across the waveform, then release. Transcribe returns to the start of the highlight and enables <strong>Selection only</strong> and <strong>Repeat</strong>. Releasing a boundary adjustment also enables Repeat. Drag either boundary to adjust the range, or set its start and end at the playhead with <kbd>[</kbd> and <kbd>]</kbd>. The bracket keys enable Selection only but leave Repeat unchanged; enable Repeat separately if you want a loop.</p>
+<p>Click the waveform without dragging to clear the highlight, seek there, and turn Selection only and Repeat off. Clearing a selection does not itself pause playback. As an alternative to dragging, Shift-click to anchor one endpoint, then move and click again to place the other. Use this on ruler markers to align the range with measure boundaries.</p>
+<p><strong>Longer selections:</strong> While dragging a selection or its boundary, hold the pointer near a waveform edge to scroll beyond the visible range. Release when the endpoint reaches the required position.</p>
+<p><a href="#timeline/pan" data-guide-demo="timeline/highlight">View the selection example</a></p>
+</div>
+</section>
+<section id="notes" aria-labelledby="guide-heading-notes"><h2 id="guide-heading-notes"><a class="guide-section-link" href="#notes">Spectrum and Piano Keyboard</a></h2>
+<div class="guide-reference-copy">
+<p>The spectrum displays frequency levels from a short audio window around the playhead, aligned with the piano keyboard below it. With Whole highlight enabled, it analyzes the selected passage instead. Peaks can indicate pitches, but harmonics and overlapping instruments also produce peaks. Confirm the indicated notes by listening.</p>
+<p>Point at the spectrum to inspect a pitch. Press and hold a piano key to hear a comparison tone; release to stop it. On a phone, swipe the spectrum sideways to inspect other notes.</p>
+<p><strong>Keyboard alternative:</strong> With keyboard navigation enabled and the piano keyboard focused, use left/right arrows to select a note by semitone, or up/down arrows to move by an octave. Hold Space or Enter to play the selected reference note, then release to stop it.</p>
+<p><a href="#notes/compare" data-guide-demo="notes/compare">View the piano keyboard example</a></p>
+<p>Use <strong>Spectrum</strong> in Controls → Analysis, or <kbd>F</kbd>, to hide or show the spectrum and keyboard.</p>
+</div>
+</section>
+<section id="transport" aria-labelledby="guide-heading-transport"><h2 id="guide-heading-transport"><a class="guide-section-link" href="#transport">Playback and Looping</a></h2>
+<div class="guide-reference-copy">
+<p>The bottom transport row contains the playback controls.</p>
+<ul><li><strong>Play / Pause</strong> starts or pauses playback. Shortcut: <kbd>Space</kbd>.</li>
+<li><strong>Rewind / Forward</strong> moves five seconds. Arrow keys move two seconds, or five with Shift.</li>
+<li><strong>Return to start</strong> goes to the beginning of the track, or the highlight when Selection only is on. Shortcut: <kbd>B</kbd>.</li>
+<li><strong>Playback position</strong> is the seek bar. The time readouts show elapsed and remaining time. <strong>Volume</strong> changes the listening level.</li></ul>
+<h3>Selection Only and Repeat</h3>
+<p><strong>Selection only</strong> limits playback to your highlight. <strong>Repeat</strong> starts that range again when it ends. With Selection only off, Repeat loops the whole recording—even if a highlight is still visible.</p>
+<p>To play a selected passage once, keep Selection only on and Repeat off. For normal playback, switch both off or clear the highlight. Shortcuts: <kbd>H</kbd> for Selection only; <kbd>R</kbd> or <kbd>L</kbd> for Repeat.</p>
+<p><a href="#transport/selection" data-guide-demo="transport/selection">View the playback and looping example</a></p>
+</div>
+</section>
+<section id="measures" aria-labelledby="guide-heading-measures"><h2 id="guide-heading-measures"><a class="guide-section-link" href="#measures">Measure and Section Markers</a></h2>
+<div class="guide-reference-copy">
+<p>Measure and section markers label positions in the recording. Beat detection is not automatic. At the playhead, press <kbd>M</kbd> to add a measure or <kbd>S</kbd> to start a section. Section labels use letters, such as A or B, with measure numbers inside them. The first marker also establishes the first section.</p>
+<p>Click a ruler marker to select it. Drag it horizontally to correct its time; Delete or Backspace removes the selected marker. Use <kbd>N</kbd> / Shift+<kbd>N</kbd> for the next / previous marker and Shift+<kbd>S</kbd> for the next section. Cmd/Ctrl+Z undoes marker edits; Cmd/Ctrl+Shift+Z redoes them.</p>
+<h3>Measure Navigation</h3>
+<p>Open <strong>mm.</strong> beside the transport, or press <kbd>G</kbd>. Enter a number or label such as <strong>B3</strong> in <strong>Go to</strong>, then press Enter. Use <strong>Loop start</strong> and <strong>Loop end</strong> for a labeled range, then press Enter to apply it. The end label is included: A2 through A4 plays to the marker after A4, or the recording end if there is no next marker. Section letters can be used too.</p>
+<p><strong>Measure numbering</strong> switches between Per section, which restarts numbers at each section, and Continuous, which keeps counting across sections. Section letters remain in both modes. <strong>Delete measures</strong> removes ordinary measure markers while keeping section starts; Undo can restore them.</p>
+<p><a href="#measures/move" data-guide-demo="measures/move">View the marker navigation example</a></p>
+<p>Shift+<kbd>L</kbd> loops the current measure; Option/Alt+Shift+<kbd>L</kbd> loops its section. A measure loop needs a following marker to define its end. A final section can extend to the recording end. Check the marker boundaries before practicing.</p>
+</div>
+</section>
+<section id="sound" aria-labelledby="guide-heading-sound"><h2 id="guide-heading-sound"><a class="guide-section-link" href="#sound">Sound Settings</a></h2>
+<div class="guide-reference-copy">
+<p>Open <strong>Controls</strong> with the sliders button at the top right, or <kbd>C</kbd>. The panel contains Sound, Analysis, EQ, and Stems settings. Speed and file controls remain above the timeline; Volume and Timeline zoom are in the transport area.</p>
+<ul><li><strong>Pitch lock</strong> preserves musical pitch as speed changes. With it off, playback speed also changes pitch.</li>
+<li><strong>Channel</strong> chooses Stereo, Mono, Left, or Right. Try a single channel when the part you need sits on one side of a stereo recording.</li>
+<li><strong>Transpose</strong> shifts pitch by up to 12 semitones in either direction. Use it to practice in another key.</li>
+<li><strong>Pitch correction</strong> shifts by up to 100 cents either way for fine tuning. A semitone is 100 cents.</li></ul>
+<p><a href="#sound/speed" data-guide-demo="sound/controls">View the Pitch lock example</a> · <a href="#pitch/controls" data-guide-demo="pitch/transpose">View the transposition example</a></p>
+<p><strong>Reset</strong> in Sound restores its defaults, including Pitch lock on and no pitch shift. It does not clear your highlight or reset playback speed.</p>
+</div>
+</section>
+<section id="analysis" aria-labelledby="guide-heading-analysis"><h2 id="guide-heading-analysis"><a class="guide-section-link" href="#analysis">Analysis Settings</a></h2>
+<div class="guide-reference-copy">
+<ul><li><strong>Spectrum</strong> shows or hides the spectrum and piano keyboard.</li>
+<li><strong>Chords</strong> shows likely chords for the current analysis window, or the selected passage when Whole highlight is enabled. Chord estimates may be inaccurate for dense mixes, passing notes, or ambiguous harmonies. Confirm results by listening.</li>
+<li><strong>Whole highlight</strong> combines analysis across the highlighted passage. This can help identify sustained harmony, but a selection containing several chords can produce ambiguous results.</li>
+<li><strong>Detection</strong> favors Balanced, Bass, Chordal, or Melody information. Select the detection mode appropriate to the musical part.</li>
+<li><strong>Low note / High note</strong> favor a pitch range. Enter note names with an octave, such as C3 or F#5. Stronger notes outside it may still appear; these are not hard filters.</li></ul>
+<p><a href="#analysis/controls" data-guide-demo="analysis/whole">View the Whole highlight example</a></p>
+<p>Detection settings affect note interpretation rather than isolating an instrument. Use EQ or Stems to change what you hear. <strong>Reset</strong> restores Analysis defaults, shows Spectrum, and turns Chords and Whole highlight off.</p>
+</div>
+</section>
+<section id="eq" aria-labelledby="guide-heading-eq"><h2 id="guide-heading-eq"><a class="guide-section-link" href="#eq">Equalizer (EQ)</a></h2>
+<div class="guide-reference-copy">
+<p>The four-band parametric equalizer boosts or reduces frequency ranges to improve the audibility of a musical part. It changes playback tone; it does not separate instruments that share those frequencies.</p>
+<ul><li>Drag a colored band left/right for <strong>frequency</strong> and up/down for <strong>gain</strong>.</li>
+<li>Scroll over a band to change <strong>Q</strong>: higher Q affects a narrower range.</li>
+<li>Drag or scroll the <strong>Low cut / High cut</strong> handles to reduce frequencies below or above their cutoffs.</li>
+<li>Use the number fields for precise Hz, dB, and Q values. On a phone these are also an alternative to scrolling over the graph.</li></ul>
+<p><a href="#eq/controls" data-guide-demo="eq/band">View the EQ adjustment example</a></p>
+<p>Start with a small adjustment and compare with <strong>Reset</strong>, which restores flat EQ and the default cutoffs. Strong boosts can make playback harsh or distorted; reduce volume if needed.</p>
+</div>
+</section>
+<section id="stems" aria-labelledby="guide-heading-stems"><h2 id="guide-heading-stems"><a class="guide-section-link" href="#stems">Stem Separation</a></h2>
+<div class="guide-reference-copy">
+<p>Stems uses a separation model to estimate individual instrument parts from a selected passage. It can help isolate a bass line, reduce vocals, or examine an accompaniment. Separation is experimental and can introduce leakage between parts, missing detail, and audible artifacts.</p>
+<ol><li>Highlight a passage of <strong>60 seconds or less</strong>.</li>
+<li>Open Controls → Stems and click <strong>Separate</strong>. First use downloads a roughly <strong>136 MB</strong> Demucs model, cached when storage allows. Processing stays on your device and may take time. <strong>Cancel</strong> stops a running separation.</li>
+<li>After separation, use the <strong>On / Off</strong> switches to choose which parts you hear. Press Play in the transport to listen.</li></ol>
+<p>The available parts are <strong>Vocals, Drums, Bass, Guitar/piano, and Other / horns</strong>. Guitar and piano play together; horns generally remain in Other. Dimmer names indicate quieter output, not proof that an instrument is absent.</p>
+<p><strong>Isolating a part:</strong> Leave its stem switch On and switch the other stems Off. You can change the mix without separating the passage again.</p>
+<p><a href="#stems/controls" data-guide-demo="stems/mute">View the stem mixing example</a></p>
+<p>While Stems is active, playback is restricted to the separated highlight and Selection only cannot be disabled. Changing that highlight clears its result, so separate again for a different passage. <strong>Reset</strong> in Stems returns to the original recording. Saved stem choices do not include the separated audio; separate the passage again after restoring a config.</p>
+<p>If separation fails, try a shorter highlight and close other demanding tabs. Check your connection for the first model download. You can continue practicing with the original recording, speed controls, and EQ.</p>
+</div>
+</section>
+<section id="shortcuts" aria-labelledby="guide-heading-shortcuts"><h2 id="guide-heading-shortcuts"><a class="guide-section-link" href="#shortcuts">Keyboard Shortcuts and Saved Data</a></h2>
+<div class="guide-reference-copy">
+<p>Press <kbd>?</kbd> in Transcribe to open the full shortcut list. Playback and editing shortcuts work with keyboard navigation either on or off. Most playback shortcuts are ignored while a text, number, or select field has focus. Move focus out of the field before using them. The focused overview and piano keyboard use their own key commands.</p>
+<p>To enable Tab navigation and visible focus indicators, press <strong>Option/Alt+Shift+K</strong>. The preference is shared across the site. Escape closes an open guide demonstration and returns you to its link.</p>
+<p><strong>Clear saved data</strong> at the bottom of Controls removes local Transcribe sessions, marker autosaves, settings, and the cached recording for every recording after confirmation. The open recording and edits remain available in the current page; exported files are unchanged. Autosave resumes when you open audio again.</p>
+<h3>Troubleshooting</h3>
+<ul><li><strong>No audio output.</strong> Check Play, Volume, the device output, and whether Selection only or muted stems are limiting what you hear.</li>
+<li><strong>Unexpected loop range.</strong> Check the highlight boundaries and Selection only. Repeat applies to the whole track when Selection only is off.</li>
+<li><strong>Configuration import failed.</strong> Open its matching original recording first. The config contains no audio.</li>
+<li><strong>Unexpected pitch results.</strong> Inspect a shorter passage, check Detection and its preferred range, and compare by ear. Analysis results require confirmation by listening.</li></ul>
+</div>
+</section>
+</main>
+</div>
+<dialog class="guide-demo-dialog" data-guide-dialog aria-labelledby="guide-demo-title" aria-describedby="guide-demo-note">
+  <header class="guide-dialog-header"><h2 id="guide-demo-title">Control Demonstration</h2><button type="button" data-guide-close aria-label="Close demonstration">Close</button></header>
+  <p id="guide-demo-note">This demonstration has no audio. Select a timeline segment to view a step, or pause the demonstration to inspect the controls.</p>
+  <div class="guide-dialog-layout">
+    {% include transcribe-guide-viewer.html %}
+    <div class="guide-article guide-dialog-instructions" id="guide-demo-article"></div>
+  </div>
+</dialog>
+<script src="{{ '/assets/js/site.js?v=20261009-site-events' | relative_url }}" defer></script>
+<script type="module" src="{{ '/assets/js/transcribe-guide.js?v=20261026-mobile-viewer' | relative_url }}" defer></script>
+
+<script type="module" src="{{ "/assets/js/transcribe-guide-navigation.js?v=20261026-sidebar-groups" | relative_url }}" defer></script>
+
+<script type="module" src="{{ "/assets/js/transcribe-guide-contents.js?v=20261026-polish-final" | relative_url }}" defer></script>

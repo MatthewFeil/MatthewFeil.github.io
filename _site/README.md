@@ -15,6 +15,10 @@ bundle exec jekyll serve
 
 Open [http://localhost:4000](http://localhost:4000) to view the site.
 
+## Development guides
+
+- [Transcribe guide cursor animations](docs/transcribe-guide-animations.md): approach, implementation responsibilities, and validation for future demonstrations.
+
 ## License
 
 Copyright © 2024–2026 Matthew Feil. See [LICENSE.txt](LICENSE.txt) for the MIT license. Third-party fonts and libraries retain their own license notices in `assets/`.

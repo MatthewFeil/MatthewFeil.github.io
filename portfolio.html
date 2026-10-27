@@ -5,6 +5,7 @@ title: Stock Portfolio
 permalink: /portfolio/
 extra_css:
   - /assets/css/portfolio.css
+  - /assets/css/tracker-log.css?v=20261026-inline-log
   - /assets/css/site-graph.css
 ---
 
@@ -65,45 +66,59 @@ extra_css:
       <div id="portfolio-graph" class="portfolio-graph" aria-busy="true"></div>
     </section>
 
-    <dialog class="portfolio-dialog" id="stock-dialog" aria-labelledby="stock-dialog-title">
+    <dialog class="portfolio-dialog tracker-dialog" id="stock-dialog" aria-labelledby="stock-dialog-title">
       <div class="portfolio-dialog-head">
         <h3 id="stock-dialog-title">Add stock</h3>
-        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add stock dialog">&times;</button>
+        <button class="portfolio-dialog-close tracker-dialog-close" type="button" data-close-dialog aria-label="Close add stock dialog">&times;</button>
       </div>
       <form id="stock-form" class="portfolio-form">
-        <label for="stock-symbol">Ticker symbol</label>
-        <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" maxlength="16" pattern="[A-Za-z0-9.=-]{1,16}" autocapitalize="characters" spellcheck="false" required>
+        <div class="tracker-log-field">
+          <label for="stock-symbol">Ticker symbol</label>
+          <input id="stock-symbol" name="symbol" type="text" placeholder="AAPL" maxlength="16" pattern="[A-Za-z0-9.=-]{1,16}" autocapitalize="characters" spellcheck="false" required>
+        </div>
 
-        <label for="stock-name">Name</label>
-        <input id="stock-name" name="name" type="text" placeholder="Apple Inc." maxlength="120">
+        <div class="tracker-log-field">
+          <label for="stock-name">Name</label>
+          <input id="stock-name" name="name" type="text" placeholder="Apple Inc." maxlength="120">
+        </div>
 
         <button type="submit" disabled>Add stock</button>
       </form>
     </dialog>
 
-    <dialog class="portfolio-dialog" id="log-dialog" aria-labelledby="log-dialog-title">
+    <dialog class="portfolio-dialog tracker-log-dialog tracker-dialog" id="log-dialog" aria-labelledby="log-dialog-title">
       <div class="portfolio-dialog-head">
         <h3 id="log-dialog-title">Add investment log</h3>
-        <button class="portfolio-dialog-close" type="button" data-close-dialog aria-label="Close add log dialog">&times;</button>
+        <button class="portfolio-dialog-close tracker-dialog-close" type="button" data-close-dialog aria-label="Close add log dialog">&times;</button>
       </div>
       <form id="log-form" class="portfolio-form">
-        <label for="log-stock">Stock</label>
-        <select id="log-stock" name="stock_id" required></select>
+        <div class="tracker-log-field">
+          <label for="log-stock">Stock</label>
+          <select id="log-stock" name="stock_id" required></select>
+        </div>
 
-        <label for="log-date">Date</label>
-        <input id="log-date" name="logged_at" type="date" required>
+        <div class="tracker-log-field">
+          <label for="log-date">Date</label>
+          <input id="log-date" name="logged_at" type="text" inputmode="numeric" placeholder="MM-DD-YYYY" aria-label="Date (MM-DD-YYYY)" autocomplete="off" spellcheck="false" required>
+        </div>
 
-        <label for="log-type">Type</label>
-        <select id="log-type" name="entry_type">
-          <option value="additional_investment">Additional invested money</option>
-          <option value="reinvested_dividend">Reinvested dividend</option>
-        </select>
+        <div class="tracker-log-field tracker-log-field-wide">
+          <label for="log-type">Type</label>
+          <select id="log-type" name="entry_type">
+            <option value="additional_investment">Additional invested money</option>
+            <option value="reinvested_dividend">Reinvested dividend</option>
+          </select>
+        </div>
 
-        <label for="log-price">Purchase price per share</label>
-        <input id="log-price" name="purchase_price" type="number" min="0.0001" step="0.0001" inputmode="decimal" placeholder="125.50" required>
+        <div class="tracker-log-field">
+          <label for="log-price">Purchase price per share</label>
+          <input id="log-price" name="purchase_price" type="number" min="0.0001" step="0.0001" inputmode="decimal" placeholder="125.50" required>
+        </div>
 
-        <label for="log-amount">Total purchase amount</label>
-        <input id="log-amount" name="total_purchase_amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="250.00" required>
+        <div class="tracker-log-field">
+          <label for="log-amount">Total purchase amount</label>
+          <input id="log-amount" name="total_purchase_amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="250.00" required>
+        </div>
 
         <button type="submit" disabled>Add log</button>
       </form>
@@ -140,4 +155,5 @@ extra_css:
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.3/dist/umd/supabase.js" defer></script>
 <script src="{{ "/assets/js/personal-auth.js" | relative_url }}" defer></script>
 <script src="{{ "/assets/js/site-graph.js" | relative_url }}" defer></script>
-<script src="{{ "/assets/js/portfolio.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/calculator-dates.js" | relative_url }}?v=20261026-log-dates" defer></script>
+<script src="{{ "/assets/js/portfolio.js" | relative_url }}?v=20261026-log-dates" defer></script>

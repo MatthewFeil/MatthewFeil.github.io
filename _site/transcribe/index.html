@@ -35,15 +35,18 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261008-overflow">
   
     
-  <link rel="stylesheet" href="/assets/css/transcribe.css?v=20261004-note-fields">
+  <link rel="stylesheet" href="/assets/css/transcribe.css?v=20261026-transport-edge">
     
   
-  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" />
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Matthew Feil" /><link rel="stylesheet" href="/assets/css/analytics-consent.css?v=20261008-mobile-buttons"><script defer src="/assets/js/analytics-consent.js?v=20261025-footer-only"
+  data-measurement-id="G-DSJ82YWBSZ"
+  data-analytics-enabled="true"
+  data-privacy-url="/privacy/"></script>
 <link rel="stylesheet" href="/assets/css/keyboard-navigation.css">
-<script src="/assets/js/keyboard-navigation.js"></script>
+<script src="/assets/js/keyboard-navigation.js?v=20261025-footer-only"></script>
 </head>
 <body class="transcribe-shell">
     <!--
@@ -84,6 +87,7 @@
 
       <div class="transcribe-file-control">
         <div class="transcribe-file-summary"><button type="button" class="transcribe-file-name" id="transcribe-file-name" title="Open a new audio file">Open audio</button>
+          <span class="transcribe-restore-status" id="transcribe-restore-status" role="status" aria-live="polite" aria-atomic="true" hidden></span>
         </div>
         <span id="transcribe-config-actions"><button type="button" id="transcribe-config-import" disabled>Load config</button><button type="button" id="transcribe-config-export" disabled>Save config</button></span>
         <input id="transcribe-config-file" type="file" accept=".json,application/json" hidden>
@@ -130,6 +134,10 @@
       <div class="transcribe-panel-buttons">
       <button type="button" id="transcribe-stems-toggle" aria-expanded="false" aria-controls="transcribe-stems-panel" data-tooltip="Separate instruments in a highlight">Stems <strong>Off</strong><span id="transcribe-stems-toggle-progress" aria-hidden="true" hidden></span></button>
       <button type="button" id="transcribe-controls-toggle" title="Controls (C)" aria-keyshortcuts="C" aria-expanded="false" aria-controls="transcribe-controls-panel">Controls</button>
+      <a id="transcribe-guide-link" class="transcribe-guide-link" href="/transcribe/guide/" target="_blank" rel="noopener" aria-label="User guide (opens in a new tab)" data-tooltip="User guide (opens in a new tab)">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C9 3.5 5.5 3.5 2.5 5v15c3-1.5 6.5-1.5 9.5.5 3-2 6.5-2 9.5-.5V5C18.5 3.5 15 3.5 12 5.5ZM12 5.5v15"/></svg>
+</a>
+
       </div>
       </div>
       </div>
@@ -237,6 +245,7 @@
             <div><dt><span class="transcribe-key-combo"><kbd data-platform-modifier>Ctrl</kbd><span>+</span><kbd>Z</kbd></span></dt><dd>Undo marker edit</dd></div>
             <div><dt><span class="transcribe-key-combo"><kbd data-platform-modifier>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Z</kbd></span></dt><dd>Redo marker edit</dd></div>
           </dl>
+          <div class="site-footer-controls transcribe-preferences" role="group" aria-label="Site preferences"></div>
         </section>
       </section>
     </header>
@@ -355,15 +364,16 @@
   </section>
 </main>
 
-<script src="/assets/js/site.js?v=20260922-tooltips" defer></script>
-<script src="/assets/js/transcribe-marks.js?v=20261001-no-beats" defer></script>
+<script src="/assets/js/site.js?v=20261009-site-events" defer></script>
+<script src="/assets/js/transcribe-marks.js?v=20261009-detailed-events" defer></script>
 <script src="/assets/js/transcribe-notes.js?v=20261004-melody-dropouts" defer></script>
 <script src="/assets/js/transcribe-chords.js?v=20261005-chord-stability" defer></script>
 <script src="/assets/js/transcribe-stems-core.js?v=20260914-stem-controls" defer></script>
-<script src="/assets/js/transcribe-stems.js?v=20261001-quiet-stems" defer></script>
-<script src="/assets/js/transcribe-eq.js?v=20261001-eq-width" defer></script>
-<script src="/assets/js/transcribe.js?v=20261005-chord-stability" defer></script>
+<script src="/assets/js/transcribe-stems.js?v=20261009-detailed-events" defer></script>
+<script src="/assets/js/transcribe-eq.js?v=20261009-detailed-events" defer></script>
+<script src="/assets/js/transcribe.js?v=20261011-config-restored" defer></script>
 <script src="/assets/js/transcribe-tooltips.js?v=20260922-controls" defer></script>
+
 
   </body>
 
